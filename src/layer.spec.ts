@@ -3,10 +3,11 @@ import Service from "serverless/classes/Service";
 import { FunctionDefinition } from "serverless";
 
 function createMockService(region: string, funcs: { [funcName: string]: Partial<FunctionDefinition> }): Service {
-  const service: Partial<Service> = {
+  const service: Partial<Service> & { functions: any } = {
     provider: { region } as any,
     getAllFunctionsNames: () => Object.keys(funcs),
     getFunction: (name) => funcs[name] as FunctionDefinition,
+    functions: funcs as any,
   };
   return service as Service;
 }

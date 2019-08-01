@@ -7,6 +7,7 @@ export enum RuntimeType {
 }
 
 export interface HandlerInfo {
+  name: string;
   type: RuntimeType;
   handler: FunctionDefinition;
 }
@@ -30,13 +31,13 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
 };
 
 export function findHandlers(service: Service): HandlerInfo[] {
-  return service
-    .getAllFunctionsNames()
-    .map((name) => {
-      const handler = service.getFunction(name);
+  const funcs = (service as any).functions as { [key: string]: FunctionDefinition };
+
+  return Object.entries(funcs)
+    .map(([name, handler]) => {
       const { runtime } = handler;
       if (runtime !== undefined && runtime in runtimeLookup) {
-        return { type: runtimeLookup[runtime], handler } as HandlerInfo;
+        return { type: runtimeLookup[runtime], name, handler } as HandlerInfo;
       }
       return undefined;
     })
