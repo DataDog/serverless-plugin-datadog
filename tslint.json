@@ -1,0 +1,24 @@
+{
+  "extends": "tslint:recommended",
+  "rules": {
+    "interface-name": false,
+    "variable-name": {
+      "options": ["allow-leading-underscore"]
+    },
+    "no-console": false,
+    "no-empty": false,
+    "trailing-comma": [
+      true,
+      {
+        "multiline": {
+          "imports": "ignore",
+          "exports": "ignore",
+          "properties": "always",
+          "functions": "always",
+          "objects": "always",
+          "typeLiterals": "always"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "name": "serverless-plugin-datadog",
+  "version": "0.0.1",
+  "description": "Serverless plugin to automatically instrument python and node functions with datadog tracing",
+  "main": "index.js",
+  "repository": "https://github.com/DataDog/serverless-plugin-datadog",
+  "author": "Datadog",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "tslint --project tsconfig.json",
+    "check-formatting": "prettier --check src/**"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.13",
+    "@types/node": "^12.0.4",
+    "@types/serverless": "true1.18.2",
+    "jest": "^24.8.0",
+    "nock": "^10.0.6",
+    "prettier": "^1.17.1",
+    "ts-jest": "^24.0.2",
+    "tslint": "^5.16.0",
+    "typescript": "^3.5.3"
+  },
+  "jest": {
+    "verbose": true,
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "transform": {
+      ".(ts|tsx)": "ts-jest"
+    },
+    "collectCoverage": true,
+    "coverageReporters": [
+      "lcovonly"
+    ],
+    "testRegex": "(src\\/).*(\\.spec\\.ts)$",
+    "testPathIgnorePatterns": [
+      "\\.snap$",
+      "<rootDir>/node_modules/"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.ts"
+    ]
+  }
+}
