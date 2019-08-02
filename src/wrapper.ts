@@ -1,18 +1,17 @@
-import * as fs from "fs";
-import * as path from "path";
-import * as util from "util";
-
 import { HandlerInfo, RuntimeType } from "./layer";
 
 import Service from "serverless/classes/Service";
+import fs from "fs";
 import { nodeTemplate } from "./templates/node-js-template";
+import path from "path";
 import { pythonTemplate } from "./templates/python-template";
 import { removeDirectory } from "./util";
+import util from "util";
 
-const datadogDirectory = "datadog_handlers";
+export const datadogDirectory = "datadog_handlers";
 
 export async function writeHandlers(service: Service, handlers: HandlerInfo[]) {
-  await removeDirectory(datadogDirectory);
+  await cleanupHandlers();
   await util.promisify(fs.mkdir)(datadogDirectory);
 
   const promises = handlers.map(async (handlerInfo) => {
@@ -23,11 +22,11 @@ export async function writeHandlers(service: Service, handlers: HandlerInfo[]) {
     const { text, method } = result;
     const filename = await writeWrapperFunction(handlerInfo, text);
     handlerInfo.handler.handler = `${path.join(datadogDirectory, handlerInfo.name)}.${method}`;
-    return `${filename}/**`;
+    return `${filename}`;
   });
   const files = [...(await Promise.all(promises))];
   const allFiles = files.filter((file) => file !== undefined) as string[];
-  allFiles.push(datadogDirectory);
+  allFiles.push(path.join(datadogDirectory, "**"));
   addToExclusionList(service, allFiles);
 }
 
@@ -55,7 +54,7 @@ export async function writeWrapperFunction(handlerInfo: HandlerInfo, wrapperText
   const filename = `${handlerInfo.name}.${extension}`;
   const pathname = path.join(datadogDirectory, filename);
   await util.promisify(fs.writeFile)(pathname, wrapperText);
-  return filename;
+  return pathname;
 }
 
 export function getHandlerPath(handlerInfo: HandlerInfo) {

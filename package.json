@@ -16,9 +16,11 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.13",
+    "@types/mock-fs": "true3.6.30",
     "@types/node": "^12.0.4",
     "@types/serverless": "true1.18.2",
     "jest": "^24.8.0",
+    "mock-fs": "true4.10.1",
     "nock": "^10.0.6",
     "prettier": "^1.17.1",
     "ts-jest": "^24.0.2",
@@ -37,7 +39,8 @@
     },
     "collectCoverage": true,
     "coverageReporters": [
-      "lcovonly"
+      "lcovonly",
+      "text-summary"
     ],
     "testRegex": "(src\\/).*(\\.spec\\.ts)$",
     "testPathIgnorePatterns": [
