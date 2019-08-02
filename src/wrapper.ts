@@ -1,12 +1,11 @@
-import { HandlerInfo, RuntimeType } from "./layer";
-
-import Service from "serverless/classes/Service";
 import fs from "fs";
-import { nodeTemplate } from "./templates/node-js-template";
 import path from "path";
+import Service from "serverless/classes/Service";
+import util from "util";
+import { HandlerInfo, RuntimeType } from "./layer";
+import { nodeTemplate } from "./templates/node-js-template";
 import { pythonTemplate } from "./templates/python-template";
 import { removeDirectory } from "./util";
-import util from "util";
 
 export const datadogDirectory = "datadog_handlers";
 
@@ -24,8 +23,8 @@ export async function writeHandlers(service: Service, handlers: HandlerInfo[]) {
     handlerInfo.handler.handler = `${path.join(datadogDirectory, handlerInfo.name)}.${method}`;
     if (handlerInfo.handler.package === undefined) {
       handlerInfo.handler.package = {
-        include: [],
         exclude: [],
+        include: [],
       };
     }
     if (handlerInfo.handler.package.include === undefined) {

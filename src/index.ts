@@ -8,6 +8,8 @@ import { enabledTracing } from "./tracing";
 
 module.exports = class ServerlessPlugin {
   public hooks = {
+    "after:datadog:clean:init": this.afterDeployFunction.bind(this),
+    "after:datadog:generate:init": this.beforeDeployFunction.bind(this),
     "after:deploy:function:packageFunction": this.afterDeployFunction.bind(this),
     "after:invoke:local:invoke": this.afterDeployFunction.bind(this),
     "after:package:createDeploymentArtifacts": this.afterDeployFunction.bind(this),
@@ -18,6 +20,22 @@ module.exports = class ServerlessPlugin {
     "before:step-functions-offline:start": this.beforeDeployFunction.bind(this),
   };
 
+  public commands = {
+    datadog: {
+      commands: {
+        clean: {
+          lifecycleEvents: ["init"],
+          usage: "Cleans up wrapper handler functions for DataDog, not necessary in most cases",
+        },
+        generate: {
+          lifecycleEvents: ["init"],
+          usage: "Generates wrapper handler functions for DataDog, not necessary in most cases",
+        },
+      },
+      lifecycleEvents: ["clean", "generate"],
+      usage: "Automatically instruments your lambdas with DataDog",
+    },
+  };
   constructor(private serverless: Serverless, private options: Serverless.Options) {}
 
   private async beforeDeployFunction() {
