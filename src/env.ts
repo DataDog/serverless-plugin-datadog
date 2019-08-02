@@ -1,4 +1,3 @@
-import { HandlerInfo } from "./layer";
 import Service from "serverless/classes/Service";
 
 export interface Configuration {
@@ -24,9 +23,9 @@ const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
 
 export const defaultConfiguration: Configuration = {
   addLayers: true,
-  site: "datadoghq.com",
-  logLevel: "info",
   flushMetricsToLogs: false,
+  logLevel: "info",
+  site: "datadoghq.com",
 };
 
 export function setEnvConfiguration(config: Configuration, service: Service) {

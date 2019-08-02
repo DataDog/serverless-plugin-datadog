@@ -1,11 +1,10 @@
 import * as Serverless from "serverless";
 import * as layers from "./layers.json";
 
-import { applyLayers, findHandlers } from "./layer";
-import { cleanupHandlers, writeHandlers } from "./wrapper";
-
-import { enabledTracing } from "./tracing";
 import { getConfig, setEnvConfiguration } from "./env";
+import { applyLayers, findHandlers } from "./layer";
+import { enabledTracing } from "./tracing";
+import { cleanupHandlers, writeHandlers } from "./wrapper";
 
 module.exports = class ServerlessPlugin {
   public hooks = {
