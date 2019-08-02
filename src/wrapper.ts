@@ -22,6 +22,16 @@ export async function writeHandlers(service: Service, handlers: HandlerInfo[]) {
     const { text, method } = result;
     const filename = await writeWrapperFunction(handlerInfo, text);
     handlerInfo.handler.handler = `${path.join(datadogDirectory, handlerInfo.name)}.${method}`;
+    if (handlerInfo.handler.package === undefined) {
+      handlerInfo.handler.package = {
+        include: [],
+        exclude: [],
+      };
+    }
+    if (handlerInfo.handler.package.include === undefined) {
+      handlerInfo.handler.package.include = [];
+    }
+    handlerInfo.handler.package.include.push(filename);
     return `${filename}`;
   });
   const files = [...(await Promise.all(promises))];

@@ -40,8 +40,7 @@
     "collectCoverage": true,
     "coverageReporters": [
       "lcovonly",
-      "text-summary",
-      "text"
+      "text-summary"
     ],
     "testRegex": "(src\\/).*(\\.spec\\.ts)$",
     "testPathIgnorePatterns": [
