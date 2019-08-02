@@ -1,6 +1,7 @@
-import { findHandlers, LayerJSON, RuntimeType, applyLayers, HandlerInfo } from "./layer";
-import Service from "serverless/classes/Service";
+import { HandlerInfo, LayerJSON, RuntimeType, applyLayers, findHandlers } from "./layer";
+
 import { FunctionDefinition } from "serverless";
+import Service from "serverless/classes/Service";
 
 function createMockService(region: string, funcs: { [funcName: string]: Partial<FunctionDefinition> }): Service {
   const service: Partial<Service> & { functions: any } = {
@@ -107,15 +108,26 @@ describe("applyLayers", () => {
   });
   it("only adds layer when layer ARN can be found", () => {
     const handler = {
-      handler: { runtime: "nodejs10.x", layers: ["node:1"] } as any,
+      handler: { runtime: "nodejs10.x" } as any,
       type: RuntimeType.NODE,
     } as HandlerInfo;
     const layers: LayerJSON = {
       regions: { "us-east-1": { "python2.7": "python:2" } },
     };
     applyLayers("us-east-1", [handler], layers);
-    expect(handler.handler).toMatchObject({
+    expect(handler.handler).toEqual({
       runtime: "nodejs10.x",
     });
+  });
+  it("only adds layer when runtime present", () => {
+    const handler = {
+      handler: {} as any,
+      type: RuntimeType.NODE,
+    } as HandlerInfo;
+    const layers: LayerJSON = {
+      regions: { "us-east-1": { "python2.7": "python:2" } },
+    };
+    applyLayers("us-east-1", [handler], layers);
+    expect(handler.handler).toEqual({});
   });
 });

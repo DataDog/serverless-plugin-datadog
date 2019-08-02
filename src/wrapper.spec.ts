@@ -113,6 +113,21 @@ describe("writeHandlers", () => {
     });
   });
 
+  it("adds datadog_handlers to include list by default", async () => {
+    mock({});
+    const service = {
+      package: {
+        include: [],
+      },
+    } as any;
+    await writeHandlers(service, []);
+    expect(service).toEqual({
+      package: {
+        include: [`${datadogDirectory}/**`],
+      },
+    });
+  });
+
   it("cleans up existing datadogDirectory", async () => {
     mock({
       [datadogDirectory]: {
