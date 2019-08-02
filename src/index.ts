@@ -6,6 +6,14 @@ import { cleanupHandlers, writeHandlers } from "./wrapper";
 
 import { enabledTracing } from "./tracing";
 
+interface Configuration {
+  addLayers: boolean;
+}
+
+const defaultConfiguration: Configuration = {
+  addLayers: true,
+};
+
 module.exports = class ServerlessPlugin {
   public hooks = {
     "after:datadog:clean:init": this.afterDeployFunction.bind(this),
@@ -36,12 +44,35 @@ module.exports = class ServerlessPlugin {
       usage: "Automatically instruments your lambdas with DataDog",
     },
   };
-  constructor(private serverless: Serverless, private options: Serverless.Options) {}
+  constructor(private serverless: Serverless, _: Serverless.Options) {}
+
+  private getConfig(): Configuration {
+    let custom = this.serverless.service.custom as any;
+    if (custom === undefined) {
+      custom = {};
+    }
+
+    let datadog = custom.datadog as Partial<Configuration> | undefined;
+    if (datadog === undefined) {
+      datadog = {};
+    }
+    return {
+      ...defaultConfiguration,
+      ...datadog,
+    };
+  }
 
   private async beforeDeployFunction() {
+    const config = this.getConfig();
+
     this.serverless.cli.log("Auto instrumenting functions with Datadog");
     const handlers = findHandlers(this.serverless.service);
-    applyLayers(this.serverless.service.provider.region, handlers, layers);
+    if (config.addLayers) {
+      this.serverless.cli.log("Adding Lambda Layers to functions");
+      applyLayers(this.serverless.service.provider.region, handlers, layers);
+    } else {
+      this.serverless.cli.log("Skipping adding Lambda Layers, make sure you are packaging them yourself");
+    }
     enabledTracing(this.serverless.service);
     await writeHandlers(this.serverless.service, handlers);
   }
