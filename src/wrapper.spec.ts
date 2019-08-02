@@ -13,10 +13,13 @@ describe("getWrapperText", () => {
       },
     });
     expect(wrapperText).toMatchInlineSnapshot(`
-            "from datadog_lambda.wrapper import datadog_lambda_wrapper
-            from mydir.func import myhandler as myhandler_impl
-            myhandler = datadog_lambda_wrapper(myhandler_impl)"
-        `);
+      Object {
+        "method": "myhandler",
+        "text": "from datadog_lambda.wrapper import datadog_lambda_wrapper
+      from mydir.func import myhandler as myhandler_impl
+      myhandler = datadog_lambda_wrapper(myhandler_impl)",
+      }
+    `);
   });
   it("renders the node template correctly", () => {
     const wrapperText = getWrapperText({
@@ -29,9 +32,12 @@ describe("getWrapperText", () => {
       },
     });
     expect(wrapperText).toMatchInlineSnapshot(`
-      "const { datadog } = require(\\"datadog-lambda-js\\");
-      const original = require(\\"my\\");
-      module.exports.myhandler = datadog(original.myhandler);"
+      Object {
+        "method": "myhandler",
+        "text": "const { datadog } = require(\\"datadog-lambda-js\\");
+      const original = require(\\"../my\\");
+      module.exports.myhandler = datadog(original.myhandler);",
+      }
     `);
   });
 });

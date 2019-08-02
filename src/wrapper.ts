@@ -5,7 +5,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { promisify } from "util";
 
-const datadogDirectory = ".datadog";
+const datadogDirectory = "datadog_handlers";
 
 export async function writeHandlers(handlers: HandlerInfo[]) {
   await removeDirectory(datadogDirectory);
@@ -17,10 +17,18 @@ export async function writeHandlers(handlers: HandlerInfo[]) {
       return;
     }
     const { text, method } = result;
-    await writeWrapperFunction(handlerInfo, text);
+    const filename = await writeWrapperFunction(handlerInfo, text);
     handlerInfo.handler.handler = `${path.join(datadogDirectory, handlerInfo.name)}.${method}`;
+    return `${filename}/**`;
   });
-  await Promise.all(promises);
+  const files = [...(await Promise.all(promises))];
+  const allFiles = files.filter((file) => file !== undefined) as string[];
+  allFiles.push(datadogDirectory);
+  return allFiles;
+}
+
+export async function cleanupHandlers() {
+  await removeDirectory(datadogDirectory);
 }
 
 export function getWrapperText(handlerInfo: HandlerInfo) {
@@ -43,6 +51,7 @@ export async function writeWrapperFunction(handlerInfo: HandlerInfo, wrapperText
   const filename = `${handlerInfo.name}.${extension}`;
   const pathname = path.join(datadogDirectory, filename);
   await promisify(fs.writeFile)(pathname, wrapperText);
+  return filename;
 }
 
 export function getHandlerPath(handlerInfo: HandlerInfo) {
