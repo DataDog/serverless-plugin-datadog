@@ -1,15 +1,19 @@
-import { HandlerInfo, RuntimeType } from "./layer";
-import { nodeTemplate } from "./templates/node-js-template";
-import { pythonTemplate } from "./templates/python-template";
 import * as fs from "fs";
 import * as path from "path";
-import { promisify } from "util";
+import * as util from "util";
+
+import { HandlerInfo, RuntimeType } from "./layer";
+
+import Service from "serverless/classes/Service";
+import { nodeTemplate } from "./templates/node-js-template";
+import { pythonTemplate } from "./templates/python-template";
+import { removeDirectory } from "./util";
 
 const datadogDirectory = "datadog_handlers";
 
-export async function writeHandlers(handlers: HandlerInfo[]) {
+export async function writeHandlers(service: Service, handlers: HandlerInfo[]) {
   await removeDirectory(datadogDirectory);
-  await promisify(fs.mkdir)(datadogDirectory);
+  await util.promisify(fs.mkdir)(datadogDirectory);
 
   const promises = handlers.map(async (handlerInfo) => {
     const result = getWrapperText(handlerInfo);
@@ -24,7 +28,7 @@ export async function writeHandlers(handlers: HandlerInfo[]) {
   const files = [...(await Promise.all(promises))];
   const allFiles = files.filter((file) => file !== undefined) as string[];
   allFiles.push(datadogDirectory);
-  return allFiles;
+  addToExclusionList(service, allFiles);
 }
 
 export async function cleanupHandlers() {
@@ -33,7 +37,7 @@ export async function cleanupHandlers() {
 
 export function getWrapperText(handlerInfo: HandlerInfo) {
   const result = getHandlerPath(handlerInfo);
-  if (result == undefined) {
+  if (result === undefined) {
     return;
   }
   const { method, filename } = result;
@@ -50,7 +54,7 @@ export async function writeWrapperFunction(handlerInfo: HandlerInfo, wrapperText
   const extension = handlerInfo.type === RuntimeType.PYTHON ? "py" : "js";
   const filename = `${handlerInfo.name}.${extension}`;
   const pathname = path.join(datadogDirectory, filename);
-  await promisify(fs.writeFile)(pathname, wrapperText);
+  await util.promisify(fs.writeFile)(pathname, wrapperText);
   return filename;
 }
 
@@ -65,21 +69,13 @@ export function getHandlerPath(handlerInfo: HandlerInfo) {
   return { method, filename };
 }
 
-export async function removeDirectory(path: string) {
-  const exists = await promisify(fs.exists)(path);
-  if (exists) {
-    const files = await promisify(fs.readdir)(path);
-    for (const file of files) {
-      var curPath = path + "/" + file;
-      const stats = await promisify(fs.lstat)(curPath);
-      if (stats.isDirectory()) {
-        // recurse
-        await removeDirectory(curPath);
-      } else {
-        // delete file
-        await promisify(fs.unlink)(curPath);
-      }
-    }
-    await promisify(fs.rmdir)(path);
+export async function addToExclusionList(service: any, files: string[]) {
+  if (service.package === undefined) {
+    service.package = {};
   }
+  const pack = service.package;
+  if (pack.include === undefined) {
+    pack.include = [];
+  }
+  pack.include.push(...files);
 }

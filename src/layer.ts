@@ -1,5 +1,5 @@
-import Service from "serverless/classes/Service";
 import { FunctionDefinition } from "serverless";
+import Service from "serverless/classes/Service";
 
 export enum RuntimeType {
   NODE,
@@ -23,8 +23,8 @@ export interface LayerJSON {
 }
 
 export const runtimeLookup: { [key: string]: RuntimeType } = {
-  "nodejs8.10": RuntimeType.NODE,
   "nodejs10.x": RuntimeType.NODE,
+  "nodejs8.10": RuntimeType.NODE,
   "python2.7": RuntimeType.PYTHON,
   "python3.6": RuntimeType.PYTHON,
   "python3.7": RuntimeType.PYTHON,
@@ -52,19 +52,19 @@ export function applyLayers(region: string, handlers: HandlerInfo[], layers: Lay
 
   for (const handler of handlers) {
     const { runtime } = handler.handler;
-    const layerARN = runtime != undefined ? regionRuntimes[runtime] : undefined;
+    const layerARN = runtime !== undefined ? regionRuntimes[runtime] : undefined;
     if (layerARN !== undefined) {
-      const layers = getLayers(handler);
-      if (!new Set(layers).has(layerARN)) {
-        layers.push(layerARN);
+      const currentLayers = getLayers(handler);
+      if (!new Set(currentLayers).has(layerARN)) {
+        currentLayers.push(layerARN);
       }
-      setLayers(handler, layers);
+      setLayers(handler, currentLayers);
     }
   }
 }
 
 function getLayers(handler: HandlerInfo) {
-  const layersList = (handler.handler as any)["layers"] as string[] | undefined;
+  const layersList = (handler.handler as any).layers as string[] | undefined;
   if (layersList === undefined) {
     return [];
   }
