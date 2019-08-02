@@ -11,13 +11,16 @@ export async function writeHandlers(handlers: HandlerInfo[]) {
   await removeDirectory(datadogDirectory);
   await promisify(fs.mkdir)(datadogDirectory);
 
-  for (const handlerInfo of handlers) {
+  const promises = handlers.map(async (handlerInfo) => {
     const result = getWrapperText(handlerInfo);
     if (result === undefined) {
-      continue;
+      return;
     }
-    await writeWrapperFunction(handlerInfo, result);
-  }
+    const { text, method } = result;
+    await writeWrapperFunction(handlerInfo, text);
+    handlerInfo.handler.handler = `${path.join(datadogDirectory, handlerInfo.name)}.${method}`;
+  });
+  await Promise.all(promises);
 }
 
 export function getWrapperText(handlerInfo: HandlerInfo) {
@@ -29,9 +32,9 @@ export function getWrapperText(handlerInfo: HandlerInfo) {
 
   switch (handlerInfo.type) {
     case RuntimeType.NODE:
-      return nodeTemplate(filename, method);
+      return { text: nodeTemplate(filename, method), method };
     case RuntimeType.PYTHON:
-      return pythonTemplate(filename, method);
+      return { text: pythonTemplate(filename, method), method };
   }
 }
 
@@ -59,7 +62,8 @@ export async function removeDirectory(path: string) {
     const files = await promisify(fs.readdir)(path);
     for (const file of files) {
       var curPath = path + "/" + file;
-      if (fs.lstatSync(curPath).isDirectory()) {
+      const stats = await promisify(fs.lstat)(curPath);
+      if (stats.isDirectory()) {
         // recurse
         await removeDirectory(curPath);
       } else {
@@ -67,6 +71,6 @@ export async function removeDirectory(path: string) {
         await promisify(fs.unlink)(curPath);
       }
     }
-    await promisify(fs.rmdirSync)(path);
+    await promisify(fs.rmdir)(path);
   }
 }
