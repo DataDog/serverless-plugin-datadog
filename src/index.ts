@@ -5,14 +5,7 @@ import { applyLayers, findHandlers } from "./layer";
 import { cleanupHandlers, writeHandlers } from "./wrapper";
 
 import { enabledTracing } from "./tracing";
-
-interface Configuration {
-  addLayers: boolean;
-}
-
-const defaultConfiguration: Configuration = {
-  addLayers: true,
-};
+import { getConfig, setEnvConfiguration } from "./env";
 
 module.exports = class ServerlessPlugin {
   public hooks = {
@@ -46,26 +39,11 @@ module.exports = class ServerlessPlugin {
   };
   constructor(private serverless: Serverless, _: Serverless.Options) {}
 
-  private getConfig(): Configuration {
-    let custom = this.serverless.service.custom as any;
-    if (custom === undefined) {
-      custom = {};
-    }
-
-    let datadog = custom.datadog as Partial<Configuration> | undefined;
-    if (datadog === undefined) {
-      datadog = {};
-    }
-    return {
-      ...defaultConfiguration,
-      ...datadog,
-    };
-  }
-
   private async beforeDeployFunction() {
-    const config = this.getConfig();
-
     this.serverless.cli.log("Auto instrumenting functions with Datadog");
+    const config = getConfig(this.serverless.service);
+    setEnvConfiguration(config, this.serverless.service);
+
     const handlers = findHandlers(this.serverless.service);
     if (config.addLayers) {
       this.serverless.cli.log("Adding Lambda Layers to functions");
