@@ -40,6 +40,11 @@ describe("findHandlers", () => {
         runtime: "nodejs8.10",
       },
       {
+        handler: { runtime: "go1.10" },
+        type: RuntimeType.UNSUPPORTED,
+        runtime: "go1.10",
+      },
+      {
         handler: { runtime: "nodejs10.x" },
         type: RuntimeType.NODE,
         runtime: "nodejs10.x",
@@ -155,6 +160,17 @@ describe("applyLayers", () => {
       handler: {} as any,
       type: RuntimeType.NODE,
       runtime: "nodejs10.x",
+    } as HandlerInfo;
+    const layers: LayerJSON = {
+      regions: { "us-east-1": { "python2.7": "python:2" } },
+    };
+    applyLayers("us-east-1", [handler], layers);
+    expect(handler.handler).toEqual({});
+  });
+  it("only add layer when when supported runtime present", () => {
+    const handler = {
+      handler: {} as any,
+      type: RuntimeType.UNSUPPORTED,
     } as HandlerInfo;
     const layers: LayerJSON = {
       regions: { "us-east-1": { "python2.7": "python:2" } },

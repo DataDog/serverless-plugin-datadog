@@ -10,7 +10,7 @@ import * as Serverless from "serverless";
 import * as layers from "./layers.json";
 
 import { getConfig, setEnvConfiguration } from "./env";
-import { applyLayers, findHandlers, findGlobalRuntime } from "./layer";
+import { applyLayers, findHandlers, RuntimeType, HandlerInfo } from "./layer";
 import { enabledTracing } from "./tracing";
 import { cleanupHandlers, writeHandlers } from "./wrapper";
 
@@ -54,6 +54,7 @@ module.exports = class ServerlessPlugin {
     const handlers = findHandlers(this.serverless.service, defaultRuntime);
     if (config.addLayers) {
       this.serverless.cli.log("Adding Lambda Layers to functions");
+      this.debugLogHandlers(handlers);
       applyLayers(this.serverless.service.provider.region, handlers, layers);
     } else {
       this.serverless.cli.log("Skipping adding Lambda Layers, make sure you are packaging them yourself");
@@ -64,5 +65,19 @@ module.exports = class ServerlessPlugin {
   private async afterDeployFunction() {
     this.serverless.cli.log("Cleaning up Datadog Handlers");
     await cleanupHandlers();
+  }
+
+  private debugLogHandlers(handlers: HandlerInfo[]) {
+    for (const handler of handlers) {
+      if (handler.type === RuntimeType.UNSUPPORTED) {
+        if (handler.runtime === undefined) {
+          this.serverless.cli.log(`Unable to determine runtime for function ${handler.name}`);
+        } else {
+          this.serverless.cli.log(
+            `Unable to add Lambda Layers to function ${handler.name} with runtime ${handler.runtime}`,
+          );
+        }
+      }
+    }
   }
 };

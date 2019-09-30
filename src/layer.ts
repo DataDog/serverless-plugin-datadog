@@ -12,13 +12,14 @@ import Service from "serverless/classes/Service";
 export enum RuntimeType {
   NODE,
   PYTHON,
+  UNSUPPORTED,
 }
 
 export interface HandlerInfo {
   name: string;
   type: RuntimeType;
   handler: FunctionDefinition;
-  runtime: string;
+  runtime?: string;
 }
 
 export interface LayerJSON {
@@ -51,7 +52,7 @@ export function findHandlers(service: Service, defaultRuntime?: string): Handler
       if (runtime !== undefined && runtime in runtimeLookup) {
         return { type: runtimeLookup[runtime], runtime, name, handler } as HandlerInfo;
       }
-      return undefined;
+      return { type: RuntimeType.UNSUPPORTED, runtime, name, handler } as HandlerInfo;
     })
     .filter((result) => result !== undefined) as HandlerInfo[];
 }
@@ -63,6 +64,10 @@ export function applyLayers(region: string, handlers: HandlerInfo[], layers: Lay
   }
 
   for (const handler of handlers) {
+    if (handler.type === RuntimeType.UNSUPPORTED) {
+      continue;
+    }
+
     const { runtime } = handler;
     const layerARN = runtime !== undefined ? regionRuntimes[runtime] : undefined;
     if (layerARN !== undefined) {
