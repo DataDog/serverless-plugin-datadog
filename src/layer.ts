@@ -18,6 +18,7 @@ export interface HandlerInfo {
   name: string;
   type: RuntimeType;
   handler: FunctionDefinition;
+  runtime: string;
 }
 
 export interface LayerJSON {
@@ -38,14 +39,17 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
   "python3.7": RuntimeType.PYTHON,
 };
 
-export function findHandlers(service: Service): HandlerInfo[] {
+export function findHandlers(service: Service, defaultRuntime?: string): HandlerInfo[] {
   const funcs = (service as any).functions as { [key: string]: FunctionDefinition };
 
   return Object.entries(funcs)
     .map(([name, handler]) => {
-      const { runtime } = handler;
+      let { runtime } = handler;
+      if (runtime === undefined) {
+        runtime = defaultRuntime;
+      }
       if (runtime !== undefined && runtime in runtimeLookup) {
-        return { type: runtimeLookup[runtime], name, handler } as HandlerInfo;
+        return { type: runtimeLookup[runtime], runtime, name, handler } as HandlerInfo;
       }
       return undefined;
     })
@@ -59,7 +63,7 @@ export function applyLayers(region: string, handlers: HandlerInfo[], layers: Lay
   }
 
   for (const handler of handlers) {
-    const { runtime } = handler.handler;
+    const { runtime } = handler;
     const layerARN = runtime !== undefined ? regionRuntimes[runtime] : undefined;
     if (layerARN !== undefined) {
       const currentLayers = getLayers(handler);

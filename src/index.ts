@@ -10,7 +10,7 @@ import * as Serverless from "serverless";
 import * as layers from "./layers.json";
 
 import { getConfig, setEnvConfiguration } from "./env";
-import { applyLayers, findHandlers } from "./layer";
+import { applyLayers, findHandlers, findGlobalRuntime } from "./layer";
 import { enabledTracing } from "./tracing";
 import { cleanupHandlers, writeHandlers } from "./wrapper";
 
@@ -50,8 +50,8 @@ module.exports = class ServerlessPlugin {
     this.serverless.cli.log("Auto instrumenting functions with Datadog");
     const config = getConfig(this.serverless.service);
     setEnvConfiguration(config, this.serverless.service);
-
-    const handlers = findHandlers(this.serverless.service);
+    const defaultRuntime = this.serverless.service.provider.runtime;
+    const handlers = findHandlers(this.serverless.service, defaultRuntime);
     if (config.addLayers) {
       this.serverless.cli.log("Adding Lambda Layers to functions");
       applyLayers(this.serverless.service.provider.region, handlers, layers);
