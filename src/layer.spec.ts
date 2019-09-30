@@ -37,22 +37,45 @@ describe("findHandlers", () => {
       {
         handler: { runtime: "nodejs8.10" },
         type: RuntimeType.NODE,
+        runtime: "nodejs8.10",
+      },
+      {
+        handler: { runtime: "go1.10" },
+        type: RuntimeType.UNSUPPORTED,
+        runtime: "go1.10",
       },
       {
         handler: { runtime: "nodejs10.x" },
         type: RuntimeType.NODE,
+        runtime: "nodejs10.x",
       },
       {
         handler: { runtime: "python2.7" },
         type: RuntimeType.PYTHON,
+        runtime: "python2.7",
       },
       {
         handler: { runtime: "python3.6" },
         type: RuntimeType.PYTHON,
+        runtime: "python3.6",
       },
       {
         handler: { runtime: "python3.7" },
         type: RuntimeType.PYTHON,
+        runtime: "python3.7",
+      },
+    ]);
+  });
+  it("uses the global runtime when one isn't specified", () => {
+    const mockService = createMockService("us-east-1", {
+      "func-a": {},
+    });
+    const result = findHandlers(mockService, "nodejs8.10");
+    expect(result).toMatchObject([
+      {
+        handler: {},
+        type: RuntimeType.NODE,
+        runtime: "nodejs8.10",
       },
     ]);
   });
@@ -63,6 +86,7 @@ describe("applyLayers", () => {
     const handler = {
       handler: { runtime: "nodejs10.x" },
       type: RuntimeType.NODE,
+      runtime: "nodejs10.x",
     } as HandlerInfo;
     const layers: LayerJSON = {
       regions: { "us-east-1": { "nodejs10.x": "node:2" } },
@@ -77,6 +101,7 @@ describe("applyLayers", () => {
     const handler = {
       handler: { runtime: "nodejs10.x", layers: ["node:1"] } as any,
       type: RuntimeType.NODE,
+      runtime: "nodejs10.x",
     } as HandlerInfo;
     const layers: LayerJSON = {
       regions: { "us-east-1": { "nodejs10.x": "node:2" } },
@@ -91,6 +116,7 @@ describe("applyLayers", () => {
     const handler = {
       handler: { runtime: "nodejs10.x", layers: ["node:1"] } as any,
       type: RuntimeType.NODE,
+      runtime: "nodejs10.x",
     } as HandlerInfo;
     const layers: LayerJSON = {
       regions: { "us-east-1": { "nodejs10.x": "node:1" } },
@@ -105,6 +131,7 @@ describe("applyLayers", () => {
     const handler = {
       handler: { runtime: "nodejs10.x" } as any,
       type: RuntimeType.NODE,
+      runtime: "nodejs10.x",
     } as HandlerInfo;
     const layers: LayerJSON = {
       regions: { "us-east-1": { "nodejs10.x": "node:1" } },
@@ -118,6 +145,7 @@ describe("applyLayers", () => {
     const handler = {
       handler: { runtime: "nodejs10.x" } as any,
       type: RuntimeType.NODE,
+      runtime: "nodejs10.x",
     } as HandlerInfo;
     const layers: LayerJSON = {
       regions: { "us-east-1": { "python2.7": "python:2" } },
@@ -131,6 +159,18 @@ describe("applyLayers", () => {
     const handler = {
       handler: {} as any,
       type: RuntimeType.NODE,
+      runtime: "nodejs10.x",
+    } as HandlerInfo;
+    const layers: LayerJSON = {
+      regions: { "us-east-1": { "python2.7": "python:2" } },
+    };
+    applyLayers("us-east-1", [handler], layers);
+    expect(handler.handler).toEqual({});
+  });
+  it("only add layer when when supported runtime present", () => {
+    const handler = {
+      handler: {} as any,
+      type: RuntimeType.UNSUPPORTED,
     } as HandlerInfo;
     const layers: LayerJSON = {
       regions: { "us-east-1": { "python2.7": "python:2" } },

@@ -12,12 +12,14 @@ import Service from "serverless/classes/Service";
 export enum RuntimeType {
   NODE,
   PYTHON,
+  UNSUPPORTED,
 }
 
 export interface HandlerInfo {
   name: string;
   type: RuntimeType;
   handler: FunctionDefinition;
+  runtime?: string;
 }
 
 export interface LayerJSON {
@@ -38,16 +40,19 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
   "python3.7": RuntimeType.PYTHON,
 };
 
-export function findHandlers(service: Service): HandlerInfo[] {
+export function findHandlers(service: Service, defaultRuntime?: string): HandlerInfo[] {
   const funcs = (service as any).functions as { [key: string]: FunctionDefinition };
 
   return Object.entries(funcs)
     .map(([name, handler]) => {
-      const { runtime } = handler;
-      if (runtime !== undefined && runtime in runtimeLookup) {
-        return { type: runtimeLookup[runtime], name, handler } as HandlerInfo;
+      let { runtime } = handler;
+      if (runtime === undefined) {
+        runtime = defaultRuntime;
       }
-      return undefined;
+      if (runtime !== undefined && runtime in runtimeLookup) {
+        return { type: runtimeLookup[runtime], runtime, name, handler } as HandlerInfo;
+      }
+      return { type: RuntimeType.UNSUPPORTED, runtime, name, handler } as HandlerInfo;
     })
     .filter((result) => result !== undefined) as HandlerInfo[];
 }
@@ -59,7 +64,11 @@ export function applyLayers(region: string, handlers: HandlerInfo[], layers: Lay
   }
 
   for (const handler of handlers) {
-    const { runtime } = handler.handler;
+    if (handler.type === RuntimeType.UNSUPPORTED) {
+      continue;
+    }
+
+    const { runtime } = handler;
     const layerARN = runtime !== undefined ? regionRuntimes[runtime] : undefined;
     if (layerARN !== undefined) {
       const currentLayers = getLayers(handler);
