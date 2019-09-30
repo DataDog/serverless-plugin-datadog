@@ -10,7 +10,7 @@ import * as Serverless from "serverless";
 import * as layers from "./layers.json";
 
 import { getConfig, setEnvConfiguration } from "./env";
-import { applyLayers, findHandlers, RuntimeType, HandlerInfo } from "./layer";
+import { applyLayers, findHandlers, HandlerInfo, RuntimeType } from "./layer";
 import { enabledTracing } from "./tracing";
 import { cleanupHandlers, writeHandlers } from "./wrapper";
 
