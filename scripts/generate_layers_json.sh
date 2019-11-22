@@ -9,8 +9,8 @@
 
 set -e
 
-LAYER_NAMES=("Datadog-Node8-10" "Datadog-Node10-x" "Datadog-Python27" "Datadog-Python36" "Datadog-Python37")
-JSON_LAYER_NAMES=("nodejs8.10" "nodejs10.x" "python2.7" "python3.6" "python3.7")
+LAYER_NAMES=("Datadog-Node8-10" "Datadog-Node10-x" "Datadog-Node12-x" "Datadog-Python27" "Datadog-Python36" "Datadog-Python37" "Datadog-Python38")
+JSON_LAYER_NAMES=("nodejs8.10" "nodejs10.x" "nodejs12.x" "python2.7" "python3.6" "python3.7" "python3.8")
 AVAILABLE_REGIONS=(us-east-2 us-east-1 us-west-1 us-west-2 ap-south-1 ap-northeast-2 ap-southeast-1 ap-southeast-2 ap-northeast-1 ca-central-1 eu-north-1 eu-central-1 eu-west-1 eu-west-2 eu-west-3 sa-east-1)
 
 INPUT_JSON="{\"regions\":{}}"
