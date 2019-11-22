@@ -30,6 +30,8 @@ describe("findHandlers", () => {
       "func-d": { runtime: "python2.7" },
       "func-e": { runtime: "python3.6" },
       "func-f": { runtime: "python3.7" },
+      "func-g": { runtime: "python3.8" },
+      "func-h": { runtime: "nodejs12.x" },
     });
 
     const result = findHandlers(mockService);
@@ -63,6 +65,16 @@ describe("findHandlers", () => {
         handler: { runtime: "python3.7" },
         type: RuntimeType.PYTHON,
         runtime: "python3.7",
+      },
+      {
+        handler: { runtime: "python3.8" },
+        type: RuntimeType.PYTHON,
+        runtime: "python3.8",
+      },
+      {
+        handler: { runtime: "nodejs12.x" },
+        type: RuntimeType.NODE,
+        runtime: "nodejs12.x",
       },
     ]);
   });
