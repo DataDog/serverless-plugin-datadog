@@ -28,7 +28,7 @@ export async function writeHandlers(service: Service, handlers: HandlerInfo[]) {
     }
     const { text, method } = result;
     const filename = await writeWrapperFunction(handlerInfo, text);
-    handlerInfo.handler.handler = `${path.join(datadogDirectory, handlerInfo.name)}.${method}`;
+    handlerInfo.handler.handler = `${path.posix.join(datadogDirectory, handlerInfo.name)}.${method}`;
     if (handlerInfo.handler.package === undefined) {
       handlerInfo.handler.package = {
         exclude: [],
