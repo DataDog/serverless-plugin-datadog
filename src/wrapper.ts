@@ -83,10 +83,6 @@ export function getWrapperText(handlerInfo: HandlerInfo) {
 
 export async function writeWrapperFunction(handlerInfo: HandlerInfo, wrapperText: string) {
   const extension = getHandlerExtension(handlerInfo.type);
-  switch (handlerInfo.type) {
-    case RuntimeType.PYTHON:
-  }
-
   const filename = `${handlerInfo.name}.${extension}`;
 
   const pathname = path.join(datadogDirectory, filename);
