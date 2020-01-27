@@ -8,7 +8,6 @@
 
 import { FunctionDefinition } from "serverless";
 import Service from "serverless/classes/Service";
-import * as fs from "fs";
 
 export enum RuntimeType {
   NODE,
