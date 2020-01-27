@@ -11,6 +11,7 @@ import Service from "serverless/classes/Service";
 
 export enum RuntimeType {
   NODE,
+  NODE_TS,
   PYTHON,
   UNSUPPORTED,
 }
