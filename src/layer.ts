@@ -5,13 +5,15 @@
  * This product includes software developed at Datadog (https://www.datadoghq.com/).
  * Copyright 2019 Datadog, Inc.
  */
-
+import fs from "fs";
 import { FunctionDefinition } from "serverless";
 import Service from "serverless/classes/Service";
+import { getHandlerPath } from "./util";
 
 export enum RuntimeType {
   NODE,
   NODE_TS,
+  NODE_ES6,
   PYTHON,
   UNSUPPORTED,
 }
@@ -43,7 +45,11 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
   "python3.8": RuntimeType.PYTHON,
 };
 
-export function findHandlers(service: Service, defaultRuntime?: string): HandlerInfo[] {
+export function findHandlers(
+  service: Service,
+  defaultRuntime?: string,
+  defaultNodeRuntime?: RuntimeType.NODE_ES6 | RuntimeType.NODE_TS | RuntimeType.NODE,
+): HandlerInfo[] {
   const funcs = (service as any).functions as { [key: string]: FunctionDefinition };
 
   return Object.entries(funcs)
@@ -53,7 +59,30 @@ export function findHandlers(service: Service, defaultRuntime?: string): Handler
         runtime = defaultRuntime;
       }
       if (runtime !== undefined && runtime in runtimeLookup) {
-        return { type: runtimeLookup[runtime], runtime, name, handler } as HandlerInfo;
+        const handlerInfo = { type: runtimeLookup[runtime], runtime, name, handler } as HandlerInfo;
+        if (handlerInfo.type === RuntimeType.NODE) {
+          const handlerPath = getHandlerPath(handlerInfo);
+          if (handlerPath === undefined) {
+            return;
+          }
+
+          if (defaultNodeRuntime === undefined) {
+            if (
+              fs.existsSync(`./${handlerPath.filename}.es.js`) ||
+              fs.existsSync(`./${handlerPath.filename}.mjs`) ||
+              hasWebpackPlugin(service)
+            ) {
+              handlerInfo.type = RuntimeType.NODE_ES6;
+            }
+            if (fs.existsSync(`./${handlerPath.filename}.ts`)) {
+              handlerInfo.type = RuntimeType.NODE_TS;
+            }
+          } else {
+            handlerInfo.type = defaultNodeRuntime;
+          }
+        }
+
+        return handlerInfo;
       }
       return { type: RuntimeType.UNSUPPORTED, runtime, name, handler } as HandlerInfo;
     })
@@ -93,4 +122,12 @@ function getLayers(handler: HandlerInfo) {
 
 function setLayers(handler: HandlerInfo, layers: string[]) {
   (handler.handler as any).layers = layers;
+}
+
+function hasWebpackPlugin(service: Service) {
+  const plugins: string[] | undefined = (service as any).plugins;
+  if (plugins === undefined) {
+    return false;
+  }
+  return plugins.find((plugin) => plugin === "serverless-webpack") !== undefined;
 }

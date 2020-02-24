@@ -51,7 +51,20 @@ module.exports = class ServerlessPlugin {
     const config = getConfig(this.serverless.service);
     setEnvConfiguration(config, this.serverless.service);
     const defaultRuntime = this.serverless.service.provider.runtime;
-    const handlers = findHandlers(this.serverless.service, defaultRuntime);
+    let defaultNodeRuntime: RuntimeType.NODE | RuntimeType.NODE_ES6 | RuntimeType.NODE_TS | undefined;
+    switch (config.nodeModuleType) {
+      case "es6":
+        defaultNodeRuntime = RuntimeType.NODE_ES6;
+        break;
+      case "typescript":
+        defaultNodeRuntime = RuntimeType.NODE_TS;
+        break;
+      case "node":
+        defaultNodeRuntime = RuntimeType.NODE;
+        break;
+    }
+
+    const handlers = findHandlers(this.serverless.service, defaultRuntime, defaultNodeRuntime);
     if (config.addLayers) {
       this.serverless.cli.log("Adding Lambda Layers to functions");
       this.debugLogHandlers(handlers);

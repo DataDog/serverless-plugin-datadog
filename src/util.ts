@@ -8,6 +8,7 @@
 
 import * as fs from "fs";
 
+import { HandlerInfo } from "layer";
 import { promisify } from "util";
 
 const exists = promisify(fs.exists);
@@ -31,4 +32,15 @@ export async function removeDirectory(path: string) {
     }
     await rmdir(path);
   }
+}
+
+export function getHandlerPath(handlerInfo: HandlerInfo) {
+  const handlerfile = handlerInfo.handler.handler;
+  const parts = handlerfile.split(".");
+  if (parts.length < 2) {
+    return;
+  }
+  const method = parts[parts.length - 1];
+  const filename = parts.slice(0, -1).join(".");
+  return { method, filename };
 }
