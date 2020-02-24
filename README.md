@@ -98,6 +98,8 @@ custom:
     nodeModuleType: "node" # 'typescript' | 'es6'
 ```
 
+If you have the addLayers option enabled, you may also want to add 'datadog-lambda-js' and 'dd-trace' to the [externals](https://webpack.js.org/configuration/externals/) section of your webpack config.
+
 ### How do I use this with serverless-typescript?
 
 Make sure serverless-datadog is above the serverless-typescript entry in your serverless.yml. The plugin will detect automatically .ts files.
