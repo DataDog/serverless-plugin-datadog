@@ -7,8 +7,8 @@
  */
 
 export function es6Template(filePath: string, method: string) {
-    return `/* eslint-disable */
+  return `/* eslint-disable */
   const { datadog } = require("datadog-lambda-js");
   import * as original from "../${filePath}";
   export const ${method} = datadog(original.${method});`;
-  }
+}

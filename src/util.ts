@@ -8,8 +8,8 @@
 
 import * as fs from "fs";
 
-import { promisify } from "util";
 import { HandlerInfo } from "layer";
+import { promisify } from "util";
 
 const exists = promisify(fs.exists);
 const readdir = promisify(fs.readdir);

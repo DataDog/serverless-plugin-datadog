@@ -5,11 +5,10 @@
  * This product includes software developed at Datadog (https://www.datadoghq.com/).
  * Copyright 2019 Datadog, Inc.
  */
-
+import fs from "fs";
 import { FunctionDefinition } from "serverless";
 import Service from "serverless/classes/Service";
 import { getHandlerPath } from "./util";
-import fs from "fs";
 
 export enum RuntimeType {
   NODE,
@@ -63,11 +62,11 @@ export function findHandlers(
         const handlerInfo = { type: runtimeLookup[runtime], runtime, name, handler } as HandlerInfo;
         if (handlerInfo.type === RuntimeType.NODE) {
           const handlerPath = getHandlerPath(handlerInfo);
-          if (handlerPath == undefined) {
+          if (handlerPath === undefined) {
             return;
           }
 
-          if (defaultNodeRuntime == undefined) {
+          if (defaultNodeRuntime === undefined) {
             if (
               fs.existsSync(`./${handlerPath.filename}.es.js`) ||
               fs.existsSync(`./${handlerPath.filename}.mjs`) ||
@@ -127,7 +126,7 @@ function setLayers(handler: HandlerInfo, layers: string[]) {
 
 function hasWebpackPlugin(service: Service) {
   const plugins: string[] | undefined = (service as any).plugins;
-  if (plugins == undefined) {
+  if (plugins === undefined) {
     return false;
   }
   return plugins.find((plugin) => plugin === "serverless-webpack") !== undefined;

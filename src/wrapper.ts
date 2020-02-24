@@ -11,11 +11,11 @@ import path from "path";
 import Service from "serverless/classes/Service";
 import util from "util";
 import { HandlerInfo, RuntimeType } from "./layer";
-import { nodeTemplate } from "./templates/node-js-template";
 import { es6Template } from "./templates/node-es6-template";
+import { nodeTemplate } from "./templates/node-js-template";
 import { typescriptTemplate } from "./templates/node-ts-template";
 import { pythonTemplate } from "./templates/python-template";
-import { removeDirectory, getHandlerPath } from "./util";
+import { getHandlerPath, removeDirectory } from "./util";
 
 export const datadogDirectory = "datadog_handlers";
 
@@ -23,7 +23,7 @@ export async function writeHandlers(service: Service, handlers: HandlerInfo[]) {
   await cleanupHandlers();
   await util.promisify(fs.mkdir)(datadogDirectory);
 
-  const promises = handlers.map(async (handlerInfo) => {    
+  const promises = handlers.map(async (handlerInfo) => {
     const result = getWrapperText(handlerInfo);
     if (result === undefined) {
       return;
@@ -80,8 +80,6 @@ export async function writeWrapperFunction(handlerInfo: HandlerInfo, wrapperText
   await util.promisify(fs.writeFile)(pathname, wrapperText);
   return pathname;
 }
-
-
 
 export async function addToExclusionList(service: any, files: string[]) {
   if (service.package === undefined) {

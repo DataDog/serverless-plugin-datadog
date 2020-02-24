@@ -23,7 +23,7 @@ export interface Configuration {
   flushMetricsToLogs: boolean;
   // When set, the plugin will always write wrapper handlers in the given format. Otherwise, will try
   // to infer the handler type either from the extension, or presence of webpack.
-  nodeHandlerType?: 'es6' | 'node' | 'typescript';
+  nodeModuleType?: "es6" | "node" | "typescript";
 }
 
 const apiKeyEnvVar = "DD_API_KEY";
