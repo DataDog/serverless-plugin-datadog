@@ -10,13 +10,20 @@ import { HandlerInfo, LayerJSON, RuntimeType, applyLayers, findHandlers } from "
 
 import { FunctionDefinition } from "serverless";
 import Service from "serverless/classes/Service";
+import fs from "fs";
+import mock from "mock-fs";
 
-function createMockService(region: string, funcs: { [funcName: string]: Partial<FunctionDefinition> }): Service {
-  const service: Partial<Service> & { functions: any } = {
+function createMockService(
+  region: string,
+  funcs: { [funcName: string]: Partial<FunctionDefinition> },
+  plugins?: string[],
+): Service {
+  const service: Partial<Service> & { functions: any; plugins: any } = {
     provider: { region } as any,
     getAllFunctionsNames: () => Object.keys(funcs),
     getFunction: (name) => funcs[name] as FunctionDefinition,
     functions: funcs as any,
+    plugins,
   };
   return service as Service;
 }
@@ -24,50 +31,50 @@ function createMockService(region: string, funcs: { [funcName: string]: Partial<
 describe("findHandlers", () => {
   it("finds all node and python layers with matching layers", () => {
     const mockService = createMockService("us-east-1", {
-      "func-a": { runtime: "nodejs8.10" },
-      "func-b": { runtime: "go1.10" },
-      "func-c": { runtime: "nodejs10.x" },
-      "func-d": { runtime: "python2.7" },
-      "func-e": { runtime: "python3.6" },
-      "func-f": { runtime: "python3.7" },
-      "func-g": { runtime: "python3.8" },
-      "func-h": { runtime: "nodejs12.x" },
+      "func-a": { handler: "myfile.handler", runtime: "nodejs8.10" },
+      "func-b": { handler: "myfile.handler", runtime: "go1.10" },
+      "func-c": { handler: "myfile.handler", runtime: "nodejs10.x" },
+      "func-d": { handler: "myfile.handler", runtime: "python2.7" },
+      "func-e": { handler: "myfile.handler", runtime: "python3.6" },
+      "func-f": { handler: "myfile.handler", runtime: "python3.7" },
+      "func-g": { handler: "myfile.handler", runtime: "python3.8" },
+      "func-h": { handler: "myfile.handler", runtime: "nodejs12.x" },
     });
 
     const result = findHandlers(mockService);
     expect(result).toMatchObject([
       {
-        handler: { runtime: "nodejs8.10" },
+        handler: { handler: "myfile.handler", runtime: "nodejs8.10" },
         type: RuntimeType.NODE,
         runtime: "nodejs8.10",
       },
       {
-        handler: { runtime: "go1.10" },
+        handler: { handler: "myfile.handler", runtime: "go1.10" },
         type: RuntimeType.UNSUPPORTED,
         runtime: "go1.10",
       },
       {
-        handler: { runtime: "nodejs10.x" },
+        handler: { handler: "myfile.handler", runtime: "nodejs10.x" },
         type: RuntimeType.NODE,
         runtime: "nodejs10.x",
       },
       {
-        handler: { runtime: "python2.7" },
+        handler: { handler: "myfile.handler", runtime: "python2.7" },
         type: RuntimeType.PYTHON,
         runtime: "python2.7",
       },
       {
-        handler: { runtime: "python3.6" },
+        handler: { handler: "myfile.handler", runtime: "python3.6" },
         type: RuntimeType.PYTHON,
         runtime: "python3.6",
       },
       {
-        handler: { runtime: "python3.7" },
+        handler: { handler: "myfile.handler", runtime: "python3.7" },
         type: RuntimeType.PYTHON,
         runtime: "python3.7",
       },
       {
-        handler: { runtime: "python3.8" },
+        handler: { handler: "myfile.handler", runtime: "python3.8" },
         type: RuntimeType.PYTHON,
         runtime: "python3.8",
       },
@@ -80,13 +87,104 @@ describe("findHandlers", () => {
   });
   it("uses the global runtime when one isn't specified", () => {
     const mockService = createMockService("us-east-1", {
-      "func-a": {},
+      "func-a": { handler: "myfile.handler" },
     });
     const result = findHandlers(mockService, "nodejs8.10");
     expect(result).toMatchObject([
       {
         handler: {},
         type: RuntimeType.NODE,
+        runtime: "nodejs8.10",
+      },
+    ]);
+  });
+
+  it("uses typescript runtime when ts file is detected", () => {
+    mock({
+      "mylambda.ts": "",
+    });
+    const mockService = createMockService("us-east-1", {
+      "func-a": { handler: "mylambda.handler", runtime: "nodejs8.10" },
+    });
+    const result = findHandlers(mockService, "nodejs8.10");
+
+    expect(result).toMatchObject([
+      {
+        handler: { handler: "mylambda.handler", runtime: "nodejs8.10" },
+        type: RuntimeType.NODE_TS,
+        runtime: "nodejs8.10",
+      },
+    ]);
+  });
+  it("uses es6 runtime when es.js file is detected", () => {
+    mock({
+      "mylambda.es.js": "",
+    });
+    const mockService = createMockService("us-east-1", {
+      "func-a": { handler: "mylambda.handler", runtime: "nodejs8.10" },
+    });
+    const result = findHandlers(mockService, "nodejs8.10");
+
+    expect(result).toMatchObject([
+      {
+        handler: { handler: "mylambda.handler", runtime: "nodejs8.10" },
+        type: RuntimeType.NODE_ES6,
+        runtime: "nodejs8.10",
+      },
+    ]);
+  });
+  it("uses es6 runtime when .mjs file is detected", () => {
+    mock({
+      "mylambda.mjs": "",
+    });
+    const mockService = createMockService("us-east-1", {
+      "func-a": { handler: "mylambda.handler", runtime: "nodejs8.10" },
+    });
+    const result = findHandlers(mockService, "nodejs8.10");
+
+    expect(result).toMatchObject([
+      {
+        handler: { handler: "mylambda.handler", runtime: "nodejs8.10" },
+        type: RuntimeType.NODE_ES6,
+        runtime: "nodejs8.10",
+      },
+    ]);
+  });
+  it("uses default node runtime when provided", () => {
+    mock({
+      "mylambda.js": "",
+    });
+    const mockService = createMockService("us-east-1", {
+      "func-a": { handler: "mylambda.handler", runtime: "nodejs8.10" },
+    });
+    const result = findHandlers(mockService, "nodejs8.10", RuntimeType.NODE_TS);
+
+    expect(result).toMatchObject([
+      {
+        handler: { handler: "mylambda.handler", runtime: "nodejs8.10" },
+        type: RuntimeType.NODE_TS,
+        runtime: "nodejs8.10",
+      },
+    ]);
+  });
+  it("uses es6 runtime by default when webpack detected", () => {
+    mock({
+      "mylambda.js": "",
+    });
+    const plugins = ["serverless-plugin-datadog", "serverless-webpack"];
+    const mockService = createMockService(
+      "us-east-1",
+      {
+        "func-a": { handler: "mylambda.handler", runtime: "nodejs8.10" },
+      },
+      plugins,
+    );
+    const result = findHandlers(mockService, "nodejs8.10");
+
+    expect(result).toMatchObject([
+      {
+        handler: { handler: "mylambda.handler", runtime: "nodejs8.10" },
+        type: RuntimeType.NODE_ES6,
         runtime: "nodejs8.10",
       },
     ]);

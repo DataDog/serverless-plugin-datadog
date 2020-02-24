@@ -12,9 +12,10 @@ import Service from "serverless/classes/Service";
 import util from "util";
 import { HandlerInfo, RuntimeType } from "./layer";
 import { nodeTemplate } from "./templates/node-js-template";
+import { es6Template } from "./templates/node-es6-template";
 import { typescriptTemplate } from "./templates/node-ts-template";
 import { pythonTemplate } from "./templates/python-template";
-import { removeDirectory } from "./util";
+import { removeDirectory, getHandlerPath } from "./util";
 
 export const datadogDirectory = "datadog_handlers";
 
@@ -22,19 +23,7 @@ export async function writeHandlers(service: Service, handlers: HandlerInfo[]) {
   await cleanupHandlers();
   await util.promisify(fs.mkdir)(datadogDirectory);
 
-  const promises = handlers.map(async (handlerInfo) => {
-    const handlerPath = getHandlerPath(handlerInfo);
-    if (handlerPath === undefined) {
-      return;
-    }
-
-    if (handlerInfo.type === RuntimeType.NODE && fs.existsSync(`./${handlerPath.filename}.ts`)) {
-      handlerInfo = {
-        ...handlerInfo,
-        type: RuntimeType.NODE_TS,
-      };
-    }
-
+  const promises = handlers.map(async (handlerInfo) => {    
     const result = getWrapperText(handlerInfo);
     if (result === undefined) {
       return;
@@ -74,6 +63,8 @@ export function getWrapperText(handlerInfo: HandlerInfo) {
   switch (handlerInfo.type) {
     case RuntimeType.NODE:
       return { text: nodeTemplate(filename, method), method };
+    case RuntimeType.NODE_ES6:
+      return { text: es6Template(filename, method), method };
     case RuntimeType.NODE_TS:
       return { text: typescriptTemplate(filename, method), method };
     case RuntimeType.PYTHON:
@@ -90,16 +81,7 @@ export async function writeWrapperFunction(handlerInfo: HandlerInfo, wrapperText
   return pathname;
 }
 
-export function getHandlerPath(handlerInfo: HandlerInfo) {
-  const handlerfile = handlerInfo.handler.handler;
-  const parts = handlerfile.split(".");
-  if (parts.length < 2) {
-    return;
-  }
-  const method = parts[parts.length - 1];
-  const filename = parts.slice(0, -1).join(".");
-  return { method, filename };
-}
+
 
 export async function addToExclusionList(service: any, files: string[]) {
   if (service.package === undefined) {
@@ -114,6 +96,7 @@ export async function addToExclusionList(service: any, files: string[]) {
 
 function getHandlerExtension(type: RuntimeType) {
   switch (type) {
+    case RuntimeType.NODE_ES6:
     case RuntimeType.NODE:
       return "js";
     case RuntimeType.NODE_TS:

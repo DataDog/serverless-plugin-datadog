@@ -21,6 +21,9 @@ export interface Configuration {
   logLevel: string;
   // Whether the log forwarder integration is enabled by default
   flushMetricsToLogs: boolean;
+  // When set, the plugin will always write wrapper handlers in the given format. Otherwise, will try
+  // to infer the handler type either from the extension, or presence of webpack.
+  nodeHandlerType?: 'es6' | 'node' | 'typescript';
 }
 
 const apiKeyEnvVar = "DD_API_KEY";
