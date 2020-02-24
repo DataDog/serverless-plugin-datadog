@@ -52,7 +52,7 @@ module.exports = class ServerlessPlugin {
     setEnvConfiguration(config, this.serverless.service);
     const defaultRuntime = this.serverless.service.provider.runtime;
     let defaultNodeRuntime: RuntimeType.NODE | RuntimeType.NODE_ES6 | RuntimeType.NODE_TS | undefined;
-    switch (config.nodeHandlerType) {
+    switch (config.nodeModuleType) {
       case "es6":
         defaultNodeRuntime = RuntimeType.NODE_ES6;
         break;

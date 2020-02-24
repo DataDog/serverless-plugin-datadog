@@ -80,6 +80,34 @@ custom:
 
 You can use your own version of those libraries by setting 'addLayers' to false in the datadog configuration block. Just make sure to bundle those libaries with your Lambda functions.
 
+### How do I use this with serverless-webpack?
+
+Make sure serverless-datadog is above the serverless-webpack entry in your serverless.yml
+
+```yaml
+plugins:
+  - serverless-plugin-datadog
+  - serverless-webpack
+```
+
+When using serverless webpack, the plugin will assume you are using es6 module format. If that's not the case, you can manually configure `nodeModuleType`.
+
+```yaml
+custom:
+  datadog:
+    nodeModuleType: "node" # 'typescript' | 'es6'
+```
+
+### How do I use this with serverless-typescript?
+
+Make sure serverless-datadog is above the serverless-typescript entry in your serverless.yml. The plugin will detect automatically .ts files.
+
+```yaml
+plugins:
+  - serverless-plugin-datadog
+  - serverless-typescript
+```
+
 ## Opening Issues
 
 If you encounter a bug with this package, we want to hear about it. Before opening a new issue, search the existing issues to avoid duplicates.
