@@ -29,7 +29,7 @@ plugins:
 
 This plugin attaches the Datadog Lambda Layers for [Node.js](https://github.com/DataDog/datadog-lambda-layer-js) and [Python](https://github.com/DataDog/datadog-lambda-layer-python) to your functions. At deploy time, it generates new handler functions that wrap your existing functions and initializes the Lambda Layers.
 
-**IMPORTANT NOTE:** Because the plugin automatically wraps your Lambda handler function, you do **NOT** need to wrap your handler function as it is stated in the Node.js and Python layer documentations.
+**IMPORTANT NOTE:** Because the plugin automatically wraps your Lambda handler function, you do **NOT** need to wrap your handler function as stated in the Node.js and Python Layer documentation.
 
 **Node.js**
 ```js
@@ -44,7 +44,7 @@ module.exports.myHandler = datadog( // This wrapper is NOT needed when using thi
 def lambda_handler(event, context):
 ```
 
-## Configurations
+## Configuration
 
 You can configure the library by add the following section to your `serverless.yml`:
 
