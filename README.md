@@ -41,16 +41,16 @@ custom:
   datadog:
     # Add one of the following variables to override it's default
 
-    # Whether to add the Lambda Layers, or expect the user to bring their own, defaults to true
+    # Whether to add the Lambda Layers, or expect the user to bring their own. Defaults to true
     addLayers: true
 
-    # Which Datadog Site to send data to, (should be datadoghq.com or datadoghq.eu), defaults to datadoghq.com
+    # Which Datadog Site to send data to, (should be datadoghq.com or datadoghq.eu). Defaults to datadoghq.com
     site: datadoghq.com
 
-    # The log level, set to DEBUG for extended logging, defaults to info
+    # The log level, set to DEBUG for extended logging. Defaults to info
     logLevel: "info"
 
-    # Send custom metrics via logs with the help of Datadog Forwarder Lambda function (recommended), defaults to false
+    # Send custom metrics via logs with the help of Datadog Forwarder Lambda function (recommended). Defaults to false
     flushMetricsToLogs: true
 
     # Datadog API Key, only needed when flushMetricsToLogs is false
