@@ -29,49 +29,50 @@ plugins:
 
 This plugin attaches the Datadog Lambda Layers for [Node.js](https://github.com/DataDog/datadog-lambda-layer-js) and [Python](https://github.com/DataDog/datadog-lambda-layer-python) to your functions. At deploy time, it generates new handler functions that wrap your existing functions and initializes the Lambda Layers.
 
+**IMPORTANT NOTE:** Because the plugin automatically wraps your Lambda handler function, you do **NOT** need to wrap your handler function as it is stated in the Node.js and Python layer documentations.
+
+**Node.js**
+```js
+module.exports.myHandler = datadog( // This wrapper is NOT needed when using this plugin
+  async function myHandler(event, context) {
+});
+```
+
+**Python**
+```python
+@datadog_lambda_wrapper # This wrapper is NOT needed when using this plugin
+def lambda_handler(event, context):
+```
+
 ## Configurations
 
 You can configure the library by add the following section to your `serverless.yml`:
 
-[Datadog Log Forwarder](https://docs.datadoghq.com/integrations/amazon_lambda/?tab=python#log-collection)
+[Datadog Forwarder](https://docs.datadoghq.com/integrations/amazon_lambda/?tab=python#log-collection)
 
-### Default
-
-```yaml
-custom:
-  datadog:
-    # Whether to add the Lambda Layers, or expect the user to bring their own
-    addLayers: true
-    # Datadog API Key, only necessary when using metrics without log forwarding
-    apiKey: ""
-    # Whether the log forwarder integration is enabled by default
-    flushMetricsToLogs: false
-```
-
-### All Options
 
 ```yaml
 custom:
   datadog:
     # Add one of the following variables to override it's default
 
-    # Whether to add the Lambda Layers, or expect the user to bring their own
+    # Whether to add the Lambda Layers, or expect the user to bring their own. Defaults to true
     addLayers: true
 
-    # Datadog API Key, only necessary when using metrics without log forwarding
-    apiKey: ""
-
-    # Datadog API Key encrypted using KMS, only necessary when using metrics without log forwarding
-    apiKMSKey: ""
-
-    # Which Site to send to, (should be datadoghq.com or datadoghq.eu)
+    # Which Datadog Site to send data to, (should be datadoghq.com or datadoghq.eu). Defaults to datadoghq.com
     site: datadoghq.com
 
-    # The log level, (set to DEBUG for extended logging)
+    # The log level, set to DEBUG for extended logging. Defaults to info
     logLevel: "info"
 
-    # Whether the log forwarder integration is enabled by default
-    flushMetricsToLogs: false
+    # Send custom metrics via logs with the help of Datadog Forwarder Lambda function (recommended). Defaults to false
+    flushMetricsToLogs: true
+
+    # Datadog API Key, only needed when flushMetricsToLogs is false
+    apiKey: ""
+
+    # Datadog API Key encrypted using KMS, only needed when flushMetricsToLogs is false
+    apiKMSKey: ""
 ```
 
 ## FAQ
