@@ -7,11 +7,11 @@
 [![Slack](https://img.shields.io/badge/slack-%23serverless-blueviolet?logo=slack)](https://datadoghq.slack.com/channels/serverless/)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](https://github.com/DataDog/serverless-plugin-datadog/blob/master/LICENSE)
 
-This serverless framework plugin automatically instruments your Python and NodeJS Lambda functions with Datadog's native Lambda Layers. You can use this function to collect traces, and custom metrics.
+This serverless framework plugin automatically installs Datadog Lambda layers to your Python and Node.js Lambda functions to collect custom metrics and traces.
 
 ## Installation
 
-You can install the plugin with one of the following commands. Keep in mind, you will need to bundle this package with your function manually.
+You can install the plugin with one of the following commands or add `serverless-plugin-datadog` to your project's package.json.
 
 ```bash
 yarn add --dev serverless-plugin-datadog         # Yarn users
@@ -27,7 +27,7 @@ plugins:
 
 ## How it works
 
-This plugin attaches the Datadog Lambda Layers for [Node.js](https://github.com/DataDog/datadog-lambda-layer-js) and [Python](https://github.com/DataDog/datadog-lambda-layer-python) to your functions. At deploy time, it generates new handler functions that wrap your existing functions and initializes the Lambda Layers.
+This plugin attaches the Datadog Lambda Layers for [Node.js](https://github.com/DataDog/datadog-lambda-layer-js) and [Python](https://github.com/DataDog/datadog-lambda-layer-python) to your functions. At deploy time, it generates new handler functions that wrap your existing functions and initializes the Lambda Layers. It also enables X-Ray tracing for your Lambda functions and API Gateways.
 
 **IMPORTANT NOTE:** Because the plugin automatically wraps your Lambda handler function, you do **NOT** need to wrap your handler function as stated in the Node.js and Python Layer documentation.
 
@@ -48,25 +48,21 @@ def lambda_handler(event, context):
 
 You can configure the library by add the following section to your `serverless.yml`:
 
-[Datadog Forwarder](https://docs.datadoghq.com/integrations/amazon_lambda/?tab=python#log-collection)
-
 
 ```yaml
 custom:
   datadog:
-    # Add one of the following variables to override it's default
-
-    # Whether to add the Lambda Layers, or expect the user to bring their own. Defaults to true
+    # Whether to add the Lambda Layers, or expect the user to bring their own. Defaults to true.
     addLayers: true
 
-    # Which Datadog Site to send data to, (should be datadoghq.com or datadoghq.eu). Defaults to datadoghq.com
-    site: datadoghq.com
-
-    # The log level, set to DEBUG for extended logging. Defaults to info
+    # The log level, set to DEBUG for extended logging. Defaults to info.
     logLevel: "info"
 
-    # Send custom metrics via logs with the help of Datadog Forwarder Lambda function (recommended). Defaults to false
+    # Send custom metrics via logs with the help of Datadog Forwarder Lambda function (recommended). Defaults to false.
     flushMetricsToLogs: true
+
+    # Which Datadog Site to send data to, only needed when flushMetricsToLogs is false. Defaults to datadoghq.com.
+    site: datadoghq.com # datadoghq.eu for Datadog EU
 
     # Datadog API Key, only needed when flushMetricsToLogs is false
     apiKey: ""
@@ -74,6 +70,8 @@ custom:
     # Datadog API Key encrypted using KMS, only needed when flushMetricsToLogs is false
     apiKMSKey: ""
 ```
+
+`flushMetricsToLogs: true` is recommended for submitting custom metrics via CloudWatch logs with the help of [Datadog Forwarder](https://github.com/DataDog/datadog-serverless-functions/tree/master/aws/logs_monitoring).
 
 ## FAQ
 
