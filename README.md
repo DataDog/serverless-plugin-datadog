@@ -33,45 +33,31 @@ This plugin attaches the Datadog Lambda Layers for [Node.js](https://github.com/
 
 You can configure the library by add the following section to your `serverless.yml`:
 
-[Datadog Log Forwarder](https://docs.datadoghq.com/integrations/amazon_lambda/?tab=python#log-collection)
+[Datadog Forwarder](https://docs.datadoghq.com/integrations/amazon_lambda/?tab=python#log-collection)
 
-### Default
-
-```yaml
-custom:
-  datadog:
-    # Whether to add the Lambda Layers, or expect the user to bring their own
-    addLayers: true
-    # Datadog API Key, only necessary when using metrics without log forwarding
-    apiKey: ""
-    # Whether the log forwarder integration is enabled by default
-    flushMetricsToLogs: false
-```
-
-### All Options
 
 ```yaml
 custom:
   datadog:
     # Add one of the following variables to override it's default
 
-    # Whether to add the Lambda Layers, or expect the user to bring their own
+    # Whether to add the Lambda Layers, or expect the user to bring their own, defaults to true
     addLayers: true
 
-    # Datadog API Key, only necessary when using metrics without log forwarding
-    apiKey: ""
-
-    # Datadog API Key encrypted using KMS, only necessary when using metrics without log forwarding
-    apiKMSKey: ""
-
-    # Which Site to send to, (should be datadoghq.com or datadoghq.eu)
+    # Which Datadog Site to send data to, (should be datadoghq.com or datadoghq.eu), defaults to datadoghq.com
     site: datadoghq.com
 
-    # The log level, (set to DEBUG for extended logging)
+    # The log level, set to DEBUG for extended logging, defaults to info
     logLevel: "info"
 
-    # Whether the log forwarder integration is enabled by default
-    flushMetricsToLogs: false
+    # Send custom metrics via logs with the help of Datadog Forwarder Lambda function (recommended), defaults to false
+    flushMetricsToLogs: true
+
+    # Datadog API Key, only needed when flushMetricsToLogs is false
+    apiKey: ""
+
+    # Datadog API Key encrypted using KMS, only needed when flushMetricsToLogs is false
+    apiKMSKey: ""
 ```
 
 ## FAQ
