@@ -20,7 +20,6 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-<< parameters.node >>-
       - run: yarn install
-      - run: cp .circleci/test-layers.json src/layers.json
       - run: yarn build
       - run: yarn lint
       - run: yarn check-formatting
@@ -33,7 +32,6 @@ jobs:
           key: v1-dependencies-<< parameters.node >>-{{ checksum "package.json" }}
 
 workflows:
-
   node-v1015:
     jobs:
       - verify_build:
