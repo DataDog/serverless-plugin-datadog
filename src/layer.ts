@@ -8,7 +8,7 @@
 import fs from "fs";
 import { FunctionDefinition } from "serverless";
 import Service from "serverless/classes/Service";
-import { getHandlerPath } from "./util";
+import { getHandlerPath, hasWebpackPlugin } from "./util";
 
 export enum RuntimeType {
   NODE,
@@ -122,12 +122,4 @@ function getLayers(handler: HandlerInfo) {
 
 function setLayers(handler: HandlerInfo, layers: string[]) {
   (handler.handler as any).layers = layers;
-}
-
-function hasWebpackPlugin(service: Service) {
-  const plugins: string[] | undefined = (service as any).plugins;
-  if (plugins === undefined) {
-    return false;
-  }
-  return plugins.find((plugin) => plugin === "serverless-webpack") !== undefined;
 }

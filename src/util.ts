@@ -10,6 +10,7 @@ import * as fs from "fs";
 
 import { HandlerInfo } from "layer";
 import { promisify } from "util";
+import Service from "serverless/classes/Service";
 
 const exists = promisify(fs.exists);
 const readdir = promisify(fs.readdir);
@@ -43,4 +44,12 @@ export function getHandlerPath(handlerInfo: HandlerInfo) {
   const method = parts[parts.length - 1];
   const filename = parts.slice(0, -1).join(".");
   return { method, filename };
+}
+
+export function hasWebpackPlugin(service: Service) {
+  const plugins: string[] | undefined = (service as any).plugins;
+  if (plugins === undefined) {
+    return false;
+  }
+  return plugins.find((plugin) => plugin === "serverless-webpack") !== undefined;
 }
