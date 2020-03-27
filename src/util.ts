@@ -8,7 +8,7 @@
 
 import * as fs from "fs";
 
-import { HandlerInfo } from "layer";
+import { FunctionInfo } from "layer";
 import { promisify } from "util";
 import Service from "serverless/classes/Service";
 
@@ -35,7 +35,7 @@ export async function removeDirectory(path: string) {
   }
 }
 
-export function getHandlerPath(handlerInfo: HandlerInfo) {
+export function getHandlerPath(handlerInfo: FunctionInfo) {
   const handlerfile = handlerInfo.handler.handler;
   const parts = handlerfile.split(".");
   if (parts.length < 2) {

@@ -10,7 +10,7 @@ import * as Serverless from "serverless";
 import * as layers from "./layers.json";
 
 import { getConfig, setEnvConfiguration, forceExcludeDepsFromWebpack } from "./env";
-import { applyLayers, findHandlers, HandlerInfo, RuntimeType } from "./layer";
+import { applyLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
 import { enabledTracing } from "./tracing";
 import { cleanupHandlers, writeHandlers } from "./wrapper";
 import { hasWebpackPlugin } from "./util";
@@ -84,7 +84,7 @@ module.exports = class ServerlessPlugin {
     await cleanupHandlers();
   }
 
-  private debugLogHandlers(handlers: HandlerInfo[]) {
+  private debugLogHandlers(handlers: FunctionInfo[]) {
     for (const handler of handlers) {
       if (handler.type === RuntimeType.UNSUPPORTED) {
         if (handler.runtime === undefined) {

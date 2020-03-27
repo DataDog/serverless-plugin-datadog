@@ -14,82 +14,41 @@ import mock from "mock-fs";
 
 describe("getWrapperText", () => {
   it("renders the python template correctly", () => {
-    const wrapperText = getWrapperText({
-      name: "my-lambda",
-      type: RuntimeType.PYTHON,
-      handler: {
-        name: "",
-        package: {} as any,
-        handler: "mydir/func.myhandler",
-      },
-    });
+    const wrapperText = getWrapperText(RuntimeType.PYTHON, "mydir/func", ["myhandler"]);
+
     expect(wrapperText).toMatchInlineSnapshot(`
-                  Object {
-                    "method": "myhandler",
-                    "text": "from datadog_lambda.wrapper import datadog_lambda_wrapper
+                  "from datadog_lambda.wrapper import datadog_lambda_wrapper
                   from mydir.func import myhandler as myhandler_impl
-                  myhandler = datadog_lambda_wrapper(myhandler_impl)",
-                  }
+                  myhandler = datadog_lambda_wrapper(myhandler_impl)"
             `);
   });
   it("renders the node template correctly", () => {
-    const wrapperText = getWrapperText({
-      name: "my-lambda",
-      type: RuntimeType.NODE,
-      handler: {
-        name: "",
-        package: {} as any,
-        handler: "my.myhandler",
-      },
-    });
+    const wrapperText = getWrapperText(RuntimeType.NODE, "my", ["myhandler"]);
+
     expect(wrapperText).toMatchInlineSnapshot(`
-                  Object {
-                    "method": "myhandler",
-                    "text": "const { datadog } = require(\\"datadog-lambda-js\\");
+                  "const { datadog } = require(\\"datadog-lambda-js\\");
                   const original = require(\\"../my\\");
-                  module.exports.myhandler = datadog(original.myhandler);",
-                  }
+                  module.exports.myhandler = datadog(original.myhandler);"
             `);
   });
   it("renders the node ts template correctly", () => {
-    const wrapperText = getWrapperText({
-      name: "my-lambda",
-      type: RuntimeType.NODE_TS,
-      handler: {
-        name: "",
-        package: {} as any,
-        handler: "my.myhandler",
-      },
-    });
+    const wrapperText = getWrapperText(RuntimeType.NODE_TS, "my", ["myhandler"]);
     expect(wrapperText).toMatchInlineSnapshot(`
-            Object {
-              "method": "myhandler",
-              "text": "/* tslint:disable */
+            "/* tslint:disable */
             /* eslint-disable */
             const { datadog } = require(\\"datadog-lambda-js\\") as any;
             import * as original from \\"../my\\";
-            export const myhandler = datadog(original.myhandler);",
-            }
+            export const myhandler = datadog(original.myhandler);"
         `);
   });
   it("renders the node es template correctly", () => {
-    const wrapperText = getWrapperText({
-      name: "my-lambda",
-      type: RuntimeType.NODE_ES6,
-      handler: {
-        name: "",
-        package: {} as any,
-        handler: "my.myhandler",
-      },
-    });
+    const wrapperText = getWrapperText(RuntimeType.NODE_ES6, "my", ["myhandler"]);
+
     expect(wrapperText).toMatchInlineSnapshot(`
-      Object {
-        "method": "myhandler",
-        "text": "/* eslint-disable */
+      "/* eslint-disable */
         const { datadog } = require(\\"datadog-lambda-js\\");
         import * as original from \\"../my\\";
-        export const myhandler = datadog(original.myhandler);",
-      }
+        export const myhandler = datadog(original.myhandler);"
     `);
   });
 });
@@ -107,13 +66,22 @@ describe("writeWrapperFunction", () => {
   it("writes out node files to a .js file", async () => {
     await writeWrapperFunction(
       {
-        name: "my-lambda",
-        type: RuntimeType.NODE,
-        handler: {
-          name: "my-lambda",
-          package: {} as any,
-          handler: "mydir/func.myhandler",
-        },
+        filename: "mydir/my",
+        funcs: [
+          {
+            info: {
+              name: "my-lambda",
+              type: RuntimeType.NODE,
+              handler: {
+                name: "my-lambda",
+                package: {} as any,
+                handler: "mydir/func.myhandler",
+              },
+            },
+            method: "myhandler",
+          },
+        ],
+        runtime: RuntimeType.NODE,
       },
       "my-text",
     );
@@ -122,13 +90,22 @@ describe("writeWrapperFunction", () => {
   it("writes out python files to a .py file", async () => {
     await writeWrapperFunction(
       {
-        name: "my-lambda",
-        type: RuntimeType.PYTHON,
-        handler: {
-          name: "my-lambda",
-          package: {} as any,
-          handler: "mydir/func.myhandler",
-        },
+        filename: "mydir/my",
+        funcs: [
+          {
+            info: {
+              name: "my-lambda",
+              type: RuntimeType.PYTHON,
+              handler: {
+                name: "my-lambda",
+                package: {} as any,
+                handler: "mydir/func.myhandler",
+              },
+            },
+            method: "myhandler",
+          },
+        ],
+        runtime: RuntimeType.PYTHON,
       },
       "my-text",
     );

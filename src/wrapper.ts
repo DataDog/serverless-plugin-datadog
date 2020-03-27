@@ -10,7 +10,7 @@ import fs from "fs";
 import path from "path";
 import Service from "serverless/classes/Service";
 import util from "util";
-import { HandlerInfo, RuntimeType } from "./layer";
+import { FunctionInfo, RuntimeType } from "./layer";
 import { es6Template } from "./templates/node-es6-template";
 import { nodeTemplate } from "./templates/node-js-template";
 import { typescriptTemplate } from "./templates/node-ts-template";
@@ -19,28 +19,40 @@ import { getHandlerPath, removeDirectory } from "./util";
 
 export const datadogDirectory = "datadog_handlers";
 
-export async function writeHandlers(service: Service, handlers: HandlerInfo[]) {
+export interface FunctionGroup {
+  funcs: {
+    info: FunctionInfo;
+    method: string;
+  }[];
+  filename: string;
+  runtime: RuntimeType;
+}
+
+export async function writeHandlers(service: Service, funcs: FunctionInfo[]) {
   await cleanupHandlers();
   await util.promisify(fs.mkdir)(datadogDirectory);
-
-  const promises = handlers.map(async (handlerInfo) => {
-    const result = getWrapperText(handlerInfo);
+  const groups = getFunctionGroups(funcs);
+  const promises = groups.map(async (funcGroup) => {
+    const methods = [...funcGroup.funcs.map((func) => func.method)];
+    const result = getWrapperText(funcGroup.runtime, funcGroup.filename, methods);
     if (result === undefined) {
       return;
     }
-    const { text, method } = result;
-    const filename = await writeWrapperFunction(handlerInfo, text);
-    handlerInfo.handler.handler = `${path.posix.join(datadogDirectory, handlerInfo.name)}.${method}`;
-    if (handlerInfo.handler.package === undefined) {
-      handlerInfo.handler.package = {
-        exclude: [],
-        include: [],
-      };
+    const text = result;
+    const filename = await writeWrapperFunction(funcGroup, text);
+    for (const func of funcGroup.funcs) {
+      func.info.handler.handler = `${path.posix.join(datadogDirectory, func.info.name)}.${func.method}`;
+      if (func.info.handler.package === undefined) {
+        func.info.handler.package = {
+          exclude: [],
+          include: [],
+        };
+      }
+      if (func.info.handler.package.include === undefined) {
+        func.info.handler.package.include = [];
+      }
+      func.info.handler.package.include.push(filename);
     }
-    if (handlerInfo.handler.package.include === undefined) {
-      handlerInfo.handler.package.include = [];
-    }
-    handlerInfo.handler.package.include.push(filename);
     return `${filename}`;
   });
   const files = [...(await Promise.all(promises))];
@@ -53,31 +65,46 @@ export async function cleanupHandlers() {
   await removeDirectory(datadogDirectory);
 }
 
-export function getWrapperText(handlerInfo: HandlerInfo) {
-  const result = getHandlerPath(handlerInfo);
-  if (result === undefined) {
-    return;
-  }
-  const { method, filename } = result;
-
-  switch (handlerInfo.type) {
+export function getWrapperText(type: RuntimeType, filename: string, methods: string[]) {
+  switch (type) {
     case RuntimeType.NODE:
-      return { text: nodeTemplate(filename, [method]), method };
+      return nodeTemplate(filename, methods);
     case RuntimeType.NODE_ES6:
-      return { text: es6Template(filename, [method]), method };
+      return es6Template(filename, methods);
     case RuntimeType.NODE_TS:
-      return { text: typescriptTemplate(filename, [method]), method };
+      return typescriptTemplate(filename, methods);
     case RuntimeType.PYTHON:
-      return { text: pythonTemplate(filename, [method]), method };
+      return pythonTemplate(filename, methods);
   }
 }
 
-export async function writeWrapperFunction(handlerInfo: HandlerInfo, wrapperText: string) {
-  const extension = getHandlerExtension(handlerInfo.type);
-  const filename = `${handlerInfo.name}.${extension}`;
+export function getFunctionGroups(functionInfos: FunctionInfo[]) {
+  const lookup: {
+    [key: string]: FunctionGroup;
+  } = {};
+  for (const func of functionInfos) {
+    const path = getHandlerPath(func);
+    if (path === undefined) {
+      continue;
+    }
+    const group = lookup[path.filename] ?? {
+      funcs: [],
+      filename: path.filename,
+      runtime: func.type,
+    };
+    group.funcs.push({ info: func, method: path.method });
+    lookup[path.filename] = group;
+  }
+  return [...Object.values(lookup)];
+}
+
+export async function writeWrapperFunction(group: FunctionGroup, wrapperText: string) {
+  const extension = getHandlerExtension(group.runtime);
+  const filename = `${group.funcs[0].info.name}.${extension}`;
 
   const pathname = path.join(datadogDirectory, filename);
   await util.promisify(fs.writeFile)(pathname, wrapperText);
+  console.log(pathname);
   return pathname;
 }
 
