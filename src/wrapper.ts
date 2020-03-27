@@ -62,13 +62,13 @@ export function getWrapperText(handlerInfo: HandlerInfo) {
 
   switch (handlerInfo.type) {
     case RuntimeType.NODE:
-      return { text: nodeTemplate(filename, method), method };
+      return { text: nodeTemplate(filename, [method]), method };
     case RuntimeType.NODE_ES6:
-      return { text: es6Template(filename, method), method };
+      return { text: es6Template(filename, [method]), method };
     case RuntimeType.NODE_TS:
-      return { text: typescriptTemplate(filename, method), method };
+      return { text: typescriptTemplate(filename, [method]), method };
     case RuntimeType.PYTHON:
-      return { text: pythonTemplate(filename, method), method };
+      return { text: pythonTemplate(filename, [method]), method };
   }
 }
 
