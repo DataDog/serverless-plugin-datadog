@@ -103,8 +103,8 @@ export async function writeWrapperFunction(group: FunctionGroup, wrapperText: st
   const filename = `${group.funcs[0].info.name}.${extension}`;
 
   const pathname = path.join(datadogDirectory, filename);
+
   await util.promisify(fs.writeFile)(pathname, wrapperText);
-  console.log(pathname);
   return pathname;
 }
 
