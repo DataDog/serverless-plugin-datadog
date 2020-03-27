@@ -83,17 +83,17 @@ export function getFunctionGroups(functionInfos: FunctionInfo[]) {
     [key: string]: FunctionGroup;
   } = {};
   for (const func of functionInfos) {
-    const path = getHandlerPath(func);
-    if (path === undefined) {
+    const handlerPath = getHandlerPath(func);
+    if (handlerPath === undefined) {
       continue;
     }
-    const group = lookup[path.filename] ?? {
+    const group = lookup[handlerPath.filename] ?? {
       funcs: [],
-      filename: path.filename,
+      filename: handlerPath.filename,
       runtime: func.type,
     };
-    group.funcs.push({ info: func, method: path.method });
-    lookup[path.filename] = group;
+    group.funcs.push({ info: func, method: handlerPath.method });
+    lookup[handlerPath.filename] = group;
   }
   return [...Object.values(lookup)];
 }
