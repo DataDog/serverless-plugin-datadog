@@ -72,7 +72,9 @@ module.exports = class ServerlessPlugin {
     } else {
       this.serverless.cli.log("Skipping adding Lambda Layers, make sure you are packaging them yourself");
     }
-    enabledTracing(this.serverless.service);
+    if (config.enableTracing) {
+      enabledTracing(this.serverless.service);
+    }
     await writeHandlers(this.serverless.service, handlers);
   }
   private async afterDeployFunction() {
