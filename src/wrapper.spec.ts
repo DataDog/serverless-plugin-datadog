@@ -304,15 +304,6 @@ describe("writeHandlers", () => {
           handler: "mydir/func.secondhandler",
         },
       },
-      {
-        name: "second-lambda",
-        type: RuntimeType.PYTHON,
-        handler: {
-          name: "second-lambda",
-          package: {} as any,
-          handler: "mydir/func.myhandler", // duplicate
-        },
-      },
     ]);
     expect(service).toEqual({
       package: {
