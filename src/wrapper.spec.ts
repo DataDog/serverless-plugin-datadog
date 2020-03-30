@@ -311,4 +311,34 @@ describe("writeHandlers", () => {
       },
     });
   });
+
+  it("creates one file for each language with the same base name", async () => {
+    mock({});
+    const service = {} as any;
+    await writeHandlers(service, [
+      {
+        name: "my-lambda",
+        type: RuntimeType.PYTHON,
+        handler: {
+          name: "my-lambda",
+          package: {} as any,
+          handler: "mydir/func.myhandler",
+        },
+      },
+      {
+        name: "second-lambda",
+        type: RuntimeType.NODE,
+        handler: {
+          name: "second-lambda",
+          package: {} as any,
+          handler: "mydir/func.secondhandler",
+        },
+      },
+    ]);
+    expect(service).toEqual({
+      package: {
+        include: [`${datadogDirectory}/my-lambda.py`, `${datadogDirectory}/second-lambda.js`, `${datadogDirectory}/**`],
+      },
+    });
+  });
 });
