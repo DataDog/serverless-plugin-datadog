@@ -39,7 +39,7 @@ export const defaultConfiguration: Configuration = {
   flushMetricsToLogs: false,
   logLevel: "info",
   site: "datadoghq.com",
-  enableTracing: true
+  enableTracing: true,
 };
 
 export function setEnvConfiguration(config: Configuration, service: Service) {
