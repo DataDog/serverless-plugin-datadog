@@ -33,15 +33,16 @@ export async function writeHandlers(service: Service, funcs: FunctionInfo[]) {
   await util.promisify(fs.mkdir)(datadogDirectory);
   const groups = getFunctionGroups(funcs);
   const promises = groups.map(async (funcGroup) => {
-    const methods = [...funcGroup.funcs.map((func) => func.method)];
+    const methods = getMethods(funcGroup);
     const result = getWrapperText(funcGroup.runtime, funcGroup.filename, methods);
     if (result === undefined) {
       return;
     }
     const text = result;
     const filename = await writeWrapperFunction(funcGroup, text);
+    const baseMethodName = path.posix.join(datadogDirectory, funcGroup.funcs[0].info.name);
     for (const func of funcGroup.funcs) {
-      func.info.handler.handler = `${path.posix.join(datadogDirectory, func.info.name)}.${func.method}`;
+      func.info.handler.handler = `${baseMethodName}.${func.method}`;
       if (func.info.handler.package === undefined) {
         func.info.handler.package = {
           exclude: [],
@@ -117,6 +118,11 @@ export async function addToExclusionList(service: any, files: string[]) {
     pack.include = [];
   }
   pack.include.push(...files);
+}
+
+function getMethods(funcGroup: FunctionGroup) {
+  // Dedups methods shared between multiple function groups
+  return [...new Set(funcGroup.funcs.map((func) => func.method)).values()].sort();
 }
 
 function getHandlerExtension(type: RuntimeType) {
