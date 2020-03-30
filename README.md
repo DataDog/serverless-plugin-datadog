@@ -69,6 +69,9 @@ custom:
 
     # Datadog API Key encrypted using KMS, only needed when flushMetricsToLogs is false
     apiKMSKey: ""
+
+    # Enable tracing on Lambda functions and API Gateway integrations. Defaults to true
+    enableTracing: true
 ```
 
 `flushMetricsToLogs: true` is recommended for submitting custom metrics via CloudWatch logs with the help of [Datadog Forwarder](https://github.com/DataDog/datadog-serverless-functions/tree/master/aws/logs_monitoring).
