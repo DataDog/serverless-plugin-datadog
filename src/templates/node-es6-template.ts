@@ -6,9 +6,20 @@
  * Copyright 2019 Datadog, Inc.
  */
 
-export function es6Template(filePath: string, method: string) {
-  return `/* eslint-disable */
+export function es6Template(filePath: string, methods: string[]) {
+  const methodsString = methodsTemplate(methods);
+  return (
+    `/* eslint-disable */
   const { datadog } = require("datadog-lambda-js");
-  import * as original from "../${filePath}";
-  export const ${method} = datadog(original.${method});`;
+  import * as original from "../${filePath}";` + methodsString
+  );
+}
+
+function methodsTemplate(methods: string[]) {
+  let data = "";
+  for (const method of methods) {
+    data += "\n";
+    data += `  export const ${method} = datadog(original.${method});`;
+  }
+  return data;
 }

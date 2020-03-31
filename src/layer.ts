@@ -8,7 +8,7 @@
 import fs from "fs";
 import { FunctionDefinition } from "serverless";
 import Service from "serverless/classes/Service";
-import { getHandlerPath } from "./util";
+import { getHandlerPath, hasWebpackPlugin } from "./util";
 
 export enum RuntimeType {
   NODE,
@@ -18,7 +18,7 @@ export enum RuntimeType {
   UNSUPPORTED,
 }
 
-export interface HandlerInfo {
+export interface FunctionInfo {
   name: string;
   type: RuntimeType;
   handler: FunctionDefinition;
@@ -49,7 +49,7 @@ export function findHandlers(
   service: Service,
   defaultRuntime?: string,
   defaultNodeRuntime?: RuntimeType.NODE_ES6 | RuntimeType.NODE_TS | RuntimeType.NODE,
-): HandlerInfo[] {
+): FunctionInfo[] {
   const funcs = (service as any).functions as { [key: string]: FunctionDefinition };
 
   return Object.entries(funcs)
@@ -59,7 +59,7 @@ export function findHandlers(
         runtime = defaultRuntime;
       }
       if (runtime !== undefined && runtime in runtimeLookup) {
-        const handlerInfo = { type: runtimeLookup[runtime], runtime, name, handler } as HandlerInfo;
+        const handlerInfo = { type: runtimeLookup[runtime], runtime, name, handler } as FunctionInfo;
         if (handlerInfo.type === RuntimeType.NODE) {
           const handlerPath = getHandlerPath(handlerInfo);
           if (handlerPath === undefined) {
@@ -84,12 +84,12 @@ export function findHandlers(
 
         return handlerInfo;
       }
-      return { type: RuntimeType.UNSUPPORTED, runtime, name, handler } as HandlerInfo;
+      return { type: RuntimeType.UNSUPPORTED, runtime, name, handler } as FunctionInfo;
     })
-    .filter((result) => result !== undefined) as HandlerInfo[];
+    .filter((result) => result !== undefined) as FunctionInfo[];
 }
 
-export function applyLayers(region: string, handlers: HandlerInfo[], layers: LayerJSON) {
+export function applyLayers(region: string, handlers: FunctionInfo[], layers: LayerJSON) {
   const regionRuntimes = layers.regions[region];
   if (regionRuntimes === undefined) {
     return;
@@ -112,7 +112,7 @@ export function applyLayers(region: string, handlers: HandlerInfo[], layers: Lay
   }
 }
 
-function getLayers(handler: HandlerInfo) {
+function getLayers(handler: FunctionInfo) {
   const layersList = (handler.handler as any).layers as string[] | undefined;
   if (layersList === undefined) {
     return [];
@@ -120,14 +120,6 @@ function getLayers(handler: HandlerInfo) {
   return layersList;
 }
 
-function setLayers(handler: HandlerInfo, layers: string[]) {
+function setLayers(handler: FunctionInfo, layers: string[]) {
   (handler.handler as any).layers = layers;
-}
-
-function hasWebpackPlugin(service: Service) {
-  const plugins: string[] | undefined = (service as any).plugins;
-  if (plugins === undefined) {
-    return false;
-  }
-  return plugins.find((plugin) => plugin === "serverless-webpack") !== undefined;
 }

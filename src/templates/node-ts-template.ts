@@ -6,10 +6,22 @@
  * Copyright 2019 Datadog, Inc.
  */
 
-export function typescriptTemplate(filePath: string, method: string) {
-  return `/* tslint:disable */
+export function typescriptTemplate(filePath: string, methods: string[]) {
+  const methodsString = methodsTemplate(methods);
+
+  return (
+    `/* tslint:disable */
 /* eslint-disable */
 const { datadog } = require("datadog-lambda-js") as any;
-import * as original from "../${filePath}";
-export const ${method} = datadog(original.${method});`;
+import * as original from "../${filePath}";` + methodsString
+  );
+}
+
+function methodsTemplate(methods: string[]) {
+  let data = "";
+  for (const method of methods) {
+    data += "\n";
+    data += `export const ${method} = datadog(original.${method});`;
+  }
+  return data;
 }

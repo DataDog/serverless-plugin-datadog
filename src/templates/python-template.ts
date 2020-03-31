@@ -6,9 +6,19 @@
  * Copyright 2019 Datadog, Inc.
  */
 
-export function pythonTemplate(filePath: string, method: string) {
+export function pythonTemplate(filePath: string, methods: string[]) {
   const newPath = filePath.split(/\/|\\/).join(".");
-  return `from datadog_lambda.wrapper import datadog_lambda_wrapper
-from ${newPath} import ${method} as ${method}_impl
+  const methodsString = methodsTemplate(newPath, methods);
+
+  return `from datadog_lambda.wrapper import datadog_lambda_wrapper` + methodsString;
+}
+
+function methodsTemplate(newPath: string, methods: string[]) {
+  let data = "";
+  for (const method of methods) {
+    data += "\n";
+    data += `from ${newPath} import ${method} as ${method}_impl
 ${method} = datadog_lambda_wrapper(${method}_impl)`;
+  }
+  return data;
 }

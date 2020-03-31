@@ -6,7 +6,7 @@
  * Copyright 2019 Datadog, Inc.
  */
 
-import { HandlerInfo, LayerJSON, RuntimeType, applyLayers, findHandlers } from "./layer";
+import { FunctionInfo, LayerJSON, RuntimeType, applyLayers, findHandlers } from "./layer";
 
 import { FunctionDefinition } from "serverless";
 import Service from "serverless/classes/Service";
@@ -197,7 +197,7 @@ describe("applyLayers", () => {
       handler: { runtime: "nodejs10.x" },
       type: RuntimeType.NODE,
       runtime: "nodejs10.x",
-    } as HandlerInfo;
+    } as FunctionInfo;
     const layers: LayerJSON = {
       regions: { "us-east-1": { "nodejs10.x": "node:2" } },
     };
@@ -212,7 +212,7 @@ describe("applyLayers", () => {
       handler: { runtime: "nodejs10.x", layers: ["node:1"] } as any,
       type: RuntimeType.NODE,
       runtime: "nodejs10.x",
-    } as HandlerInfo;
+    } as FunctionInfo;
     const layers: LayerJSON = {
       regions: { "us-east-1": { "nodejs10.x": "node:2" } },
     };
@@ -227,7 +227,7 @@ describe("applyLayers", () => {
       handler: { runtime: "nodejs10.x", layers: ["node:1"] } as any,
       type: RuntimeType.NODE,
       runtime: "nodejs10.x",
-    } as HandlerInfo;
+    } as FunctionInfo;
     const layers: LayerJSON = {
       regions: { "us-east-1": { "nodejs10.x": "node:1" } },
     };
@@ -242,7 +242,7 @@ describe("applyLayers", () => {
       handler: { runtime: "nodejs10.x" } as any,
       type: RuntimeType.NODE,
       runtime: "nodejs10.x",
-    } as HandlerInfo;
+    } as FunctionInfo;
     const layers: LayerJSON = {
       regions: { "us-east-1": { "nodejs10.x": "node:1" } },
     };
@@ -256,7 +256,7 @@ describe("applyLayers", () => {
       handler: { runtime: "nodejs10.x" } as any,
       type: RuntimeType.NODE,
       runtime: "nodejs10.x",
-    } as HandlerInfo;
+    } as FunctionInfo;
     const layers: LayerJSON = {
       regions: { "us-east-1": { "python2.7": "python:2" } },
     };
@@ -270,7 +270,7 @@ describe("applyLayers", () => {
       handler: {} as any,
       type: RuntimeType.NODE,
       runtime: "nodejs10.x",
-    } as HandlerInfo;
+    } as FunctionInfo;
     const layers: LayerJSON = {
       regions: { "us-east-1": { "python2.7": "python:2" } },
     };
@@ -281,7 +281,7 @@ describe("applyLayers", () => {
     const handler = {
       handler: {} as any,
       type: RuntimeType.UNSUPPORTED,
-    } as HandlerInfo;
+    } as FunctionInfo;
     const layers: LayerJSON = {
       regions: { "us-east-1": { "python2.7": "python:2" } },
     };

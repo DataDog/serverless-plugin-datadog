@@ -78,3 +78,36 @@ export function getConfig(service: Service): Configuration {
     ...datadog,
   };
 }
+
+export function forceExcludeDepsFromWebpack(service: Service) {
+  const includeModules = getPropertyFromPath(service, ["custom", "webpack", "includeModules"]);
+  if (includeModules === undefined) {
+    return;
+  }
+  let forceExclude = includeModules.forceExclude as string[] | undefined;
+  if (forceExclude === undefined) {
+    forceExclude = [];
+    includeModules.forceExclude = forceExclude;
+  }
+  if (!forceExclude.includes("datadog-lambda-js")) {
+    forceExclude.push("datadog-lambda-js");
+  }
+  if (!forceExclude.includes("dd-trace")) {
+    forceExclude.push("dd-trace");
+  }
+}
+
+function getPropertyFromPath(obj: any, path: string[]) {
+  for (const part of path) {
+    let prop = obj[part];
+    if (prop === undefined || prop === true) {
+      prop = {};
+      obj[part] = prop;
+    }
+    if (prop === false) {
+      return;
+    }
+    obj = prop;
+  }
+  return obj;
+}

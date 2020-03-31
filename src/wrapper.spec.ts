@@ -14,88 +14,91 @@ import mock from "mock-fs";
 
 describe("getWrapperText", () => {
   it("renders the python template correctly", () => {
-    const wrapperText = getWrapperText({
-      name: "my-lambda",
-      type: RuntimeType.PYTHON,
-      handler: {
-        name: "",
-        package: {} as any,
-        handler: "mydir/func.myhandler",
-      },
-    });
+    const wrapperText = getWrapperText(RuntimeType.PYTHON, "mydir/func", ["myhandler"]);
+
     expect(wrapperText).toMatchInlineSnapshot(`
-                  Object {
-                    "method": "myhandler",
-                    "text": "from datadog_lambda.wrapper import datadog_lambda_wrapper
+                  "from datadog_lambda.wrapper import datadog_lambda_wrapper
                   from mydir.func import myhandler as myhandler_impl
-                  myhandler = datadog_lambda_wrapper(myhandler_impl)",
-                  }
+                  myhandler = datadog_lambda_wrapper(myhandler_impl)"
+            `);
+  });
+  it("renders multiple methods with the python template correctly", () => {
+    const wrapperText = getWrapperText(RuntimeType.PYTHON, "mydir/func", ["myhandler", "secondhandler"]);
+
+    expect(wrapperText).toMatchInlineSnapshot(`
+                  "from datadog_lambda.wrapper import datadog_lambda_wrapper
+                  from mydir.func import myhandler as myhandler_impl
+                  myhandler = datadog_lambda_wrapper(myhandler_impl)
+                  from mydir.func import secondhandler as secondhandler_impl
+                  secondhandler = datadog_lambda_wrapper(secondhandler_impl)"
             `);
   });
   it("renders the node template correctly", () => {
-    const wrapperText = getWrapperText({
-      name: "my-lambda",
-      type: RuntimeType.NODE,
-      handler: {
-        name: "",
-        package: {} as any,
-        handler: "my.myhandler",
-      },
-    });
+    const wrapperText = getWrapperText(RuntimeType.NODE, "my", ["myhandler"]);
+
     expect(wrapperText).toMatchInlineSnapshot(`
-                  Object {
-                    "method": "myhandler",
-                    "text": "const { datadog } = require(\\"datadog-lambda-js\\");
+                  "const { datadog } = require(\\"datadog-lambda-js\\");
                   const original = require(\\"../my\\");
-                  module.exports.myhandler = datadog(original.myhandler);",
-                  }
+                  module.exports.myhandler = datadog(original.myhandler);"
+            `);
+  });
+  it("renders multiple handlers with the node template", () => {
+    const wrapperText = getWrapperText(RuntimeType.NODE, "my", ["myhandler", "secondhandler"]);
+
+    expect(wrapperText).toMatchInlineSnapshot(`
+                  "const { datadog } = require(\\"datadog-lambda-js\\");
+                  const original = require(\\"../my\\");
+                  module.exports.myhandler = datadog(original.myhandler);
+                  module.exports.secondhandler = datadog(original.secondhandler);"
             `);
   });
   it("renders the node ts template correctly", () => {
-    const wrapperText = getWrapperText({
-      name: "my-lambda",
-      type: RuntimeType.NODE_TS,
-      handler: {
-        name: "",
-        package: {} as any,
-        handler: "my.myhandler",
-      },
-    });
+    const wrapperText = getWrapperText(RuntimeType.NODE_TS, "my", ["myhandler"]);
     expect(wrapperText).toMatchInlineSnapshot(`
-            Object {
-              "method": "myhandler",
-              "text": "/* tslint:disable */
+            "/* tslint:disable */
             /* eslint-disable */
             const { datadog } = require(\\"datadog-lambda-js\\") as any;
             import * as original from \\"../my\\";
-            export const myhandler = datadog(original.myhandler);",
-            }
+            export const myhandler = datadog(original.myhandler);"
+        `);
+  });
+  it("renders multiple methods with the node ts template", () => {
+    const wrapperText = getWrapperText(RuntimeType.NODE_TS, "my", ["myhandler", "secondhandler"]);
+    expect(wrapperText).toMatchInlineSnapshot(`
+            "/* tslint:disable */
+            /* eslint-disable */
+            const { datadog } = require(\\"datadog-lambda-js\\") as any;
+            import * as original from \\"../my\\";
+            export const myhandler = datadog(original.myhandler);
+            export const secondhandler = datadog(original.secondhandler);"
         `);
   });
   it("renders the node es template correctly", () => {
-    const wrapperText = getWrapperText({
-      name: "my-lambda",
-      type: RuntimeType.NODE_ES6,
-      handler: {
-        name: "",
-        package: {} as any,
-        handler: "my.myhandler",
-      },
-    });
+    const wrapperText = getWrapperText(RuntimeType.NODE_ES6, "my", ["myhandler"]);
+
     expect(wrapperText).toMatchInlineSnapshot(`
-      Object {
-        "method": "myhandler",
-        "text": "/* eslint-disable */
+      "/* eslint-disable */
         const { datadog } = require(\\"datadog-lambda-js\\");
         import * as original from \\"../my\\";
-        export const myhandler = datadog(original.myhandler);",
-      }
+        export const myhandler = datadog(original.myhandler);"
+    `);
+  });
+  it("renders the multiple methods with the  node es template", () => {
+    const wrapperText = getWrapperText(RuntimeType.NODE_ES6, "my", ["myhandler", "secondhandler"]);
+
+    expect(wrapperText).toMatchInlineSnapshot(`
+      "/* eslint-disable */
+        const { datadog } = require(\\"datadog-lambda-js\\");
+        import * as original from \\"../my\\";
+        export const myhandler = datadog(original.myhandler);
+        export const secondhandler = datadog(original.secondhandler);"
     `);
   });
 });
 
 describe("writeWrapperFunction", () => {
   beforeAll(() => {
+    console.log(""); // Workaround for this issue: https://github.com/facebook/jest/issues/5792
     mock({
       [datadogDirectory]: {},
     });
@@ -107,13 +110,22 @@ describe("writeWrapperFunction", () => {
   it("writes out node files to a .js file", async () => {
     await writeWrapperFunction(
       {
-        name: "my-lambda",
-        type: RuntimeType.NODE,
-        handler: {
-          name: "my-lambda",
-          package: {} as any,
-          handler: "mydir/func.myhandler",
-        },
+        filename: "mydir/my",
+        funcs: [
+          {
+            info: {
+              name: "my-lambda",
+              type: RuntimeType.NODE,
+              handler: {
+                name: "my-lambda",
+                package: {} as any,
+                handler: "mydir/func.myhandler",
+              },
+            },
+            method: "myhandler",
+          },
+        ],
+        runtime: RuntimeType.NODE,
       },
       "my-text",
     );
@@ -122,13 +134,59 @@ describe("writeWrapperFunction", () => {
   it("writes out python files to a .py file", async () => {
     await writeWrapperFunction(
       {
-        name: "my-lambda",
-        type: RuntimeType.PYTHON,
-        handler: {
-          name: "my-lambda",
-          package: {} as any,
-          handler: "mydir/func.myhandler",
-        },
+        filename: "mydir/my",
+        funcs: [
+          {
+            info: {
+              name: "my-lambda",
+              type: RuntimeType.PYTHON,
+              handler: {
+                name: "my-lambda",
+                package: {} as any,
+                handler: "mydir/func.myhandler",
+              },
+            },
+            method: "myhandler",
+          },
+        ],
+        runtime: RuntimeType.PYTHON,
+      },
+      "my-text",
+    );
+    expect(fs.existsSync(`${datadogDirectory}/my-lambda.py`)).toBeTruthy();
+  });
+
+  it("writes out one python file for each source with handlers", async () => {
+    await writeWrapperFunction(
+      {
+        filename: "mydir/my",
+        funcs: [
+          {
+            info: {
+              name: "my-lambda",
+              type: RuntimeType.PYTHON,
+              handler: {
+                name: "my-lambda",
+                package: {} as any,
+                handler: "mydir/func.myhandler",
+              },
+            },
+            method: "myhandler",
+          },
+          {
+            info: {
+              name: "another-lambda",
+              type: RuntimeType.PYTHON,
+              handler: {
+                name: "another-lambda",
+                package: {} as any,
+                handler: "mydir/func.another",
+              },
+            },
+            method: "another",
+          },
+        ],
+        runtime: RuntimeType.PYTHON,
       },
       "my-text",
     );
@@ -222,5 +280,65 @@ describe("writeHandlers", () => {
       },
     ]);
     expect(fs.existsSync(`${datadogDirectory}/my-lambda.py`)).toBeTruthy();
+  });
+
+  it("creates one file for each source handler file", async () => {
+    mock({});
+    const service = {} as any;
+    await writeHandlers(service, [
+      {
+        name: "my-lambda",
+        type: RuntimeType.PYTHON,
+        handler: {
+          name: "my-lambda",
+          package: {} as any,
+          handler: "mydir/func.myhandler",
+        },
+      },
+      {
+        name: "second-lambda",
+        type: RuntimeType.PYTHON,
+        handler: {
+          name: "second-lambda",
+          package: {} as any,
+          handler: "mydir/func.secondhandler",
+        },
+      },
+    ]);
+    expect(service).toEqual({
+      package: {
+        include: [`${datadogDirectory}/my-lambda.py`, `${datadogDirectory}/**`],
+      },
+    });
+  });
+
+  it("creates one file for each language with the same base name", async () => {
+    mock({});
+    const service = {} as any;
+    await writeHandlers(service, [
+      {
+        name: "my-lambda",
+        type: RuntimeType.PYTHON,
+        handler: {
+          name: "my-lambda",
+          package: {} as any,
+          handler: "mydir/func.myhandler",
+        },
+      },
+      {
+        name: "second-lambda",
+        type: RuntimeType.NODE,
+        handler: {
+          name: "second-lambda",
+          package: {} as any,
+          handler: "mydir/func.secondhandler",
+        },
+      },
+    ]);
+    expect(service).toEqual({
+      package: {
+        include: [`${datadogDirectory}/my-lambda.py`, `${datadogDirectory}/second-lambda.js`, `${datadogDirectory}/**`],
+      },
+    });
   });
 });
