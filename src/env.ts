@@ -22,7 +22,7 @@ export interface Configuration {
   // Whether the log forwarder integration is enabled by default
   flushMetricsToLogs: boolean;
   // Enable tracing on Lambda functions and API Gateway integrations. Defaults to true
-  enableTracing: true;
+  enableXrayTracing: true;
   // When set, the plugin will always write wrapper handlers in the given format. Otherwise, will try
   // to infer the handler type either from the extension, or presence of webpack.
   nodeModuleType?: "es6" | "node" | "typescript";
@@ -39,7 +39,7 @@ export const defaultConfiguration: Configuration = {
   flushMetricsToLogs: false,
   logLevel: "info",
   site: "datadoghq.com",
-  enableTracing: true,
+  enableXrayTracing: true,
 };
 
 export function setEnvConfiguration(config: Configuration, service: Service) {

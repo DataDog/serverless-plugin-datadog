@@ -114,7 +114,7 @@ describe("ServerlessPlugin", () => {
       });
     });
 
-    it("skips adding tracing when enableTracing is false", async () => {
+    it("skips adding tracing when enableXrayTracing is false", async () => {
       mock({});
       const serverless = {
         cli: {
@@ -133,7 +133,7 @@ describe("ServerlessPlugin", () => {
           },
           custom: {
             datadog: {
-              enableTracing: false,
+              enableXrayTracing: false,
             },
           },
         },

@@ -29,7 +29,7 @@ describe("getConfig", () => {
       flushMetricsToLogs: false,
       logLevel: "debug",
       site: "datadoghq.com",
-      enableTracing: true,
+      enableXrayTracing: true,
     });
   });
 });
@@ -47,7 +47,7 @@ describe("setEnvConfiguration", () => {
         site: "datadoghq.eu",
         logLevel: "debug",
         flushMetricsToLogs: true,
-        enableTracing: true,
+        enableXrayTracing: true,
       },
       service,
     );
@@ -84,7 +84,7 @@ describe("setEnvConfiguration", () => {
         site: "datadoghq.com",
         logLevel: "info",
         flushMetricsToLogs: false,
-        enableTracing: true,
+        enableXrayTracing: true,
       },
       service,
     );
