@@ -13,7 +13,8 @@
     "test:watch": "jest --watch",
     "coverage": "jest --coverage",
     "lint": "tslint --project tsconfig.json",
-    "check-formatting": "prettier --check src/**"
+    "check-formatting": "prettier --check src/**",
+    "format": "prettier --write src/**"
   },
   "devDependencies": {
     "@types/jest": "^25.1.4",

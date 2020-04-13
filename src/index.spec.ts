@@ -141,7 +141,7 @@ describe("ServerlessPlugin", () => {
 
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:initialize"]();
-      expect(Object.keys(serverless.service.provider)).not.toContain('tracing');
+      expect(Object.keys(serverless.service.provider)).not.toContain("tracing");
     });
 
     it("cleans up temp handler files afterwards", async () => {
