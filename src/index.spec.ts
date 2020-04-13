@@ -114,6 +114,36 @@ describe("ServerlessPlugin", () => {
       });
     });
 
+    it("skips adding tracing when enableXrayTracing is false", async () => {
+      mock({});
+      const serverless = {
+        cli: {
+          log: () => {},
+        },
+        service: {
+          provider: {
+            region: "us-east-1",
+          },
+          functions: {
+            node1: {
+              handler: "datadog_handlers/node1.ev",
+              layers: [],
+              runtime: "nodejs8.10",
+            },
+          },
+          custom: {
+            datadog: {
+              enableXrayTracing: false,
+            },
+          },
+        },
+      };
+
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:initialize"]();
+      expect(Object.keys(serverless.service.provider)).not.toContain("tracing");
+    });
+
     it("cleans up temp handler files afterwards", async () => {
       mock({
         [datadogDirectory]: {
