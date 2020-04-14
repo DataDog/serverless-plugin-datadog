@@ -6,13 +6,27 @@
  * Copyright 2019 Datadog, Inc.
  */
 
-export function nodeTemplate(filePath: string, methods: string[]) {
-  const methodsString = methodsTemplate(methods);
+import { TracingMode } from "./common";
 
-  return (
-    `const { datadog } = require("datadog-lambda-js");
-const original = require("../${filePath}");` + methodsString
-  );
+export function nodeTemplate(filePath: string, methods: string[], mode: TracingMode) {
+  const methodsString = methodsTemplate(methods);
+  const tracerString = tracerTemplate(mode);
+
+  return `const { datadog } = require("datadog-lambda-js");
+${tracerString}
+const original = require("../${filePath}");
+${methodsString}`;
+}
+
+function tracerTemplate(mode: TracingMode): string {
+  switch (mode) {
+    case TracingMode.DD_TRACE:
+    case TracingMode.HYBRID:
+      return 'import { tracer } from "dd-trace-js"\ntracer.init();';
+    case TracingMode.XRAY:
+    case TracingMode.NONE:
+      return "";
+  }
 }
 
 function methodsTemplate(methods: string[]) {

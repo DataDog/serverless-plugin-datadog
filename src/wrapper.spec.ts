@@ -11,10 +11,11 @@ import { datadogDirectory, getWrapperText, writeHandlers, writeWrapperFunction }
 import { RuntimeType } from "./layer";
 import fs from "fs";
 import mock from "mock-fs";
+import { TracingMode } from "./templates/common";
 
 describe("getWrapperText", () => {
   it("renders the python template correctly", () => {
-    const wrapperText = getWrapperText(RuntimeType.PYTHON, "mydir/func", ["myhandler"]);
+    const wrapperText = getWrapperText(RuntimeType.PYTHON, "mydir/func", ["myhandler"], TracingMode.XRAY);
 
     expect(wrapperText).toMatchInlineSnapshot(`
                   "from datadog_lambda.wrapper import datadog_lambda_wrapper
@@ -23,7 +24,12 @@ describe("getWrapperText", () => {
             `);
   });
   it("renders multiple methods with the python template correctly", () => {
-    const wrapperText = getWrapperText(RuntimeType.PYTHON, "mydir/func", ["myhandler", "secondhandler"]);
+    const wrapperText = getWrapperText(
+      RuntimeType.PYTHON,
+      "mydir/func",
+      ["myhandler", "secondhandler"],
+      TracingMode.XRAY,
+    );
 
     expect(wrapperText).toMatchInlineSnapshot(`
                   "from datadog_lambda.wrapper import datadog_lambda_wrapper
@@ -34,65 +40,126 @@ describe("getWrapperText", () => {
             `);
   });
   it("renders the node template correctly", () => {
-    const wrapperText = getWrapperText(RuntimeType.NODE, "my", ["myhandler"]);
+    const wrapperText = getWrapperText(RuntimeType.NODE, "my", ["myhandler"], TracingMode.XRAY);
 
     expect(wrapperText).toMatchInlineSnapshot(`
-                  "const { datadog } = require(\\"datadog-lambda-js\\");
-                  const original = require(\\"../my\\");
-                  module.exports.myhandler = datadog(original.myhandler);"
-            `);
+      "const { datadog } = require(\\"datadog-lambda-js\\");
+
+      const original = require(\\"../my\\");
+
+      module.exports.myhandler = datadog(original.myhandler);"
+    `);
   });
   it("renders multiple handlers with the node template", () => {
-    const wrapperText = getWrapperText(RuntimeType.NODE, "my", ["myhandler", "secondhandler"]);
+    const wrapperText = getWrapperText(RuntimeType.NODE, "my", ["myhandler", "secondhandler"], TracingMode.XRAY);
 
     expect(wrapperText).toMatchInlineSnapshot(`
                   "const { datadog } = require(\\"datadog-lambda-js\\");
+
                   const original = require(\\"../my\\");
+                  
                   module.exports.myhandler = datadog(original.myhandler);
                   module.exports.secondhandler = datadog(original.secondhandler);"
             `);
   });
   it("renders the node ts template correctly", () => {
-    const wrapperText = getWrapperText(RuntimeType.NODE_TS, "my", ["myhandler"]);
+    const wrapperText = getWrapperText(RuntimeType.NODE_TS, "my", ["myhandler"], TracingMode.XRAY);
     expect(wrapperText).toMatchInlineSnapshot(`
-            "/* tslint:disable */
-            /* eslint-disable */
-            const { datadog } = require(\\"datadog-lambda-js\\") as any;
-            import * as original from \\"../my\\";
-            export const myhandler = datadog(original.myhandler);"
-        `);
+      "/* tslint:disable */
+      /* eslint-disable */
+
+      const { datadog } = require(\\"datadog-lambda-js\\") as any;
+      import * as original from \\"../my\\";
+
+      export const myhandler = datadog(original.myhandler);"
+    `);
   });
   it("renders multiple methods with the node ts template", () => {
-    const wrapperText = getWrapperText(RuntimeType.NODE_TS, "my", ["myhandler", "secondhandler"]);
+    const wrapperText = getWrapperText(RuntimeType.NODE_TS, "my", ["myhandler", "secondhandler"], TracingMode.XRAY);
     expect(wrapperText).toMatchInlineSnapshot(`
-            "/* tslint:disable */
-            /* eslint-disable */
-            const { datadog } = require(\\"datadog-lambda-js\\") as any;
-            import * as original from \\"../my\\";
-            export const myhandler = datadog(original.myhandler);
-            export const secondhandler = datadog(original.secondhandler);"
-        `);
+"/* tslint:disable */
+/* eslint-disable */
+
+const { datadog } = require(\\"datadog-lambda-js\\") as any;
+import * as original from \\"../my\\";
+
+export const myhandler = datadog(original.myhandler);
+export const secondhandler = datadog(original.secondhandler);"
+`);
   });
+  it("renders tracer initialisation with ts template using hybrid tracing", () => {
+    const wrapperText = getWrapperText(RuntimeType.NODE_TS, "my", ["myhandler"], TracingMode.HYBRID);
+    expect(wrapperText).toMatchInlineSnapshot(`
+"/* tslint:disable */
+/* eslint-disable */
+import { tracer } from \\"dd-trace-js\\"
+tracer.init();
+const { datadog } = require(\\"datadog-lambda-js\\") as any;
+import * as original from \\"../my\\";
+
+export const myhandler = datadog(original.myhandler);"
+`);
+  });
+  it("renders tracer initialisation with ts template using dd-trace", () => {
+    const wrapperText = getWrapperText(RuntimeType.NODE_TS, "my", ["myhandler"], TracingMode.DD_TRACE);
+    expect(wrapperText).toMatchInlineSnapshot(`
+"/* tslint:disable */
+/* eslint-disable */
+import { tracer } from \\"dd-trace-js\\"
+tracer.init();
+const { datadog } = require(\\"datadog-lambda-js\\") as any;
+import * as original from \\"../my\\";
+
+export const myhandler = datadog(original.myhandler);"
+`);
+  });
+
   it("renders the node es template correctly", () => {
-    const wrapperText = getWrapperText(RuntimeType.NODE_ES6, "my", ["myhandler"]);
+    const wrapperText = getWrapperText(RuntimeType.NODE_ES6, "my", ["myhandler"], TracingMode.XRAY);
 
     expect(wrapperText).toMatchInlineSnapshot(`
-      "/* eslint-disable */
-        const { datadog } = require(\\"datadog-lambda-js\\");
-        import * as original from \\"../my\\";
-        export const myhandler = datadog(original.myhandler);"
-    `);
+"/* eslint-disable */
+
+const { datadog } = require(\\"datadog-lambda-js\\");
+import * as original from \\"../my\\";
+
+export const myhandler = datadog(original.myhandler);"
+`);
   });
   it("renders the multiple methods with the  node es template", () => {
-    const wrapperText = getWrapperText(RuntimeType.NODE_ES6, "my", ["myhandler", "secondhandler"]);
+    const wrapperText = getWrapperText(RuntimeType.NODE_ES6, "my", ["myhandler", "secondhandler"], TracingMode.XRAY);
 
     expect(wrapperText).toMatchInlineSnapshot(`
-      "/* eslint-disable */
-        const { datadog } = require(\\"datadog-lambda-js\\");
-        import * as original from \\"../my\\";
-        export const myhandler = datadog(original.myhandler);
-        export const secondhandler = datadog(original.secondhandler);"
-    `);
+"/* eslint-disable */
+
+const { datadog } = require(\\"datadog-lambda-js\\");
+import * as original from \\"../my\\";
+
+export const myhandler = datadog(original.myhandler);
+export const secondhandler = datadog(original.secondhandler);"
+`);
+  });
+  it("renders tracer initialisation with es template using dd-trace", () => {
+    const wrapperText = getWrapperText(RuntimeType.NODE_ES6, "my", ["myhandler"], TracingMode.DD_TRACE);
+    expect(wrapperText).toMatchInlineSnapshot(`
+"/* eslint-disable */
+require(\\"dd-trace-js\\").init();
+const { datadog } = require(\\"datadog-lambda-js\\");
+import * as original from \\"../my\\";
+
+export const myhandler = datadog(original.myhandler);"
+`);
+  });
+  it("renders tracer initialisation with ts template using hybrid tracing", () => {
+    const wrapperText = getWrapperText(RuntimeType.NODE_ES6, "my", ["myhandler"], TracingMode.HYBRID);
+    expect(wrapperText).toMatchInlineSnapshot(`
+"/* eslint-disable */
+require(\\"dd-trace-js\\").init();
+const { datadog } = require(\\"datadog-lambda-js\\");
+import * as original from \\"../my\\";
+
+export const myhandler = datadog(original.myhandler);"
+`);
   });
 });
 
@@ -202,17 +269,21 @@ describe("writeHandlers", () => {
   it("adds created files to the includes list", async () => {
     mock({});
     const service = {} as any;
-    await writeHandlers(service, [
-      {
-        name: "my-lambda",
-        type: RuntimeType.PYTHON,
-        handler: {
+    await writeHandlers(
+      service,
+      [
+        {
           name: "my-lambda",
-          package: {} as any,
-          handler: "mydir/func.myhandler",
+          type: RuntimeType.PYTHON,
+          handler: {
+            name: "my-lambda",
+            package: {} as any,
+            handler: "mydir/func.myhandler",
+          },
         },
-      },
-    ]);
+      ],
+      TracingMode.XRAY,
+    );
     expect(service).toEqual({
       package: {
         include: [`${datadogDirectory}/my-lambda.py`, `${datadogDirectory}/**`],
@@ -227,7 +298,7 @@ describe("writeHandlers", () => {
         include: [],
       },
     } as any;
-    await writeHandlers(service, []);
+    await writeHandlers(service, [], TracingMode.XRAY);
     expect(service).toEqual({
       package: {
         include: [`${datadogDirectory}/**`],
@@ -242,69 +313,81 @@ describe("writeHandlers", () => {
       },
     });
     const service = {} as any;
-    await writeHandlers(service, []);
+    await writeHandlers(service, [], TracingMode.XRAY);
     expect(fs.existsSync(`${datadogDirectory}/unused-file`)).toBeFalsy();
   });
 
   it("ignores handlers with poorly formatted names", async () => {
     mock({});
     const service = {} as any;
-    await writeHandlers(service, [
-      {
-        name: "my-lambda",
-        type: RuntimeType.PYTHON,
-        handler: {
+    await writeHandlers(
+      service,
+      [
+        {
           name: "my-lambda",
+          type: RuntimeType.PYTHON,
+          handler: {
+            name: "my-lambda",
 
-          package: {} as any,
-          handler: "mydir-myhandler",
+            package: {} as any,
+            handler: "mydir-myhandler",
+          },
         },
-      },
-    ]);
+      ],
+      TracingMode.XRAY,
+    );
     expect(fs.existsSync(`${datadogDirectory}/my-lambda.py`)).toBeFalsy();
   });
 
   it("creates well formatted handlers", async () => {
     mock({});
     const service = {} as any;
-    await writeHandlers(service, [
-      {
-        name: "my-lambda",
-        type: RuntimeType.PYTHON,
-        handler: {
+    await writeHandlers(
+      service,
+      [
+        {
           name: "my-lambda",
+          type: RuntimeType.PYTHON,
+          handler: {
+            name: "my-lambda",
 
-          package: {} as any,
-          handler: "mydir.myhandler",
+            package: {} as any,
+            handler: "mydir.myhandler",
+          },
         },
-      },
-    ]);
+      ],
+      TracingMode.XRAY,
+    );
     expect(fs.existsSync(`${datadogDirectory}/my-lambda.py`)).toBeTruthy();
   });
 
   it("creates one file for each source handler file", async () => {
     mock({});
     const service = {} as any;
-    await writeHandlers(service, [
-      {
-        name: "my-lambda",
-        type: RuntimeType.PYTHON,
-        handler: {
+    await writeHandlers(
+      service,
+      [
+        {
           name: "my-lambda",
-          package: {} as any,
-          handler: "mydir/func.myhandler",
+          type: RuntimeType.PYTHON,
+          handler: {
+            name: "my-lambda",
+            package: {} as any,
+            handler: "mydir/func.myhandler",
+          },
         },
-      },
-      {
-        name: "second-lambda",
-        type: RuntimeType.PYTHON,
-        handler: {
+        {
           name: "second-lambda",
-          package: {} as any,
-          handler: "mydir/func.secondhandler",
+          type: RuntimeType.PYTHON,
+          handler: {
+            name: "second-lambda",
+            package: {} as any,
+            handler: "mydir/func.secondhandler",
+          },
         },
-      },
-    ]);
+      ],
+      TracingMode.XRAY,
+    );
     expect(service).toEqual({
       package: {
         include: [`${datadogDirectory}/my-lambda.py`, `${datadogDirectory}/**`],
@@ -315,26 +398,30 @@ describe("writeHandlers", () => {
   it("creates one file for each language with the same base name", async () => {
     mock({});
     const service = {} as any;
-    await writeHandlers(service, [
-      {
-        name: "my-lambda",
-        type: RuntimeType.PYTHON,
-        handler: {
+    await writeHandlers(
+      service,
+      [
+        {
           name: "my-lambda",
-          package: {} as any,
-          handler: "mydir/func.myhandler",
+          type: RuntimeType.PYTHON,
+          handler: {
+            name: "my-lambda",
+            package: {} as any,
+            handler: "mydir/func.myhandler",
+          },
         },
-      },
-      {
-        name: "second-lambda",
-        type: RuntimeType.NODE,
-        handler: {
+        {
           name: "second-lambda",
-          package: {} as any,
-          handler: "mydir/func.secondhandler",
+          type: RuntimeType.NODE,
+          handler: {
+            name: "second-lambda",
+            package: {} as any,
+            handler: "mydir/func.secondhandler",
+          },
         },
-      },
-    ]);
+      ],
+      TracingMode.XRAY,
+    );
     expect(service).toEqual({
       package: {
         include: [`${datadogDirectory}/my-lambda.py`, `${datadogDirectory}/second-lambda.js`, `${datadogDirectory}/**`],

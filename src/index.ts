@@ -79,7 +79,8 @@ module.exports = class ServerlessPlugin {
     if (config.enableXrayTracing) {
       enabledTracing(this.serverless.service);
     }
-    await writeHandlers(this.serverless.service, handlers);
+
+    await writeHandlers(this.serverless.service, handlers, config.enableDDTracing);
   }
   private async afterDeployFunction() {
     this.serverless.cli.log("Cleaning up Datadog Handlers");

@@ -16,6 +16,7 @@ import { nodeTemplate } from "./templates/node-js-template";
 import { typescriptTemplate } from "./templates/node-ts-template";
 import { pythonTemplate } from "./templates/python-template";
 import { getHandlerPath, removeDirectory } from "./util";
+import { TracingMode } from "./templates/common";
 
 export const datadogDirectory = "datadog_handlers";
 
@@ -28,13 +29,13 @@ export interface FunctionGroup {
   runtime: RuntimeType;
 }
 
-export async function writeHandlers(service: Service, funcs: FunctionInfo[]) {
+export async function writeHandlers(service: Service, funcs: FunctionInfo[], tracingMode: TracingMode) {
   await cleanupHandlers();
   await util.promisify(fs.mkdir)(datadogDirectory);
   const groups = getFunctionGroups(funcs);
   const promises = groups.map(async (funcGroup) => {
     const methods = getMethods(funcGroup);
-    const result = getWrapperText(funcGroup.runtime, funcGroup.filename, methods);
+    const result = getWrapperText(funcGroup.runtime, funcGroup.filename, methods, tracingMode);
     if (result === undefined) {
       return;
     }
@@ -66,14 +67,14 @@ export async function cleanupHandlers() {
   await removeDirectory(datadogDirectory);
 }
 
-export function getWrapperText(type: RuntimeType, filename: string, methods: string[]) {
+export function getWrapperText(type: RuntimeType, filename: string, methods: string[], tracingMode: TracingMode) {
   switch (type) {
     case RuntimeType.NODE:
-      return nodeTemplate(filename, methods);
+      return nodeTemplate(filename, methods, tracingMode);
     case RuntimeType.NODE_ES6:
-      return es6Template(filename, methods);
+      return es6Template(filename, methods, tracingMode);
     case RuntimeType.NODE_TS:
-      return typescriptTemplate(filename, methods);
+      return typescriptTemplate(filename, methods, tracingMode);
     case RuntimeType.PYTHON:
       return pythonTemplate(filename, methods);
   }
