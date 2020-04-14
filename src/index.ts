@@ -14,6 +14,7 @@ import { applyLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
 import { enabledTracing } from "./tracing";
 import { cleanupHandlers, writeHandlers } from "./wrapper";
 import { hasWebpackPlugin } from "./util";
+import { TracingMode } from "./templates/common";
 
 module.exports = class ServerlessPlugin {
   public hooks = {
@@ -80,7 +81,16 @@ module.exports = class ServerlessPlugin {
       enabledTracing(this.serverless.service);
     }
 
-    await writeHandlers(this.serverless.service, handlers, config.enableDDTracing);
+    let tracingMode = TracingMode.NONE;
+    if (config.enableXrayTracing && config.enableDDTracing) {
+      tracingMode = TracingMode.HYBRID;
+    } else if (config.enableDDTracing) {
+      tracingMode = TracingMode.DD_TRACE;
+    } else if (config.enableXrayTracing) {
+      tracingMode = TracingMode.XRAY;
+    }
+
+    await writeHandlers(this.serverless.service, handlers, tracingMode);
   }
   private async afterDeployFunction() {
     this.serverless.cli.log("Cleaning up Datadog Handlers");

@@ -6,10 +6,10 @@
  * Copyright 2019 Datadog, Inc.
  */
 
-import { TracingMode } from "./common";
+import { TracingMode, optionsTemplate } from "./common";
 
 export function nodeTemplate(filePath: string, methods: string[], mode: TracingMode) {
-  const methodsString = methodsTemplate(methods);
+  const methodsString = methodsTemplate(methods, mode);
   const tracerString = tracerTemplate(mode);
 
   return `const { datadog } = require("datadog-lambda-js");
@@ -29,11 +29,13 @@ function tracerTemplate(mode: TracingMode): string {
   }
 }
 
-function methodsTemplate(methods: string[]) {
+function methodsTemplate(methods: string[], tracingMode: TracingMode) {
+  const optionsStr = optionsTemplate(tracingMode);
+
   let data = "";
   for (const method of methods) {
     data += "\n";
-    data += `module.exports.${method} = datadog(original.${method});`;
+    data += `module.exports.${method} = datadog(original.${method}, ${optionsStr});`;
   }
   return data;
 }

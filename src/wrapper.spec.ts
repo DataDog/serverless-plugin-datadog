@@ -47,23 +47,57 @@ describe("getWrapperText", () => {
 
       const original = require(\\"../my\\");
 
-      module.exports.myhandler = datadog(original.myhandler);"
+      module.exports.myhandler = datadog(original.myhandler, {});"
     `);
   });
   it("renders multiple handlers with the node template", () => {
     const wrapperText = getWrapperText(RuntimeType.NODE, "my", ["myhandler", "secondhandler"], TracingMode.XRAY);
 
     expect(wrapperText).toMatchInlineSnapshot(`
-                  "const { datadog } = require(\\"datadog-lambda-js\\");
+      "const { datadog } = require(\\"datadog-lambda-js\\");
 
-                  const original = require(\\"../my\\");
-                  
-                  module.exports.myhandler = datadog(original.myhandler);
-                  module.exports.secondhandler = datadog(original.secondhandler);"
-            `);
+      const original = require(\\"../my\\");
+
+      module.exports.myhandler = datadog(original.myhandler, {});
+      module.exports.secondhandler = datadog(original.secondhandler, {});"
+    `);
   });
-  it("renders the node ts template correctly", () => {
-    const wrapperText = getWrapperText(RuntimeType.NODE_TS, "my", ["myhandler"], TracingMode.XRAY);
+  it("renders tracer initialisation with ts template using hybrid tracing", () => {
+    const wrapperText = getWrapperText(RuntimeType.NODE_TS, "my", ["myhandler"], TracingMode.HYBRID);
+    expect(wrapperText).toMatchInlineSnapshot(`
+      "/* tslint:disable */
+      /* eslint-disable */
+      import { tracer } from \\"dd-trace-js\\"
+      tracer.init();
+      const { datadog } = require(\\"datadog-lambda-js\\") as any;
+      import * as original from \\"../my\\";
+
+      export const myhandler = datadog(original.myhandler,,{ mergeDatadogXrayTraces: true });"
+    `);
+  });
+  it("renders tracer initialisation with template using dd-trace", () => {
+    const wrapperText = getWrapperText(RuntimeType.NODE, "my", ["myhandler"], TracingMode.DD_TRACE);
+    expect(wrapperText).toMatchInlineSnapshot(`
+"const { datadog } = require(\\"datadog-lambda-js\\");
+import { tracer } from \\"dd-trace-js\\"
+tracer.init();
+const original = require(\\"../my\\");
+
+module.exports.myhandler = datadog(original.myhandler, {});"
+`);
+  });
+  it("renders the node template correctly", () => {
+    const wrapperText = getWrapperText(RuntimeType.NODE, "my", ["myhandler"], TracingMode.XRAY);
+    expect(wrapperText).toMatchInlineSnapshot(`
+"const { datadog } = require(\\"datadog-lambda-js\\");
+
+const original = require(\\"../my\\");
+
+module.exports.myhandler = datadog(original.myhandler, {});"
+`);
+  });
+  it("renders multiple methods with the node ts template", () => {
+    const wrapperText = getWrapperText(RuntimeType.NODE_TS, "my", ["myhandler", "secondhandler"], TracingMode.XRAY);
     expect(wrapperText).toMatchInlineSnapshot(`
       "/* tslint:disable */
       /* eslint-disable */
@@ -71,73 +105,61 @@ describe("getWrapperText", () => {
       const { datadog } = require(\\"datadog-lambda-js\\") as any;
       import * as original from \\"../my\\";
 
-      export const myhandler = datadog(original.myhandler);"
+      export const myhandler = datadog(original.myhandler,{});
+      export const secondhandler = datadog(original.secondhandler,{});"
     `);
-  });
-  it("renders multiple methods with the node ts template", () => {
-    const wrapperText = getWrapperText(RuntimeType.NODE_TS, "my", ["myhandler", "secondhandler"], TracingMode.XRAY);
-    expect(wrapperText).toMatchInlineSnapshot(`
-"/* tslint:disable */
-/* eslint-disable */
-
-const { datadog } = require(\\"datadog-lambda-js\\") as any;
-import * as original from \\"../my\\";
-
-export const myhandler = datadog(original.myhandler);
-export const secondhandler = datadog(original.secondhandler);"
-`);
   });
   it("renders tracer initialisation with ts template using hybrid tracing", () => {
     const wrapperText = getWrapperText(RuntimeType.NODE_TS, "my", ["myhandler"], TracingMode.HYBRID);
     expect(wrapperText).toMatchInlineSnapshot(`
-"/* tslint:disable */
-/* eslint-disable */
-import { tracer } from \\"dd-trace-js\\"
-tracer.init();
-const { datadog } = require(\\"datadog-lambda-js\\") as any;
-import * as original from \\"../my\\";
+      "/* tslint:disable */
+      /* eslint-disable */
+      import { tracer } from \\"dd-trace-js\\"
+      tracer.init();
+      const { datadog } = require(\\"datadog-lambda-js\\") as any;
+      import * as original from \\"../my\\";
 
-export const myhandler = datadog(original.myhandler);"
-`);
+      export const myhandler = datadog(original.myhandler,,{ mergeDatadogXrayTraces: true });"
+    `);
   });
   it("renders tracer initialisation with ts template using dd-trace", () => {
     const wrapperText = getWrapperText(RuntimeType.NODE_TS, "my", ["myhandler"], TracingMode.DD_TRACE);
     expect(wrapperText).toMatchInlineSnapshot(`
-"/* tslint:disable */
-/* eslint-disable */
-import { tracer } from \\"dd-trace-js\\"
-tracer.init();
-const { datadog } = require(\\"datadog-lambda-js\\") as any;
-import * as original from \\"../my\\";
+      "/* tslint:disable */
+      /* eslint-disable */
+      import { tracer } from \\"dd-trace-js\\"
+      tracer.init();
+      const { datadog } = require(\\"datadog-lambda-js\\") as any;
+      import * as original from \\"../my\\";
 
-export const myhandler = datadog(original.myhandler);"
-`);
+      export const myhandler = datadog(original.myhandler,{});"
+    `);
   });
 
   it("renders the node es template correctly", () => {
     const wrapperText = getWrapperText(RuntimeType.NODE_ES6, "my", ["myhandler"], TracingMode.XRAY);
 
     expect(wrapperText).toMatchInlineSnapshot(`
-"/* eslint-disable */
+      "/* eslint-disable */
 
-const { datadog } = require(\\"datadog-lambda-js\\");
-import * as original from \\"../my\\";
+      const { datadog } = require(\\"datadog-lambda-js\\");
+      import * as original from \\"../my\\";
 
-export const myhandler = datadog(original.myhandler);"
-`);
+      export const myhandler = datadog(original.myhandler,{});"
+    `);
   });
   it("renders the multiple methods with the  node es template", () => {
     const wrapperText = getWrapperText(RuntimeType.NODE_ES6, "my", ["myhandler", "secondhandler"], TracingMode.XRAY);
 
     expect(wrapperText).toMatchInlineSnapshot(`
-"/* eslint-disable */
+      "/* eslint-disable */
 
-const { datadog } = require(\\"datadog-lambda-js\\");
-import * as original from \\"../my\\";
+      const { datadog } = require(\\"datadog-lambda-js\\");
+      import * as original from \\"../my\\";
 
-export const myhandler = datadog(original.myhandler);
-export const secondhandler = datadog(original.secondhandler);"
-`);
+      export const myhandler = datadog(original.myhandler,{});
+      export const secondhandler = datadog(original.secondhandler,{});"
+    `);
   });
   it("renders tracer initialisation with es template using dd-trace", () => {
     const wrapperText = getWrapperText(RuntimeType.NODE_ES6, "my", ["myhandler"], TracingMode.DD_TRACE);
@@ -147,7 +169,7 @@ require(\\"dd-trace-js\\").init();
 const { datadog } = require(\\"datadog-lambda-js\\");
 import * as original from \\"../my\\";
 
-export const myhandler = datadog(original.myhandler);"
+export const myhandler = datadog(original.myhandler,{});"
 `);
   });
   it("renders tracer initialisation with ts template using hybrid tracing", () => {
@@ -158,7 +180,7 @@ require(\\"dd-trace-js\\").init();
 const { datadog } = require(\\"datadog-lambda-js\\");
 import * as original from \\"../my\\";
 
-export const myhandler = datadog(original.myhandler);"
+export const myhandler = datadog(original.myhandler,,{ mergeDatadogXrayTraces: true });"
 `);
   });
 });
