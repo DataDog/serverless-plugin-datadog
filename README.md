@@ -60,8 +60,8 @@ custom:
     # The log level, set to DEBUG for extended logging. Defaults to info.
     logLevel: "info"
 
-    # Send custom metrics via logs with the help of Datadog Forwarder Lambda function (recommended). Defaults to true.
-    flushMetricsToLogs: true
+    # Send custom metrics via logs with the help of Datadog Forwarder Lambda function (recommended). Defaults to false.
+    flushMetricsToLogs: false
 
     # Which Datadog Site to send data to, only needed when flushMetricsToLogs is false. Defaults to datadoghq.com.
     site: datadoghq.com # datadoghq.eu for Datadog EU
