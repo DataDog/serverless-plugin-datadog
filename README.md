@@ -75,7 +75,8 @@ custom:
     # Enable tracing on Lambda functions and API Gateway integrations. Defaults to true
     enableXrayTracing: true
 
-    enable
+    # Enable tracing on Lambda function using dd-trace, datadog's APM library. Requires datadog log forwarder to be set up. Defaults to true.
+    enableDDTracing: true
 ```
 
 `flushMetricsToLogs: true` is recommended for submitting custom metrics via CloudWatch logs with the help of [Datadog Forwarder](https://github.com/DataDog/datadog-serverless-functions/tree/master/aws/logs_monitoring).
@@ -104,7 +105,7 @@ custom:
     nodeModuleType: "node" # 'typescript' | 'es6'
 ```
 
-If you have the addLayers option enabled, you may also want to add 'datadog-lambda-js' and 'dd-trace' to the [externals](https://webpack.js.org/configuration/externals/) section of your webpack config.
+If you have the addLayers option enabled, you may also want to add 'datadog-lambda-js' and 'dd-trace' to the [externals](https://webpack.js.org/configuration/externals/) section of your webpack config. Note that auto instrumentation of libraries that have been webpacked into your bundle won't work, but other tracer features can be used.
 
 ### How do I use this with serverless-typescript?
 
