@@ -11,7 +11,7 @@ import * as layers from "./layers.json";
 
 import { getConfig, setEnvConfiguration, forceExcludeDepsFromWebpack } from "./env";
 import { applyLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
-import { enabledTracing } from "./tracing";
+import { enableTracing } from "./tracing";
 import { cleanupHandlers, writeHandlers } from "./wrapper";
 import { hasWebpackPlugin } from "./util";
 import { TracingMode } from "./templates/common";
@@ -77,9 +77,6 @@ module.exports = class ServerlessPlugin {
     } else {
       this.serverless.cli.log("Skipping adding Lambda Layers, make sure you are packaging them yourself");
     }
-    if (config.enableXrayTracing) {
-      enabledTracing(this.serverless.service);
-    }
 
     let tracingMode = TracingMode.NONE;
     if (config.enableXrayTracing && config.enableDDTracing) {
@@ -89,6 +86,7 @@ module.exports = class ServerlessPlugin {
     } else if (config.enableXrayTracing) {
       tracingMode = TracingMode.XRAY;
     }
+    enableTracing(this.serverless.service, tracingMode);
 
     await writeHandlers(this.serverless.service, handlers, tracingMode);
   }
