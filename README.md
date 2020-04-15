@@ -32,13 +32,16 @@ This plugin attaches the Datadog Lambda Layers for [Node.js](https://github.com/
 **IMPORTANT NOTE:** Because the plugin automatically wraps your Lambda handler function, you do **NOT** need to wrap your handler function as stated in the Node.js and Python Layer documentation.
 
 **Node.js**
+
 ```js
-module.exports.myHandler = datadog( // This wrapper is NOT needed when using this plugin
-  async function myHandler(event, context) {
-});
+module.exports.myHandler = datadog(
+  // This wrapper is NOT needed when using this plugin
+  async function myHandler(event, context) {},
+);
 ```
 
 **Python**
+
 ```python
 @datadog_lambda_wrapper # This wrapper is NOT needed when using this plugin
 def lambda_handler(event, context):
@@ -47,7 +50,6 @@ def lambda_handler(event, context):
 ## Configuration
 
 You can configure the library by add the following section to your `serverless.yml`:
-
 
 ```yaml
 custom:
@@ -58,7 +60,7 @@ custom:
     # The log level, set to DEBUG for extended logging. Defaults to info.
     logLevel: "info"
 
-    # Send custom metrics via logs with the help of Datadog Forwarder Lambda function (recommended). Defaults to false.
+    # Send custom metrics via logs with the help of Datadog Forwarder Lambda function (recommended). Defaults to true.
     flushMetricsToLogs: true
 
     # Which Datadog Site to send data to, only needed when flushMetricsToLogs is false. Defaults to datadoghq.com.
@@ -72,6 +74,8 @@ custom:
 
     # Enable tracing on Lambda functions and API Gateway integrations. Defaults to true
     enableXrayTracing: true
+
+    enable
 ```
 
 `flushMetricsToLogs: true` is recommended for submitting custom metrics via CloudWatch logs with the help of [Datadog Forwarder](https://github.com/DataDog/datadog-serverless-functions/tree/master/aws/logs_monitoring).
