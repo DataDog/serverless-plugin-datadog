@@ -6,22 +6,37 @@
  * Copyright 2019 Datadog, Inc.
  */
 
-export function typescriptTemplate(filePath: string, methods: string[]) {
-  const methodsString = methodsTemplate(methods);
+import { TracingMode, optionsTemplate } from "./common";
 
-  return (
-    `/* tslint:disable */
+export function typescriptTemplate(filePath: string, methods: string[], mode: TracingMode) {
+  const methodsString = methodsTemplate(methods, mode);
+  const tracerString = tracerTemplate(mode);
+
+  return `/* tslint:disable */
 /* eslint-disable */
+${tracerString}
 const { datadog } = require("datadog-lambda-js") as any;
-import * as original from "../${filePath}";` + methodsString
-  );
+import * as original from "../${filePath}";
+${methodsString}`;
 }
 
-function methodsTemplate(methods: string[]) {
+function tracerTemplate(mode: TracingMode): string {
+  switch (mode) {
+    case TracingMode.DD_TRACE:
+    case TracingMode.HYBRID:
+      return 'const tracer = require("dd-trace") as any;\ntracer.init();';
+    case TracingMode.XRAY:
+    case TracingMode.NONE:
+      return "";
+  }
+}
+
+function methodsTemplate(methods: string[], tracingMode: TracingMode) {
+  const optionsStr = optionsTemplate(tracingMode);
   let data = "";
   for (const method of methods) {
     data += "\n";
-    data += `export const ${method} = datadog(original.${method});`;
+    data += `export const ${method} = datadog(original.${method},${optionsStr});`;
   }
   return data;
 }

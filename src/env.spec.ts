@@ -26,10 +26,11 @@ describe("getConfig", () => {
     expect(result).toEqual({
       addLayers: true,
       apiKey: "1234",
-      flushMetricsToLogs: false,
+      flushMetricsToLogs: true,
       logLevel: "debug",
       site: "datadoghq.com",
       enableXrayTracing: true,
+      enableDDTracing: true,
     });
   });
 });
@@ -48,6 +49,7 @@ describe("setEnvConfiguration", () => {
         logLevel: "debug",
         flushMetricsToLogs: true,
         enableXrayTracing: true,
+        enableDDTracing: true,
       },
       service,
     );
@@ -85,6 +87,7 @@ describe("setEnvConfiguration", () => {
         logLevel: "info",
         flushMetricsToLogs: false,
         enableXrayTracing: true,
+        enableDDTracing: true,
       },
       service,
     );

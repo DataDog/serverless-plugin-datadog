@@ -6,20 +6,36 @@
  * Copyright 2019 Datadog, Inc.
  */
 
-export function nodeTemplate(filePath: string, methods: string[]) {
-  const methodsString = methodsTemplate(methods);
+import { TracingMode, optionsTemplate } from "./common";
 
-  return (
-    `const { datadog } = require("datadog-lambda-js");
-const original = require("../${filePath}");` + methodsString
-  );
+export function nodeTemplate(filePath: string, methods: string[], mode: TracingMode) {
+  const methodsString = methodsTemplate(methods, mode);
+  const tracerString = tracerTemplate(mode);
+
+  return `const { datadog } = require("datadog-lambda-js");
+${tracerString}
+const original = require("../${filePath}");
+${methodsString}`;
 }
 
-function methodsTemplate(methods: string[]) {
+function tracerTemplate(mode: TracingMode): string {
+  switch (mode) {
+    case TracingMode.DD_TRACE:
+    case TracingMode.HYBRID:
+      return 'require("dd-trace").init();';
+    case TracingMode.XRAY:
+    case TracingMode.NONE:
+      return "";
+  }
+}
+
+function methodsTemplate(methods: string[], tracingMode: TracingMode) {
+  const optionsStr = optionsTemplate(tracingMode);
+
   let data = "";
   for (const method of methods) {
     data += "\n";
-    data += `module.exports.${method} = datadog(original.${method});`;
+    data += `module.exports.${method} = datadog(original.${method}, ${optionsStr});`;
   }
   return data;
 }

@@ -21,8 +21,10 @@ export interface Configuration {
   logLevel: string;
   // Whether the log forwarder integration is enabled by default
   flushMetricsToLogs: boolean;
-  // Enable tracing on Lambda functions and API Gateway integrations. Defaults to true
-  enableXrayTracing: true;
+  // Enable tracing on Lambda functions and API Gateway integrations using X-Ray. Defaults to true
+  enableXrayTracing: boolean;
+  // Enable tracing on Lambda function using dd-trace, datadog's APM library.
+  enableDDTracing: boolean;
   // When set, the plugin will always write wrapper handlers in the given format. Otherwise, will try
   // to infer the handler type either from the extension, or presence of webpack.
   nodeModuleType?: "es6" | "node" | "typescript";
@@ -36,10 +38,11 @@ const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
 
 export const defaultConfiguration: Configuration = {
   addLayers: true,
-  flushMetricsToLogs: false,
+  flushMetricsToLogs: true,
   logLevel: "info",
   site: "datadoghq.com",
   enableXrayTracing: true,
+  enableDDTracing: true,
 };
 
 export function setEnvConfiguration(config: Configuration, service: Service) {
