@@ -21,7 +21,7 @@ function tracerTemplate(mode: TracingMode): string {
   switch (mode) {
     case TracingMode.DD_TRACE:
     case TracingMode.HYBRID:
-      return 'require("dd-trace-js").init();';
+      return 'require("dd-trace").init();';
     case TracingMode.XRAY:
     case TracingMode.NONE:
       return "";
