@@ -15,19 +15,20 @@ import { enableTracing } from "./tracing";
 import { cleanupHandlers, writeHandlers } from "./wrapper";
 import { hasWebpackPlugin } from "./util";
 import { TracingMode } from "./templates/common";
+import { addCloudWatchForwarderSubscriptions } from "./forwarder";
 
 module.exports = class ServerlessPlugin {
   public hooks = {
-    "after:datadog:clean:init": this.afterDeployFunction.bind(this),
-    "after:datadog:generate:init": this.beforeDeployFunction.bind(this),
-    "after:deploy:function:packageFunction": this.afterDeployFunction.bind(this),
-    "after:invoke:local:invoke": this.afterDeployFunction.bind(this),
-    "after:package:createDeploymentArtifacts": this.afterDeployFunction.bind(this),
-    "after:package:initialize": this.beforeDeployFunction.bind(this),
-    "before:deploy:function:packageFunction": this.beforeDeployFunction.bind(this),
-    "before:invoke:local:invoke": this.beforeDeployFunction.bind(this),
-    "before:offline:start:init": this.beforeDeployFunction.bind(this),
-    "before:step-functions-offline:start": this.beforeDeployFunction.bind(this),
+    "after:datadog:clean:init": this.afterPackageFunction.bind(this),
+    "after:datadog:generate:init": this.beforePackageFunction.bind(this),
+    "after:deploy:function:packageFunction": this.afterPackageFunction.bind(this),
+    "after:invoke:local:invoke": this.afterPackageFunction.bind(this),
+    "after:package:createDeploymentArtifacts": this.afterPackageFunction.bind(this),
+    "after:package:initialize": this.beforePackageFunction.bind(this),
+    "before:deploy:function:packageFunction": this.beforePackageFunction.bind(this),
+    "before:invoke:local:invoke": this.beforePackageFunction.bind(this),
+    "before:offline:start:init": this.beforePackageFunction.bind(this),
+    "before:step-functions-offline:start": this.beforePackageFunction.bind(this),
   };
 
   public commands = {
@@ -48,7 +49,7 @@ module.exports = class ServerlessPlugin {
   };
   constructor(private serverless: Serverless, _: Serverless.Options) {}
 
-  private async beforeDeployFunction() {
+  private async beforePackageFunction() {
     this.serverless.cli.log("Auto instrumenting functions with Datadog");
     const config = getConfig(this.serverless.service);
     setEnvConfiguration(config, this.serverless.service);
@@ -90,7 +91,12 @@ module.exports = class ServerlessPlugin {
 
     await writeHandlers(this.serverless.service, handlers, tracingMode);
   }
-  private async afterDeployFunction() {
+  private async afterPackageFunction() {
+    const config = getConfig(this.serverless.service);
+    if (config.forwarderArn) {
+      addCloudWatchForwarderSubscriptions(this.serverless.service, config.forwarderArn);
+    }
+
     this.serverless.cli.log("Cleaning up Datadog Handlers");
     await cleanupHandlers();
   }
