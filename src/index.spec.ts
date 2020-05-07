@@ -185,7 +185,7 @@ describe("ServerlessPlugin", () => {
           },
           custom: {
             datadog: {
-              forwarderArn: "some-arn",
+              forwarder: "some-arn",
             },
           },
         },

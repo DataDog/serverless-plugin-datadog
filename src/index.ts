@@ -93,8 +93,8 @@ module.exports = class ServerlessPlugin {
   }
   private async afterPackageFunction() {
     const config = getConfig(this.serverless.service);
-    if (config.forwarderArn) {
-      addCloudWatchForwarderSubscriptions(this.serverless.service, config.forwarderArn);
+    if (config.forwarder) {
+      addCloudWatchForwarderSubscriptions(this.serverless.service, config.forwarder);
     }
 
     this.serverless.cli.log("Cleaning up Datadog Handlers");

@@ -30,7 +30,7 @@ export interface Configuration {
   nodeModuleType?: "es6" | "node" | "typescript";
 
   // When set, the plugin will subscribe the lambdas to the forwarder with the given arn.
-  forwarderArn?: string;
+  forwarder?: string;
 }
 
 const apiKeyEnvVar = "DD_API_KEY";
