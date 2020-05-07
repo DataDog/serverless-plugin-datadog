@@ -1,17 +1,17 @@
 import Service from "serverless/classes/Service";
 
-const LogGroupKey = "AWS::Logs::LogGroup";
-const LogGroupSubscriptionKey = "AWS::Logs::SubscriptionFilter";
+const logGroupKey = "AWS::Logs::LogGroup";
+const logGroupSubscriptionKey = "AWS::Logs::SubscriptionFilter";
 
 interface LogGroupResource {
-  Type: typeof LogGroupKey;
+  Type: typeof logGroupKey;
   Properties: {
     LogGroupName: string;
   };
 }
 
 function isLogGroup(value: any): value is LogGroupResource {
-  return value.Type === LogGroupKey;
+  return value.Type === logGroupKey;
 }
 
 export function addCloudWatchForwarderSubscriptions(service: Service, functionArn: string) {
@@ -22,7 +22,7 @@ export function addCloudWatchForwarderSubscriptions(service: Service, functionAr
       continue;
     }
     const subscription = {
-      Type: LogGroupSubscriptionKey,
+      Type: logGroupSubscriptionKey,
       Properties: {
         DestinationArn: functionArn,
         FilterPattern: "",
