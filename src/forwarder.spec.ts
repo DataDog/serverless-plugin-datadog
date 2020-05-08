@@ -1,8 +1,10 @@
 import Service from "serverless/classes/Service";
 import { addCloudWatchForwarderSubscriptions } from "./forwarder";
+import Aws from "serverless/plugins/aws/provider/awsProvider";
 
-function serviceWithResources(resources: Record<string, any>): Service {
+function serviceWithResources(resources: Record<string, any>, serviceName = "my-service"): Service {
   const service: Partial<Service> = {
+    getServiceName: () => serviceName,
     provider: {
       name: "",
       stage: "",
@@ -17,8 +19,21 @@ function serviceWithResources(resources: Record<string, any>): Service {
   return service as Service;
 }
 
+function awsMock(existingSubs: { [key: string]: any }): Aws {
+  return {
+    getStage: () => "dev",
+    request: (service, method, params: any) => {
+      const logGroupName = params.logGroupName;
+      if (existingSubs[logGroupName]) {
+        return Promise.resolve({ subscriptionFilters: existingSubs[logGroupName] });
+      }
+      return Promise.reject("Log group doesn't exist");
+    },
+  } as Aws;
+}
+
 describe("addCloudWatchForwarderSubscriptions", () => {
-  it("adds a subscription for each log group", () => {
+  it("adds a subscription for each log group", async () => {
     const service = serviceWithResources({
       FirstGroup: {
         Type: "AWS::Logs::LogGroup",
@@ -44,7 +59,9 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       },
     });
 
-    addCloudWatchForwarderSubscriptions(service as Service, "my-func");
+    const aws = awsMock({});
+
+    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func");
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
       Object {
         "FirstGroup": Object {
@@ -88,6 +105,68 @@ describe("addCloudWatchForwarderSubscriptions", () => {
         "UnrelatedResource": Object {
           "Properties": Object {},
           "Type": "AWS::AnotherResourceType",
+        },
+      }
+    `);
+  });
+
+  it("doesn't add subscription when an unknown subscription already exists", async () => {
+    const service = serviceWithResources({
+      FirstGroup: {
+        Type: "AWS::Logs::LogGroup",
+        Properties: {
+          LogGroupName: "/aws/lambda/first-group",
+        },
+      },
+    });
+
+    const aws = awsMock({ "/aws/lambda/first-group": [{ filterName: "unknown-filter-name" }] });
+
+    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func");
+    expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
+      Object {
+        "FirstGroup": Object {
+          "Properties": Object {
+            "LogGroupName": "/aws/lambda/first-group",
+          },
+          "Type": "AWS::Logs::LogGroup",
+        },
+      }
+    `);
+  });
+  it("adds a subscription when an known subscription already exists", async () => {
+    const service = serviceWithResources(
+      {
+        FirstGroup: {
+          Type: "AWS::Logs::LogGroup",
+          Properties: {
+            LogGroupName: "/aws/lambda/first-group",
+          },
+        },
+      },
+      "my-service",
+    );
+
+    const aws = awsMock({ "/aws/lambda/first-group": [{ filterName: "my-service-dev-FirstGroupSubscription-XXXX" }] });
+
+    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func");
+    expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
+      Object {
+        "FirstGroup": Object {
+          "Properties": Object {
+            "LogGroupName": "/aws/lambda/first-group",
+          },
+          "Type": "AWS::Logs::LogGroup",
+        },
+        "FirstGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "my-func",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Ref": "FirstGroup",
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
         },
       }
     `);

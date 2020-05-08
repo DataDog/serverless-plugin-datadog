@@ -11,6 +11,14 @@ const ServerlessPlugin = require("./index");
 import { datadogDirectory } from "./wrapper";
 import fs from "fs";
 import mock from "mock-fs";
+import Aws from "serverless/plugins/aws/provider/awsProvider";
+
+function awsMock(): Aws {
+  return {
+    getStage: () => "dev",
+    request: (service, method, params: any) => Promise.reject("Log group doesn't exist"),
+  } as Aws;
+}
 
 describe("ServerlessPlugin", () => {
   describe("beforePackageFunction", () => {
@@ -170,7 +178,9 @@ describe("ServerlessPlugin", () => {
       });
       const serverless = {
         cli: { log: () => {} },
+        getProvider: awsMock,
         service: {
+          getServiceName: () => "dev",
           provider: {
             compiledCloudFormationTemplate: {
               Resources: {
