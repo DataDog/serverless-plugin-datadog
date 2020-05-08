@@ -18,7 +18,7 @@ export function addCloudWatchForwarderSubscriptions(service: Service, functionAr
   const resources = service.provider.compiledCloudFormationTemplate.Resources;
 
   for (const [name, resource] of Object.entries(resources)) {
-    if (!isLogGroup(resource)) {
+    if (!isLogGroup(resource) || !resource.Properties.LogGroupName.startsWith("/aws/lambda/")) {
       continue;
     }
     const subscription = {

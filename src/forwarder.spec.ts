@@ -32,6 +32,12 @@ describe("addCloudWatchForwarderSubscriptions", () => {
           LogGroupName: "/aws/lambda/second-group",
         },
       },
+      NonLambdaGroup: {
+        Type: "AWS::Logs::LogGroup",
+        Properties: {
+          LogGroupName: "/aws/apigateway/second-group",
+        },
+      },
       UnrelatedResource: {
         Type: "AWS::AnotherResourceType",
         Properties: {},
@@ -56,6 +62,12 @@ describe("addCloudWatchForwarderSubscriptions", () => {
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
+        },
+        "NonLambdaGroup": Object {
+          "Properties": Object {
+            "LogGroupName": "/aws/apigateway/second-group",
+          },
+          "Type": "AWS::Logs::LogGroup",
         },
         "SecondGroup": Object {
           "Properties": Object {
