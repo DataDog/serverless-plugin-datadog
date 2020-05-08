@@ -28,6 +28,9 @@ export interface Configuration {
   // When set, the plugin will always write wrapper handlers in the given format. Otherwise, will try
   // to infer the handler type either from the extension, or presence of webpack.
   nodeModuleType?: "es6" | "node" | "typescript";
+
+  // When set, the plugin will subscribe the lambdas to the forwarder with the given arn.
+  forwarder?: string;
 }
 
 const apiKeyEnvVar = "DD_API_KEY";

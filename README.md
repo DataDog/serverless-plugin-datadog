@@ -77,6 +77,9 @@ custom:
 
     # Enable tracing on Lambda function using dd-trace, datadog's APM library. Requires datadog log forwarder to be set up. Defaults to true.
     enableDDTracing: true
+
+    # When set, the plugin will try to subscribe the lambda's cloudwatch log groups to the forwarder with the given arn.
+    forwarderArn: arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder
 ```
 
 `flushMetricsToLogs: true` is recommended for submitting custom metrics via CloudWatch logs with the help of [Datadog Forwarder](https://github.com/DataDog/datadog-serverless-functions/tree/master/aws/logs_monitoring).

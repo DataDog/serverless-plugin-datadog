@@ -11,9 +11,17 @@ const ServerlessPlugin = require("./index");
 import { datadogDirectory } from "./wrapper";
 import fs from "fs";
 import mock from "mock-fs";
+import Aws from "serverless/plugins/aws/provider/awsProvider";
+
+function awsMock(): Aws {
+  return {
+    getStage: () => "dev",
+    request: (service, method, params: any) => Promise.reject("Log group doesn't exist"),
+  } as Aws;
+}
 
 describe("ServerlessPlugin", () => {
-  describe("beforeDeployFunction", () => {
+  describe("beforePackageFunction", () => {
     afterEach(() => {
       mock.restore();
     });
@@ -143,7 +151,11 @@ describe("ServerlessPlugin", () => {
       await plugin.hooks["after:package:initialize"]();
       expect(Object.keys(serverless.service.provider)).not.toContain("tracing");
     });
-
+  });
+  describe("afterPackageFunction", () => {
+    afterEach(() => {
+      mock.restore();
+    });
     it("cleans up temp handler files afterwards", async () => {
       mock({
         [datadogDirectory]: {
@@ -151,10 +163,49 @@ describe("ServerlessPlugin", () => {
           "handler-2.js": "also-content",
         },
       });
-      const serverless = { cli: { log: () => {} } };
+      const serverless = { cli: { log: () => {} }, service: { custom: {} } };
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
       expect(fs.existsSync(datadogDirectory)).toBeFalsy();
+    });
+
+    it("adds subscription filters when fowarderArn is set", async () => {
+      mock({
+        [datadogDirectory]: {
+          "handler-1.js": "my-content",
+          "handler-2.js": "also-content",
+        },
+      });
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: awsMock,
+        service: {
+          getServiceName: () => "dev",
+          provider: {
+            compiledCloudFormationTemplate: {
+              Resources: {
+                FirstGroup: {
+                  Type: "AWS::Logs::LogGroup",
+                  Properties: {
+                    LogGroupName: "/aws/lambda/first-group",
+                  },
+                },
+              },
+            },
+          },
+          custom: {
+            datadog: {
+              forwarder: "some-arn",
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).toHaveProperty(
+        "FirstGroupSubscription",
+      );
     });
   });
 });
