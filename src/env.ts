@@ -31,6 +31,10 @@ export interface Configuration {
 
   // When set, the plugin will subscribe the lambdas to the forwarder with the given arn.
   forwarder?: string;
+
+  // When set, the plugin wiill try to automatically tag customers' lambda functions with service and env,
+  // but will not override existing tags. Defaults to true
+  enableTags: boolean;
 }
 
 const apiKeyEnvVar = "DD_API_KEY";
@@ -46,6 +50,7 @@ export const defaultConfiguration: Configuration = {
   site: "datadoghq.com",
   enableXrayTracing: true,
   enableDDTracing: true,
+  enableTags: true,
 };
 
 export function setEnvConfiguration(config: Configuration, service: Service) {

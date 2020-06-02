@@ -16,6 +16,20 @@ import { cleanupHandlers, writeHandlers } from "./wrapper";
 import { hasWebpackPlugin } from "./util";
 import { TracingMode } from "./templates/common";
 import { addCloudWatchForwarderSubscriptions } from "./forwarder";
+import { Package, Event } from "serverless";
+
+// Separate interface since DefinitelyTyped dependency currently doesn't include tags
+interface Function {
+  name: string;
+  package: Package;
+  runtime?: string;
+  handler: string;
+  timeout?: number;
+  memorySize?: number;
+  environment?: { [name: string]: string };
+  events: Event[];
+  tags?: { [key: string]: string }; 
+}
 
 module.exports = class ServerlessPlugin {
   public hooks = {
@@ -101,6 +115,13 @@ module.exports = class ServerlessPlugin {
       }
     }
 
+    if (config.enableTags) {
+      this.serverless.cli.log("Adding service and environment tags to functions");
+      this.handleTags();
+    } else {
+      console.log('enableTags is false');
+    }
+
     this.serverless.cli.log("Cleaning up Datadog Handlers");
     await cleanupHandlers();
   }
@@ -117,5 +138,27 @@ module.exports = class ServerlessPlugin {
         }
       }
     }
+  }
+
+  private handleTags() {
+    this.serverless.service.getAllFunctions().forEach(functionName => {
+      const function_: Function = this.serverless.service.getFunction(functionName);
+
+      if (!function_.tags) {
+          function_.tags = {}
+      }
+
+      // Service tag
+      if (!function_.tags['service']) {
+        function_.tags['service'] = this.serverless.service.getServiceName();
+      }
+
+      // Environment tag
+      if (!function_.tags['env']) {
+        function_.tags['env'] = this.serverless.getProvider("aws").getStage();
+      }
+
+      console.log(function_.tags);
+    });
   }
 };
