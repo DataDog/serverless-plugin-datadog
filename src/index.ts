@@ -118,8 +118,6 @@ module.exports = class ServerlessPlugin {
     if (config.enableTags) {
       this.serverless.cli.log("Adding service and environment tags to functions");
       this.handleTags();
-    } else {
-      console.log('enableTags is false');
     }
 
     this.serverless.cli.log("Cleaning up Datadog Handlers");
@@ -157,8 +155,6 @@ module.exports = class ServerlessPlugin {
       if (!function_.tags['env']) {
         function_.tags['env'] = this.serverless.getProvider("aws").getStage();
       }
-
-      console.log(function_.tags);
     });
   }
 };
