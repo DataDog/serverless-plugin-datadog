@@ -31,6 +31,7 @@ describe("getConfig", () => {
       site: "datadoghq.com",
       enableXrayTracing: true,
       enableDDTracing: true,
+      enableTags: true,
     });
   });
 });
