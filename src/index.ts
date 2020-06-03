@@ -142,11 +142,11 @@ module.exports = class ServerlessPlugin {
   }
 
   private handleTags() {
-    this.serverless.service.getAllFunctions().forEach(functionName => {
+    this.serverless.service.getAllFunctions().forEach((functionName) => {
       const functionDefintion: FunctionDefinitionWithTags = this.serverless.service.getFunction(functionName);
 
       if (!functionDefintion.tags) {
-        functionDefintion.tags = {}
+        functionDefintion.tags = {};
       }
 
       // Service tag

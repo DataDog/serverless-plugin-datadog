@@ -13,7 +13,7 @@ import fs from "fs";
 import mock from "mock-fs";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
 import { FunctionDefinition } from "serverless";
-import { FunctionDefinitionWithTags } from "./index"
+import { FunctionDefinitionWithTags } from "./index";
 
 function awsMock(): Aws {
   return {
@@ -176,9 +176,9 @@ describe("ServerlessPlugin", () => {
           "handler-2.js": "also-content",
         },
       });
-      const serverless = { 
-        cli: { log: () => {} }, 
-        service: { custom: {}, getAllFunctions: () => [] } 
+      const serverless = {
+        cli: { log: () => {} },
+        service: { custom: {}, getAllFunctions: () => [] },
       };
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
@@ -232,7 +232,7 @@ describe("ServerlessPlugin", () => {
           "handler-2.js": "also-content",
         },
       });
-      const function_ = functionMock({ "env": "test" });
+      const function_ = functionMock({ env: "test" });
       const functionWithTags: FunctionDefinitionWithTags = function_;
       const serverless = {
         cli: { log: () => {} },
@@ -250,7 +250,7 @@ describe("ServerlessPlugin", () => {
       };
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
-      expect(functionWithTags).toHaveProperty("tags", { "env": "test" });
+      expect(functionWithTags).toHaveProperty("tags", { env: "test" });
     });
 
     it("adds tags by default with service name and stage values", async () => {
@@ -273,7 +273,7 @@ describe("ServerlessPlugin", () => {
       };
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
-      expect(functionWithTags).toHaveProperty("tags", { "env": "dev", "service": "dev" });
+      expect(functionWithTags).toHaveProperty("tags", { env: "dev", service: "dev" });
     });
 
     it("does not override existing tags", async () => {
@@ -283,7 +283,7 @@ describe("ServerlessPlugin", () => {
           "handler-2.js": "also-content",
         },
       });
-      const function_ = functionMock({ "service": "test" });
+      const function_ = functionMock({ service: "test" });
       const functionWithTags: FunctionDefinitionWithTags = function_;
       const serverless = {
         cli: { log: () => {} },
@@ -296,7 +296,7 @@ describe("ServerlessPlugin", () => {
       };
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
-      expect(functionWithTags).toHaveProperty("tags", { "env": "dev", "service": "test" });
+      expect(functionWithTags).toHaveProperty("tags", { env: "dev", service: "test" });
     });
   });
 });
