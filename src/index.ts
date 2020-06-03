@@ -31,8 +31,10 @@ export interface FunctionDefinitionWithTags {
   tags?: { [key: string]: string };
 }
 
-const serviceKey = "service";
-const envKey = "env";
+enum TagKeys {
+  Service = "service",
+  Env = "env",
+}
 
 module.exports = class ServerlessPlugin {
   public hooks = {
@@ -120,7 +122,7 @@ module.exports = class ServerlessPlugin {
 
     if (config.enableTags) {
       this.serverless.cli.log("Adding service and environment tags to functions");
-      this.handleTags();
+      this.addServiceAndEnvTags();
     }
 
     this.serverless.cli.log("Cleaning up Datadog Handlers");
@@ -141,7 +143,7 @@ module.exports = class ServerlessPlugin {
     }
   }
 
-  private handleTags() {
+  private addServiceAndEnvTags() {
     this.serverless.service.getAllFunctions().forEach((functionName) => {
       const functionDefintion: FunctionDefinitionWithTags = this.serverless.service.getFunction(functionName);
 
@@ -150,13 +152,13 @@ module.exports = class ServerlessPlugin {
       }
 
       // Service tag
-      if (!functionDefintion.tags[serviceKey]) {
-        functionDefintion.tags[serviceKey] = this.serverless.service.getServiceName();
+      if (!functionDefintion.tags[TagKeys.Service]) {
+        functionDefintion.tags[TagKeys.Service] = this.serverless.service.getServiceName();
       }
 
       // Environment tag
-      if (!functionDefintion.tags[envKey]) {
-        functionDefintion.tags[envKey] = this.serverless.getProvider("aws").getStage();
+      if (!functionDefintion.tags[TagKeys.Env]) {
+        functionDefintion.tags[TagKeys.Env] = this.serverless.getProvider("aws").getStage();
       }
     });
   }
