@@ -32,7 +32,7 @@ export interface Configuration {
   // When set, the plugin will subscribe the lambdas to the forwarder with the given arn.
   forwarder?: string;
 
-  // When set, the plugin wiill try to automatically tag customers' lambda functions with service and env,
+  // When set, the plugin will try to automatically tag customers' lambda functions with service and env,
   // but will not override existing tags. Defaults to true
   enableTags: boolean;
 }
