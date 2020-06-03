@@ -28,8 +28,11 @@ export interface FunctionDefinitionWithTags {
   memorySize?: number;
   environment?: { [name: string]: string };
   events: Event[];
-  tags?: { [key: string]: string }; 
+  tags?: { [key: string]: string };
 }
+
+const serviceKey = "service";
+const envKey = "env";
 
 module.exports = class ServerlessPlugin {
   public hooks = {
@@ -140,20 +143,20 @@ module.exports = class ServerlessPlugin {
 
   private handleTags() {
     this.serverless.service.getAllFunctions().forEach(functionName => {
-      const function_: FunctionDefinitionWithTags = this.serverless.service.getFunction(functionName);
+      const functionDefintion: FunctionDefinitionWithTags = this.serverless.service.getFunction(functionName);
 
-      if (!function_.tags) {
-          function_.tags = {}
+      if (!functionDefintion.tags) {
+        functionDefintion.tags = {}
       }
 
       // Service tag
-      if (!function_.tags['service']) {
-        function_.tags['service'] = this.serverless.service.getServiceName();
+      if (!functionDefintion.tags[serviceKey]) {
+        functionDefintion.tags[serviceKey] = this.serverless.service.getServiceName();
       }
 
       // Environment tag
-      if (!function_.tags['env']) {
-        function_.tags['env'] = this.serverless.getProvider("aws").getStage();
+      if (!functionDefintion.tags[envKey]) {
+        functionDefintion.tags[envKey] = this.serverless.getProvider("aws").getStage();
       }
     });
   }
