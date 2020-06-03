@@ -19,7 +19,7 @@ import { addCloudWatchForwarderSubscriptions } from "./forwarder";
 import { Package, Event } from "serverless";
 
 // Separate interface since DefinitelyTyped dependency currently doesn't include tags
-interface Function {
+export interface FunctionDefinitionWithTags {
   name: string;
   package: Package;
   runtime?: string;
@@ -140,7 +140,7 @@ module.exports = class ServerlessPlugin {
 
   private handleTags() {
     this.serverless.service.getAllFunctions().forEach(functionName => {
-      const function_: Function = this.serverless.service.getFunction(functionName);
+      const function_: FunctionDefinitionWithTags = this.serverless.service.getFunction(functionName);
 
       if (!function_.tags) {
           function_.tags = {}
