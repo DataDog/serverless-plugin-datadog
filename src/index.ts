@@ -16,18 +16,10 @@ import { cleanupHandlers, writeHandlers } from "./wrapper";
 import { hasWebpackPlugin } from "./util";
 import { TracingMode } from "./templates/common";
 import { addCloudWatchForwarderSubscriptions } from "./forwarder";
-import { Package, Event } from "serverless";
+import { FunctionDefinition } from "serverless";
 
 // Separate interface since DefinitelyTyped dependency currently doesn't include tags
-export interface FunctionDefinitionWithTags {
-  name: string;
-  package: Package;
-  runtime?: string;
-  handler: string;
-  timeout?: number;
-  memorySize?: number;
-  environment?: { [name: string]: string };
-  events: Event[];
+export interface FunctionDefinitionWithTags extends FunctionDefinition {
   tags?: { [key: string]: string };
 }
 
