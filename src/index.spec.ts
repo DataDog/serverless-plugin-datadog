@@ -12,12 +12,25 @@ import { datadogDirectory } from "./wrapper";
 import fs from "fs";
 import mock from "mock-fs";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
+import { FunctionDefinition } from "serverless";
+import { FunctionDefinitionWithTags } from "./index";
 
 function awsMock(): Aws {
   return {
     getStage: () => "dev",
     request: (service, method, params: any) => Promise.reject("Log group doesn't exist"),
   } as Aws;
+}
+
+function functionMock(mockTags: { [key: string]: string }): FunctionDefinition {
+  const mockPackage = { include: [], exclude: [] };
+  return {
+    name: "test",
+    package: mockPackage,
+    handler: "handler",
+    events: [],
+    tags: mockTags,
+  } as FunctionDefinition;
 }
 
 describe("ServerlessPlugin", () => {
@@ -163,7 +176,10 @@ describe("ServerlessPlugin", () => {
           "handler-2.js": "also-content",
         },
       });
-      const serverless = { cli: { log: () => {} }, service: { custom: {} } };
+      const serverless = {
+        cli: { log: () => {} },
+        service: { custom: {}, getAllFunctions: () => [] },
+      };
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
       expect(fs.existsSync(datadogDirectory)).toBeFalsy();
@@ -181,6 +197,7 @@ describe("ServerlessPlugin", () => {
         getProvider: awsMock,
         service: {
           getServiceName: () => "dev",
+          getAllFunctions: () => [],
           provider: {
             compiledCloudFormationTemplate: {
               Resources: {
@@ -206,6 +223,80 @@ describe("ServerlessPlugin", () => {
       expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).toHaveProperty(
         "FirstGroupSubscription",
       );
+    });
+
+    it("does not add or modify tags when enabledTags is false", async () => {
+      mock({
+        [datadogDirectory]: {
+          "handler-1.js": "my-content",
+          "handler-2.js": "also-content",
+        },
+      });
+      const function_ = functionMock({ env: "test" });
+      const functionWithTags: FunctionDefinitionWithTags = function_;
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: awsMock,
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [function_],
+          getFunction: () => function_,
+          custom: {
+            datadog: {
+              enableTags: false,
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(functionWithTags).toHaveProperty("tags", { env: "test" });
+    });
+
+    it("adds tags by default with service name and stage values", async () => {
+      mock({
+        [datadogDirectory]: {
+          "handler-1.js": "my-content",
+          "handler-2.js": "also-content",
+        },
+      });
+      const function_ = functionMock({});
+      const functionWithTags: FunctionDefinitionWithTags = function_;
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: awsMock,
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [function_],
+          getFunction: () => function_,
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(functionWithTags).toHaveProperty("tags", { env: "dev", service: "dev" });
+    });
+
+    it("does not override existing tags", async () => {
+      mock({
+        [datadogDirectory]: {
+          "handler-1.js": "my-content",
+          "handler-2.js": "also-content",
+        },
+      });
+      const function_ = functionMock({ service: "test" });
+      const functionWithTags: FunctionDefinitionWithTags = function_;
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: awsMock,
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [function_],
+          getFunction: () => function_,
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(functionWithTags).toHaveProperty("tags", { env: "dev", service: "test" });
     });
   });
 });

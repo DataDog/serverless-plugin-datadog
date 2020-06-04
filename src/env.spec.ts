@@ -31,6 +31,7 @@ describe("getConfig", () => {
       site: "datadoghq.com",
       enableXrayTracing: true,
       enableDDTracing: true,
+      enableTags: true,
     });
   });
 });
@@ -50,6 +51,7 @@ describe("setEnvConfiguration", () => {
         flushMetricsToLogs: true,
         enableXrayTracing: true,
         enableDDTracing: true,
+        enableTags: true,
       },
       service,
     );
@@ -88,6 +90,7 @@ describe("setEnvConfiguration", () => {
         flushMetricsToLogs: false,
         enableXrayTracing: true,
         enableDDTracing: true,
+        enableTags: true,
       },
       service,
     );
