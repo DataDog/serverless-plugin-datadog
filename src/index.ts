@@ -12,15 +12,16 @@ import * as layers from "./layers.json";
 import { getConfig, setEnvConfiguration, forceExcludeDepsFromWebpack } from "./env";
 import { applyLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
 import { enableTracing } from "./tracing";
-import { cleanupHandlers, writeHandlers } from "./wrapper";
+import { writeHandlers } from "./wrapper";
 import { hasWebpackPlugin } from "./util";
 import { TracingMode } from "./templates/common";
 import { addCloudWatchForwarderSubscriptions } from "./forwarder";
 import { FunctionDefinition } from "serverless";
 
-// Separate interface since DefinitelyTyped dependency currently doesn't include tags
+// Separate interface since DefinitelyTyped currently doesn't include tags or env
 export interface FunctionDefinitionWithTags extends FunctionDefinition {
   tags?: { [key: string]: string };
+  environment?: { [key: string]: string };
 }
 
 enum TagKeys {
@@ -100,7 +101,7 @@ module.exports = class ServerlessPlugin {
     }
     enableTracing(this.serverless.service, tracingMode);
 
-    await writeHandlers(this.serverless.service, handlers, tracingMode);
+    await writeHandlers(this.serverless.service, handlers);
   }
   private async afterPackageFunction() {
     const config = getConfig(this.serverless.service);
@@ -116,9 +117,6 @@ module.exports = class ServerlessPlugin {
       this.serverless.cli.log("Adding service and environment tags to functions");
       this.addServiceAndEnvTags();
     }
-
-    this.serverless.cli.log("Cleaning up Datadog Handlers");
-    await cleanupHandlers();
   }
 
   private debugLogHandlers(handlers: FunctionInfo[]) {

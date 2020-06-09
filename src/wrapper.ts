@@ -6,137 +6,75 @@
  * Copyright 2019 Datadog, Inc.
  */
 
-import fs from "fs";
-import path from "path";
 import Service from "serverless/classes/Service";
-import util from "util";
 import { FunctionInfo, RuntimeType } from "./layer";
-import { es6Template } from "./templates/node-es6-template";
-import { nodeTemplate } from "./templates/node-js-template";
-import { typescriptTemplate } from "./templates/node-ts-template";
-import { pythonTemplate } from "./templates/python-template";
-import { getHandlerPath, removeDirectory } from "./util";
-import { TracingMode } from "./templates/common";
+import { getHandlerPath } from "./util";
 
-export const datadogDirectory = "datadog_handlers";
+const datadogHandlerEnvVar = "DD_LAMBDA_HANDLER";
+const pythonHandler = "datadog_lambda.handler.handler";
+const pythonHandlerFile = "datadog_lambda.handler.py";
+const jsHandler = "node_modules/datadog-lambda-js/dist/handler.handler";
+const jsHandlerFile = "node_modules/datadog-lambda-js/dist/handler.js";
 
-export interface FunctionGroup {
-  funcs: {
-    info: FunctionInfo;
-    method: string;
-  }[];
-  filename: string;
-  runtime: RuntimeType;
-}
+export async function writeHandlers(service: Service, funcs: FunctionInfo[]) {
+  console.log("At writeHandlers...");
+  funcs.map((func) => {
+    console.log(`Processing ${func.name}`);
 
-export async function writeHandlers(service: Service, funcs: FunctionInfo[], tracingMode: TracingMode) {
-  await cleanupHandlers();
-  await util.promisify(fs.mkdir)(datadogDirectory);
-  const groups = getFunctionGroups(funcs);
-  const promises = groups.map(async (funcGroup) => {
-    const methods = getMethods(funcGroup);
-    const result = getWrapperText(funcGroup.runtime, funcGroup.filename, methods, tracingMode);
-    if (result === undefined) {
+    setEnvDatadogHandler(func);
+    const handlerInfo = getDDHandler(func.type);
+    if (handlerInfo === undefined) {
       return;
     }
-    const text = result;
-    const filename = await writeWrapperFunction(funcGroup, text);
-    const baseMethodName = path.posix.join(datadogDirectory, funcGroup.funcs[0].info.name);
-    for (const func of funcGroup.funcs) {
-      func.info.handler.handler = `${baseMethodName}.${func.method}`;
-      if (func.info.handler.package === undefined) {
-        func.info.handler.package = {
-          exclude: [],
-          include: [],
-        };
-      }
-      if (func.info.handler.package.include === undefined) {
-        func.info.handler.package.include = [];
-      }
-      func.info.handler.package.include.push(filename);
+    const { handler, handlerFile } = handlerInfo;
+
+    console.log(`New handler is ${handler}`);
+    console.log(`New handler file is ${handlerFile}`);
+
+    console.log(`Handler before change: ${func.handler.handler}`);
+    func.handler.handler = handler;
+    console.log(`Handler after change: ${func.handler.handler}`);
+
+    if (func.handler.package === undefined) {
+      func.handler.package = {
+        exclude: [],
+        include: [],
+      };
     }
-    return `${filename}`;
+    if (func.handler.package.include === undefined) {
+      func.handler.package.include = [];
+    }
+    func.handler.package.include.push(handlerFile);
   });
-  const files = [...(await Promise.all(promises))];
-  const allFiles = files.filter((file) => file !== undefined) as string[];
-  allFiles.push(path.join(datadogDirectory, "**"));
-  addToExclusionList(service, allFiles);
 }
 
-export async function cleanupHandlers() {
-  await removeDirectory(datadogDirectory);
-}
-
-export function getWrapperText(type: RuntimeType, filename: string, methods: string[], tracingMode: TracingMode) {
+function getDDHandler(type: RuntimeType | undefined) {
+  console.log("Start of getDDHandler");
+  if (type === undefined) {
+    return;
+  }
   switch (type) {
     case RuntimeType.NODE:
-      return nodeTemplate(filename, methods, tracingMode);
-    case RuntimeType.NODE_ES6:
-      return es6Template(filename, methods, tracingMode);
+      console.log("type is node");
     case RuntimeType.NODE_TS:
-      return typescriptTemplate(filename, methods, tracingMode);
-    case RuntimeType.PYTHON:
-      return pythonTemplate(filename, methods);
-  }
-}
-
-export function getFunctionGroups(functionInfos: FunctionInfo[]) {
-  const lookup: {
-    [key: string]: FunctionGroup;
-  } = {};
-  for (const func of functionInfos) {
-    const handlerPath = getHandlerPath(func);
-    if (handlerPath === undefined) {
-      continue;
-    }
-    const key = `${handlerPath.filename}.${getHandlerExtension(func.type)}`;
-    const group = lookup[key] ?? {
-      funcs: [],
-      filename: handlerPath.filename,
-      runtime: func.type,
-    };
-    group.funcs.push({ info: func, method: handlerPath.method });
-    lookup[key] = group;
-  }
-  return [...Object.values(lookup)];
-}
-
-export async function writeWrapperFunction(group: FunctionGroup, wrapperText: string) {
-  const extension = getHandlerExtension(group.runtime);
-  const filename = `${group.funcs[0].info.name}.${extension}`;
-
-  const pathname = path.join(datadogDirectory, filename);
-
-  await util.promisify(fs.writeFile)(pathname, wrapperText);
-  return pathname;
-}
-
-export async function addToExclusionList(service: any, files: string[]) {
-  if (service.package === undefined) {
-    service.package = {};
-  }
-  const pack = service.package;
-  if (pack.include === undefined) {
-    pack.include = [];
-  }
-  pack.include.push(...files);
-}
-
-function getMethods(funcGroup: FunctionGroup) {
-  // Dedups methods shared between multiple function groups
-  return [...new Set(funcGroup.funcs.map((func) => func.method)).values()].sort();
-}
-
-function getHandlerExtension(type: RuntimeType) {
-  switch (type) {
+      console.log("type is node_ts");
     case RuntimeType.NODE_ES6:
-    case RuntimeType.NODE:
-      return "js";
-    case RuntimeType.NODE_TS:
-      return "ts";
+      console.log("type is node_es6");
+      return { handler: jsHandler, handlerFile: jsHandlerFile };
     case RuntimeType.PYTHON:
-      return "py";
-    case RuntimeType.UNSUPPORTED:
-      return "";
+      return { handler: pythonHandler, handlerFile: pythonHandlerFile };
   }
+}
+
+function setEnvDatadogHandler(func: FunctionInfo) {
+  console.log(`Setting environment lambda variable to be ${func.handler.handler}...`);
+  const originalHandler = func.handler.handler;
+
+  var environment = (func.handler as any).environment;
+  if (environment === undefined) {
+    environment = {};
+  }
+
+  environment[datadogHandlerEnvVar] = originalHandler;
+  (func.handler as any).environment = environment;
 }
