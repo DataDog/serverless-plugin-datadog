@@ -6,18 +6,27 @@
  * Copyright 2019 Datadog, Inc.
  */
 
+import fs from "fs";
 import Service from "serverless/classes/Service";
+import util from "util";
 import { FunctionInfo, RuntimeType } from "./layer";
-import { getHandlerPath } from "./util";
+import { removeDirectory } from "./util";
 
+export const datadogDirectory = "datadog_handlers";
 const datadogHandlerEnvVar = "DD_LAMBDA_HANDLER";
+
 const pythonHandler = "datadog_lambda.handler.handler";
 const pythonHandlerFile = "datadog_lambda.handler.py";
-const jsHandler = "node_modules/datadog-lambda-js/dist/handler.handler";
-const jsHandlerFile = "node_modules/datadog-lambda-js/dist/handler.js";
+
+const originalJsHandlerFile = "node_modules/datadog-lambda-js/dist/handler.js";
+const copyJsHandlerFile = `${datadogDirectory}/jsHandler.js`;
+const jsHandler = `${datadogDirectory}/jsHandler.handler`;
 
 export async function writeHandlers(service: Service, funcs: FunctionInfo[]) {
-  console.log("At writeHandlers...");
+  await cleanupHandlers();
+  await util.promisify(fs.mkdir)(datadogDirectory);
+  await util.promisify(fs.copyFile)(originalJsHandlerFile, copyJsHandlerFile);
+
   funcs.map((func) => {
     console.log(`Processing ${func.name}`);
 
@@ -44,8 +53,9 @@ export async function writeHandlers(service: Service, funcs: FunctionInfo[]) {
     if (func.handler.package.include === undefined) {
       func.handler.package.include = [];
     }
-    func.handler.package.include.push(handlerFile);
+    func.handler.package.include.push(copyJsHandlerFile);
   });
+  addToExclusionList(service, [copyJsHandlerFile]);
 }
 
 function getDDHandler(type: RuntimeType | undefined) {
@@ -60,7 +70,7 @@ function getDDHandler(type: RuntimeType | undefined) {
       console.log("type is node_ts");
     case RuntimeType.NODE_ES6:
       console.log("type is node_es6");
-      return { handler: jsHandler, handlerFile: jsHandlerFile };
+      return { handler: jsHandler, handlerFile: copyJsHandlerFile };
     case RuntimeType.PYTHON:
       return { handler: pythonHandler, handlerFile: pythonHandlerFile };
   }
@@ -70,11 +80,22 @@ function setEnvDatadogHandler(func: FunctionInfo) {
   console.log(`Setting environment lambda variable to be ${func.handler.handler}...`);
   const originalHandler = func.handler.handler;
 
-  var environment = (func.handler as any).environment;
-  if (environment === undefined) {
-    environment = {};
-  }
-
+  const environment = (func.handler as any).environment ?? {};
   environment[datadogHandlerEnvVar] = originalHandler;
   (func.handler as any).environment = environment;
+}
+
+export async function cleanupHandlers() {
+  await removeDirectory(datadogDirectory);
+}
+
+export async function addToExclusionList(service: any, files: string[]) {
+  if (service.package === undefined) {
+    service.package = {};
+  }
+  const pack = service.package;
+  if (pack.include === undefined) {
+    pack.include = [];
+  }
+  pack.include.push(...files);
 }

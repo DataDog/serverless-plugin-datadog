@@ -12,7 +12,7 @@ import * as layers from "./layers.json";
 import { getConfig, setEnvConfiguration, forceExcludeDepsFromWebpack } from "./env";
 import { applyLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
 import { enableTracing } from "./tracing";
-import { writeHandlers } from "./wrapper";
+import { cleanupHandlers, writeHandlers } from "./wrapper";
 import { hasWebpackPlugin } from "./util";
 import { TracingMode } from "./templates/common";
 import { addCloudWatchForwarderSubscriptions } from "./forwarder";
@@ -117,6 +117,9 @@ module.exports = class ServerlessPlugin {
       this.serverless.cli.log("Adding service and environment tags to functions");
       this.addServiceAndEnvTags();
     }
+
+    this.serverless.cli.log("Cleaning up Datadog Handlers");
+    await cleanupHandlers();
   }
 
   private debugLogHandlers(handlers: FunctionInfo[]) {
