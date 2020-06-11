@@ -6,43 +6,24 @@
  * Copyright 2019 Datadog, Inc.
  */
 
-import fs from "fs";
-import Service from "serverless/classes/Service";
-import util from "util";
 import { FunctionInfo, RuntimeType } from "./layer";
-import { removeDirectory } from "./util";
 
-export const datadogDirectory = "datadog_handlers";
-const datadogHandlerEnvVar = "DD_LAMBDA_HANDLER";
+export const datadogHandlerEnvVar = "DD_LAMBDA_HANDLER";
+export const pythonHandler = "datadog_lambda.handler.handler";
+export const pythonHandlerFile = "datadog_lambda.handler.py";
+export const jsHandlerLayerPrefix = "/opt/nodejs/";
+export const jsHandler = "node_modules/datadog-lambda-js/handler.handler";
+export const jsHandlerFile = "node_modules/datadog-lambda-js/handler.js";
 
-const pythonHandler = "datadog_lambda.handler.handler";
-const pythonHandlerFile = "datadog_lambda.handler.py";
-
-const originalJsHandlerFile = "node_modules/datadog-lambda-js/dist/handler.js";
-const copyJsHandlerFile = `${datadogDirectory}/jsHandler.js`;
-const jsHandler = `${datadogDirectory}/jsHandler.handler`;
-
-export async function writeHandlers(service: Service, funcs: FunctionInfo[]) {
-  await cleanupHandlers();
-  await util.promisify(fs.mkdir)(datadogDirectory);
-  await util.promisify(fs.copyFile)(originalJsHandlerFile, copyJsHandlerFile);
-
+export function redirectHandlers(funcs: FunctionInfo[], addLayers: boolean) {
   funcs.map((func) => {
-    console.log(`Processing ${func.name}`);
-
     setEnvDatadogHandler(func);
-    const handlerInfo = getDDHandler(func.type);
+    const handlerInfo = getDDHandler(func.type, addLayers);
     if (handlerInfo === undefined) {
       return;
     }
     const { handler, handlerFile } = handlerInfo;
-
-    console.log(`New handler is ${handler}`);
-    console.log(`New handler file is ${handlerFile}`);
-
-    console.log(`Handler before change: ${func.handler.handler}`);
     func.handler.handler = handler;
-    console.log(`Handler after change: ${func.handler.handler}`);
 
     if (func.handler.package === undefined) {
       func.handler.package = {
@@ -53,49 +34,29 @@ export async function writeHandlers(service: Service, funcs: FunctionInfo[]) {
     if (func.handler.package.include === undefined) {
       func.handler.package.include = [];
     }
-    func.handler.package.include.push(copyJsHandlerFile);
+    func.handler.package.include.push(handlerFile);
   });
-  addToExclusionList(service, [copyJsHandlerFile]);
 }
 
-function getDDHandler(type: RuntimeType | undefined) {
-  console.log("Start of getDDHandler");
+function getDDHandler(type: RuntimeType | undefined, addLayers: boolean) {
   if (type === undefined) {
     return;
   }
+  const finalJsHandler = addLayers ? `${jsHandlerLayerPrefix}${jsHandler}` : jsHandler;
+  const finalJsHandlerFile = addLayers ? `${jsHandlerLayerPrefix}${jsHandlerFile}` : jsHandlerFile;
   switch (type) {
     case RuntimeType.NODE:
-      console.log("type is node");
     case RuntimeType.NODE_TS:
-      console.log("type is node_ts");
     case RuntimeType.NODE_ES6:
-      console.log("type is node_es6");
-      return { handler: jsHandler, handlerFile: copyJsHandlerFile };
+      return { handler: finalJsHandler, handlerFile: finalJsHandlerFile };
     case RuntimeType.PYTHON:
       return { handler: pythonHandler, handlerFile: pythonHandlerFile };
   }
 }
 
 function setEnvDatadogHandler(func: FunctionInfo) {
-  console.log(`Setting environment lambda variable to be ${func.handler.handler}...`);
   const originalHandler = func.handler.handler;
-
   const environment = (func.handler as any).environment ?? {};
   environment[datadogHandlerEnvVar] = originalHandler;
   (func.handler as any).environment = environment;
-}
-
-export async function cleanupHandlers() {
-  await removeDirectory(datadogDirectory);
-}
-
-export async function addToExclusionList(service: any, files: string[]) {
-  if (service.package === undefined) {
-    service.package = {};
-  }
-  const pack = service.package;
-  if (pack.include === undefined) {
-    pack.include = [];
-  }
-  pack.include.push(...files);
 }
