@@ -6,6 +6,7 @@
  * Copyright 2019 Datadog, Inc.
  */
 
+import Service from "serverless/classes/Service";
 import { FunctionInfo, RuntimeType } from "./layer";
 
 export const datadogHandlerEnvVar = "DD_LAMBDA_HANDLER";
@@ -15,7 +16,8 @@ export const jsHandlerLayerPrefix = "/opt/nodejs/";
 export const jsHandler = "node_modules/datadog-lambda-js/handler.handler";
 export const jsHandlerFile = "node_modules/datadog-lambda-js/handler.js";
 
-export function redirectHandlers(funcs: FunctionInfo[], addLayers: boolean) {
+export function redirectHandlers(service: Service, funcs: FunctionInfo[], addLayers: boolean) {
+  const handlerFiles: Set<string> = new Set();
   funcs.map((func) => {
     setEnvDatadogHandler(func);
     const handlerInfo = getDDHandler(func.type, addLayers);
@@ -35,7 +37,9 @@ export function redirectHandlers(funcs: FunctionInfo[], addLayers: boolean) {
       func.handler.package.include = [];
     }
     func.handler.package.include.push(handlerFile);
+    handlerFiles.add(handlerFile);
   });
+  addToExclusionList(service, [...handlerFiles]);
 }
 
 function getDDHandler(type: RuntimeType | undefined, addLayers: boolean) {
@@ -59,4 +63,15 @@ function setEnvDatadogHandler(func: FunctionInfo) {
   const environment = (func.handler as any).environment ?? {};
   environment[datadogHandlerEnvVar] = originalHandler;
   (func.handler as any).environment = environment;
+}
+
+export async function addToExclusionList(service: any, files: string[]) {
+  if (service.package === undefined) {
+    service.package = {};
+  }
+  const pack = service.package;
+  if (pack.include === undefined) {
+    pack.include = [];
+  }
+  pack.include.push(...files);
 }

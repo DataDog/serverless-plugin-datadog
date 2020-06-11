@@ -104,7 +104,7 @@ module.exports = class ServerlessPlugin {
     }
 
     const handlers = this.getHandlers(config.nodeModuleType);
-    redirectHandlers(handlers, config.addLayers);
+    redirectHandlers(this.serverless.service, handlers, config.addLayers);
   }
 
   private debugLogHandlers(handlers: FunctionInfo[]) {
