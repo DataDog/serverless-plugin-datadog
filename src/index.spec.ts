@@ -8,12 +8,10 @@
 
 const ServerlessPlugin = require("./index");
 
-import { datadogDirectory } from "./wrapper";
-import fs from "fs";
 import mock from "mock-fs";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
 import { FunctionDefinition } from "serverless";
-import { FunctionDefinitionWithTags } from "./index";
+import { ExtendedFunctionDefinition } from "./index";
 
 function awsMock(): Aws {
   return {
@@ -25,9 +23,9 @@ function awsMock(): Aws {
 function functionMock(mockTags: { [key: string]: string }): FunctionDefinition {
   const mockPackage = { include: [], exclude: [] };
   return {
-    name: "test",
+    name: "node1",
     package: mockPackage,
-    handler: "handler",
+    handler: "my-func.ev",
     events: [],
     tags: mockTags,
   } as FunctionDefinition;
@@ -39,7 +37,7 @@ describe("ServerlessPlugin", () => {
       mock.restore();
     });
 
-    it("creates a wrapped lambda", async () => {
+    it("adds lambda layers by default and doesn't change handler", async () => {
       mock({});
       const serverless = {
         cli: {
@@ -64,14 +62,10 @@ describe("ServerlessPlugin", () => {
         service: {
           functions: {
             node1: {
-              handler: "datadog_handlers/node1.ev",
+              handler: "my-func.ev",
               layers: [expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:.*/)],
               runtime: "nodejs8.10",
             },
-          },
-
-          package: {
-            include: ["datadog_handlers/node1.js", "datadog_handlers/**"],
           },
           provider: {
             region: "us-east-1",
@@ -115,14 +109,10 @@ describe("ServerlessPlugin", () => {
         service: {
           functions: {
             node1: {
-              handler: "datadog_handlers/node1.ev",
+              handler: "my-func.ev",
               layers: [],
               runtime: "nodejs8.10",
             },
-          },
-
-          package: {
-            include: ["datadog_handlers/node1.js", "datadog_handlers/**"],
           },
           provider: {
             region: "us-east-1",
@@ -147,7 +137,7 @@ describe("ServerlessPlugin", () => {
           },
           functions: {
             node1: {
-              handler: "datadog_handlers/node1.ev",
+              handler: "my-func.ev",
               layers: [],
               runtime: "nodejs8.10",
             },
@@ -169,29 +159,7 @@ describe("ServerlessPlugin", () => {
     afterEach(() => {
       mock.restore();
     });
-    it("cleans up temp handler files afterwards", async () => {
-      mock({
-        [datadogDirectory]: {
-          "handler-1.js": "my-content",
-          "handler-2.js": "also-content",
-        },
-      });
-      const serverless = {
-        cli: { log: () => {} },
-        service: { custom: {}, getAllFunctions: () => [] },
-      };
-      const plugin = new ServerlessPlugin(serverless, {});
-      await plugin.hooks["after:package:createDeploymentArtifacts"]();
-      expect(fs.existsSync(datadogDirectory)).toBeFalsy();
-    });
-
     it("adds subscription filters when fowarderArn is set", async () => {
-      mock({
-        [datadogDirectory]: {
-          "handler-1.js": "my-content",
-          "handler-2.js": "also-content",
-        },
-      });
       const serverless = {
         cli: { log: () => {} },
         getProvider: awsMock,
@@ -210,6 +178,7 @@ describe("ServerlessPlugin", () => {
               },
             },
           },
+          functions: {},
           custom: {
             datadog: {
               forwarder: "some-arn",
@@ -226,18 +195,25 @@ describe("ServerlessPlugin", () => {
     });
 
     it("does not add or modify tags when enabledTags is false", async () => {
-      mock({
-        [datadogDirectory]: {
-          "handler-1.js": "my-content",
-          "handler-2.js": "also-content",
-        },
-      });
       const function_ = functionMock({ env: "test" });
-      const functionWithTags: FunctionDefinitionWithTags = function_;
+      const functionWithTags: ExtendedFunctionDefinition = function_;
       const serverless = {
         cli: { log: () => {} },
         getProvider: awsMock,
         service: {
+          provider: {
+            region: "us-east-1",
+          },
+          functions: {
+            node1: {
+              handler: "my-func.ev",
+              layers: [],
+              runtime: "nodejs8.10",
+              tags: {
+                env: "test",
+              },
+            },
+          },
           getServiceName: () => "dev",
           getAllFunctions: () => [function_],
           getFunction: () => function_,
@@ -254,14 +230,8 @@ describe("ServerlessPlugin", () => {
     });
 
     it("adds tags by default with service name and stage values", async () => {
-      mock({
-        [datadogDirectory]: {
-          "handler-1.js": "my-content",
-          "handler-2.js": "also-content",
-        },
-      });
       const function_ = functionMock({});
-      const functionWithTags: FunctionDefinitionWithTags = function_;
+      const functionWithTags: ExtendedFunctionDefinition = function_;
       const serverless = {
         cli: { log: () => {} },
         getProvider: awsMock,
@@ -269,6 +239,16 @@ describe("ServerlessPlugin", () => {
           getServiceName: () => "dev",
           getAllFunctions: () => [function_],
           getFunction: () => function_,
+          provider: {
+            region: "us-east-1",
+          },
+          functions: {
+            node1: {
+              handler: "my-func.ev",
+              layers: [],
+              runtime: "nodejs8.10",
+            },
+          },
         },
       };
       const plugin = new ServerlessPlugin(serverless, {});
@@ -277,14 +257,8 @@ describe("ServerlessPlugin", () => {
     });
 
     it("does not override existing tags", async () => {
-      mock({
-        [datadogDirectory]: {
-          "handler-1.js": "my-content",
-          "handler-2.js": "also-content",
-        },
-      });
       const function_ = functionMock({ service: "test" });
-      const functionWithTags: FunctionDefinitionWithTags = function_;
+      const functionWithTags: ExtendedFunctionDefinition = function_;
       const serverless = {
         cli: { log: () => {} },
         getProvider: awsMock,
@@ -292,6 +266,19 @@ describe("ServerlessPlugin", () => {
           getServiceName: () => "dev",
           getAllFunctions: () => [function_],
           getFunction: () => function_,
+          provider: {
+            region: "us-east-1",
+          },
+          functions: {
+            node1: {
+              handler: "my-func.ev",
+              layers: [],
+              runtime: "nodejs8.10",
+              tags: {
+                service: "test",
+              },
+            },
+          },
         },
       };
       const plugin = new ServerlessPlugin(serverless, {});
