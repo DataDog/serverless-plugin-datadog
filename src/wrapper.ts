@@ -52,8 +52,6 @@ function getDDHandler(lambdaRuntime: RuntimeType | undefined, addLayers: boolean
   }
   switch (lambdaRuntime) {
     case RuntimeType.NODE:
-    case RuntimeType.NODE_TS:
-    case RuntimeType.NODE_ES6:
       const finalJsHandler = addLayers ? `${jsHandlerLayerPrefix}${jsHandler}` : jsHandler;
       const finalJsHandlerFile = addLayers ? `${jsHandlerLayerPrefix}${jsHandlerFile}` : jsHandlerFile;
       return { handler: finalJsHandler, handlerFile: finalJsHandlerFile };

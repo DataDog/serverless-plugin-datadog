@@ -10,8 +10,6 @@ import { FunctionInfo, LayerJSON, RuntimeType, applyLayers, findHandlers } from 
 
 import { FunctionDefinition } from "serverless";
 import Service from "serverless/classes/Service";
-import fs from "fs";
-import mock from "mock-fs";
 
 function createMockService(
   region: string,
@@ -85,7 +83,7 @@ describe("findHandlers", () => {
       },
     ]);
   });
-  it("uses the global runtime when one isn't specified", () => {
+  it("uses regular node runtime", () => {
     const mockService = createMockService("us-east-1", {
       "func-a": { handler: "myfile.handler" },
     });
@@ -99,193 +97,102 @@ describe("findHandlers", () => {
     ]);
   });
 
-  it("uses typescript runtime when ts file is detected", () => {
-    mock({
-      "mylambda.ts": "",
+  describe("applyLayers", () => {
+    it("adds a layer array if none are present", () => {
+      const handler = {
+        handler: { runtime: "nodejs10.x" },
+        type: RuntimeType.NODE,
+        runtime: "nodejs10.x",
+      } as FunctionInfo;
+      const layers: LayerJSON = {
+        regions: { "us-east-1": { "nodejs10.x": "node:2" } },
+      };
+      applyLayers("us-east-1", [handler], layers);
+      expect(handler.handler).toEqual({
+        runtime: "nodejs10.x",
+        layers: ["node:2"],
+      });
     });
-    const mockService = createMockService("us-east-1", {
-      "func-a": { handler: "mylambda.handler", runtime: "nodejs8.10" },
+    it("appends to the layer array if already present", () => {
+      const handler = {
+        handler: { runtime: "nodejs10.x", layers: ["node:1"] } as any,
+        type: RuntimeType.NODE,
+        runtime: "nodejs10.x",
+      } as FunctionInfo;
+      const layers: LayerJSON = {
+        regions: { "us-east-1": { "nodejs10.x": "node:2" } },
+      };
+      applyLayers("us-east-1", [handler], layers);
+      expect(handler.handler).toEqual({
+        runtime: "nodejs10.x",
+        layers: ["node:1", "node:2"],
+      });
     });
-    const result = findHandlers(mockService, "nodejs8.10");
-
-    expect(result).toMatchObject([
-      {
-        handler: { handler: "mylambda.handler", runtime: "nodejs8.10" },
-        type: RuntimeType.NODE_TS,
-        runtime: "nodejs8.10",
-      },
-    ]);
-  });
-  it("uses es6 runtime when es.js file is detected", () => {
-    mock({
-      "mylambda.es.js": "",
+    it("doesn't add duplicate layers", () => {
+      const handler = {
+        handler: { runtime: "nodejs10.x", layers: ["node:1"] } as any,
+        type: RuntimeType.NODE,
+        runtime: "nodejs10.x",
+      } as FunctionInfo;
+      const layers: LayerJSON = {
+        regions: { "us-east-1": { "nodejs10.x": "node:1" } },
+      };
+      applyLayers("us-east-1", [handler], layers);
+      expect(handler.handler).toEqual({
+        runtime: "nodejs10.x",
+        layers: ["node:1"],
+      });
     });
-    const mockService = createMockService("us-east-1", {
-      "func-a": { handler: "mylambda.handler", runtime: "nodejs8.10" },
+    it("only adds layer when region can be found", () => {
+      const handler = {
+        handler: { runtime: "nodejs10.x" } as any,
+        type: RuntimeType.NODE,
+        runtime: "nodejs10.x",
+      } as FunctionInfo;
+      const layers: LayerJSON = {
+        regions: { "us-east-1": { "nodejs10.x": "node:1" } },
+      };
+      applyLayers("us-east-2", [handler], layers);
+      expect(handler.handler).toEqual({
+        runtime: "nodejs10.x",
+      });
     });
-    const result = findHandlers(mockService, "nodejs8.10");
-
-    expect(result).toMatchObject([
-      {
-        handler: { handler: "mylambda.handler", runtime: "nodejs8.10" },
-        type: RuntimeType.NODE_ES6,
-        runtime: "nodejs8.10",
-      },
-    ]);
-  });
-  it("uses es6 runtime when .mjs file is detected", () => {
-    mock({
-      "mylambda.mjs": "",
+    it("only adds layer when layer ARN can be found", () => {
+      const handler = {
+        handler: { runtime: "nodejs10.x" } as any,
+        type: RuntimeType.NODE,
+        runtime: "nodejs10.x",
+      } as FunctionInfo;
+      const layers: LayerJSON = {
+        regions: { "us-east-1": { "python2.7": "python:2" } },
+      };
+      applyLayers("us-east-1", [handler], layers);
+      expect(handler.handler).toEqual({
+        runtime: "nodejs10.x",
+      });
     });
-    const mockService = createMockService("us-east-1", {
-      "func-a": { handler: "mylambda.handler", runtime: "nodejs8.10" },
+    it("only adds layer when runtime present", () => {
+      const handler = {
+        handler: {} as any,
+        type: RuntimeType.NODE,
+        runtime: "nodejs10.x",
+      } as FunctionInfo;
+      const layers: LayerJSON = {
+        regions: { "us-east-1": { "python2.7": "python:2" } },
+      };
+      applyLayers("us-east-1", [handler], layers);
+      expect(handler.handler).toEqual({});
     });
-    const result = findHandlers(mockService, "nodejs8.10");
-
-    expect(result).toMatchObject([
-      {
-        handler: { handler: "mylambda.handler", runtime: "nodejs8.10" },
-        type: RuntimeType.NODE_ES6,
-        runtime: "nodejs8.10",
-      },
-    ]);
-  });
-  it("uses default node runtime when provided", () => {
-    mock({
-      "mylambda.js": "",
+    it("only add layer when when supported runtime present", () => {
+      const handler = {
+        handler: {} as any,
+        type: RuntimeType.UNSUPPORTED,
+      } as FunctionInfo;
+      const layers: LayerJSON = {
+        regions: { "us-east-1": { "python2.7": "python:2" } },
+      };
+      applyLayers("us-east-1", [handler], layers);
+      expect(handler.handler).toEqual({});
     });
-    const mockService = createMockService("us-east-1", {
-      "func-a": { handler: "mylambda.handler", runtime: "nodejs8.10" },
-    });
-    const result = findHandlers(mockService, "nodejs8.10", RuntimeType.NODE_TS);
-
-    expect(result).toMatchObject([
-      {
-        handler: { handler: "mylambda.handler", runtime: "nodejs8.10" },
-        type: RuntimeType.NODE_TS,
-        runtime: "nodejs8.10",
-      },
-    ]);
-  });
-  it("uses es6 runtime by default when webpack detected", () => {
-    mock({
-      "mylambda.js": "",
-    });
-    const plugins = ["serverless-plugin-datadog", "serverless-webpack"];
-    const mockService = createMockService(
-      "us-east-1",
-      {
-        "func-a": { handler: "mylambda.handler", runtime: "nodejs8.10" },
-      },
-      plugins,
-    );
-    const result = findHandlers(mockService, "nodejs8.10");
-
-    expect(result).toMatchObject([
-      {
-        handler: { handler: "mylambda.handler", runtime: "nodejs8.10" },
-        type: RuntimeType.NODE_ES6,
-        runtime: "nodejs8.10",
-      },
-    ]);
-  });
-});
-
-describe("applyLayers", () => {
-  it("adds a layer array if none are present", () => {
-    const handler = {
-      handler: { runtime: "nodejs10.x" },
-      type: RuntimeType.NODE,
-      runtime: "nodejs10.x",
-    } as FunctionInfo;
-    const layers: LayerJSON = {
-      regions: { "us-east-1": { "nodejs10.x": "node:2" } },
-    };
-    applyLayers("us-east-1", [handler], layers);
-    expect(handler.handler).toEqual({
-      runtime: "nodejs10.x",
-      layers: ["node:2"],
-    });
-  });
-  it("appends to the layer array if already present", () => {
-    const handler = {
-      handler: { runtime: "nodejs10.x", layers: ["node:1"] } as any,
-      type: RuntimeType.NODE,
-      runtime: "nodejs10.x",
-    } as FunctionInfo;
-    const layers: LayerJSON = {
-      regions: { "us-east-1": { "nodejs10.x": "node:2" } },
-    };
-    applyLayers("us-east-1", [handler], layers);
-    expect(handler.handler).toEqual({
-      runtime: "nodejs10.x",
-      layers: ["node:1", "node:2"],
-    });
-  });
-  it("doesn't add duplicate layers", () => {
-    const handler = {
-      handler: { runtime: "nodejs10.x", layers: ["node:1"] } as any,
-      type: RuntimeType.NODE,
-      runtime: "nodejs10.x",
-    } as FunctionInfo;
-    const layers: LayerJSON = {
-      regions: { "us-east-1": { "nodejs10.x": "node:1" } },
-    };
-    applyLayers("us-east-1", [handler], layers);
-    expect(handler.handler).toEqual({
-      runtime: "nodejs10.x",
-      layers: ["node:1"],
-    });
-  });
-  it("only adds layer when region can be found", () => {
-    const handler = {
-      handler: { runtime: "nodejs10.x" } as any,
-      type: RuntimeType.NODE,
-      runtime: "nodejs10.x",
-    } as FunctionInfo;
-    const layers: LayerJSON = {
-      regions: { "us-east-1": { "nodejs10.x": "node:1" } },
-    };
-    applyLayers("us-east-2", [handler], layers);
-    expect(handler.handler).toEqual({
-      runtime: "nodejs10.x",
-    });
-  });
-  it("only adds layer when layer ARN can be found", () => {
-    const handler = {
-      handler: { runtime: "nodejs10.x" } as any,
-      type: RuntimeType.NODE,
-      runtime: "nodejs10.x",
-    } as FunctionInfo;
-    const layers: LayerJSON = {
-      regions: { "us-east-1": { "python2.7": "python:2" } },
-    };
-    applyLayers("us-east-1", [handler], layers);
-    expect(handler.handler).toEqual({
-      runtime: "nodejs10.x",
-    });
-  });
-  it("only adds layer when runtime present", () => {
-    const handler = {
-      handler: {} as any,
-      type: RuntimeType.NODE,
-      runtime: "nodejs10.x",
-    } as FunctionInfo;
-    const layers: LayerJSON = {
-      regions: { "us-east-1": { "python2.7": "python:2" } },
-    };
-    applyLayers("us-east-1", [handler], layers);
-    expect(handler.handler).toEqual({});
-  });
-  it("only add layer when when supported runtime present", () => {
-    const handler = {
-      handler: {} as any,
-      type: RuntimeType.UNSUPPORTED,
-    } as FunctionInfo;
-    const layers: LayerJSON = {
-      regions: { "us-east-1": { "python2.7": "python:2" } },
-    };
-    applyLayers("us-east-1", [handler], layers);
-    expect(handler.handler).toEqual({});
   });
 });
