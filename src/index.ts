@@ -102,7 +102,7 @@ module.exports = class ServerlessPlugin {
 
     const defaultRuntime = this.serverless.service.provider.runtime;
     const handlers = findHandlers(this.serverless.service, defaultRuntime);
-    redirectHandlers(this.serverless.service, handlers, config.addLayers);
+    redirectHandlers(handlers, config.addLayers);
   }
 
   private debugLogHandlers(handlers: FunctionInfo[]) {
