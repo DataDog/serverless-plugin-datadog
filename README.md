@@ -27,7 +27,7 @@ plugins:
 
 ## How it works
 
-This plugin attaches the Datadog Lambda Layers for [Node.js](https://github.com/DataDog/datadog-lambda-layer-js) and [Python](https://github.com/DataDog/datadog-lambda-layer-python) to your functions. At deploy time, it generates new handler functions that wrap your existing functions and initializes the Lambda Layers. It also enables X-Ray tracing for your Lambda functions and API Gateways.
+This plugin attaches the Datadog Lambda Layers for [Node.js](https://github.com/DataDog/datadog-lambda-layer-js) and [Python](https://github.com/DataDog/datadog-lambda-layer-python) to your functions. At deploy time, it redirects to a replacement handler that initializes the Lambda Layers without any required code changes. It also enables X-Ray tracing for your Lambda functions and API Gateways.
 
 **IMPORTANT NOTE:** Because the plugin automatically wraps your Lambda handler function, you do **NOT** need to wrap your handler function as stated in the Node.js and Python Layer documentation.
 
@@ -80,6 +80,9 @@ custom:
 
     # When set, the plugin will try to subscribe the lambda's cloudwatch log groups to the forwarder with the given arn.
     forwarder: arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder
+
+    # When set, the plugin will try to automatically tag lambdas with service and env, but will not override existing tags. Defaults to true.
+    enableTags: true
 ```
 
 `flushMetricsToLogs: true` is recommended for submitting custom metrics via CloudWatch logs with the help of [Datadog Forwarder](https://github.com/DataDog/datadog-serverless-functions/tree/master/aws/logs_monitoring).
