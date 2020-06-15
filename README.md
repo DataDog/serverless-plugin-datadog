@@ -91,26 +91,6 @@ custom:
 
 ### What if I want to provide my own version of `datadog-lambda-layer-js` or `datadog-lambda-layer-python`?
 
-You can use your own version of those libraries by setting 'addLayers' to false in the datadog configuration block. Just make sure to bundle those libaries with your Lambda functions.
-
-### How do I use this with serverless-webpack?
-
-Make sure serverless-datadog is above the serverless-webpack entry in your serverless.yml
-
-```yaml
-plugins:
-  - serverless-plugin-datadog
-  - serverless-webpack
-```
-
-When using serverless webpack, the plugin will assume you are using es6 module format. If that's not the case, you can manually configure `nodeModuleType`.
-
-```yaml
-custom:
-  datadog:
-    nodeModuleType: "node" # 'typescript' | 'es6'
-```
-
 If you have the addLayers option enabled, you may also want to add 'datadog-lambda-js' and 'dd-trace' to the [externals](https://webpack.js.org/configuration/externals/) section of your webpack config. Note that auto instrumentation of libraries that have been webpacked into your bundle won't work, but other tracer features can be used.
 
 ### How do I use this with serverless-typescript?
