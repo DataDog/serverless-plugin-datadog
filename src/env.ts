@@ -25,9 +25,6 @@ export interface Configuration {
   enableXrayTracing: boolean;
   // Enable tracing on Lambda function using dd-trace, datadog's APM library.
   enableDDTracing: boolean;
-  // When set, the plugin will always write wrapper handlers in the given format. Otherwise, will try
-  // to infer the handler type either from the extension, or presence of webpack.
-  nodeModuleType?: "es6" | "node" | "typescript";
 
   // When set, the plugin will subscribe the lambdas to the forwarder with the given arn.
   forwarder?: string;
@@ -91,37 +88,4 @@ export function getConfig(service: Service): Configuration {
     ...defaultConfiguration,
     ...datadog,
   };
-}
-
-export function forceExcludeDepsFromWebpack(service: Service) {
-  const includeModules = getPropertyFromPath(service, ["custom", "webpack", "includeModules"]);
-  if (includeModules === undefined) {
-    return;
-  }
-  let forceExclude = includeModules.forceExclude as string[] | undefined;
-  if (forceExclude === undefined) {
-    forceExclude = [];
-    includeModules.forceExclude = forceExclude;
-  }
-  if (!forceExclude.includes("datadog-lambda-js")) {
-    forceExclude.push("datadog-lambda-js");
-  }
-  if (!forceExclude.includes("dd-trace")) {
-    forceExclude.push("dd-trace");
-  }
-}
-
-function getPropertyFromPath(obj: any, path: string[]) {
-  for (const part of path) {
-    let prop = obj[part];
-    if (prop === undefined || prop === true) {
-      prop = {};
-      obj[part] = prop;
-    }
-    if (prop === false) {
-      return;
-    }
-    obj = prop;
-  }
-  return obj;
 }

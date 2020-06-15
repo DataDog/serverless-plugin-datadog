@@ -5,15 +5,11 @@
  * This product includes software developed at Datadog (https://www.datadoghq.com/).
  * Copyright 2019 Datadog, Inc.
  */
-import fs from "fs";
 import { FunctionDefinition } from "serverless";
 import Service from "serverless/classes/Service";
-import { getHandlerPath, hasWebpackPlugin } from "./util";
 
 export enum RuntimeType {
   NODE,
-  NODE_TS,
-  NODE_ES6,
   PYTHON,
   UNSUPPORTED,
 }
@@ -45,11 +41,7 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
   "python3.8": RuntimeType.PYTHON,
 };
 
-export function findHandlers(
-  service: Service,
-  defaultRuntime?: string,
-  defaultNodeRuntime?: RuntimeType.NODE_ES6 | RuntimeType.NODE_TS | RuntimeType.NODE,
-): FunctionInfo[] {
+export function findHandlers(service: Service, defaultRuntime?: string): FunctionInfo[] {
   const funcs = (service as any).functions as { [key: string]: FunctionDefinition };
 
   return Object.entries(funcs)
@@ -59,30 +51,7 @@ export function findHandlers(
         runtime = defaultRuntime;
       }
       if (runtime !== undefined && runtime in runtimeLookup) {
-        const handlerInfo = { type: runtimeLookup[runtime], runtime, name, handler } as FunctionInfo;
-        if (handlerInfo.type === RuntimeType.NODE) {
-          const handlerPath = getHandlerPath(handlerInfo);
-          if (handlerPath === undefined) {
-            return;
-          }
-
-          if (defaultNodeRuntime === undefined) {
-            if (
-              fs.existsSync(`./${handlerPath.filename}.es.js`) ||
-              fs.existsSync(`./${handlerPath.filename}.mjs`) ||
-              hasWebpackPlugin(service)
-            ) {
-              handlerInfo.type = RuntimeType.NODE_ES6;
-            }
-            if (fs.existsSync(`./${handlerPath.filename}.ts`)) {
-              handlerInfo.type = RuntimeType.NODE_TS;
-            }
-          } else {
-            handlerInfo.type = defaultNodeRuntime;
-          }
-        }
-
-        return handlerInfo;
+        return { type: runtimeLookup[runtime], runtime, name, handler } as FunctionInfo;
       }
       return { type: RuntimeType.UNSUPPORTED, runtime, name, handler } as FunctionInfo;
     })

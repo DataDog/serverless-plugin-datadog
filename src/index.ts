@@ -9,18 +9,17 @@
 import * as Serverless from "serverless";
 import * as layers from "./layers.json";
 
-import { getConfig, setEnvConfiguration, forceExcludeDepsFromWebpack } from "./env";
+import { getConfig, setEnvConfiguration } from "./env";
 import { applyLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
-import { enableTracing } from "./tracing";
-import { cleanupHandlers, writeHandlers } from "./wrapper";
-import { hasWebpackPlugin } from "./util";
-import { TracingMode } from "./templates/common";
+import { TracingMode, enableTracing } from "./tracing";
+import { redirectHandlers } from "./wrapper";
 import { addCloudWatchForwarderSubscriptions } from "./forwarder";
 import { FunctionDefinition } from "serverless";
 
-// Separate interface since DefinitelyTyped dependency currently doesn't include tags
-export interface FunctionDefinitionWithTags extends FunctionDefinition {
+// Separate interface since DefinitelyTyped currently doesn't include tags or env
+export interface ExtendedFunctionDefinition extends FunctionDefinition {
   tags?: { [key: string]: string };
+  environment?: { [key: string]: string };
 }
 
 enum TagKeys {
@@ -64,28 +63,13 @@ module.exports = class ServerlessPlugin {
     this.serverless.cli.log("Auto instrumenting functions with Datadog");
     const config = getConfig(this.serverless.service);
     setEnvConfiguration(config, this.serverless.service);
-    const defaultRuntime = this.serverless.service.provider.runtime;
-    let defaultNodeRuntime: RuntimeType.NODE | RuntimeType.NODE_ES6 | RuntimeType.NODE_TS | undefined;
-    switch (config.nodeModuleType) {
-      case "es6":
-        defaultNodeRuntime = RuntimeType.NODE_ES6;
-        break;
-      case "typescript":
-        defaultNodeRuntime = RuntimeType.NODE_TS;
-        break;
-      case "node":
-        defaultNodeRuntime = RuntimeType.NODE;
-        break;
-    }
 
-    const handlers = findHandlers(this.serverless.service, defaultRuntime, defaultNodeRuntime);
+    const defaultRuntime = this.serverless.service.provider.runtime;
+    const handlers = findHandlers(this.serverless.service, defaultRuntime);
     if (config.addLayers) {
       this.serverless.cli.log("Adding Lambda Layers to functions");
       this.debugLogHandlers(handlers);
       applyLayers(this.serverless.service.provider.region, handlers, layers);
-      if (hasWebpackPlugin(this.serverless.service)) {
-        forceExcludeDepsFromWebpack(this.serverless.service);
-      }
     } else {
       this.serverless.cli.log("Skipping adding Lambda Layers, make sure you are packaging them yourself");
     }
@@ -99,8 +83,6 @@ module.exports = class ServerlessPlugin {
       tracingMode = TracingMode.XRAY;
     }
     enableTracing(this.serverless.service, tracingMode);
-
-    await writeHandlers(this.serverless.service, handlers, tracingMode);
   }
   private async afterPackageFunction() {
     const config = getConfig(this.serverless.service);
@@ -117,8 +99,9 @@ module.exports = class ServerlessPlugin {
       this.addServiceAndEnvTags();
     }
 
-    this.serverless.cli.log("Cleaning up Datadog Handlers");
-    await cleanupHandlers();
+    const defaultRuntime = this.serverless.service.provider.runtime;
+    const handlers = findHandlers(this.serverless.service, defaultRuntime);
+    redirectHandlers(handlers, config.addLayers);
   }
 
   private debugLogHandlers(handlers: FunctionInfo[]) {
@@ -137,7 +120,7 @@ module.exports = class ServerlessPlugin {
 
   private addServiceAndEnvTags() {
     this.serverless.service.getAllFunctions().forEach((functionName) => {
-      const functionDefintion: FunctionDefinitionWithTags = this.serverless.service.getFunction(functionName);
+      const functionDefintion: ExtendedFunctionDefinition = this.serverless.service.getFunction(functionName);
 
       if (!functionDefintion.tags) {
         functionDefintion.tags = {};
