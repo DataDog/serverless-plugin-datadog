@@ -11,7 +11,7 @@ import { FunctionInfo, RuntimeType } from "./layer";
 export const datadogHandlerEnvVar = "DD_LAMBDA_HANDLER";
 export const pythonHandler = "datadog_lambda.handler.handler";
 export const jsHandlerWithLayers = "/opt/nodejs/node_modules/datadog-lambda-js/handler.handler";
-export const jsHandler = "node_modules/datadog-lambda-js/handler.handler";
+export const jsHandler = "node_modules/datadog-lambda-js/dist/handler.handler";
 
 /**
  * For each lambda function, redirects handler to the Datadog handler for the given runtime,
