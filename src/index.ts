@@ -11,9 +11,8 @@ import * as layers from "./layers.json";
 
 import { getConfig, setEnvConfiguration } from "./env";
 import { applyLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
-import { enableTracing } from "./tracing";
+import { TracingMode, enableTracing } from "./tracing";
 import { redirectHandlers } from "./wrapper";
-import { TracingMode } from "./templates/common";
 import { addCloudWatchForwarderSubscriptions } from "./forwarder";
 import { FunctionDefinition } from "serverless";
 
