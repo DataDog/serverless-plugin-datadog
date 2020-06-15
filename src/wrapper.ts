@@ -10,10 +10,8 @@ import { FunctionInfo, RuntimeType } from "./layer";
 
 export const datadogHandlerEnvVar = "DD_LAMBDA_HANDLER";
 export const pythonHandler = "datadog_lambda.handler.handler";
-export const pythonHandlerFile = "datadog_lambda.handler.py";
-export const jsHandlerLayerPrefix = "/opt/nodejs/";
+export const jsHandlerWithLayers = "/opt/nodejs/node_modules/datadog-lambda-js/handler.handler";
 export const jsHandler = "node_modules/datadog-lambda-js/handler.handler";
-export const jsHandlerFile = "node_modules/datadog-lambda-js/handler.js";
 
 /**
  * For each lambda function, redirects handler to the Datadog handler for the given runtime,
@@ -22,13 +20,11 @@ export const jsHandlerFile = "node_modules/datadog-lambda-js/handler.js";
 export function redirectHandlers(funcs: FunctionInfo[], addLayers: boolean) {
   funcs.forEach((func) => {
     setEnvDatadogHandler(func);
-    const handlerInfo = getDDHandler(func.type, addLayers);
-    if (handlerInfo === undefined) {
+    const handler = getDDHandler(func.type, addLayers);
+    if (handler === undefined) {
       return;
     }
-    const { handler, handlerFile } = handlerInfo;
     func.handler.handler = handler;
-
     if (func.handler.package === undefined) {
       func.handler.package = {
         exclude: [],
@@ -47,11 +43,9 @@ function getDDHandler(lambdaRuntime: RuntimeType | undefined, addLayers: boolean
   }
   switch (lambdaRuntime) {
     case RuntimeType.NODE:
-      const finalJsHandler = addLayers ? `${jsHandlerLayerPrefix}${jsHandler}` : jsHandler;
-      const finalJsHandlerFile = addLayers ? `${jsHandlerLayerPrefix}${jsHandlerFile}` : jsHandlerFile;
-      return { handler: finalJsHandler, handlerFile: finalJsHandlerFile };
+      return addLayers ? jsHandlerWithLayers : jsHandler;
     case RuntimeType.PYTHON:
-      return { handler: pythonHandler, handlerFile: pythonHandlerFile };
+      return pythonHandler;
   }
 }
 

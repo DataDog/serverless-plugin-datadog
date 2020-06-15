@@ -7,7 +7,7 @@
  */
 
 import { redirectHandlers } from "./wrapper";
-import { datadogHandlerEnvVar, jsHandlerLayerPrefix, jsHandler, pythonHandler } from "./wrapper";
+import { datadogHandlerEnvVar, jsHandler, jsHandlerWithLayers, pythonHandler } from "./wrapper";
 import { RuntimeType } from "./layer";
 import mock from "mock-fs";
 
@@ -34,7 +34,7 @@ describe("redirectHandlers", () => {
       ],
       true,
     );
-    expect(handler.handler).toEqual(`${jsHandlerLayerPrefix}${jsHandler}`);
+    expect(handler.handler).toEqual(jsHandlerWithLayers);
   });
 
   it("redirects js handlers correctly when addLayers is false", async () => {
