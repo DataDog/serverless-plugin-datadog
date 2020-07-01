@@ -119,26 +119,33 @@ module.exports = class ServerlessPlugin {
   }
 
   private addServiceAndEnvTags() {
-    let serviceName: string | undefined;
-    let env: string | undefined;
+    let providerServiceTagExists = false;
+    let providerEnvTagExists = false;
 
     const provider = this.serverless.service.provider as any;
-    const customTags = provider.tags;
-    if (customTags !== undefined) {
-      serviceName = customTags[TagKeys.Service];
-      env = customTags[TagKeys.Env];
+
+    const providerTags = provider.tags;
+    if (providerTags !== undefined) {
+      providerServiceTagExists = providerTags[TagKeys.Service] !== undefined;
+      providerEnvTagExists = providerTags[TagKeys.Env] !== undefined;
     }
 
-    if (serviceName === undefined || env === undefined) {
+    const providerStackTags = provider.stackTags;
+    if (providerStackTags !== undefined) {
+      providerServiceTagExists = providerStackTags[TagKeys.Service] !== undefined;
+      providerEnvTagExists = providerStackTags[TagKeys.Env] !== undefined;
+    }
+
+    if (!providerServiceTagExists || !providerEnvTagExists) {
       this.serverless.service.getAllFunctions().forEach((functionName) => {
         const functionDefintion: ExtendedFunctionDefinition = this.serverless.service.getFunction(functionName);
         if (!functionDefintion.tags) {
           functionDefintion.tags = {};
         }
-        if (!serviceName && !functionDefintion.tags[TagKeys.Service]) {
+        if (!providerServiceTagExists && !functionDefintion.tags[TagKeys.Service]) {
           functionDefintion.tags[TagKeys.Service] = this.serverless.service.getServiceName();
         }
-        if (!env && !functionDefintion.tags[TagKeys.Env]) {
+        if (!providerEnvTagExists && !functionDefintion.tags[TagKeys.Env]) {
           functionDefintion.tags[TagKeys.Env] = this.serverless.getProvider("aws").getStage();
         }
       });
