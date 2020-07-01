@@ -132,8 +132,8 @@ module.exports = class ServerlessPlugin {
 
     const providerStackTags = provider.stackTags;
     if (providerStackTags !== undefined) {
-      providerServiceTagExists = providerStackTags[TagKeys.Service] !== undefined;
-      providerEnvTagExists = providerStackTags[TagKeys.Env] !== undefined;
+      providerServiceTagExists = providerServiceTagExists || providerStackTags[TagKeys.Service] !== undefined;
+      providerEnvTagExists = providerEnvTagExists || providerStackTags[TagKeys.Env] !== undefined;
     }
 
     if (!providerServiceTagExists || !providerEnvTagExists) {
