@@ -118,23 +118,42 @@ module.exports = class ServerlessPlugin {
     }
   }
 
+  /**
+   * Check for service and env tags on provider level (under tags and stackTags),
+   * as well as function level. Automatically create tags for service and env with
+   * properties from deployment configurations if needed; does not override any existing values.
+   */
   private addServiceAndEnvTags() {
-    this.serverless.service.getAllFunctions().forEach((functionName) => {
-      const functionDefintion: ExtendedFunctionDefinition = this.serverless.service.getFunction(functionName);
+    let providerServiceTagExists = false;
+    let providerEnvTagExists = false;
 
-      if (!functionDefintion.tags) {
-        functionDefintion.tags = {};
-      }
+    const provider = this.serverless.service.provider as any;
 
-      // Service tag
-      if (!functionDefintion.tags[TagKeys.Service]) {
-        functionDefintion.tags[TagKeys.Service] = this.serverless.service.getServiceName();
-      }
+    const providerTags = provider.tags;
+    if (providerTags !== undefined) {
+      providerServiceTagExists = providerTags[TagKeys.Service] !== undefined;
+      providerEnvTagExists = providerTags[TagKeys.Env] !== undefined;
+    }
 
-      // Environment tag
-      if (!functionDefintion.tags[TagKeys.Env]) {
-        functionDefintion.tags[TagKeys.Env] = this.serverless.getProvider("aws").getStage();
-      }
-    });
+    const providerStackTags = provider.stackTags;
+    if (providerStackTags !== undefined) {
+      providerServiceTagExists = providerServiceTagExists || providerStackTags[TagKeys.Service] !== undefined;
+      providerEnvTagExists = providerEnvTagExists || providerStackTags[TagKeys.Env] !== undefined;
+    }
+
+    if (!providerServiceTagExists || !providerEnvTagExists) {
+      this.serverless.service.getAllFunctions().forEach((functionName) => {
+        const functionDefintion: ExtendedFunctionDefinition = this.serverless.service.getFunction(functionName);
+        if (!functionDefintion.tags) {
+          functionDefintion.tags = {};
+        }
+        if (!providerServiceTagExists && !functionDefintion.tags[TagKeys.Service]) {
+          functionDefintion.tags[TagKeys.Service] = this.serverless.service.getServiceName();
+        }
+        if (!providerEnvTagExists && !functionDefintion.tags[TagKeys.Env]) {
+          functionDefintion.tags[TagKeys.Env] = this.serverless.getProvider("aws").getStage();
+        }
+      });
+    }
   }
 };

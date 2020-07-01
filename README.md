@@ -81,7 +81,7 @@ custom:
     # When set, the plugin will try to subscribe the lambda's cloudwatch log groups to the forwarder with the given arn.
     forwarder: arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder
 
-    # When set, the plugin will try to automatically tag lambdas with service and env, but will not override existing tags. Defaults to true.
+    # When set, the plugin will try to automatically tag lambdas with service and env, but will not override existing tags set on function or provider levels. Defaults to true.
     enableTags: true
 ```
 

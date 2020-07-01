@@ -256,7 +256,7 @@ describe("ServerlessPlugin", () => {
       expect(functionWithTags).toHaveProperty("tags", { env: "dev", service: "dev" });
     });
 
-    it("does not override existing tags", async () => {
+    it("does not override existing tags on function", async () => {
       const function_ = functionMock({ service: "test" });
       const functionWithTags: ExtendedFunctionDefinition = function_;
       const serverless = {
@@ -284,6 +284,44 @@ describe("ServerlessPlugin", () => {
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
       expect(functionWithTags).toHaveProperty("tags", { env: "dev", service: "test" });
+    });
+
+    it("does not override tags set on provider level", async () => {
+      const function_ = functionMock({});
+      const functionWithTags: ExtendedFunctionDefinition = function_;
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: awsMock,
+        service: {
+          getServiceName: () => "my-service",
+          getAllFunctions: () => [function_],
+          getFunction: () => function_,
+          provider: {
+            region: "us-east-1",
+            tags: {
+              service: "service-name",
+            },
+            stackTags: {
+              env: "dev",
+            },
+          },
+          functions: {
+            node1: {
+              handler: "my-func.ev",
+              layers: [],
+              runtime: "nodejs8.10",
+              tags: {
+                service: "test",
+              },
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+
+      // The service and env tags will be set with the values given in the provider instead
+      expect(functionWithTags).toHaveProperty("tags", {});
     });
   });
 });
