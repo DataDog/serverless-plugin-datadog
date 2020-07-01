@@ -30,7 +30,7 @@ export interface Configuration {
   forwarder?: string;
 
   // When set, the plugin will try to automatically tag customers' lambda functions with service and env,
-  // but will not override existing tags. Defaults to true
+  // but will not override existing tags set under the function or the provider. Defaults to true
   enableTags: boolean;
 }
 
