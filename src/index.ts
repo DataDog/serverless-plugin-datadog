@@ -118,6 +118,11 @@ module.exports = class ServerlessPlugin {
     }
   }
 
+  /**
+   * Check for service and env tags on provider level (under tags and stackTags),
+   * as well as function level. Automatically create tags for service and env with
+   * properties from deployment configurations if needed; does not override any existing values.
+   */
   private addServiceAndEnvTags() {
     let providerServiceTagExists = false;
     let providerEnvTagExists = false;
