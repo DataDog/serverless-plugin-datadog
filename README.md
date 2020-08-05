@@ -41,8 +41,8 @@ custom:
     # The log level, set to DEBUG for extended logging. Defaults to `info`.
     logLevel: "info"
 
-    # Enable X-Ray tracing on the Lambda functions and API Gateway integrations. Defaults to `true`.
-    enableXrayTracing: true
+    # Enable X-Ray tracing on the Lambda functions and API Gateway integrations. Defaults to `false`.
+    enableXrayTracing: false
 
     # Enable Datadog tracing on the Lambda function. Defaults to `true`.
     # When enabled, the parameter `forwarder` must be set.
