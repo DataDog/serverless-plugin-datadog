@@ -158,7 +158,7 @@ describe("ServerlessPlugin", () => {
             tracing: {
               apiGateway: true,
               lambda: true,
-           },
+            },
           },
         },
       });
