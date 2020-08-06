@@ -45,7 +45,7 @@ export const defaultConfiguration: Configuration = {
   flushMetricsToLogs: true,
   logLevel: "info",
   site: "datadoghq.com",
-  enableXrayTracing: true,
+  enableXrayTracing: false,
   enableDDTracing: true,
   enableTags: true,
 };

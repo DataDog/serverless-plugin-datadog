@@ -69,10 +69,6 @@ describe("ServerlessPlugin", () => {
           },
           provider: {
             region: "us-east-1",
-            tracing: {
-              apiGateway: true,
-              lambda: true,
-            },
           },
         },
       });
@@ -116,16 +112,12 @@ describe("ServerlessPlugin", () => {
           },
           provider: {
             region: "us-east-1",
-            tracing: {
-              apiGateway: true,
-              lambda: true,
-            },
           },
         },
       });
     });
 
-    it("skips adding tracing when enableXrayTracing is false", async () => {
+    it("Adds tracing when enableXrayTracing is true", async () => {
       mock({});
       const serverless = {
         cli: {
@@ -144,7 +136,7 @@ describe("ServerlessPlugin", () => {
           },
           custom: {
             datadog: {
-              enableXrayTracing: false,
+              enableXrayTracing: true,
             },
           },
         },
@@ -152,7 +144,24 @@ describe("ServerlessPlugin", () => {
 
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:initialize"]();
-      expect(Object.keys(serverless.service.provider)).not.toContain("tracing");
+      expect(serverless).toMatchObject({
+        service: {
+          functions: {
+            node1: {
+              handler: "my-func.ev",
+              layers: [expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:.*/)],
+              runtime: "nodejs8.10",
+            },
+          },
+          provider: {
+            region: "us-east-1",
+            tracing: {
+              apiGateway: true,
+              lambda: true,
+            },
+          },
+        },
+      });
     });
   });
   describe("afterPackageFunction", () => {

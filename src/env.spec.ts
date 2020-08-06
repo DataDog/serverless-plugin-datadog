@@ -29,7 +29,7 @@ describe("getConfig", () => {
       flushMetricsToLogs: true,
       logLevel: "debug",
       site: "datadoghq.com",
-      enableXrayTracing: true,
+      enableXrayTracing: false,
       enableDDTracing: true,
       enableTags: true,
     });
