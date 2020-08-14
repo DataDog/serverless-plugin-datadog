@@ -54,6 +54,13 @@ yarn login
 echo "Updating layer versions"
 ./scripts/generate_layers_json.sh
 
+git diff --exit-code -s src/layers.json
+layers_updated=$?
+if [ $layers_updated -eq 1 ]; then
+    echo "Layers updated, committing changes"
+    git commit src/layers.json -m "Update layer versions"
+fi
+
 echo "Bumping the version number and committing the changes"
 yarn version --new-version "$VERSION"
 
