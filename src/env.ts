@@ -39,6 +39,7 @@ const apiKeyKMSEnvVar = "DD_KMS_API_KEY";
 const siteURLEnvVar = "DD_SITE";
 const logLevelEnvVar = "DD_LOG_LEVEL";
 const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
+const ddTracingEnabledEnvVar = "DD_TRACE_ENABLED";
 
 export const defaultConfiguration: Configuration = {
   addLayers: true,
@@ -71,6 +72,9 @@ export function setEnvConfiguration(config: Configuration, service: Service) {
   }
   if (environment[logForwardingEnvVar] === undefined) {
     environment[logForwardingEnvVar] = config.flushMetricsToLogs;
+  }
+  if (config.enableDDTracing !== undefined && environment[ddTracingEnabledEnvVar] === undefined) {
+    environment[ddTracingEnabledEnvVar] = config.enableDDTracing;
   }
 }
 
