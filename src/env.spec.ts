@@ -63,6 +63,7 @@ describe("setEnvConfiguration", () => {
           DD_KMS_API_KEY: "5678",
           DD_LOG_LEVEL: "debug",
           DD_SITE: "datadoghq.eu",
+          DD_TRACE_ENABLED: true,
         },
       },
     });
@@ -77,6 +78,7 @@ describe("setEnvConfiguration", () => {
           DD_KMS_API_KEY: "5678",
           DD_LOG_LEVEL: "debug",
           DD_SITE: "datadoghq.eu",
+          DD_TRACE_ENABLED: false,
         },
       },
     } as any;
@@ -102,6 +104,7 @@ describe("setEnvConfiguration", () => {
           DD_KMS_API_KEY: "5678",
           DD_LOG_LEVEL: "debug",
           DD_SITE: "datadoghq.eu",
+          DD_TRACE_ENABLED: false,
         },
       },
     });
