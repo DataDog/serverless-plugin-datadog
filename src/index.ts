@@ -22,11 +22,9 @@ module.exports = class ServerlessPlugin {
     "after:datadog:clean:init": this.afterPackageFunction.bind(this),
     "after:datadog:generate:init": this.beforePackageFunction.bind(this),
     "after:deploy:function:packageFunction": this.afterPackageFunction.bind(this),
-    "after:invoke:local:invoke": this.afterPackageFunction.bind(this),
     "after:package:createDeploymentArtifacts": this.afterPackageFunction.bind(this),
     "after:package:initialize": this.beforePackageFunction.bind(this),
     "before:deploy:function:packageFunction": this.beforePackageFunction.bind(this),
-    "before:invoke:local:invoke": this.beforePackageFunction.bind(this),
     "before:offline:start:init": this.beforePackageFunction.bind(this),
     "before:step-functions-offline:start": this.beforePackageFunction.bind(this),
   };
