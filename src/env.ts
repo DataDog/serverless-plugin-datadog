@@ -25,12 +25,13 @@ export interface Configuration {
   enableXrayTracing: boolean;
   // Enable tracing on Lambda function using dd-trace, datadog's APM library.
   enableDDTracing: boolean;
-  // When set, the plugin will always write wrapper handlers in the given format. Otherwise, will try
-  // to infer the handler type either from the extension, or presence of webpack.
-  nodeModuleType?: "es6" | "node" | "typescript";
 
   // When set, the plugin will subscribe the lambdas to the forwarder with the given arn.
   forwarder?: string;
+
+  // When set, the plugin will try to automatically tag customers' lambda functions with service and env,
+  // but will not override existing tags set on function or provider levels. Defaults to true
+  enableTags: boolean;
 }
 
 const apiKeyEnvVar = "DD_API_KEY";
@@ -38,14 +39,16 @@ const apiKeyKMSEnvVar = "DD_KMS_API_KEY";
 const siteURLEnvVar = "DD_SITE";
 const logLevelEnvVar = "DD_LOG_LEVEL";
 const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
+const ddTracingEnabledEnvVar = "DD_TRACE_ENABLED";
 
 export const defaultConfiguration: Configuration = {
   addLayers: true,
   flushMetricsToLogs: true,
   logLevel: "info",
   site: "datadoghq.com",
-  enableXrayTracing: true,
+  enableXrayTracing: false,
   enableDDTracing: true,
+  enableTags: true,
 };
 
 export function setEnvConfiguration(config: Configuration, service: Service) {
@@ -70,6 +73,9 @@ export function setEnvConfiguration(config: Configuration, service: Service) {
   if (environment[logForwardingEnvVar] === undefined) {
     environment[logForwardingEnvVar] = config.flushMetricsToLogs;
   }
+  if (config.enableDDTracing !== undefined && environment[ddTracingEnabledEnvVar] === undefined) {
+    environment[ddTracingEnabledEnvVar] = config.enableDDTracing;
+  }
 }
 
 export function getConfig(service: Service): Configuration {
@@ -86,37 +92,4 @@ export function getConfig(service: Service): Configuration {
     ...defaultConfiguration,
     ...datadog,
   };
-}
-
-export function forceExcludeDepsFromWebpack(service: Service) {
-  const includeModules = getPropertyFromPath(service, ["custom", "webpack", "includeModules"]);
-  if (includeModules === undefined) {
-    return;
-  }
-  let forceExclude = includeModules.forceExclude as string[] | undefined;
-  if (forceExclude === undefined) {
-    forceExclude = [];
-    includeModules.forceExclude = forceExclude;
-  }
-  if (!forceExclude.includes("datadog-lambda-js")) {
-    forceExclude.push("datadog-lambda-js");
-  }
-  if (!forceExclude.includes("dd-trace")) {
-    forceExclude.push("dd-trace");
-  }
-}
-
-function getPropertyFromPath(obj: any, path: string[]) {
-  for (const part of path) {
-    let prop = obj[part];
-    if (prop === undefined || prop === true) {
-      prop = {};
-      obj[part] = prop;
-    }
-    if (prop === false) {
-      return;
-    }
-    obj = prop;
-  }
-  return obj;
 }

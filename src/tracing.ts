@@ -7,10 +7,16 @@
  */
 
 import Service from "serverless/classes/Service";
-import { TracingMode } from "./templates/common";
 
 const ddTraceEnabledEnvVar = "DD_TRACE_ENABLED";
 const ddMergeXrayTracesEnvVar = "DD_MERGE_XRAY_TRACES";
+
+export enum TracingMode {
+  XRAY,
+  DD_TRACE,
+  HYBRID,
+  NONE,
+}
 
 export function enableTracing(service: Service, tracingMode: TracingMode) {
   const provider = service.provider as any;

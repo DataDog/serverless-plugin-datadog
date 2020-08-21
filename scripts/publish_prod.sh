@@ -54,6 +54,12 @@ yarn login
 echo "Updating layer versions"
 ./scripts/generate_layers_json.sh
 
+files_changed=$(git status --porcelain)
+if [[ $files_changed == *"src/layers.json"* ]]; then
+    echo "Layers updated, committing changes"
+    git commit src/layers.json -m "Update layer versions"
+fi
+
 echo "Bumping the version number and committing the changes"
 yarn version --new-version "$VERSION"
 

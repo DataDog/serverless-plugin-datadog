@@ -6,7 +6,7 @@
  * Copyright 2019 Datadog, Inc.
  */
 
-import { getConfig, defaultConfiguration, setEnvConfiguration, forceExcludeDepsFromWebpack } from "./env";
+import { getConfig, defaultConfiguration, setEnvConfiguration } from "./env";
 
 describe("getConfig", () => {
   it("get a default configuration when none is present", () => {
@@ -29,8 +29,9 @@ describe("getConfig", () => {
       flushMetricsToLogs: true,
       logLevel: "debug",
       site: "datadoghq.com",
-      enableXrayTracing: true,
+      enableXrayTracing: false,
       enableDDTracing: true,
+      enableTags: true,
     });
   });
 });
@@ -50,6 +51,7 @@ describe("setEnvConfiguration", () => {
         flushMetricsToLogs: true,
         enableXrayTracing: true,
         enableDDTracing: true,
+        enableTags: true,
       },
       service,
     );
@@ -61,6 +63,7 @@ describe("setEnvConfiguration", () => {
           DD_KMS_API_KEY: "5678",
           DD_LOG_LEVEL: "debug",
           DD_SITE: "datadoghq.eu",
+          DD_TRACE_ENABLED: true,
         },
       },
     });
@@ -75,6 +78,7 @@ describe("setEnvConfiguration", () => {
           DD_KMS_API_KEY: "5678",
           DD_LOG_LEVEL: "debug",
           DD_SITE: "datadoghq.eu",
+          DD_TRACE_ENABLED: false,
         },
       },
     } as any;
@@ -88,6 +92,7 @@ describe("setEnvConfiguration", () => {
         flushMetricsToLogs: false,
         enableXrayTracing: true,
         enableDDTracing: true,
+        enableTags: true,
       },
       service,
     );
@@ -99,79 +104,7 @@ describe("setEnvConfiguration", () => {
           DD_KMS_API_KEY: "5678",
           DD_LOG_LEVEL: "debug",
           DD_SITE: "datadoghq.eu",
-        },
-      },
-    });
-  });
-});
-
-describe("forceExcludeDepsFromWebpack", () => {
-  it("adds missing fields to the webpack config", () => {
-    const service = {} as any;
-    forceExcludeDepsFromWebpack(service);
-    expect(service).toEqual({
-      custom: {
-        webpack: {
-          includeModules: {
-            forceExclude: ["datadog-lambda-js", "dd-trace"],
-          },
-        },
-      },
-    });
-  });
-  it("replaces includeModules:true", () => {
-    const service = {
-      custom: {
-        webpack: {
-          includeModules: true,
-        },
-      },
-    } as any;
-    forceExcludeDepsFromWebpack(service);
-    expect(service).toEqual({
-      custom: {
-        webpack: {
-          includeModules: {
-            forceExclude: ["datadog-lambda-js", "dd-trace"],
-          },
-        },
-      },
-    });
-  });
-  it("doesn't replace includeModules:false", () => {
-    const service = {
-      custom: {
-        webpack: {
-          includeModules: false,
-        },
-      },
-    } as any;
-    forceExcludeDepsFromWebpack(service);
-    expect(service).toEqual({
-      custom: {
-        webpack: {
-          includeModules: false,
-        },
-      },
-    });
-  });
-  it("doesn't modify webpack when dependencies already included", () => {
-    const service = {
-      custom: {
-        webpack: {
-          includeModules: {
-            forceExclude: ["datadog-lambda-js", "dd-trace"],
-          },
-        },
-      },
-    } as any;
-    forceExcludeDepsFromWebpack(service);
-    expect(service).toEqual({
-      custom: {
-        webpack: {
-          includeModules: {
-            forceExclude: ["datadog-lambda-js", "dd-trace"],
-          },
+          DD_TRACE_ENABLED: false,
         },
       },
     });
