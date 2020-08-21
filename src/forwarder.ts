@@ -28,7 +28,10 @@ function isLogGroup(value: any): value is LogGroupResource {
 }
 
 export async function addCloudWatchForwarderSubscriptions(service: Service, aws: Aws, functionArn: string) {
-  const resources = service.provider.compiledCloudFormationTemplate.Resources;
+  const resources = service.provider.compiledCloudFormationTemplate?.Resources;
+  if (resources === undefined) {
+    return ["No cloudformation stack available. Skipping subscribing Datadog forwarder."];
+  }
   const errors = [];
 
   for (const [name, resource] of Object.entries(resources)) {

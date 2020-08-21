@@ -2,7 +2,7 @@ import Service from "serverless/classes/Service";
 import { addCloudWatchForwarderSubscriptions } from "./forwarder";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
 
-function serviceWithResources(resources: Record<string, any>, serviceName = "my-service"): Service {
+function serviceWithResources(resources?: Record<string, any>, serviceName = "my-service"): Service {
   const service: Partial<Service> = {
     getServiceName: () => serviceName,
     provider: {
@@ -11,7 +11,7 @@ function serviceWithResources(resources: Record<string, any>, serviceName = "my-
       region: "",
       versionFunctions: true,
       compiledCloudFormationTemplate: {
-        Resources: resources,
+        Resources: resources as any,
         Outputs: {},
       },
     },
@@ -132,6 +132,18 @@ describe("addCloudWatchForwarderSubscriptions", () => {
           "Type": "AWS::Logs::LogGroup",
         },
       }
+    `);
+  });
+  it("doesn't add subscription when cloudformation stack isn't available", async () => {
+    const service = serviceWithResources(undefined);
+
+    const aws = awsMock({});
+
+    const errors = await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func");
+    expect(errors).toMatchInlineSnapshot(`
+      Array [
+        "No cloudformation stack available. Skipping subscribing Datadog forwarder.",
+      ]
     `);
   });
   it("adds a subscription when an known subscription already exists", async () => {
