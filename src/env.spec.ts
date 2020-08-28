@@ -26,7 +26,7 @@ describe("getConfig", () => {
     expect(result).toEqual({
       addLayers: true,
       apiKey: "1234",
-      flushMetricsToLogs: true,
+      flushMetricsToLogs: false,
       logLevel: "debug",
       site: "datadoghq.com",
       enableXrayTracing: false,
