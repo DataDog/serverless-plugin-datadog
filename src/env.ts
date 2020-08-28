@@ -43,7 +43,7 @@ const ddTracingEnabledEnvVar = "DD_TRACE_ENABLED";
 
 export const defaultConfiguration: Configuration = {
   addLayers: true,
-  flushMetricsToLogs: true,
+  flushMetricsToLogs: false,
   logLevel: "info",
   site: "datadoghq.com",
   enableXrayTracing: false,
