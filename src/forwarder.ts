@@ -1,6 +1,7 @@
 import Service from "serverless/classes/Service";
 import Aws = require("serverless/plugins/aws/provider/awsProvider");
 
+const forwarderVersionTagName = "dd_forwarder_version";
 const logGroupKey = "AWS::Logs::LogGroup";
 const logGroupSubscriptionKey = "AWS::Logs::SubscriptionFilter";
 
@@ -21,6 +22,10 @@ interface DescribeSubscriptionFiltersResponse {
     logGroupName: string;
     roleArn: string;
   }[];
+}
+
+interface ListTagsResponse {
+  Tags: { [key: string]: string };
 }
 
 function isLogGroup(value: any): value is LogGroupResource {
@@ -92,4 +97,26 @@ export async function describeSubscriptionFilters(aws: Aws, logGroupName: string
     // An error will occur if the log group doesn't exist, so we swallow this and return an empty list.
     return [];
   }
+}
+
+export async function getForwarderTags(aws: Aws, forwarderArn: string | undefined) {
+  try {
+    const result: ListTagsResponse = await aws.request(
+      "Lambda",
+      "listTags",
+      {
+        Resource: forwarderArn
+      },
+    );
+
+    return result.Tags;
+  } catch (err) {
+    return {};
+  }
+}
+
+export async function getForwarderVersion(aws: Aws, forwarderArn: string | undefined) {
+  const forwarderTags = await getForwarderTags(aws, forwarderArn);
+
+  return forwarderTags[forwarderVersionTagName];
 }

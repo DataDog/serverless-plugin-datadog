@@ -13,7 +13,7 @@ import { getConfig, setEnvConfiguration } from "./env";
 import { applyLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
 import { TracingMode, enableTracing } from "./tracing";
 import { redirectHandlers } from "./wrapper";
-import { addCloudWatchForwarderSubscriptions } from "./forwarder";
+import { addCloudWatchForwarderSubscriptions, getForwarderVersion } from "./forwarder";
 import { FunctionDefinition } from "serverless";
 
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
@@ -25,6 +25,7 @@ export interface ExtendedFunctionDefinition extends FunctionDefinition {
 enum TagKeys {
   Service = "service",
   Env = "env",
+  ForwarderVersion = "dd_forwarder_version",
 }
 
 module.exports = class ServerlessPlugin {
@@ -97,6 +98,11 @@ module.exports = class ServerlessPlugin {
       this.addServiceAndEnvTags();
     }
 
+    if (config.forwarder) {
+      this.serverless.cli.log("Adding forwarder metadata tags to functions");
+      await this.addForwarderTags();
+    }
+
     const defaultRuntime = this.serverless.service.provider.runtime;
     const handlers = findHandlers(this.serverless.service, defaultRuntime);
     redirectHandlers(handlers, config.addLayers);
@@ -151,6 +157,29 @@ module.exports = class ServerlessPlugin {
         if (!providerEnvTagExists && !functionDefintion.tags[TagKeys.Env]) {
           functionDefintion.tags[TagKeys.Env] = this.serverless.getProvider("aws").getStage();
         }
+      });
+    }
+  }
+
+  /**
+   * Check for the forwarder version and automatically tag the function(s) with it
+   */
+  private async addForwarderTags() {
+    const config = getConfig(this.serverless.service);
+    const aws = this.serverless.getProvider("aws");
+
+    const forwarderVersion = await getForwarderVersion(aws, config.forwarder);
+
+    if (forwarderVersion) {
+      this.serverless.cli.log(`Adding Forwarder Version ${forwarderVersion}`);
+
+      this.serverless.service.getAllFunctions().forEach((functionName) => {
+        const functionDefintion: ExtendedFunctionDefinition = this.serverless.service.getFunction(functionName);
+        if (!functionDefintion.tags) {
+          functionDefintion.tags = {};
+        }
+
+        functionDefintion.tags[TagKeys.ForwarderVersion] = forwarderVersion;
       });
     }
   }
