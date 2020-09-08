@@ -19,7 +19,7 @@ function serviceWithResources(resources?: Record<string, any>, serviceName = "my
   return service as Service;
 }
 
-function awsMock(existingSubs: { [key: string]: any }): Aws {
+function awsMock(existingSubs: { [key: string]: any }, stackName?: string): Aws {
   return {
     getStage: () => "dev",
     request: (service, method, params: any) => {
@@ -29,6 +29,9 @@ function awsMock(existingSubs: { [key: string]: any }): Aws {
       }
       return Promise.reject("Log group doesn't exist");
     },
+    naming: {
+      getStackName: () => stackName,
+    } as { [key: string]: () => string },
   } as Aws;
 }
 
@@ -109,7 +112,6 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       }
     `);
   });
-
   it("doesn't add subscription when an unknown subscription already exists", async () => {
     const service = serviceWithResources({
       FirstGroup: {
@@ -160,6 +162,43 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     );
 
     const aws = awsMock({ "/aws/lambda/first-group": [{ filterName: "my-service-dev-FirstGroupSubscription-XXXX" }] });
+
+    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func");
+    expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
+      Object {
+        "FirstGroup": Object {
+          "Properties": Object {
+            "LogGroupName": "/aws/lambda/first-group",
+          },
+          "Type": "AWS::Logs::LogGroup",
+        },
+        "FirstGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "my-func",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Ref": "FirstGroup",
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
+        },
+      }
+    `);
+  });
+  it("adds a subscription when an known subscription already exists and the stack name is defined", async () => {
+    const service = serviceWithResources(
+      {
+        FirstGroup: {
+          Type: "AWS::Logs::LogGroup",
+          Properties: {
+            LogGroupName: "/aws/lambda/first-group",
+          },
+        },
+      },
+      "my-service",
+    );
+
+    const aws = awsMock({ "/aws/lambda/first-group": [{ filterName: "myCustomStackName-FirstGroupSubscription-XXXX" }] }, "myCustomStackName");
 
     await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func");
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
