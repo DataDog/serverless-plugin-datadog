@@ -198,7 +198,10 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       "my-service",
     );
 
-    const aws = awsMock({ "/aws/lambda/first-group": [{ filterName: "myCustomStackName-FirstGroupSubscription-XXXX" }] }, "myCustomStackName");
+    const aws = awsMock(
+      { "/aws/lambda/first-group": [{ filterName: "myCustomStackName-FirstGroupSubscription-XXXX" }] },
+      "myCustomStackName",
+    );
 
     await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func");
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
