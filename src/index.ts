@@ -8,6 +8,7 @@
 
 import * as Serverless from "serverless";
 import * as layers from "./layers.json";
+import { version } from "../package.json";
 
 import { getConfig, setEnvConfiguration } from "./env";
 import { applyLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
@@ -26,6 +27,7 @@ enum TagKeys {
   Service = "service",
   Env = "env",
   ForwarderVersion = "dd_forwarder_version",
+  Plugin = "dd_sls_plugin",
 }
 
 module.exports = class ServerlessPlugin {
@@ -91,16 +93,16 @@ module.exports = class ServerlessPlugin {
       for (const error of errors) {
         this.serverless.cli.log(error);
       }
+
+      this.serverless.cli.log("Adding forwarder metadata tags to functions");
+      await this.addForwarderTags();
     }
+
+    this.addPluginTag();
 
     if (config.enableTags) {
       this.serverless.cli.log("Adding service and environment tags to functions");
       this.addServiceAndEnvTags();
-    }
-
-    if (config.forwarder) {
-      this.serverless.cli.log("Adding forwarder metadata tags to functions");
-      await this.addForwarderTags();
     }
 
     const defaultRuntime = this.serverless.service.provider.runtime;
@@ -162,7 +164,28 @@ module.exports = class ServerlessPlugin {
   }
 
   /**
-   * Check for the forwarder version and automatically tag the function(s) with it
+   * Tags the function(s) with plugin version
+   */
+  private async addPluginTag() {
+    const pluginVersion = version;
+    this.serverless.cli.log(version);
+
+    if (pluginVersion) {
+      this.serverless.cli.log(`Adding Plugin Version ${pluginVersion}`);
+
+      this.serverless.service.getAllFunctions().forEach((functionName) => {
+        const functionDefintion: ExtendedFunctionDefinition = this.serverless.service.getFunction(functionName);
+        if (!functionDefintion.tags) {
+          functionDefintion.tags = {};
+        }
+
+        functionDefintion.tags[TagKeys.Plugin] = pluginVersion;
+      });
+    }
+  }
+
+  /**
+   * Check for the forwarder version and tags the function(s) with it
    */
   private async addForwarderTags() {
     const config = getConfig(this.serverless.service);
