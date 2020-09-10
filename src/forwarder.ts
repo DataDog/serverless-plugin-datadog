@@ -23,10 +23,6 @@ interface DescribeSubscriptionFiltersResponse {
   }[];
 }
 
-interface ListTagsResponse {
-  Tags: { [key: string]: string };
-}
-
 function isLogGroup(value: any): value is LogGroupResource {
   return value.Type === logGroupKey;
 }

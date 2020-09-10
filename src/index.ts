@@ -26,7 +26,6 @@ export interface ExtendedFunctionDefinition extends FunctionDefinition {
 enum TagKeys {
   Service = "service",
   Env = "env",
-  ForwarderVersion = "dd_forwarder_version",
   Plugin = "dd_sls_plugin",
 }
 
@@ -93,9 +92,6 @@ module.exports = class ServerlessPlugin {
       for (const error of errors) {
         this.serverless.cli.log(error);
       }
-
-      this.serverless.cli.log("Adding forwarder metadata tags to functions");
-      await this.addForwarderTags();
     }
 
     this.addPluginTag();
