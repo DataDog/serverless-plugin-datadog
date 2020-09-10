@@ -14,7 +14,7 @@ import { getConfig, setEnvConfiguration } from "./env";
 import { applyLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
 import { TracingMode, enableTracing } from "./tracing";
 import { redirectHandlers } from "./wrapper";
-import { addCloudWatchForwarderSubscriptions, getForwarderVersion } from "./forwarder";
+import { addCloudWatchForwarderSubscriptions } from "./forwarder";
 import { FunctionDefinition } from "serverless";
 
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
