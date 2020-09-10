@@ -167,11 +167,10 @@ module.exports = class ServerlessPlugin {
    * Tags the function(s) with plugin version
    */
   private async addPluginTag() {
-    const pluginVersion = version;
     this.serverless.cli.log(version);
 
     if (pluginVersion) {
-      this.serverless.cli.log(`Adding Plugin Version ${pluginVersion}`);
+      this.serverless.cli.log(`Adding Plugin Version ${version}`);
 
       this.serverless.service.getAllFunctions().forEach((functionName) => {
         const functionDefintion: ExtendedFunctionDefinition = this.serverless.service.getFunction(functionName);
@@ -179,30 +178,7 @@ module.exports = class ServerlessPlugin {
           functionDefintion.tags = {};
         }
 
-        functionDefintion.tags[TagKeys.Plugin] = pluginVersion;
-      });
-    }
-  }
-
-  /**
-   * Check for the forwarder version and tags the function(s) with it
-   */
-  private async addForwarderTags() {
-    const config = getConfig(this.serverless.service);
-    const aws = this.serverless.getProvider("aws");
-
-    const forwarderVersion = await getForwarderVersion(aws, config.forwarder);
-
-    if (forwarderVersion) {
-      this.serverless.cli.log(`Adding Forwarder Version ${forwarderVersion}`);
-
-      this.serverless.service.getAllFunctions().forEach((functionName) => {
-        const functionDefintion: ExtendedFunctionDefinition = this.serverless.service.getFunction(functionName);
-        if (!functionDefintion.tags) {
-          functionDefintion.tags = {};
-        }
-
-        functionDefintion.tags[TagKeys.ForwarderVersion] = forwarderVersion;
+        functionDefintion.tags[TagKeys.Plugin] = version;
       });
     }
   }
