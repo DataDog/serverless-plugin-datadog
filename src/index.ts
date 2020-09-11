@@ -94,11 +94,10 @@ module.exports = class ServerlessPlugin {
       }
     }
 
-    this.addPluginTag();
-
     if (config.enableTags) {
       this.serverless.cli.log("Adding service and environment tags to functions");
       this.addServiceAndEnvTags();
+      this.addPluginTag();
     }
 
     const defaultRuntime = this.serverless.service.provider.runtime;
@@ -163,19 +162,15 @@ module.exports = class ServerlessPlugin {
    * Tags the function(s) with plugin version
    */
   private async addPluginTag() {
-    this.serverless.cli.log(version);
+    this.serverless.cli.log(`Adding Plugin Version ${version}`);
 
-    if (pluginVersion) {
-      this.serverless.cli.log(`Adding Plugin Version ${version}`);
+    this.serverless.service.getAllFunctions().forEach((functionName) => {
+      const functionDefintion: ExtendedFunctionDefinition = this.serverless.service.getFunction(functionName);
+      if (!functionDefintion.tags) {
+        functionDefintion.tags = {};
+      }
 
-      this.serverless.service.getAllFunctions().forEach((functionName) => {
-        const functionDefintion: ExtendedFunctionDefinition = this.serverless.service.getFunction(functionName);
-        if (!functionDefintion.tags) {
-          functionDefintion.tags = {};
-        }
-
-        functionDefintion.tags[TagKeys.Plugin] = version;
-      });
-    }
+      functionDefintion.tags[TagKeys.Plugin] = version;
+    });
   }
 };
