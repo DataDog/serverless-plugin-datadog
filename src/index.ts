@@ -170,7 +170,7 @@ module.exports = class ServerlessPlugin {
         functionDefintion.tags = {};
       }
 
-      functionDefintion.tags[TagKeys.Plugin] = version;
+      functionDefintion.tags[TagKeys.Plugin] = `v${version}`;
     });
   }
 };
