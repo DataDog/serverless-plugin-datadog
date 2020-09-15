@@ -20,9 +20,9 @@ You can configure the plugin by adding the following section to your `serverless
 ```yaml
 custom:
   datadog:
-    # Send custom metrics via logs with the help of Datadog Forwarder Lambda function (recommended). Defaults to `false`.
+    # Send custom metrics via logs with the help of Datadog Forwarder Lambda function (recommended). Defaults to `true`.
     # When disabled, the parameter `site` and `apiKey` (or `apiKMSKey` if encrypted) must be set.
-    flushMetricsToLogs: false
+    flushMetricsToLogs: true
 
     # Which Datadog Site to send data to, only needed when flushMetricsToLogs is `false`. Defaults to `datadoghq.com`.
     # Set to `datadoghq.eu` for Datadog EU.
