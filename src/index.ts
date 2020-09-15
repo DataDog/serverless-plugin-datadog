@@ -94,10 +94,11 @@ module.exports = class ServerlessPlugin {
       }
     }
 
+    this.addPluginTag();
+
     if (config.enableTags) {
       this.serverless.cli.log("Adding service and environment tags to functions");
       this.addServiceAndEnvTags();
-      this.addPluginTag();
     }
 
     const defaultRuntime = this.serverless.service.provider.runtime;

@@ -205,7 +205,7 @@ describe("ServerlessPlugin", () => {
       );
     });
 
-    it("does not add or modify tags when enabledTags is false", async () => {
+    it("only adds dd_sls_plugin tag when enabledTags is false", async () => {
       const function_ = functionMock({ env: "test" });
       const functionWithTags: ExtendedFunctionDefinition = function_;
       const serverless = {
@@ -237,7 +237,10 @@ describe("ServerlessPlugin", () => {
       };
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
-      expect(functionWithTags).toHaveProperty("tags", { env: "test" });
+      expect(functionWithTags).toHaveProperty("tags", {
+        env: "test",
+        dd_sls_plugin: expect.stringMatching(SEM_VER_REGEX),
+      });
     });
 
     it("adds tags by default with service name and stage values", async () => {
