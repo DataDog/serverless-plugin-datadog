@@ -53,6 +53,9 @@ custom:
 
     # When set, automatically tag the Lambda functions with the `service` and `env` tags using the `service` and `stage` values from the serverless application definition. It does NOT override if a `service` or `env` tag already exists. Defaults to `true`.
     enableTags: true
+
+    # When set, the lambda layer will automatically patch console.log with Datadog's tracing ids.
+    injectLogContext: true
 ```
 
 ## FAQ
