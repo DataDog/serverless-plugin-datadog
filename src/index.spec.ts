@@ -13,6 +13,8 @@ import Aws from "serverless/plugins/aws/provider/awsProvider";
 import { FunctionDefinition } from "serverless";
 import { ExtendedFunctionDefinition } from "./index";
 
+const SEM_VER_REGEX = /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$/;
+
 function awsMock(): Aws {
   return {
     getStage: () => "dev",
@@ -206,7 +208,7 @@ describe("ServerlessPlugin", () => {
       );
     });
 
-    it("does not add or modify tags when enabledTags is false", async () => {
+    it("only adds dd_sls_plugin tag when enabledTags is false", async () => {
       const function_ = functionMock({ env: "test" });
       const functionWithTags: ExtendedFunctionDefinition = function_;
       const serverless = {
@@ -238,7 +240,10 @@ describe("ServerlessPlugin", () => {
       };
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
-      expect(functionWithTags).toHaveProperty("tags", { env: "test" });
+      expect(functionWithTags).toHaveProperty("tags", {
+        env: "test",
+        dd_sls_plugin: expect.stringMatching(SEM_VER_REGEX),
+      });
     });
 
     it("adds tags by default with service name and stage values", async () => {
@@ -265,7 +270,11 @@ describe("ServerlessPlugin", () => {
       };
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
-      expect(functionWithTags).toHaveProperty("tags", { env: "dev", service: "dev" });
+      expect(functionWithTags).toHaveProperty("tags", {
+        env: "dev",
+        service: "dev",
+        dd_sls_plugin: expect.stringMatching(SEM_VER_REGEX),
+      });
     });
 
     it("does not override existing tags on function", async () => {
@@ -295,7 +304,11 @@ describe("ServerlessPlugin", () => {
       };
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
-      expect(functionWithTags).toHaveProperty("tags", { env: "dev", service: "test" });
+      expect(functionWithTags).toHaveProperty("tags", {
+        env: "dev",
+        service: "test",
+        dd_sls_plugin: expect.stringMatching(SEM_VER_REGEX),
+      });
     });
 
     it("does not override tags set on provider level", async () => {
@@ -333,7 +346,7 @@ describe("ServerlessPlugin", () => {
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
 
       // The service and env tags will be set with the values given in the provider instead
-      expect(functionWithTags).toHaveProperty("tags", {});
+      expect(functionWithTags).toHaveProperty("tags", { dd_sls_plugin: expect.stringMatching(SEM_VER_REGEX) });
     });
   });
 });
