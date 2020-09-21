@@ -41,7 +41,14 @@ export async function addCloudWatchForwarderSubscriptions(service: Service, aws:
 
     const logGroupName = resource.Properties.LogGroupName;
     const scopedSubName = `${name}Subscription`;
-    const expectedSubName = `${service.getServiceName()}-${aws.getStage()}-${scopedSubName}-`;
+
+    let expectedSubName = `${service.getServiceName()}-${aws.getStage()}-${scopedSubName}-`;
+
+    const stackName = aws.naming.getStackName();
+    if (stackName) {
+      expectedSubName = `${stackName}-${scopedSubName}-`;
+    }
+
     const canSub = await canSubscribeLogGroup(aws, logGroupName, expectedSubName);
     if (!canSub) {
       errors.push(`Subscription already exists for log group ${logGroupName}. Skipping subscribing Datadog forwarder.`);
