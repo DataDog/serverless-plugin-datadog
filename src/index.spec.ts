@@ -19,6 +19,9 @@ function awsMock(): Aws {
   return {
     getStage: () => "dev",
     request: (service, method, params: any) => Promise.reject("Log group doesn't exist"),
+    naming: {
+      getStackName: () => "",
+    } as { [key: string]: () => string },
   } as Aws;
 }
 
