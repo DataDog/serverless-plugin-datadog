@@ -8,6 +8,7 @@
 
 import * as Serverless from "serverless";
 import * as layers from "./layers.json";
+import { version } from "../package.json";
 
 import { getConfig, setEnvConfiguration } from "./env";
 import { applyLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
@@ -25,6 +26,7 @@ export interface ExtendedFunctionDefinition extends FunctionDefinition {
 enum TagKeys {
   Service = "service",
   Env = "env",
+  Plugin = "dd_sls_plugin",
 }
 
 module.exports = class ServerlessPlugin {
@@ -92,6 +94,8 @@ module.exports = class ServerlessPlugin {
       }
     }
 
+    this.addPluginTag();
+
     if (config.enableTags) {
       this.serverless.cli.log("Adding service and environment tags to functions");
       this.addServiceAndEnvTags();
@@ -153,5 +157,21 @@ module.exports = class ServerlessPlugin {
         }
       });
     }
+  }
+
+  /**
+   * Tags the function(s) with plugin version
+   */
+  private async addPluginTag() {
+    this.serverless.cli.log(`Adding Plugin Version ${version}`);
+
+    this.serverless.service.getAllFunctions().forEach((functionName) => {
+      const functionDefintion: ExtendedFunctionDefinition = this.serverless.service.getFunction(functionName);
+      if (!functionDefintion.tags) {
+        functionDefintion.tags = {};
+      }
+
+      functionDefintion.tags[TagKeys.Plugin] = `v${version}`;
+    });
   }
 };
