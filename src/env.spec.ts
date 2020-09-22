@@ -32,6 +32,7 @@ describe("getConfig", () => {
       enableXrayTracing: false,
       enableDDTracing: true,
       enableTags: true,
+      injectLogContext: true,
     });
   });
 });
@@ -52,6 +53,7 @@ describe("setEnvConfiguration", () => {
         enableXrayTracing: true,
         enableDDTracing: true,
         enableTags: true,
+        injectLogContext: false,
       },
       service,
     );
@@ -64,6 +66,7 @@ describe("setEnvConfiguration", () => {
           DD_LOG_LEVEL: "debug",
           DD_SITE: "datadoghq.eu",
           DD_TRACE_ENABLED: true,
+          DD_LOGS_INJECTION: false,
         },
       },
     });
@@ -79,6 +82,7 @@ describe("setEnvConfiguration", () => {
           DD_LOG_LEVEL: "debug",
           DD_SITE: "datadoghq.eu",
           DD_TRACE_ENABLED: false,
+          DD_LOGS_INJECTION: false,
         },
       },
     } as any;
@@ -93,6 +97,7 @@ describe("setEnvConfiguration", () => {
         enableXrayTracing: true,
         enableDDTracing: true,
         enableTags: true,
+        injectLogContext: true,
       },
       service,
     );
@@ -105,6 +110,7 @@ describe("setEnvConfiguration", () => {
           DD_LOG_LEVEL: "debug",
           DD_SITE: "datadoghq.eu",
           DD_TRACE_ENABLED: false,
+          DD_LOGS_INJECTION: false,
         },
       },
     });

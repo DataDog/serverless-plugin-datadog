@@ -32,6 +32,8 @@ export interface Configuration {
   // When set, the plugin will try to automatically tag customers' lambda functions with service and env,
   // but will not override existing tags set on function or provider levels. Defaults to true
   enableTags: boolean;
+  // When set, the lambda layer will automatically patch console.log with Datadog's tracing ids.
+  injectLogContext: boolean;
 }
 
 const apiKeyEnvVar = "DD_API_KEY";
@@ -40,6 +42,7 @@ const siteURLEnvVar = "DD_SITE";
 const logLevelEnvVar = "DD_LOG_LEVEL";
 const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
 const ddTracingEnabledEnvVar = "DD_TRACE_ENABLED";
+const logInjectionEnvVar = "DD_LOGS_INJECTION";
 
 export const defaultConfiguration: Configuration = {
   addLayers: true,
@@ -49,6 +52,7 @@ export const defaultConfiguration: Configuration = {
   enableXrayTracing: false,
   enableDDTracing: true,
   enableTags: true,
+  injectLogContext: true,
 };
 
 export function setEnvConfiguration(config: Configuration, service: Service) {
@@ -75,6 +79,10 @@ export function setEnvConfiguration(config: Configuration, service: Service) {
   }
   if (config.enableDDTracing !== undefined && environment[ddTracingEnabledEnvVar] === undefined) {
     environment[ddTracingEnabledEnvVar] = config.enableDDTracing;
+  }
+
+  if (config.injectLogContext !== undefined && environment[logInjectionEnvVar] === undefined) {
+    environment[logInjectionEnvVar] = config.injectLogContext;
   }
 }
 
