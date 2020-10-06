@@ -67,6 +67,21 @@ plugins:
 
 If you use TypeScript, you may encounter the error of missing type definitions. A missing type definition happens when you use the prebuilt layers (for example, set `addLayers` to `true`, which is the default) and need to import helper functions from the `datadog-lambda-js` and `dd-trace` packages to submit custom metrics or instrument a specific function. To resolve the error, add `datadog-lambda-js` and `dd-trace` to the `devDependencies` list of your project's package.json.
 
+### Webpack
+
+`dd-trace` is known to be not compatible with webpack due to the use of conditional import and other issues. If using webpack, make sure to mark `datadog-lambda-js` and `dd-trace` as [externals](https://webpack.js.org/configuration/externals/) for webpack, so webpack knows these dependencies will be available in the runtime. You should also remove `datadog-lambda-js` and `dd-trace` from `package.json` and the build process to ensure you're using the versions provided by the Datadog Lambda Layer.
+
+#### serverless-webpack
+
+If using `serverless-webpack`, make sure to exclude `datadog-lambda-js` and `dd-trace` in your `serverless.yml`:
+  ```
+  includeModules:
+    forceExclude:
+    - dd-trace
+    - datadog-lambda-js
+  ```
+
+
 ## Opening Issues
 
 If you encounter a bug with this package, let us know by filing an issue! Before opening a new issue, please search the existing issues to avoid duplicates.
