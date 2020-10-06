@@ -73,13 +73,28 @@ If you use TypeScript, you may encounter the error of missing type definitions. 
 
 #### serverless-webpack
 
-If using `serverless-webpack`, make sure to also exclude `datadog-lambda-js` and `dd-trace` in your `serverless.yml` in addition to declaring them as external in your webpack config file:
-  ```
-  includeModules:
-    forceExclude:
-    - dd-trace
-    - datadog-lambda-js
-  ```
+If using `serverless-webpack`, make sure to also exclude `datadog-lambda-js` and `dd-trace` in your `serverless.yml` in addition to declaring them as external in your webpack config file.
+
+**webpack.config.js**
+```
+var nodeExternals = require('webpack-node-externals')
+
+module.exports = {
+  // we use webpack-node-externals to excludes all node deps.
+  // You can manually set the externals too.
+  externals: [nodeExternals(), 'dd-trace', 'datadog-lambda-js'],
+}
+```
+
+**serverless.yml**
+```
+custom:
+  webpack:
+    includeModules:
+      forceExclude:
+        - dd-trace
+        - datadog-lambda-js
+```
 
 
 ## Opening Issues
