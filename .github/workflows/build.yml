@@ -4,29 +4,33 @@ on: push
 
 jobs:
   lint:
-    - uses: actions/checkout@v2
+    runs-on: ubuntu-latest
 
-    - name: Set up Node 12.7
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12.7
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - name: Cache Node modules
-      id: cache-node-modules
-      uses: actions/cache@v2
-      with:
-        path: '**/node_modules'
-        key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+      - name: Set up Node 12.7
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.7
 
-    - name: Install dependencies
-      if: steps.cache-node-modules.outputs.cache-hit != 'true'
-      run: yarn install
+      - name: Cache Node modules
+        id: cache-node-modules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
-    - name: Check formatting
-      run: yarn check-formatting
+      - name: Install dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: yarn install
 
-    - name: Lint
-      run: yarn lint
+      - name: Check formatting
+        run: yarn check-formatting
+
+      - name: Lint
+        run: yarn lint
 
   test:
     runs-on: ubuntu-latest
