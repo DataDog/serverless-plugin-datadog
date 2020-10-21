@@ -194,5 +194,20 @@ describe("findHandlers", () => {
       applyLayers("us-east-1", [handler], layers);
       expect(handler.handler).toEqual({});
     });
+    it("detects when to use the GovCloud layers", () => {
+      const handler = {
+        handler: { runtime: "nodejs10.x" },
+        type: RuntimeType.NODE,
+        runtime: "nodejs10.x",
+      } as FunctionInfo;
+      const layers: LayerJSON = {
+        regions: { "us-gov-east-1": { "nodejs10.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node10-x:30" } },
+      };
+      applyLayers("us-gov-east-1", [handler], layers);
+      expect(handler.handler).toEqual({
+        runtime: "nodejs10.x",
+        layers: ["arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node10-x:30"],
+      });
+    });
   });
 });
