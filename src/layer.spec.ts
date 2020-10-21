@@ -201,7 +201,11 @@ describe("findHandlers", () => {
         runtime: "nodejs10.x",
       } as FunctionInfo;
       const layers: LayerJSON = {
-        regions: { "us-gov-east-1": { "nodejs10.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node10-x:30" } },
+        regions: {
+          "us-gov-east-1": {
+            "nodejs10.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node10-x:30",
+          },
+        },
       };
       applyLayers("us-gov-east-1", [handler], layers);
       expect(handler.handler).toEqual({
