@@ -19,11 +19,11 @@ export async function addOutputLinks(serverless: Serverless, site: string) {
 
   serverless.service.getAllFunctions().forEach((functionKey) => {
     const functionName = serverless.service.getFunction(functionKey).name;
-      const key = `${outputPrefix}${functionKey}`.replace(/[^a-z0-9]/gi,'');
-      outputs[key] = {
-          Description: `See ${functionKey} in Datadog`,
-          Value: `https://app.${site}/functions/${functionName}:${region}:${awsAccount}:aws?source=sls-plugin`,
-      };
+    const key = `${outputPrefix}${functionKey}`.replace(/[^a-z0-9]/gi,'');
+    outputs[key] = {
+      Description: `See ${functionKey} in Datadog`,
+      Value: `https://app.${site}/functions/${functionName}:${region}:${awsAccount}:aws?source=sls-plugin`,
+    };
   });
 }
 
