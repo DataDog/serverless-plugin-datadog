@@ -15,7 +15,7 @@ import { applyLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
 import { TracingMode, enableTracing } from "./tracing";
 import { redirectHandlers } from "./wrapper";
 import { addCloudWatchForwarderSubscriptions } from "./forwarder";
-import { addOutputLinks, printOutputs} from "./output";
+import { addOutputLinks, printOutputs } from "./output";
 import { FunctionDefinition } from "serverless";
 
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
