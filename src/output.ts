@@ -28,7 +28,7 @@ export async function addOutputLinks(serverless: Serverless, site: string) {
 }
 
 export async function printOutputs(serverless: Serverless) {
-  const stackName = `${serverless.service.getServiceName()}-${serverless.getProvider("aws").getStage()}`;
+  const stackName = serverless.getProvider("aws").naming.getStackName();
   const describeStackOutput = await serverless
     .getProvider("aws")
     .request(
@@ -36,7 +36,13 @@ export async function printOutputs(serverless: Serverless) {
       "describeStacks",
       { StackName: stackName },
       { region: serverless.getProvider("aws").getRegion() },
-    );
+    )
+    .catch((err) => {
+      // Ignore any request exceptions, fail silently and skip output logging
+    });
+  if (describeStackOutput === undefined) {
+    return;
+  }
 
   logHeader("Datadog Monitoring", true);
   logHeader("functions");
