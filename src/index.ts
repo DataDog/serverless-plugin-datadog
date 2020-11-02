@@ -10,7 +10,7 @@ import * as Serverless from "serverless";
 import * as layers from "./layers.json";
 import { version } from "../package.json";
 
-import { getConfig, setEnvConfiguration } from "./env";
+import { getConfig, setEnvConfiguration, forceExcludeDepsFromWebpack, hasWebpackPlugin } from "./env";
 import { applyLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
 import { TracingMode, enableTracing } from "./tracing";
 import { redirectHandlers } from "./wrapper";
@@ -72,6 +72,9 @@ module.exports = class ServerlessPlugin {
       this.serverless.cli.log("Adding Lambda Layers to functions");
       this.debugLogHandlers(handlers);
       applyLayers(this.serverless.service.provider.region, handlers, layers);
+      if (hasWebpackPlugin(this.serverless.service)) {
+        forceExcludeDepsFromWebpack(this.serverless.service);
+      }
     } else {
       this.serverless.cli.log("Skipping adding Lambda Layers, make sure you are packaging them yourself");
     }

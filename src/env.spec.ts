@@ -6,7 +6,7 @@
  * Copyright 2019 Datadog, Inc.
  */
 
-import { getConfig, defaultConfiguration, setEnvConfiguration } from "./env";
+import { getConfig, defaultConfiguration, setEnvConfiguration, forceExcludeDepsFromWebpack } from "./env";
 
 describe("getConfig", () => {
   it("get a default configuration when none is present", () => {
@@ -33,6 +33,79 @@ describe("getConfig", () => {
       enableDDTracing: true,
       enableTags: true,
       injectLogContext: true,
+    });
+  });
+});
+
+describe("forceExcludeDepsFromWebpack", () => {
+  it("adds missing fields to the webpack config", () => {
+    const service = {} as any;
+    forceExcludeDepsFromWebpack(service);
+    expect(service).toEqual({
+      custom: {
+        webpack: {
+          includeModules: {
+            forceExclude: ["datadog-lambda-js", "dd-trace"],
+          },
+        },
+      },
+    });
+  });
+  it("replaces includeModules:true", () => {
+    const service = {
+      custom: {
+        webpack: {
+          includeModules: true,
+        },
+      },
+    } as any;
+    forceExcludeDepsFromWebpack(service);
+    expect(service).toEqual({
+      custom: {
+        webpack: {
+          includeModules: {
+            forceExclude: ["datadog-lambda-js", "dd-trace"],
+          },
+        },
+      },
+    });
+  });
+  it("doesn't replace includeModules:false", () => {
+    const service = {
+      custom: {
+        webpack: {
+          includeModules: false,
+        },
+      },
+    } as any;
+    forceExcludeDepsFromWebpack(service);
+    expect(service).toEqual({
+      custom: {
+        webpack: {
+          includeModules: false,
+        },
+      },
+    });
+  });
+  it("doesn't modify webpack when dependencies already included", () => {
+    const service = {
+      custom: {
+        webpack: {
+          includeModules: {
+            forceExclude: ["datadog-lambda-js", "dd-trace"],
+          },
+        },
+      },
+    } as any;
+    forceExcludeDepsFromWebpack(service);
+    expect(service).toEqual({
+      custom: {
+        webpack: {
+          includeModules: {
+            forceExclude: ["datadog-lambda-js", "dd-trace"],
+          },
+        },
+      },
     });
   });
 });
