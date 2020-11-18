@@ -7,6 +7,10 @@
 
 # Writes layer info to easily readable json file
 
+# Call: ./scripts/generate_layers_json [-g]
+# Opts:
+#   -g: generate govcloud file
+
 set -e
 
 LAYER_NAMES=("Datadog-Node8-10" "Datadog-Node10-x" "Datadog-Node12-x" "Datadog-Python27" "Datadog-Python36" "Datadog-Python37" "Datadog-Python38")
