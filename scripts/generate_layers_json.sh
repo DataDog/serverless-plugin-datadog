@@ -11,11 +11,17 @@ set -e
 
 LAYER_NAMES=("Datadog-Node8-10" "Datadog-Node10-x" "Datadog-Node12-x" "Datadog-Python27" "Datadog-Python36" "Datadog-Python37" "Datadog-Python38")
 JSON_LAYER_NAMES=("nodejs8.10" "nodejs10.x" "nodejs12.x" "python2.7" "python3.6" "python3.7" "python3.8")
-AVAILABLE_REGIONS=(us-east-2 us-east-1 us-west-1 us-west-2 ap-east-1 ap-south-1 ap-northeast-2 ap-southeast-1 ap-southeast-2 ap-northeast-1 ca-central-1 eu-north-1 eu-central-1 eu-west-1 eu-west-2 eu-west-3 sa-east-1)
+AVAILABLE_REGIONS=$(aws ec2 describe-regions | jq -r '.[] | .[] | .RegionName')
+
+FILE_NAME="src/layers.json"
 
 INPUT_JSON="{\"regions\":{}}"
 
-for region in "${AVAILABLE_REGIONS[@]}"
+if [ $1 = "-g" ]; then
+    FILE_NAME="src/layers-gov.json"
+fi
+
+for region in $AVAILABLE_REGIONS
 do
     for ((i=0;i<${#LAYER_NAMES[@]};++i));
     do
@@ -33,5 +39,5 @@ do
         fi
     done
 done
-echo "Writing to src/layers.json"
-jq '.' <<< $INPUT_JSON > src/layers.json
+echo "Writing to ${FILE_NAME}"
+jq '.' <<< $INPUT_JSON > $FILE_NAME

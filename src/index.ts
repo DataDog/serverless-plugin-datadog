@@ -8,6 +8,7 @@
 
 import * as Serverless from "serverless";
 import * as layers from "./layers.json";
+import * as govLayers from "./layers-gov.json";
 import { version } from "../package.json";
 
 import { getConfig, setEnvConfiguration, forceExcludeDepsFromWebpack, hasWebpackPlugin } from "./env";
@@ -71,7 +72,8 @@ module.exports = class ServerlessPlugin {
     if (config.addLayers) {
       this.serverless.cli.log("Adding Lambda Layers to functions");
       this.debugLogHandlers(handlers);
-      applyLayers(this.serverless.service.provider.region, handlers, layers);
+      const allLayers = { regions: { ...layers.regions, ...govLayers.regions } };
+      applyLayers(this.serverless.service.provider.region, handlers, allLayers);
       if (hasWebpackPlugin(this.serverless.service)) {
         forceExcludeDepsFromWebpack(this.serverless.service);
       }
