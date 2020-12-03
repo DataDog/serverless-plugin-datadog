@@ -8,13 +8,15 @@
 
 import * as Serverless from "serverless";
 import * as layers from "./layers.json";
+import * as govLayers from "./layers-gov.json";
 import { version } from "../package.json";
 
-import { getConfig, setEnvConfiguration } from "./env";
+import { getConfig, setEnvConfiguration, forceExcludeDepsFromWebpack, hasWebpackPlugin } from "./env";
 import { applyLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
 import { TracingMode, enableTracing } from "./tracing";
 import { redirectHandlers } from "./wrapper";
 import { addCloudWatchForwarderSubscriptions } from "./forwarder";
+import { addOutputLinks, printOutputs } from "./output";
 import { FunctionDefinition } from "serverless";
 
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
@@ -39,6 +41,7 @@ module.exports = class ServerlessPlugin {
     "before:deploy:function:packageFunction": this.beforePackageFunction.bind(this),
     "before:offline:start:init": this.beforePackageFunction.bind(this),
     "before:step-functions-offline:start": this.beforePackageFunction.bind(this),
+    "after:deploy:deploy": printOutputs.bind(null, this.serverless),
   };
 
   public commands = {
@@ -69,7 +72,11 @@ module.exports = class ServerlessPlugin {
     if (config.addLayers) {
       this.serverless.cli.log("Adding Lambda Layers to functions");
       this.debugLogHandlers(handlers);
-      applyLayers(this.serverless.service.provider.region, handlers, layers);
+      const allLayers = { regions: { ...layers.regions, ...govLayers.regions } };
+      applyLayers(this.serverless.service.provider.region, handlers, allLayers);
+      if (hasWebpackPlugin(this.serverless.service)) {
+        forceExcludeDepsFromWebpack(this.serverless.service);
+      }
     } else {
       this.serverless.cli.log("Skipping adding Lambda Layers, make sure you are packaging them yourself");
     }
@@ -84,6 +91,7 @@ module.exports = class ServerlessPlugin {
     }
     enableTracing(this.serverless.service, tracingMode);
   }
+
   private async afterPackageFunction() {
     const config = getConfig(this.serverless.service);
     if (config.forwarder) {
@@ -104,6 +112,8 @@ module.exports = class ServerlessPlugin {
     const defaultRuntime = this.serverless.service.provider.runtime;
     const handlers = findHandlers(this.serverless.service, defaultRuntime);
     redirectHandlers(handlers, config.addLayers);
+
+    addOutputLinks(this.serverless, config.site);
   }
 
   private debugLogHandlers(handlers: FunctionInfo[]) {

@@ -1,7 +1,7 @@
 # Datadog Serverless Plugin
 
 [![serverless](http://public.serverless.com/badges/v1.svg)](https://www.serverless.com)
-[![CircleCI](https://img.shields.io/circleci/build/github/DataDog/serverless-plugin-datadog)](https://circleci.com/gh/DataDog/serverless-plugin-datadog)
+![build](https://github.com/DataDog/serverless-plugin-datadog/workflows/build/badge.svg)
 [![Code Coverage](https://img.shields.io/codecov/c/github/DataDog/serverless-plugin-datadog)](https://codecov.io/gh/DataDog/serverless-plugin-datadog)
 [![NPM](https://img.shields.io/npm/v/serverless-plugin-datadog)](https://www.npmjs.com/package/serverless-plugin-datadog)
 [![Slack](https://img.shields.io/badge/slack-%23serverless-blueviolet?logo=slack)](https://datadoghq.slack.com/channels/serverless/)
@@ -96,6 +96,16 @@ custom:
         - datadog-lambda-js
 ```
 
+### Forwarder
+
+The [Datadog Forwarder Lambda function][7] needs to be installed and subscribed to your Lambda functions' log groups. The plugin automatically creates the log subscriptions when the Forwarder's ARN is supplied via the `forwarder` option.
+
+If you run into the following error, double check the supplied Forwarder ARN is correct and ensure it is from the same region and account where your serverless application is deployed.
+
+```
+An error occurred: GetaccountapiLogGroupSubscription - Could not execute the lambda function. Make sure you have given CloudWatch Logs permission to execute your function. (Service: AWSLogs; Status Code: 400; Error Code: InvalidParameterException).
+```
+
 
 ## Opening Issues
 
@@ -121,3 +131,4 @@ This product includes software developed at Datadog (https://www.datadoghq.com/)
 [4]: https://pypi.org/project/datadog-lambda/
 [5]: https://www.npmjs.com/package/datadog-lambda-js
 [6]: https://webpack.js.org/configuration/externals/
+[7]: https://docs.datadoghq.com/serverless/forwarder/
