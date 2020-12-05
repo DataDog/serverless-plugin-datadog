@@ -141,7 +141,7 @@ describe("ServerlessPlugin", () => {
           },
           custom: {
             datadog: {
-              exclude: ['node1'],
+              exclude: ["node1"],
               addLayers: true,
             },
           },

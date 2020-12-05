@@ -52,7 +52,7 @@ custom:
     forwarder: arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder
     enableTags: true
     injectLogContext: true,
-    exclude: ['dd-excluded-function'],
+    exclude: ["dd-excluded-function"],
 ```
 
 **Note**: If you use webpack, Datadog recommends using the prebuilt layers by setting `addLayers` to `true`, which is the default, and add `datadog-lambda-js` and `dd-trace` to the [externals][6] section of your webpack config.
