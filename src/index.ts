@@ -68,7 +68,7 @@ module.exports = class ServerlessPlugin {
     setEnvConfiguration(config, this.serverless.service);
 
     const defaultRuntime = this.serverless.service.provider.runtime;
-    const handlers = findHandlers(this.serverless.service, defaultRuntime);
+    const handlers = findHandlers(this.serverless.service, config.exclude, defaultRuntime);
     if (config.addLayers) {
       this.serverless.cli.log("Adding Lambda Layers to functions");
       this.debugLogHandlers(handlers);
@@ -110,7 +110,7 @@ module.exports = class ServerlessPlugin {
     }
 
     const defaultRuntime = this.serverless.service.provider.runtime;
-    const handlers = findHandlers(this.serverless.service, defaultRuntime);
+    const handlers = findHandlers(this.serverless.service, config.exclude, defaultRuntime);
     redirectHandlers(handlers, config.addLayers);
 
     addOutputLinks(this.serverless, config.site);
