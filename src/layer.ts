@@ -56,7 +56,9 @@ export function findHandlers(service: Service, exclude: string[], defaultRuntime
       return { type: RuntimeType.UNSUPPORTED, runtime, name, handler } as FunctionInfo;
     })
     .filter((result) => result !== undefined)
-    .filter((result) => exclude === undefined || (exclude !== undefined && !exclude.includes(result.name))) as FunctionInfo[];
+    .filter(
+      (result) => exclude === undefined || (exclude !== undefined && !exclude.includes(result.name)),
+    ) as FunctionInfo[];
 }
 
 export function applyLayers(region: string, handlers: FunctionInfo[], layers: LayerJSON) {

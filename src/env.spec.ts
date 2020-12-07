@@ -128,7 +128,7 @@ describe("setEnvConfiguration", () => {
         enableDDTracing: true,
         enableTags: true,
         injectLogContext: false,
-        exclude: ["dd-excluded-function"]
+        exclude: ["dd-excluded-function"],
       },
       service,
     );
