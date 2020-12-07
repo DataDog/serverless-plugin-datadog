@@ -39,7 +39,7 @@ describe("findHandlers", () => {
       "func-h": { handler: "myfile.handler", runtime: "nodejs12.x" },
     });
 
-    const result = findHandlers(mockService);
+    const result = findHandlers(mockService, []);
     expect(result).toMatchObject([
       {
         handler: { handler: "myfile.handler", runtime: "nodejs8.10" },
@@ -87,7 +87,7 @@ describe("findHandlers", () => {
     const mockService = createMockService("us-east-1", {
       "func-a": { handler: "myfile.handler" },
     });
-    const result = findHandlers(mockService, "nodejs8.10");
+    const result = findHandlers(mockService, [], "nodejs8.10");
     expect(result).toMatchObject([
       {
         handler: {},
