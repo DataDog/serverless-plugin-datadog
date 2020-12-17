@@ -91,7 +91,7 @@ export function setEnvConfiguration(config: Configuration, service: Service) {
   }
 
   if (config.exclude !== undefined && environment[excludeEnvVar] === undefined) {
-    environment[excludeEnvVar] = config.exclude;
+    environment[excludeEnvVar] = config.exclude.join(";");
   }
 }
 
