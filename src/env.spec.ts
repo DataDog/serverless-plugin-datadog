@@ -33,7 +33,6 @@ describe("getConfig", () => {
       enableDDTracing: true,
       enableTags: true,
       injectLogContext: true,
-      exclude: [],
     });
   });
 });
@@ -128,7 +127,6 @@ describe("setEnvConfiguration", () => {
         enableDDTracing: true,
         enableTags: true,
         injectLogContext: false,
-        exclude: ["dd-excluded-function"],
       },
       service,
     );
@@ -142,7 +140,6 @@ describe("setEnvConfiguration", () => {
           DD_SITE: "datadoghq.eu",
           DD_TRACE_ENABLED: true,
           DD_LOGS_INJECTION: false,
-          DD_EXCLUDED_FUNCTIONS: ["dd-excluded-function"],
         },
       },
     });
@@ -159,7 +156,6 @@ describe("setEnvConfiguration", () => {
           DD_SITE: "datadoghq.eu",
           DD_TRACE_ENABLED: false,
           DD_LOGS_INJECTION: false,
-          DD_EXCLUDED_FUNCTIONS: ["dd-excluded-function"],
         },
       },
     } as any;
@@ -175,7 +171,6 @@ describe("setEnvConfiguration", () => {
         enableDDTracing: true,
         enableTags: true,
         injectLogContext: true,
-        exclude: [],
       },
       service,
     );
@@ -189,7 +184,6 @@ describe("setEnvConfiguration", () => {
           DD_SITE: "datadoghq.eu",
           DD_TRACE_ENABLED: false,
           DD_LOGS_INJECTION: false,
-          DD_EXCLUDED_FUNCTIONS: ["dd-excluded-function"],
         },
       },
     });

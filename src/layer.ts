@@ -41,7 +41,7 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
   "python3.8": RuntimeType.PYTHON,
 };
 
-export function findHandlers(service: Service, exclude: string[], defaultRuntime?: string): FunctionInfo[] {
+export function findHandlers(service: Service, defaultRuntime?: string): FunctionInfo[] {
   const funcs = (service as any).functions as { [key: string]: FunctionDefinition };
 
   return Object.entries(funcs)
@@ -55,10 +55,7 @@ export function findHandlers(service: Service, exclude: string[], defaultRuntime
       }
       return { type: RuntimeType.UNSUPPORTED, runtime, name, handler } as FunctionInfo;
     })
-    .filter((result) => result !== undefined)
-    .filter(
-      (result) => exclude === undefined || (exclude !== undefined && !exclude.includes(result.name)),
-    ) as FunctionInfo[];
+    .filter((result) => result !== undefined) as FunctionInfo[];
 }
 
 export function applyLayers(region: string, handlers: FunctionInfo[], layers: LayerJSON) {
