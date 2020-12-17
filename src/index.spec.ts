@@ -122,50 +122,6 @@ describe("ServerlessPlugin", () => {
       });
     });
 
-    it("ignores functions contained within exclude", async () => {
-      mock({});
-      const serverless = {
-        cli: {
-          log: () => {},
-        },
-        service: {
-          provider: {
-            region: "us-east-1",
-          },
-          functions: {
-            node1: {
-              handler: "my-func.ev",
-              layers: [],
-              runtime: "nodejs8.10",
-            },
-          },
-          custom: {
-            datadog: {
-              exclude: ["node1"],
-              addLayers: true,
-            },
-          },
-        },
-      };
-
-      const plugin = new ServerlessPlugin(serverless, {});
-      await plugin.hooks["after:package:initialize"]();
-      expect(serverless).toMatchObject({
-        service: {
-          functions: {
-            node1: {
-              handler: "my-func.ev",
-              layers: [],
-              runtime: "nodejs8.10",
-            },
-          },
-          provider: {
-            region: "us-east-1",
-          },
-        },
-      });
-    });
-
     it("Adds tracing when enableXrayTracing is true", async () => {
       mock({});
       const serverless = {
