@@ -46,7 +46,6 @@ const logLevelEnvVar = "DD_LOG_LEVEL";
 const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
 const ddTracingEnabledEnvVar = "DD_TRACE_ENABLED";
 const logInjectionEnvVar = "DD_LOGS_INJECTION";
-const excludeEnvVar = "DD_EXCLUDED_FUNCTIONS";
 
 export const defaultConfiguration: Configuration = {
   addLayers: true,
@@ -88,10 +87,6 @@ export function setEnvConfiguration(config: Configuration, service: Service) {
 
   if (config.injectLogContext !== undefined && environment[logInjectionEnvVar] === undefined) {
     environment[logInjectionEnvVar] = config.injectLogContext;
-  }
-
-  if (config.exclude !== undefined && environment[excludeEnvVar] === undefined) {
-    environment[excludeEnvVar] = config.exclude;
   }
 }
 
