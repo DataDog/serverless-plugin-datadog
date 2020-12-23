@@ -9,6 +9,8 @@
 import Service from "serverless/classes/Service";
 
 export interface Configuration {
+  // Whether Datadog is enabled. Defaults to true.
+  enabled?: boolean;
   // Whether to add the lambda layers, or expect the user's to bring their own
   addLayers: boolean;
   // Datadog API Key, only necessary when using metrics without log forwarding
