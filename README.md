@@ -35,6 +35,8 @@ To further configure your plugin, use the following custom parameters in your `s
 | `forwarder`          | Setting this parameter subscribes the Lambda functions' CloudWatch log groups to the given Datadog forwarder Lambda function. Required when `enableDDTracing` is set to `true`.                                                                                                                                                                                                                 |
 | `enableTags`         | When set, automatically tag the Lambda functions with the `service` and `env` tags using the `service` and `stage` values from the serverless application definition. It does NOT override if a `service` or `env` tag already exists. Defaults to `true`.                                                                                                                                      |
 | `injectLogContext`         | When set, the lambda layer will automatically patch console.log with Datadog's tracing ids. Defaults to `true`.                                                                                                                                      |
+| `enabled`            | When set to false, the DataDog plugin will stay inactive. Defaults to `true`. |
+
 
 To use any of these parameters, add a `custom` > `datadog` section to your `serverless.yml` similar to this example:
 
