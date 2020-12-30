@@ -78,7 +78,7 @@ If you use TypeScript, you may encounter the error of missing type definitions. 
 If using `serverless-webpack`, make sure to also exclude `datadog-lambda-js` and `dd-trace` in your `serverless.yml` in addition to declaring them as external in your webpack config file.
 
 **webpack.config.js**
-```
+```javascript
 var nodeExternals = require('webpack-node-externals')
 
 module.exports = {
@@ -89,7 +89,7 @@ module.exports = {
 ```
 
 **serverless.yml**
-```
+```yaml
 custom:
   webpack:
     includeModules:
@@ -112,7 +112,7 @@ An error occurred: GetaccountapiLogGroupSubscription - Could not execute the lam
 
 If you'd like to turn off the plugin based on the environment (passed via `--stage`), you can use something similar to the example below.
 
-```
+```yaml
 provider:
   stage: ${self:opt.stage, 'dev'}
 
