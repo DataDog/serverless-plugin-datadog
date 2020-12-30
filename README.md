@@ -35,6 +35,7 @@ To further configure your plugin, use the following custom parameters in your `s
 | `forwarder`          | Setting this parameter subscribes the Lambda functions' CloudWatch log groups to the given Datadog forwarder Lambda function. Required when `enableDDTracing` is set to `true`.                                                                                                                                                                                                                 |
 | `enableTags`         | When set, automatically tag the Lambda functions with the `service` and `env` tags using the `service` and `stage` values from the serverless application definition. It does NOT override if a `service` or `env` tag already exists. Defaults to `true`.                                                                                                                                      |
 | `injectLogContext`         | When set, the lambda layer will automatically patch console.log with Datadog's tracing ids. Defaults to `true`.                                                                                                                                      |
+| `exclude`         | When set, this plugin will ignore all specified functions. Use this parameter if you have any functions that should not include Datadog functionality. Defaults to `[]`.                                                                                                                                      |
 | `enabled`            | When set to false, the DataDog plugin will stay inactive. Defaults to `true`. You can control this option using an environment variable, e.g. `enabled: ${strToBool(${env:DD_PLUGIN_ENABLED, true})}`, to activate/deactivate the plugin during deployment. Alernatively, you can also use the value passed in through `--stage` to control this option, [see example.](#disable-plugin-for-particular-environment)|
 
 
@@ -53,6 +54,8 @@ custom:
     forwarder: arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder
     enableTags: true
     injectLogContext: true
+    exclude: 
+      - dd-excluded-function
 ```
 
 **Note**: If you use webpack, Datadog recommends using the prebuilt layers by setting `addLayers` to `true`, which is the default, and add `datadog-lambda-js` and `dd-trace` to the [externals][6] section of your webpack config.

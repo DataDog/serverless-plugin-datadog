@@ -33,6 +33,7 @@ describe("getConfig", () => {
       enableDDTracing: true,
       enableTags: true,
       injectLogContext: true,
+      exclude: [],
     });
   });
 });
@@ -127,6 +128,7 @@ describe("setEnvConfiguration", () => {
         enableDDTracing: true,
         enableTags: true,
         injectLogContext: false,
+        exclude: ["dd-excluded-function"],
       },
       service,
     );
@@ -171,6 +173,7 @@ describe("setEnvConfiguration", () => {
         enableDDTracing: true,
         enableTags: true,
         injectLogContext: true,
+        exclude: [],
       },
       service,
     );

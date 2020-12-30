@@ -36,6 +36,9 @@ export interface Configuration {
   enableTags: boolean;
   // When set, the lambda layer will automatically patch console.log with Datadog's tracing ids.
   injectLogContext: boolean;
+
+  // When set, this plugin will not try to redirect the handlers of these specified functions;
+  exclude: string[];
 }
 
 const apiKeyEnvVar = "DD_API_KEY";
@@ -55,6 +58,7 @@ export const defaultConfiguration: Configuration = {
   enableDDTracing: true,
   enableTags: true,
   injectLogContext: true,
+  exclude: [],
 };
 
 export function setEnvConfiguration(config: Configuration, service: Service) {
