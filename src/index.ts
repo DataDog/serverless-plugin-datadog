@@ -41,7 +41,7 @@ module.exports = class ServerlessPlugin {
     "before:deploy:function:packageFunction": this.beforePackageFunction.bind(this),
     "before:offline:start:init": this.beforePackageFunction.bind(this),
     "before:step-functions-offline:start": this.beforePackageFunction.bind(this),
-    "after:deploy:deploy": printOutputs.bind(null, this.serverless),
+    "after:deploy:deploy": this.afterDeploy.bind(this),
   };
 
   public commands = {
@@ -63,8 +63,9 @@ module.exports = class ServerlessPlugin {
   constructor(private serverless: Serverless, _: Serverless.Options) {}
 
   private async beforePackageFunction() {
-    this.serverless.cli.log("Auto instrumenting functions with Datadog");
     const config = getConfig(this.serverless.service);
+    if (config.enabled === false) return;
+    this.serverless.cli.log("Auto instrumenting functions with Datadog");
     setEnvConfiguration(config, this.serverless.service);
 
     const defaultRuntime = this.serverless.service.provider.runtime;
@@ -94,6 +95,7 @@ module.exports = class ServerlessPlugin {
 
   private async afterPackageFunction() {
     const config = getConfig(this.serverless.service);
+    if (config.enabled === false) return;
     if (config.forwarder) {
       const aws = this.serverless.getProvider("aws");
       const errors = await addCloudWatchForwarderSubscriptions(this.serverless.service, aws, config.forwarder);
@@ -114,6 +116,12 @@ module.exports = class ServerlessPlugin {
     redirectHandlers(handlers, config.addLayers);
 
     addOutputLinks(this.serverless, config.site);
+  }
+
+  private async afterDeploy() {
+    const config = getConfig(this.serverless.service);
+    if (config.enabled === false) return;
+    return printOutputs(this.serverless);
   }
 
   private debugLogHandlers(handlers: FunctionInfo[]) {
