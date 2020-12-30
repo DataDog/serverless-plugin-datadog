@@ -36,6 +36,8 @@ To further configure your plugin, use the following custom parameters in your `s
 | `enableTags`         | When set, automatically tag the Lambda functions with the `service` and `env` tags using the `service` and `stage` values from the serverless application definition. It does NOT override if a `service` or `env` tag already exists. Defaults to `true`.                                                                                                                                      |
 | `injectLogContext`         | When set, the lambda layer will automatically patch console.log with Datadog's tracing ids. Defaults to `true`.                                                                                                                                      |
 | `exclude`         | When set, this plugin will ignore all specified functions. Use this parameter if you have any functions that should not include Datadog functionality. Defaults to `[]`.                                                                                                                                      |
+| `enabled`            | When set to false, the DataDog plugin will stay inactive. Defaults to `true`. You can control this option using an environment variable, e.g. `enabled: ${strToBool(${env:DD_PLUGIN_ENABLED, true})}`, to activate/deactivate the plugin during deployment. Alernatively, you can also use the value passed in through `--stage` to control this option, [see example.](#disable-plugin-for-particular-environment)|
+
 
 To use any of these parameters, add a `custom` > `datadog` section to your `serverless.yml` similar to this example:
 
@@ -79,7 +81,7 @@ If you use TypeScript, you may encounter the error of missing type definitions. 
 If using `serverless-webpack`, make sure to also exclude `datadog-lambda-js` and `dd-trace` in your `serverless.yml` in addition to declaring them as external in your webpack config file.
 
 **webpack.config.js**
-```
+```javascript
 var nodeExternals = require('webpack-node-externals')
 
 module.exports = {
@@ -90,7 +92,7 @@ module.exports = {
 ```
 
 **serverless.yml**
-```
+```yaml
 custom:
   webpack:
     includeModules:
@@ -109,6 +111,24 @@ If you run into the following error, double check the supplied Forwarder ARN is 
 An error occurred: GetaccountapiLogGroupSubscription - Could not execute the lambda function. Make sure you have given CloudWatch Logs permission to execute your function. (Service: AWSLogs; Status Code: 400; Error Code: InvalidParameterException).
 ```
 
+### Disable Plugin for Particular Environment
+
+If you'd like to turn off the plugin based on the environment (passed via `--stage`), you can use something similar to the example below.
+
+```yaml
+provider:
+  stage: ${self:opt.stage, 'dev'}
+
+custom:
+  staged: ${self:custom.stageVars.${self:provider.stage}, {}}
+
+  stageVars:
+    dev:
+      dd_enabled: false
+
+  datadog:
+    enabled: ${self:custom.staged.dd_enabled, true}
+```
 
 ## Opening Issues
 
