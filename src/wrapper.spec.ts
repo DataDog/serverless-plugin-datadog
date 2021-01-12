@@ -117,4 +117,28 @@ describe("redirectHandlers", () => {
       environment: { [datadogHandlerEnvVar]: "mydir/func.myhandler" },
     });
   });
+
+  it("does not modify image based function definitions", async () => {
+    mock({});
+    const funcDef = {
+      name: "my-lambda",
+      package: {} as any,
+      image: "my.oci.image",
+      events: [],
+    };
+    const origFuncDef = {
+      ...funcDef,
+    };
+    redirectHandlers(
+      [
+        {
+          name: "my-lambda",
+          type: RuntimeType.NODE,
+          handler: funcDef,
+        },
+      ],
+      true,
+    );
+    expect(funcDef).toEqual(origFuncDef);
+  });
 });

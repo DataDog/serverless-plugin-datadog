@@ -6,7 +6,8 @@
  * Copyright 2019 Datadog, Inc.
  */
 
-import { FunctionInfo, RuntimeType } from "./layer";
+import { FunctionDefinitionHandler } from "serverless";
+import { FunctionInfo, isFunctionDefinitionHandler, RuntimeType } from "./layer";
 
 export const datadogHandlerEnvVar = "DD_LAMBDA_HANDLER";
 export const pythonHandler = "datadog_lambda.handler.handler";
@@ -19,12 +20,17 @@ export const jsHandler = "node_modules/datadog-lambda-js/dist/handler.handler";
  */
 export function redirectHandlers(funcs: FunctionInfo[], addLayers: boolean) {
   funcs.forEach((func) => {
-    setEnvDatadogHandler(func);
     const handler = getDDHandler(func.type, addLayers);
     if (handler === undefined) {
       return;
     }
-    func.handler.handler = handler;
+    const funcDef = func.handler;
+    if (!isFunctionDefinitionHandler(funcDef)) {
+      return;
+    }
+    setEnvDatadogHandler(funcDef);
+
+    funcDef.handler = handler;
     if (func.handler.package === undefined) {
       func.handler.package = {
         exclude: [],
@@ -49,9 +55,9 @@ function getDDHandler(lambdaRuntime: RuntimeType | undefined, addLayers: boolean
   }
 }
 
-function setEnvDatadogHandler(func: FunctionInfo) {
-  const originalHandler = func.handler.handler;
-  const environment = (func.handler as any).environment ?? {};
+function setEnvDatadogHandler(func: FunctionDefinitionHandler) {
+  const originalHandler = func.handler;
+  const environment = func.environment ?? {};
   environment[datadogHandlerEnvVar] = originalHandler;
-  (func.handler as any).environment = environment;
+  func.environment = environment;
 }
