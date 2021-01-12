@@ -2,19 +2,28 @@
 
 We love pull requests. Here's a quick guide.
 
-Fork, then clone:
-
-```bash
-git clone git@github.com:your-username/serverless-plugin-datadog.git
-```
-
-Make your change, update tests and ensure the tests pass (install Docker if you haven't):
-
-```bash
-yarn test
-```
-
-Push to your fork and [submit a pull request][pr].
+1. Fork, clone and branch off:
+    ```bash
+    git clone git@github.com:<your-username>/serverless-plugin-datadog.git
+    git checkout -b <my-branch>
+    ```
+1. Make your changes.
+1. Test your changes against your own testing application with the help of [`yarn link`](https://classic.yarnpkg.com/en/docs/cli/link/):
+    ```bash
+    # From the root of the serverless-plugin-datadog repo
+    yarn build
+    cd dist
+    yarn link
+    
+    # From the root of your own serverless application
+    yarn link "serverless-plugin-datadog"
+    sls deploy
+    ```
+1. Ensure the unit tests pass:
+    ```bash
+    yarn test
+    ```
+1. Push to your fork and [submit a pull request][pr].
 
 [pr]: https://github.com/your-username/datadog-lambda-layer-python/compare/DataDog:master...master
 
