@@ -8,18 +8,20 @@
 
 import { FunctionInfo, LayerJSON, RuntimeType, applyLayers, findHandlers } from "./layer";
 
-import { FunctionDefinition } from "serverless";
+import { FunctionDefinition, FunctionDefinitionHandler, FunctionDefinitionImage } from "serverless";
 import Service from "serverless/classes/Service";
+
+type FunctionDefinitionAll = FunctionDefinitionHandler | FunctionDefinitionImage;
 
 function createMockService(
   region: string,
-  funcs: { [funcName: string]: Partial<FunctionDefinition> },
+  funcs: { [funcName: string]: Partial<FunctionDefinitionAll> },
   plugins?: string[],
 ): Service {
   const service: Partial<Service> & { functions: any; plugins: any } = {
     provider: { region } as any,
     getAllFunctionsNames: () => Object.keys(funcs),
-    getFunction: (name) => funcs[name] as FunctionDefinition,
+    getFunction: (name) => funcs[name] as FunctionDefinitionAll,
     functions: funcs as any,
     plugins,
   };
@@ -128,6 +130,7 @@ describe("findHandlers", () => {
         layers: ["node:1", "node:2"],
       });
     });
+
     it("doesn't add duplicate layers", () => {
       const handler = {
         handler: { runtime: "nodejs10.x", layers: ["node:1"] } as any,

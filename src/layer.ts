@@ -5,7 +5,7 @@
  * This product includes software developed at Datadog (https://www.datadoghq.com/).
  * Copyright 2019 Datadog, Inc.
  */
-import { FunctionDefinition } from "serverless";
+import { FunctionDefinition, FunctionDefinitionHandler } from "serverless";
 import Service from "serverless/classes/Service";
 
 export enum RuntimeType {
@@ -82,6 +82,10 @@ export function applyLayers(region: string, handlers: FunctionInfo[], layers: La
       setLayers(handler, currentLayers);
     }
   }
+}
+
+export function isFunctionDefinitionHandler( funcDef: FunctionDefinition): funcDef is FunctionDefinitionHandler {
+  return typeof (funcDef as any).handler === "string";
 }
 
 function getLayers(handler: FunctionInfo) {
