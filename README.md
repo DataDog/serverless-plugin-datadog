@@ -4,7 +4,7 @@
 ![build](https://github.com/DataDog/serverless-plugin-datadog/workflows/build/badge.svg)
 [![Code Coverage](https://img.shields.io/codecov/c/github/DataDog/serverless-plugin-datadog)](https://codecov.io/gh/DataDog/serverless-plugin-datadog)
 [![NPM](https://img.shields.io/npm/v/serverless-plugin-datadog)](https://www.npmjs.com/package/serverless-plugin-datadog)
-[![Slack](https://img.shields.io/badge/slack-%23serverless-blueviolet?logo=slack)](https://datadoghq.slack.com/channels/serverless/)
+[![Slack](https://chat.datadoghq.com/badge.svg?bg=632CA6)](https://chat.datadoghq.com/)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](https://github.com/DataDog/serverless-plugin-datadog/blob/master/LICENSE)
 
 Datadog recommends the Serverless Framework Plugin for developers using the Serverless Framework to deploy their serverless applications.
@@ -141,6 +141,10 @@ You can also open an issue for a feature request.
 ## Contributing
 
 If you find an issue with this package and have a fix, please feel free to open a pull request following the [procedures](CONTRIBUTING.md).
+
+## Community
+
+For product feedback and questions, join the `#serverless` channel in the [Datadog community on Slack](https://chat.datadoghq.com/).
 
 ## License
 
