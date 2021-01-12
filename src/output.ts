@@ -12,7 +12,7 @@ const outputPrefix = "DatadogMonitor";
 export async function addOutputLinks(serverless: Serverless, site: string) {
   const awsAccount = await serverless.getProvider("aws").getAccountId();
   const region = serverless.service.provider.region;
-  const outputs = serverless.service.provider.compiledCloudFormationTemplate.Outputs;
+  const outputs = serverless.service.provider.compiledCloudFormationTemplate?.Outputs;
   if (outputs === undefined) {
     return;
   }
