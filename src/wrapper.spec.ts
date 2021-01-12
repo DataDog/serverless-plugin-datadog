@@ -127,7 +127,7 @@ describe("redirectHandlers", () => {
       events: [],
     };
     const origFuncDef = {
-      ...funcDef
+      ...funcDef,
     };
     redirectHandlers(
       [

@@ -84,7 +84,7 @@ export function applyLayers(region: string, handlers: FunctionInfo[], layers: La
   }
 }
 
-export function isFunctionDefinitionHandler( funcDef: FunctionDefinition): funcDef is FunctionDefinitionHandler {
+export function isFunctionDefinitionHandler(funcDef: FunctionDefinition): funcDef is FunctionDefinitionHandler {
   return typeof (funcDef as any).handler === "string";
 }
 
