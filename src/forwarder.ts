@@ -3,6 +3,7 @@ import Aws = require("serverless/plugins/aws/provider/awsProvider");
 
 const logGroupKey = "AWS::Logs::LogGroup";
 const logGroupSubscriptionKey = "AWS::Logs::SubscriptionFilter";
+const maxAllowableLogGroupSubscriptions: number = 2;
 
 interface LogGroupResource {
   Type: typeof logGroupKey;
@@ -33,12 +34,10 @@ export async function addCloudWatchForwarderSubscriptions(service: Service, aws:
     return ["No cloudformation stack available. Skipping subscribing Datadog forwarder."];
   }
   const errors = [];
-
   for (const [name, resource] of Object.entries(resources)) {
     if (!isLogGroup(resource) || !resource.Properties.LogGroupName.startsWith("/aws/lambda/")) {
       continue;
     }
-
     const logGroupName = resource.Properties.LogGroupName;
     const scopedSubName = `${name}Subscription`;
 
@@ -51,7 +50,7 @@ export async function addCloudWatchForwarderSubscriptions(service: Service, aws:
 
     const canSub = await canSubscribeLogGroup(aws, logGroupName, expectedSubName);
     if (!canSub) {
-      errors.push(`Subscription already exists for log group ${logGroupName}. Skipping subscribing Datadog forwarder.`);
+      errors.push(`A non Datadog Subscription already exists for log group ${logGroupName}. Skipping subscribing Datadog forwarder.`);
       continue;
     }
 
@@ -70,19 +69,22 @@ export async function addCloudWatchForwarderSubscriptions(service: Service, aws:
 
 export async function canSubscribeLogGroup(aws: Aws, logGroupName: string, expectedSubName: string) {
   const subscriptionFilters = await describeSubscriptionFilters(aws, logGroupName);
-
-  let hasUnknownSubscriptions = false;
-
+  const numberOfActiveSubscriptionFilters: number = subscriptionFilters.length;
+  let foundDatadogSubscriptionFilter: boolean = false;
   for (const subscription of subscriptionFilters) {
     const filterName = subscription.filterName;
     if (filterName.startsWith(expectedSubName)) {
-      return true;
+      foundDatadogSubscriptionFilter = true;
     }
-    // We don't own this log group. It might not be possible to set a forwarder
-    hasUnknownSubscriptions = true;
+
   }
-  // No log groups, so it's possible to subscribe.
-  return !hasUnknownSubscriptions;
+  if (!foundDatadogSubscriptionFilter && numberOfActiveSubscriptionFilters >= maxAllowableLogGroupSubscriptions){
+    return false;
+  }
+  else{
+    return true;
+  }
+
 }
 
 export async function describeSubscriptionFilters(aws: Aws, logGroupName: string) {
