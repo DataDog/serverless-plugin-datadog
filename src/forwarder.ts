@@ -69,7 +69,6 @@ export async function addCloudWatchForwarderSubscriptions(service: Service, aws:
 }
 
 export async function canSubscribeLogGroup(aws: Aws, logGroupName: string, expectedSubName: string) {
-  console.log("entered the canSubscribeLogGroup from the serverless plugin with support for 2 log groups");
   const subscriptionFilters = await describeSubscriptionFilters(aws, logGroupName);
   const numberOfActiveSubscriptionFilters: number = subscriptionFilters.length;
   let foundDatadogSubscriptionFilter: boolean = false;
