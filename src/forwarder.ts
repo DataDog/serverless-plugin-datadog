@@ -1,3 +1,4 @@
+import { debug } from "console";
 import Service from "serverless/classes/Service";
 import Aws = require("serverless/plugins/aws/provider/awsProvider");
 
@@ -68,6 +69,7 @@ export async function addCloudWatchForwarderSubscriptions(service: Service, aws:
 }
 
 export async function canSubscribeLogGroup(aws: Aws, logGroupName: string, expectedSubName: string) {
+  console.log("entered the canSubscribeLogGroup from the serverless plugin with support for 2 log groups");
   const subscriptionFilters = await describeSubscriptionFilters(aws, logGroupName);
   const numberOfActiveSubscriptionFilters: number = subscriptionFilters.length;
   let foundDatadogSubscriptionFilter: boolean = false;
