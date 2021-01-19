@@ -51,7 +51,7 @@ export async function addCloudWatchForwarderSubscriptions(service: Service, aws:
 
     const canSub = await canSubscribeLogGroup(aws, logGroupName, expectedSubName);
     if (!canSub) {
-      errors.push(`A non Datadog Subscription already exists for log group ${logGroupName}. Skipping subscribing Datadog forwarder.`);
+      errors.push(`Two non Datadog Subscriptions already exist for the log group ${logGroupName}. Skipping subscribing from Datadog forwarder.`);
       continue;
     }
 
