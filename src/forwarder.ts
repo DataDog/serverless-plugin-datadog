@@ -51,7 +51,9 @@ export async function addCloudWatchForwarderSubscriptions(service: Service, aws:
 
     const canSub = await canSubscribeLogGroup(aws, logGroupName, expectedSubName);
     if (!canSub) {
-      errors.push(`Two non Datadog Subscriptions already exist for the log group ${logGroupName}. Skipping subscribing from Datadog forwarder.`);
+      errors.push(
+        `Could not subscribe Datadog Forwarder due to too many existing subscription filter(s) for ${logGroupName}.`,
+      );
       continue;
     }
 
@@ -77,15 +79,12 @@ export async function canSubscribeLogGroup(aws: Aws, logGroupName: string, expec
     if (filterName.startsWith(expectedSubName)) {
       foundDatadogSubscriptionFilter = true;
     }
-
   }
-  if (!foundDatadogSubscriptionFilter && numberOfActiveSubscriptionFilters >= maxAllowableLogGroupSubscriptions){
+  if (!foundDatadogSubscriptionFilter && numberOfActiveSubscriptionFilters >= maxAllowableLogGroupSubscriptions) {
     return false;
-  }
-  else{
+  } else {
     return true;
   }
-
 }
 
 export async function describeSubscriptionFilters(aws: Aws, logGroupName: string) {
