@@ -1,5 +1,6 @@
 import Service from "serverless/classes/Service";
 import { addCloudWatchForwarderSubscriptions } from "./forwarder";
+import { canSubscribeLogGroup } from "./forwarder";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
 
 function serviceWithResources(resources?: Record<string, any>, serviceName = "my-service"): Service {
@@ -34,6 +35,63 @@ function awsMock(existingSubs: { [key: string]: any }, stackName?: string): Aws 
     } as { [key: string]: () => string },
   } as Aws;
 }
+
+describe("canSubscribeLogGroup", () => {
+  it("Returns true if log group has 0 existing subscription filters.", async () => {
+    const aws = awsMock({});
+    const logGroupName: string = "/aws/lambda/serverless-plugin-test-dev-hello";
+    const expectedSubName: string = "serverless-plugin-test-dev-HelloLogGroupSubscription";
+
+    const canSubscribe = await canSubscribeLogGroup(aws, logGroupName, expectedSubName);
+    expect(canSubscribe).toBe(true);
+  });
+  it("Returns true if log group has 1 existing Datadog subscription filter.", async () => {
+    const aws = awsMock({
+      "/aws/lambda/serverless-plugin-test-dev-hello": [
+        { filterName: "serverless-plugin-test-dev-HelloLogGroupSubscription" },
+      ],
+    });
+    const logGroupName: string = "/aws/lambda/serverless-plugin-test-dev-hello";
+    const expectedSubName: string = "serverless-plugin-test-dev-HelloLogGroupSubscription";
+
+    const canSubscribe = await canSubscribeLogGroup(aws, logGroupName, expectedSubName);
+    expect(canSubscribe).toBe(true);
+  });
+  it("Returns true if log group has 1 existing non-Datadog subscription filter.", async () => {
+    const aws = awsMock({ "/aws/lambda/serverless-plugin-test-dev-hello": [{ filterName: "unknown-filter-name" }] });
+    const logGroupName: string = "/aws/lambda/serverless-plugin-test-dev-hello";
+    const expectedSubName: string = "serverless-plugin-test-dev-HelloLogGroupSubscription";
+
+    const canSubscribe = await canSubscribeLogGroup(aws, logGroupName, expectedSubName);
+    expect(canSubscribe).toBe(true);
+  });
+  it("Returns true if log group has 2 existing subscription filters, 1 Datadog subscription filter, and 1 non-Datadog subscription filter.", async () => {
+    const aws = awsMock({
+      "/aws/lambda/serverless-plugin-test-dev-hello": [
+        { filterName: "serverless-plugin-test-dev-HelloLogGroupSubscription" },
+        { filterName: "unknown-filter-name" },
+      ],
+    });
+    const logGroupName: string = "/aws/lambda/serverless-plugin-test-dev-hello";
+    const expectedSubName: string = "serverless-plugin-test-dev-HelloLogGroupSubscription";
+
+    const canSubscribe = await canSubscribeLogGroup(aws, logGroupName, expectedSubName);
+    expect(canSubscribe).toBe(true);
+  });
+  it("Returns false if log group has 2 existing non-Datadog subscription filters.", async () => {
+    const aws = awsMock({
+      "/aws/lambda/serverless-plugin-test-dev-hello": [
+        { filterName: "unknown-filter-name1" },
+        { filterName: "unknown-filter-name2" },
+      ],
+    });
+    const logGroupName: string = "/aws/lambda/serverless-plugin-test-dev-hello";
+    const expectedSubName: string = "serverless-plugin-test-dev-HelloLogGroupSubscription";
+
+    const canSubscribe = await canSubscribeLogGroup(aws, logGroupName, expectedSubName);
+    expect(canSubscribe).toBe(false);
+  });
+});
 
 describe("addCloudWatchForwarderSubscriptions", () => {
   it("adds a subscription for each log group", async () => {
@@ -112,7 +170,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       }
     `);
   });
-  it("doesn't add subscription when an unknown subscription already exists", async () => {
+  it("doesn't add subscription when two non-Datadog subscriptions already exist", async () => {
     const service = serviceWithResources({
       FirstGroup: {
         Type: "AWS::Logs::LogGroup",
@@ -122,7 +180,9 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       },
     });
 
-    const aws = awsMock({ "/aws/lambda/first-group": [{ filterName: "unknown-filter-name" }] });
+    const aws = awsMock({
+      "/aws/lambda/first-group": [{ filterName: "unknown-filter-name1" }, { filterName: "unknown-filter-name2" }],
+    });
 
     await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func");
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
