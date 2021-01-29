@@ -6,6 +6,17 @@ const logGroupKey = "AWS::Logs::LogGroup";
 const logGroupSubscriptionKey = "AWS::Logs::SubscriptionFilter";
 const maxAllowableLogGroupSubscriptions: number = 2;
 
+/**
+ * Error to be thrown when function ARN cannot be found.
+ */
+class DatadogForwarderNotFoundError extends Error {
+  constructor(message: string) {
+    super(...message);
+    this.name = "DatadogForwarderNotFoundError";
+    this.message = message;
+  }
+}
+
 interface LogGroupResource {
   Type: typeof logGroupKey;
   Properties: {
@@ -28,12 +39,26 @@ interface DescribeSubscriptionFiltersResponse {
 function isLogGroup(value: any): value is LogGroupResource {
   return value.Type === logGroupKey;
 }
+/**
+ * Validates whether ARN exists in the account
+ * @param aws Serverless framework provided AWS client
+ * @param functionArn The ARN to be validated
+ */
+async function doesArnExist(aws: Aws, functionArn: string) {
+  try {
+    const result = await aws.request("Lambda", "getFunction", { FunctionName: functionArn });
+  } catch (err) {
+    throw new DatadogForwarderNotFoundError(`Could not perform GetFunction on ${functionArn}.`);
+  }
+}
 
 export async function addCloudWatchForwarderSubscriptions(service: Service, aws: Aws, functionArn: string) {
   const resources = service.provider.compiledCloudFormationTemplate?.Resources;
   if (resources === undefined) {
     return ["No cloudformation stack available. Skipping subscribing Datadog forwarder."];
   }
+  const doesForwarderExist = await doesArnExist(aws, functionArn);
+  doesArnExist(aws, functionArn);
   const errors = [];
   for (const [name, resource] of Object.entries(resources)) {
     if (!isLogGroup(resource) || !resource.Properties.LogGroupName.startsWith("/aws/lambda/")) {
