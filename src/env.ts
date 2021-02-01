@@ -40,7 +40,7 @@ export interface Configuration {
   // When set, this plugin will not try to redirect the handlers of these specified functions;
   exclude: string[];
 }
-
+const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
 const apiKeyKMSEnvVar = "DD_KMS_API_KEY";
 const siteURLEnvVar = "DD_SITE";
@@ -141,12 +141,6 @@ function getPropertyFromPath(obj: any, path: string[]) {
   return obj;
 }
 
-/*
-  ~check that plugins exists, if it does not then return false
-  ~decide if you have a normal array object or a enhanced object
-  ~if we have the normal array, check if webpack is in there
-  if we have an enhanced object, pull out modules and check if its in there
-*/
 export function hasWebpackPlugin(service: Service) {
   const plugins: string[] | undefined = (service as any).plugins;
   if (plugins === undefined) {
@@ -154,12 +148,12 @@ export function hasWebpackPlugin(service: Service) {
   }
   if (Array.isArray(plugins)) {
     // We have a normal plugin array
-    return plugins.find((plugin) => plugin === "serverless-webpack") !== undefined;
+    return plugins.find((plugin) => plugin === webpackPluginName) !== undefined;
   }
-  // We have a enhanced plugins object
+  // We have an enhanced plugins object
   const modules: string[] | undefined = (service as any).plugins.modules;
   if (modules === undefined) {
     return false;
   }
-  return modules.find((plugin) => plugin === "serverless-webpack") !== undefined;
+  return modules.find((plugin) => plugin === webpackPluginName) !== undefined;
 }

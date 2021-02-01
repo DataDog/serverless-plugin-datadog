@@ -15,7 +15,7 @@ import {
 } from "./env";
 
 describe("hasWebpackPlugin", () => {
-  it("returns false when the serverless.yml plugin(s) object is not defined", () => {
+  it("returns false when the serverless.yml plugins object is not defined", () => {
     const service = {
       plugins: undefined,
     } as any;
@@ -23,7 +23,7 @@ describe("hasWebpackPlugin", () => {
     expect(result).toBe(false);
   });
 
-  it("returns false when the serverless.yml plugin(s) object does not define the serverless-webpack plugin", () => {
+  it("returns false when the serverless.yml plugins object does not define the serverless-webpack plugin", () => {
     const service = {
       plugins: ["serverless-plugin-datadog"],
     } as any;
@@ -31,7 +31,7 @@ describe("hasWebpackPlugin", () => {
     expect(result).toBe(false);
   });
 
-  it("returns true when the serverless.yml plugin(s) object does define the serverless-webpack plugin", () => {
+  it("returns true when the serverless.yml plugins object does define the serverless-webpack plugin", () => {
     const service = {
       plugins: ["serverless-plugin-datadog", "serverless-webpack"],
     } as any;
@@ -39,7 +39,7 @@ describe("hasWebpackPlugin", () => {
     expect(result).toBe(true);
   });
 
-  it("returns false when the serverless.yml enhanced plugin(s) object does not define the serverless-webpack plugin", () => {
+  it("returns false when the serverless.yml enhanced plugins object does not define the serverless-webpack plugin", () => {
     const service = {
       plugins: {
         localPath: "",
@@ -50,7 +50,7 @@ describe("hasWebpackPlugin", () => {
     expect(result).toBe(false);
   });
 
-  it("returns true when the serverless.yml enhanced plugin(s) object does define the serverless-webpack plugin", () => {
+  it("returns true when the serverless.yml enhanced plugins object does define the serverless-webpack plugin", () => {
     const service = {
       plugins: {
         localPath: "",
