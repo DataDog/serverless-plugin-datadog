@@ -25,6 +25,9 @@ function awsMock(existingSubs: { [key: string]: any }, stackName?: string): Aws 
     getStage: () => "dev",
     request: (service, method, params: any) => {
       const logGroupName = params.logGroupName;
+      if (method == "getFunction") {
+        return Promise.resolve();
+      }
       if (existingSubs[logGroupName]) {
         return Promise.resolve({ subscriptionFilters: existingSubs[logGroupName] });
       }

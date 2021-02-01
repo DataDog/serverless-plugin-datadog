@@ -18,7 +18,12 @@ const SEM_VER_REGEX = /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\
 function awsMock(): Aws {
   return {
     getStage: () => "dev",
-    request: (service, method, params: any) => Promise.reject("Log group doesn't exist"),
+    request: (service, method, params: any) => {
+      if (method == "getFunction") {
+        return Promise.resolve();
+      }
+      return Promise.reject("Log group doesn't exist");
+    },
     naming: {
       getStackName: () => "",
     } as { [key: string]: () => string },
