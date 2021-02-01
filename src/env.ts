@@ -141,10 +141,25 @@ function getPropertyFromPath(obj: any, path: string[]) {
   return obj;
 }
 
+/*
+  ~check that plugins exists, if it does not then return false
+  ~decide if you have a normal array object or a enhanced object
+  ~if we have the normal array, check if webpack is in there
+  if we have an enhanced object, pull out modules and check if its in there
+*/
 export function hasWebpackPlugin(service: Service) {
   const plugins: string[] | undefined = (service as any).plugins;
   if (plugins === undefined) {
     return false;
   }
-  return plugins.find((plugin) => plugin === "serverless-webpack") !== undefined;
+  if (Array.isArray(plugins)) {
+    // We have a normal plugin array
+    return plugins.find((plugin) => plugin === "serverless-webpack") !== undefined;
+  }
+  // We have a enhanced plugins object
+  const modules: string[] | undefined = (service as any).plugins.modules;
+  if (modules === undefined) {
+    return false;
+  }
+  return modules.find((plugin) => plugin === "serverless-webpack") !== undefined;
 }
