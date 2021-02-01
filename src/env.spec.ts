@@ -6,7 +6,61 @@
  * Copyright 2019 Datadog, Inc.
  */
 
-import { getConfig, defaultConfiguration, setEnvConfiguration, forceExcludeDepsFromWebpack } from "./env";
+import {
+  getConfig,
+  defaultConfiguration,
+  setEnvConfiguration,
+  forceExcludeDepsFromWebpack,
+  hasWebpackPlugin,
+} from "./env";
+
+describe("hasWebpackPlugin", () => {
+  it("returns false when the serverless.yml plugins object is not defined", () => {
+    const service = {
+      plugins: undefined,
+    } as any;
+    const result = hasWebpackPlugin(service);
+    expect(result).toBe(false);
+  });
+
+  it("returns false when the serverless.yml plugins object does not define the serverless-webpack plugin", () => {
+    const service = {
+      plugins: ["serverless-plugin-datadog"],
+    } as any;
+    const result = hasWebpackPlugin(service);
+    expect(result).toBe(false);
+  });
+
+  it("returns true when the serverless.yml plugins object does define the serverless-webpack plugin", () => {
+    const service = {
+      plugins: ["serverless-plugin-datadog", "serverless-webpack"],
+    } as any;
+    const result = hasWebpackPlugin(service);
+    expect(result).toBe(true);
+  });
+
+  it("returns false when the serverless.yml enhanced plugins object does not define the serverless-webpack plugin", () => {
+    const service = {
+      plugins: {
+        localPath: "",
+        modules: ["serverless-plugin-datadog"],
+      },
+    } as any;
+    const result = hasWebpackPlugin(service);
+    expect(result).toBe(false);
+  });
+
+  it("returns true when the serverless.yml enhanced plugins object does define the serverless-webpack plugin", () => {
+    const service = {
+      plugins: {
+        localPath: "",
+        modules: ["serverless-plugin-datadog", "serverless-webpack"],
+      },
+    } as any;
+    const result = hasWebpackPlugin(service);
+    expect(result).toBe(true);
+  });
+});
 
 describe("getConfig", () => {
   it("get a default configuration when none is present", () => {

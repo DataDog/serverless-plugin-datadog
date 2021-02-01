@@ -40,7 +40,7 @@ export interface Configuration {
   // When set, this plugin will not try to redirect the handlers of these specified functions;
   exclude: string[];
 }
-
+const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
 const apiKeyKMSEnvVar = "DD_KMS_API_KEY";
 const siteURLEnvVar = "DD_SITE";
@@ -146,5 +146,14 @@ export function hasWebpackPlugin(service: Service) {
   if (plugins === undefined) {
     return false;
   }
-  return plugins.find((plugin) => plugin === "serverless-webpack") !== undefined;
+  if (Array.isArray(plugins)) {
+    // We have a normal plugin array
+    return plugins.find((plugin) => plugin === webpackPluginName) !== undefined;
+  }
+  // We have an enhanced plugins object
+  const modules: string[] | undefined = (service as any).plugins.modules;
+  if (modules === undefined) {
+    return false;
+  }
+  return modules.find((plugin) => plugin === webpackPluginName) !== undefined;
 }
