@@ -20,10 +20,13 @@ function serviceWithResources(resources?: Record<string, any>, serviceName = "my
   return service as Service;
 }
 
-function awsMock(existingSubs: { [key: string]: any }, stackName?: string): Aws {
+function awsMock(existingSubs: { [key: string]: any }, stackName?: string, doesAlwaysReject?: boolean): Aws {
   return {
     getStage: () => "dev",
     request: (service, method, params: any) => {
+      if (doesAlwaysReject) {
+        return Promise.reject("Not found.");
+      }
       const logGroupName = params.logGroupName;
       if (method == "getFunction") {
         return Promise.resolve();
@@ -287,5 +290,45 @@ describe("addCloudWatchForwarderSubscriptions", () => {
         },
       }
     `);
+  });
+  it("throws DatadogForwarderNotFoundError", async () => {
+    const service = serviceWithResources({
+      FirstGroup: {
+        Type: "AWS::Logs::LogGroup",
+        Properties: {
+          LogGroupName: "/aws/lambda/first-group",
+        },
+      },
+      SecondGroup: {
+        Type: "AWS::Logs::LogGroup",
+        Properties: {
+          LogGroupName: "/aws/lambda/second-group",
+        },
+      },
+      NonLambdaGroup: {
+        Type: "AWS::Logs::LogGroup",
+        Properties: {
+          LogGroupName: "/aws/apigateway/second-group",
+        },
+      },
+      UnrelatedResource: {
+        Type: "AWS::AnotherResourceType",
+        Properties: {},
+      },
+    });
+
+    const aws = awsMock(
+      {
+        "/aws/lambda/serverless-plugin-test-dev-hello": [
+          { filterName: "serverless-plugin-test-dev-HelloLogGroupSubscription" },
+        ],
+      },
+      "myCustomStackName",
+      true,
+    );
+
+    expect(async () => await addCloudWatchForwarderSubscriptions(service, aws, "my-func")).rejects.toThrow(
+      "Could not perform GetFunction on my-func.",
+    );
   });
 });

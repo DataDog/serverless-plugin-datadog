@@ -58,7 +58,6 @@ export async function addCloudWatchForwarderSubscriptions(service: Service, aws:
     return ["No cloudformation stack available. Skipping subscribing Datadog forwarder."];
   }
   const doesForwarderExist = await doesArnExist(aws, functionArn);
-  doesArnExist(aws, functionArn);
   const errors = [];
   for (const [name, resource] of Object.entries(resources)) {
     if (!isLogGroup(resource) || !resource.Properties.LogGroupName.startsWith("/aws/lambda/")) {
