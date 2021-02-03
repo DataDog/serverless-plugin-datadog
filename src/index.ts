@@ -102,7 +102,9 @@ module.exports = class ServerlessPlugin {
     if (config.enabled === false) return;
 
     if (forwarderArn && forwarder) {
-      throw new Error("Error: Both 'forwarderArn' and 'forwarder' parameters are set. Please only use the 'forwarderArn' parameter.");
+      throw new Error(
+        "Error: Both 'forwarderArn' and 'forwarder' parameters are set. Please only use the 'forwarderArn' parameter.",
+      );
     } else if (forwarderArn !== undefined && forwarder === undefined) {
       datadogForwarderArn = forwarderArn;
     } else if (forwarder !== undefined && forwarderArn === undefined) {

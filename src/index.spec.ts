@@ -317,7 +317,6 @@ describe("ServerlessPlugin", () => {
       };
       const plugin = new ServerlessPlugin(serverless, {});
       expect(plugin.hooks["after:package:createDeploymentArtifacts"]()).toThrowError();
-
     });
 
     it("throws an error when neither the forwarderArn nor the forwarder are set", async () => {
