@@ -101,17 +101,18 @@ module.exports = class ServerlessPlugin {
     let functionArn;
     if (config.enabled === false) return;
 
-    if (forwarderArn && forwarder){
-      console.error("Error: Could not add CloudWatch forwarder subscriptions because both 'forwarderArn' and 'forwarder' parameters are set. 'forwarderArn' and 'forwarder' are equivalent, please only use 'forwarderArn' or 'forwarder'.");
-    }
-    else if (forwarderArn !== undefined && forwarder === undefined){
+    if (forwarderArn && forwarder) {
+      console.error(
+        "Error: Could not add CloudWatch forwarder subscriptions because both 'forwarderArn' and 'forwarder' parameters are set. 'forwarderArn' and 'forwarder' are equivalent, please only use 'forwarderArn' or 'forwarder'.",
+      );
+    } else if (forwarderArn !== undefined && forwarder === undefined) {
       functionArn = forwarderArn;
-    }
-    else if (forwarder !== undefined && forwarderArn === undefined){
+    } else if (forwarder !== undefined && forwarderArn === undefined) {
       functionArn = forwarder;
-    }
-    else{
-      console.error("Error: Could not add CloudWatch forwarder subscriptions. Please check that your 'forwarderArn' or 'forwarder' parameters are set properly. 'forwarderArn' and 'forwarder' are equivalent, please only use 'forwarderArn' or 'forwarder'");
+    } else {
+      console.error(
+        "Error: Could not add CloudWatch forwarder subscriptions. Please check that your 'forwarderArn' or 'forwarder' parameters are set properly. 'forwarderArn' and 'forwarder' are equivalent, please only use 'forwarderArn' or 'forwarder'",
+      );
       return;
     }
 

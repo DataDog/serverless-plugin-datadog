@@ -343,9 +343,7 @@ describe("ServerlessPlugin", () => {
           },
           functions: {},
           custom: {
-            datadog: {
-              
-            },
+            datadog: {},
           },
         },
       };
@@ -355,7 +353,7 @@ describe("ServerlessPlugin", () => {
         "FirstGroupSubscription",
       );
     });
-    
+
     it("only adds dd_sls_plugin tag when enabledTags is false", async () => {
       const function_ = functionMock({ env: "test" });
       const functionWithTags: ExtendedFunctionDefinition = function_;
