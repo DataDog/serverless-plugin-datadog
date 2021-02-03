@@ -95,10 +95,29 @@ module.exports = class ServerlessPlugin {
 
   private async afterPackageFunction() {
     const config = getConfig(this.serverless.service);
+    const forwarderArn: string | undefined = config.forwarderArn;
+    const forwarder: string | undefined = config.forwarder;
+
+    let functionArn;
     if (config.enabled === false) return;
-    if (config.forwarder) {
+
+    if (forwarderArn && forwarder){
+      console.error("Error: Could not add CloudWatch forwarder subscriptions because both 'forwarderArn' and 'forwarder' parameters are set. 'forwarderArn' and 'forwarder' are equivalent, please only use 'forwarderArn' or 'forwarder'.");
+    }
+    else if (forwarderArn !== undefined && forwarder === undefined){
+      functionArn = forwarderArn;
+    }
+    else if (forwarder !== undefined && forwarderArn === undefined){
+      functionArn = forwarder;
+    }
+    else{
+      console.error("Error: Could not add CloudWatch forwarder subscriptions. Please check that your 'forwarderArn' or 'forwarder' parameters are set properly. 'forwarderArn' and 'forwarder' are equivalent, please only use 'forwarderArn' or 'forwarder'");
+      return;
+    }
+
+    if (functionArn) {
       const aws = this.serverless.getProvider("aws");
-      const errors = await addCloudWatchForwarderSubscriptions(this.serverless.service, aws, config.forwarder);
+      const errors = await addCloudWatchForwarderSubscriptions(this.serverless.service, aws, functionArn);
       for (const error of errors) {
         this.serverless.cli.log(error);
       }

@@ -220,6 +220,41 @@ describe("ServerlessPlugin", () => {
     it("adds subscription filters when fowarderArn is set", async () => {
       const serverless = {
         cli: { log: () => {} },
+        getProvider: awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            compiledCloudFormationTemplate: {
+              Resources: {
+                FirstGroup: {
+                  Type: "AWS::Logs::LogGroup",
+                  Properties: {
+                    LogGroupName: "/aws/lambda/first-group",
+                  },
+                },
+              },
+            },
+          },
+          functions: {},
+          custom: {
+            datadog: {
+              forwarderArn: "some-arn",
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).toHaveProperty(
+        "FirstGroupSubscription",
+      );
+    });
+
+    it("adds subscription filters when fowarder is set", async () => {
+      const serverless = {
+        cli: { log: () => {} },
         getProvider: awsMock,
         service: {
           getServiceName: () => "dev",
@@ -252,6 +287,75 @@ describe("ServerlessPlugin", () => {
       );
     });
 
+    it("does not add subscription filters when fowarderArn and forwarder is set", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: awsMock,
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            compiledCloudFormationTemplate: {
+              Resources: {
+                FirstGroup: {
+                  Type: "AWS::Logs::LogGroup",
+                  Properties: {
+                    LogGroupName: "/aws/lambda/first-group",
+                  },
+                },
+              },
+            },
+          },
+          functions: {},
+          custom: {
+            datadog: {
+              forwarderArn: "some-arn",
+              forwarder: "some-arn",
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).not.toHaveProperty(
+        "FirstGroupSubscription",
+      );
+    });
+
+    it("does not add subscription filters when neither fowarderArn or forwarder are set", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: awsMock,
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            compiledCloudFormationTemplate: {
+              Resources: {
+                FirstGroup: {
+                  Type: "AWS::Logs::LogGroup",
+                  Properties: {
+                    LogGroupName: "/aws/lambda/first-group",
+                  },
+                },
+              },
+            },
+          },
+          functions: {},
+          custom: {
+            datadog: {
+              
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).not.toHaveProperty(
+        "FirstGroupSubscription",
+      );
+    });
+    
     it("only adds dd_sls_plugin tag when enabledTags is false", async () => {
       const function_ = functionMock({ env: "test" });
       const functionWithTags: ExtendedFunctionDefinition = function_;
