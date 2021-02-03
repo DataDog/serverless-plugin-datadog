@@ -103,15 +103,15 @@ module.exports = class ServerlessPlugin {
 
     if (forwarderArn && forwarder) {
       throw new Error(
-        "Error: Both 'forwarderArn' and 'forwarder' parameters are set. Please only use the 'forwarderArn' parameter.",
+        "Both 'forwarderArn' and 'forwarder' parameters are set. Please only use the 'forwarderArn' parameter.",
       );
     } else if (forwarderArn !== undefined && forwarder === undefined) {
       datadogForwarderArn = forwarderArn;
     } else if (forwarder !== undefined && forwarderArn === undefined) {
       datadogForwarderArn = forwarder;
     } else {
-      throw new Error(
-        "Error: Could not add CloudWatch forwarder subscriptions. Please check that your 'forwarderArn' parameter is set properly. Also double check the supplied Datadog Forwarder ARN is from the same region and account where your serverless application is deployed.",
+      return new Error( //todo change this
+        "Could not add CloudWatch forwarder subscriptions. Please check that your 'forwarderArn' parameter is set properly. Also double check the supplied Datadog Forwarder ARN is from the same region and account where your serverless application is deployed.",
       );
     }
 
