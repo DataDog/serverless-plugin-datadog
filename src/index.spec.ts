@@ -252,7 +252,7 @@ describe("ServerlessPlugin", () => {
       );
     });
 
-    it("adds subscription filters when fowarder is set", async () => {
+    it("adds subscription filters when forwarder is set", async () => {
       const serverless = {
         cli: { log: () => {} },
         getProvider: awsMock,
@@ -287,7 +287,7 @@ describe("ServerlessPlugin", () => {
       );
     });
 
-    it("does not add subscription filters when fowarderArn and forwarder is set", async () => {
+    it("throws an error when forwarderArn and forwarder are set", async () => {
       const serverless = {
         cli: { log: () => {} },
         getProvider: awsMock,
@@ -316,13 +316,11 @@ describe("ServerlessPlugin", () => {
         },
       };
       const plugin = new ServerlessPlugin(serverless, {});
-      await plugin.hooks["after:package:createDeploymentArtifacts"]();
-      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).not.toHaveProperty(
-        "FirstGroupSubscription",
-      );
+      expect(plugin.hooks["after:package:createDeploymentArtifacts"]()).toThrowError();
+
     });
 
-    it("does not add subscription filters when neither fowarderArn or forwarder are set", async () => {
+    it("throws an error when neither the forwarderArn nor the forwarder are set", async () => {
       const serverless = {
         cli: { log: () => {} },
         getProvider: awsMock,
@@ -348,10 +346,7 @@ describe("ServerlessPlugin", () => {
         },
       };
       const plugin = new ServerlessPlugin(serverless, {});
-      await plugin.hooks["after:package:createDeploymentArtifacts"]();
-      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).not.toHaveProperty(
-        "FirstGroupSubscription",
-      );
+      expect(plugin.hooks["after:package:createDeploymentArtifacts"]()).toThrowError();
     });
 
     it("only adds dd_sls_plugin tag when enabledTags is false", async () => {

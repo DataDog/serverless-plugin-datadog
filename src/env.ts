@@ -28,7 +28,7 @@ export interface Configuration {
   // Enable tracing on Lambda function using dd-trace, datadog's APM library.
   enableDDTracing: boolean;
 
-  // When either are set, the plugin will subscribe the lambdas to the forwarder with the given arn.
+  // When either is set, the plugin will subscribe the lambdas to the forwarder with the given arn.
   forwarderArn?: string;
   forwarder?: string;
   // When set, the plugin will try to automatically tag customers' lambda functions with service and env,

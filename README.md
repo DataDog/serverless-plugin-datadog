@@ -32,7 +32,7 @@ To further configure your plugin, use the following custom parameters in your `s
 | `logLevel`           | The log level, set to `DEBUG` for extended logging. Defaults to `info`.                                                                                                                                                                                                                                                                                                                           |
 | `enableXrayTracing`  | Set `true` to enable X-Ray tracing on the Lambda functions and API Gateway integrations. Defaults to `false`.                                                                                                                                                                                                                                                                                   |
 | `enableDDTracing`    | Enable Datadog tracing on the Lambda function. Defaults to `true`. When enabled, it's required to set either the `forwarderArn` or `forwarder` parameter there is no difference in which you choose but please only use one .                                                                                                                                                                                                                                                                         |
-| `forwarderArn` or `forwarder`          | Setting either one of these parameters subscribes the Lambda functions' CloudWatch log groups to the given Datadog forwarder Lambda function. Required when `enableDDTracing` is set to `true`. There is no difference between `forwarderArn` and `forwarder` but please only use one.                                                                                                                                                                                                                 |
+| `forwarderArn`          | Setting this parameter subscribes the Lambda functions' CloudWatch log groups to the given Datadog forwarder Lambda function. Required when `enableDDTracing` is set to `true`.                                                                                                                                                                                                                 |
 | `enableTags`         | When set, automatically tag the Lambda functions with the `service` and `env` tags using the `service` and `stage` values from the serverless application definition. It does NOT override if a `service` or `env` tag already exists. Defaults to `true`.                                                                                                                                      |
 | `injectLogContext`         | When set, the lambda layer will automatically patch console.log with Datadog's tracing ids. Defaults to `true`.                                                                                                                                      |
 | `exclude`         | When set, this plugin will ignore all specified functions. Use this parameter if you have any functions that should not include Datadog functionality. Defaults to `[]`.                                                                                                                                      |
@@ -40,8 +40,6 @@ To further configure your plugin, use the following custom parameters in your `s
 
 
 To use any of these parameters, add a `custom` > `datadog` section to your `serverless.yml` similar to this example:
-
-**Note**: `forwarderArn` and `forwarder`are the same, you can choose between either.
 
 ```yaml
 custom:
@@ -54,8 +52,6 @@ custom:
     enableXrayTracing: false
     enableDDTracing: true
     forwarderArn: arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder
-    # Using `forwarderArn` and `forwarder` will cause subscriptions filters to be deleted and or not created. Please only use one.
-    forwarder: arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder
     enableTags: true
     injectLogContext: true
     exclude: 
@@ -107,7 +103,7 @@ custom:
 
 ### Forwarder
 
-The [Datadog Forwarder Lambda function][7] needs to be installed and subscribed to your Lambda functions' log groups. The plugin automatically creates the log subscriptions when the Forwarder's ARN is supplied via the `forwarderArn` or `forwarder` option, please only use one.
+The [Datadog Forwarder Lambda function][7] needs to be installed and subscribed to your Lambda functions' log groups. The plugin automatically creates the log subscriptions when the Forwarder's ARN is supplied via the `forwarderArn` option.
 
 If you run into the following error, double check the supplied Forwarder ARN is correct and ensure it is from the same region and account where your serverless application is deployed.
 

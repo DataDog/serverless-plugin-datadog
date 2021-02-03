@@ -98,27 +98,24 @@ module.exports = class ServerlessPlugin {
     const forwarderArn: string | undefined = config.forwarderArn;
     const forwarder: string | undefined = config.forwarder;
 
-    let functionArn;
+    let datadogForwarderArn;
     if (config.enabled === false) return;
 
     if (forwarderArn && forwarder) {
-      console.error(
-        "Error: Could not add CloudWatch forwarder subscriptions because both 'forwarderArn' and 'forwarder' parameters are set. 'forwarderArn' and 'forwarder' are equivalent, please only use 'forwarderArn' or 'forwarder'.",
-      );
+      throw new Error("Error: Both 'forwarderArn' and 'forwarder' parameters are set. Please only use the 'forwarderArn' parameter.");
     } else if (forwarderArn !== undefined && forwarder === undefined) {
-      functionArn = forwarderArn;
+      datadogForwarderArn = forwarderArn;
     } else if (forwarder !== undefined && forwarderArn === undefined) {
-      functionArn = forwarder;
+      datadogForwarderArn = forwarder;
     } else {
-      console.error(
-        "Error: Could not add CloudWatch forwarder subscriptions. Please check that your 'forwarderArn' or 'forwarder' parameters are set properly. 'forwarderArn' and 'forwarder' are equivalent, please only use 'forwarderArn' or 'forwarder'",
+      throw new Error(
+        "Error: Could not add CloudWatch forwarder subscriptions. Please check that your 'forwarderArn' parameter is set properly. Also double check the supplied Datadog Forwarder ARN is from the same region and account where your serverless application is deployed.",
       );
-      return;
     }
 
-    if (functionArn) {
+    if (datadogForwarderArn) {
       const aws = this.serverless.getProvider("aws");
-      const errors = await addCloudWatchForwarderSubscriptions(this.serverless.service, aws, functionArn);
+      const errors = await addCloudWatchForwarderSubscriptions(this.serverless.service, aws, datadogForwarderArn);
       for (const error of errors) {
         this.serverless.cli.log(error);
       }
