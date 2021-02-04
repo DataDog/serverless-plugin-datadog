@@ -20,13 +20,21 @@ function serviceWithResources(resources?: Record<string, any>, serviceName = "my
   return service as Service;
 }
 
-function awsMock(existingSubs: { [key: string]: any }, stackName?: string): Aws {
+function awsMock(existingSubs: { [key: string]: any }, stackName?: string, doesAlwaysReject?: boolean): Aws {
   return {
     getStage: () => "dev",
     request: (service, method, params: any) => {
+      if (doesAlwaysReject) {
+        return Promise.reject("Not found.");
+      }
       const logGroupName = params.logGroupName;
-      if (existingSubs[logGroupName]) {
-        return Promise.resolve({ subscriptionFilters: existingSubs[logGroupName] });
+      if (method == "getFunction") {
+        return Promise.resolve();
+      }
+      if (method == "describeSubscriptionFilters") {
+        if (existingSubs[logGroupName]) {
+          return Promise.resolve({ subscriptionFilters: existingSubs[logGroupName] });
+        }
       }
       return Promise.reject("Log group doesn't exist");
     },
@@ -284,5 +292,45 @@ describe("addCloudWatchForwarderSubscriptions", () => {
         },
       }
     `);
+  });
+  it("throws DatadogForwarderNotFoundError when function ARN is not found", async () => {
+    const service = serviceWithResources({
+      FirstGroup: {
+        Type: "AWS::Logs::LogGroup",
+        Properties: {
+          LogGroupName: "/aws/lambda/first-group",
+        },
+      },
+      SecondGroup: {
+        Type: "AWS::Logs::LogGroup",
+        Properties: {
+          LogGroupName: "/aws/lambda/second-group",
+        },
+      },
+      NonLambdaGroup: {
+        Type: "AWS::Logs::LogGroup",
+        Properties: {
+          LogGroupName: "/aws/apigateway/second-group",
+        },
+      },
+      UnrelatedResource: {
+        Type: "AWS::AnotherResourceType",
+        Properties: {},
+      },
+    });
+
+    const aws = awsMock(
+      {
+        "/aws/lambda/serverless-plugin-test-dev-hello": [
+          { filterName: "serverless-plugin-test-dev-HelloLogGroupSubscription" },
+        ],
+      },
+      "myCustomStackName",
+      true,
+    );
+
+    expect(async () => await addCloudWatchForwarderSubscriptions(service, aws, "my-func")).rejects.toThrow(
+      "Could not perform GetFunction on my-func.",
+    );
   });
 });

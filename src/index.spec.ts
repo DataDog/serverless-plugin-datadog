@@ -19,7 +19,12 @@ function awsMock(): Aws {
   return {
     getAccountId: () => Promise.resolve("111111111111"),
     getStage: () => "dev",
-    request: (service, method, params: any) => Promise.reject("Log group doesn't exist"),
+    request: (service, method, params: any) => {
+      if (method == "describeSubscriptionFilters") {
+        return Promise.reject("Log group doesn't exist");
+      }
+      return Promise.resolve();
+    },
     naming: {
       getStackName: () => "",
     } as { [key: string]: () => string },
