@@ -37,9 +37,9 @@ function isLogGroup(value: any): value is LogGroupResource {
   return value.Type === logGroupKey;
 }
 /**
- * Validates whether Lambda function exists in the account
+ * Validates whether Lambda forwarder exists in the account
  * @param aws Serverless framework provided AWS client
- * @param functionArn The ARN to be validated
+ * @param functionArn The forwarder ARN to be validated
  */
 async function doesForwarderExist(aws: Aws, functionArn: string) {
   try {
