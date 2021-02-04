@@ -116,8 +116,6 @@ module.exports = class ServerlessPlugin {
       for (const error of errors) {
         this.serverless.cli.log(error);
       }
-    } else {
-      this.serverless.cli.log("Warning: 'forwarderArn' is not set, skipping CloudWatch Forwarder Subscriptions.");
     }
 
     this.addPluginTag();

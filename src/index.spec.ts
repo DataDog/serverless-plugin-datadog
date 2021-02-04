@@ -223,7 +223,7 @@ describe("ServerlessPlugin", () => {
     afterEach(() => {
       mock.restore();
     });
-    it("adds subscription filters when fowarderArn is set", async () => {
+    it("adds subscription filters when forwarderArn is set", async () => {
       const serverless = {
         cli: { log: () => {} },
         getProvider: (name: string) => awsMock(),
