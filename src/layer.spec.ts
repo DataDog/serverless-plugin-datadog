@@ -39,6 +39,7 @@ describe("findHandlers", () => {
       "func-f": { handler: "myfile.handler", runtime: "python3.7" },
       "func-g": { handler: "myfile.handler", runtime: "python3.8" },
       "func-h": { handler: "myfile.handler", runtime: "nodejs12.x" },
+      "func-i": { handler: "myfile.handler", runtime: "nodejs14.x" },
     });
 
     const result = findHandlers(mockService, []);
@@ -82,6 +83,11 @@ describe("findHandlers", () => {
         handler: { runtime: "nodejs12.x" },
         type: RuntimeType.NODE,
         runtime: "nodejs12.x",
+      },
+      {
+        handler: { runtime: "nodejs14.x" },
+        type: RuntimeType.NODE,
+        runtime: "nodejs14.x",
       },
     ]);
   });
