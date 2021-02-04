@@ -37,7 +37,7 @@ function isLogGroup(value: any): value is LogGroupResource {
   return value.Type === logGroupKey;
 }
 /**
- * Validates whether ARN exists in the account
+ * Validates whether Lambda function exists in the account
  * @param aws Serverless framework provided AWS client
  * @param functionArn The ARN to be validated
  */

@@ -31,8 +31,10 @@ function awsMock(existingSubs: { [key: string]: any }, stackName?: string, doesA
       if (method == "getFunction") {
         return Promise.resolve();
       }
-      if (existingSubs[logGroupName]) {
-        return Promise.resolve({ subscriptionFilters: existingSubs[logGroupName] });
+      if (method == "describeSubscriptionFilters") {
+        if (existingSubs[logGroupName]) {
+          return Promise.resolve({ subscriptionFilters: existingSubs[logGroupName] });
+        }
       }
       return Promise.reject("Log group doesn't exist");
     },
