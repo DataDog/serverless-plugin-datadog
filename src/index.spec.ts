@@ -223,7 +223,41 @@ describe("ServerlessPlugin", () => {
     afterEach(() => {
       mock.restore();
     });
-    it("adds subscription filters when fowarderArn is set", async () => {
+    it("adds subscription filters when forwarderArn is set", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: (name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            compiledCloudFormationTemplate: {
+              Resources: {
+                FirstGroup: {
+                  Type: "AWS::Logs::LogGroup",
+                  Properties: {
+                    LogGroupName: "/aws/lambda/first-group",
+                  },
+                },
+              },
+            },
+          },
+          functions: {},
+          custom: {
+            datadog: {
+              forwarderArn: "some-arn",
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).toHaveProperty(
+        "FirstGroupSubscription",
+      );
+    });
+
+    it("adds subscription filters when forwarder is set", async () => {
       const serverless = {
         cli: { log: () => {} },
         getProvider: awsMock,
@@ -252,8 +286,77 @@ describe("ServerlessPlugin", () => {
       };
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
-
       expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).toHaveProperty(
+        "FirstGroupSubscription",
+      );
+    });
+
+    it("throws an error when forwarderArn and forwarder are set", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: awsMock,
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            compiledCloudFormationTemplate: {
+              Resources: {
+                FirstGroup: {
+                  Type: "AWS::Logs::LogGroup",
+                  Properties: {
+                    LogGroupName: "/aws/lambda/first-group",
+                  },
+                },
+              },
+            },
+          },
+          functions: {},
+          custom: {
+            datadog: {
+              forwarderArn: "some-arn",
+              forwarder: "some-arn",
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      let throwsError;
+      try {
+        await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      } catch (e) {
+        throwsError = true;
+      }
+      expect(throwsError).toBe(true);
+    });
+
+    it("does not add subscription filters when neither the forwarderArn nor the forwarder are set", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: awsMock,
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            compiledCloudFormationTemplate: {
+              Resources: {
+                FirstGroup: {
+                  Type: "AWS::Logs::LogGroup",
+                  Properties: {
+                    LogGroupName: "/aws/lambda/first-group",
+                  },
+                },
+              },
+            },
+          },
+          functions: {},
+          custom: {
+            datadog: {},
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).not.toHaveProperty(
         "FirstGroupSubscription",
       );
     });
