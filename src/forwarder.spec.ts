@@ -332,7 +332,8 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       "Could not perform GetFunction on my-func.",
     );
   });
-  it("skips doesFowarderExist when functionArn is defined with CloudFormation subsitute variables", async () => {
+
+  it("skips doesFowarderExist when functionArn is defined with CloudFormation substitute variables", async () => {
     const service = serviceWithResources({});
     const aws = awsMock(
       {
