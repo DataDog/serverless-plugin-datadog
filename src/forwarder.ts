@@ -42,6 +42,18 @@ export interface CloudFormationObjectArn {
 function isLogGroup(value: any): value is LogGroupResource {
   return value.Type === logGroupKey;
 }
+/**
+ * Validates whether Lambda forwarder exists in the account
+ * @param aws Serverless framework provided AWS client
+ * @param functionArn The forwarder ARN to be validated
+ */
+async function doesForwarderExist(aws: Aws, functionArn: string) {
+  try {
+    await aws.request("Lambda", "getFunction", { FunctionName: functionArn });
+  } catch (err) {
+    throw new DatadogForwarderNotFoundError(`Could not perform GetFunction on ${functionArn}.`);
+  }
+}
 
 /**
  * Validates whether Lambda forwarder exists in the account
@@ -65,6 +77,7 @@ export async function addCloudWatchForwarderSubscriptions(
   if (resources === undefined) {
     return ["No cloudformation stack available. Skipping subscribing Datadog forwarder."];
   }
+  await doesForwarderExist(aws, functionArn);
   const errors = [];
   if (typeof functionArn !== "string") {
     errors.push("Skipping forwarder ARN validation because forwarder string defined with CloudFormation function.");

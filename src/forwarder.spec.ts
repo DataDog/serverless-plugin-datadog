@@ -301,7 +301,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     `);
   });
 
-  it("throws DatadogForwarderNotFoundError when forwarder ARN is not found", async () => {
+  it("throws DatadogForwarderNotFoundError when function ARN is not found", async () => {
     const service = serviceWithResources({
       FirstGroup: {
         Type: "AWS::Logs::LogGroup",
