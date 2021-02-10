@@ -66,7 +66,7 @@ export async function addCloudWatchForwarderSubscriptions(
     return ["No cloudformation stack available. Skipping subscribing Datadog forwarder."];
   }
   const errors = [];
-  if (typeof functionArn != "string") {
+  if (typeof functionArn !== "string") {
     errors.push("Skipping forwarder ARN validation because forwarder string defined with CloudFormation function.");
   } else {
     await validateForwarderArn(aws, functionArn);
