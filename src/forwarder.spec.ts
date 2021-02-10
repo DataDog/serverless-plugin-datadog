@@ -1,6 +1,5 @@
 import Service from "serverless/classes/Service";
-import { addCloudWatchForwarderSubscriptions } from "./forwarder";
-import { canSubscribeLogGroup } from "./forwarder";
+import { addCloudWatchForwarderSubscriptions, CloudFormationObjectArn, canSubscribeLogGroup } from "./forwarder";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
 
 function serviceWithResources(resources?: Record<string, any>, serviceName = "my-service"): Service {
@@ -293,7 +292,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       }
     `);
   });
-  it("throws DatadogForwarderNotFoundError when function ARN is not found", async () => {
+  it("throws DatadogForwarderNotFoundError when forwarder ARN is not found", async () => {
     const service = serviceWithResources({
       FirstGroup: {
         Type: "AWS::Logs::LogGroup",
@@ -332,5 +331,21 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     expect(async () => await addCloudWatchForwarderSubscriptions(service, aws, "my-func")).rejects.toThrow(
       "Could not perform GetFunction on my-func.",
     );
+  });
+  it("skips doesFowarderExist when functionArn is defined with CloudFormation subsitute variables", async () => {
+    const service = serviceWithResources({});
+    const aws = awsMock(
+      {
+        "/aws/lambda/serverless-plugin-test-dev-hello": [
+          { filterName: "serverless-plugin-test-dev-HelloLogGroupSubscription" },
+        ],
+      },
+      "myCustomStackName",
+      true,
+    );
+    const functionArn: CloudFormationObjectArn = {
+      "Fn::Sub": "!Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:datadog-logs-forwarder",
+    };
+    expect(async () => await addCloudWatchForwarderSubscriptions(service, aws, functionArn)).rejects.not.toThrow();
   });
 });

@@ -33,15 +33,22 @@ interface DescribeSubscriptionFiltersResponse {
   }[];
 }
 
+// When users define ARN with CloudFormation functions, the ARN takes this type instead of a string.
+export interface CloudFormationObjectArn {
+  "Fn::Sub"?: string;
+  "arn:aws"?: string;
+}
+
 function isLogGroup(value: any): value is LogGroupResource {
   return value.Type === logGroupKey;
 }
+
 /**
  * Validates whether Lambda forwarder exists in the account
  * @param aws Serverless framework provided AWS client
  * @param functionArn The forwarder ARN to be validated
  */
-async function doesForwarderExist(aws: Aws, functionArn: string) {
+async function validateForwarderArn(aws: Aws, functionArn: CloudFormationObjectArn | string) {
   try {
     await aws.request("Lambda", "getFunction", { FunctionName: functionArn });
   } catch (err) {
@@ -49,13 +56,21 @@ async function doesForwarderExist(aws: Aws, functionArn: string) {
   }
 }
 
-export async function addCloudWatchForwarderSubscriptions(service: Service, aws: Aws, functionArn: string) {
+export async function addCloudWatchForwarderSubscriptions(
+  service: Service,
+  aws: Aws,
+  functionArn: CloudFormationObjectArn | string,
+) {
   const resources = service.provider.compiledCloudFormationTemplate?.Resources;
   if (resources === undefined) {
     return ["No cloudformation stack available. Skipping subscribing Datadog forwarder."];
   }
-  await doesForwarderExist(aws, functionArn);
   const errors = [];
+  if (typeof functionArn != "string") {
+    errors.push("Skipping forwarder ARN validation because forwarder string defined with CloudFormation function.");
+  } else {
+    await validateForwarderArn(aws, functionArn);
+  }
   for (const [name, resource] of Object.entries(resources)) {
     if (!isLogGroup(resource) || !resource.Properties.LogGroupName.startsWith("/aws/lambda/")) {
       continue;
