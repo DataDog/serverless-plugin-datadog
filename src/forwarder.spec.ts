@@ -52,6 +52,7 @@ describe("canSubscribeLogGroup", () => {
     const canSubscribe = await canSubscribeLogGroup(aws, logGroupName, expectedSubName);
     expect(canSubscribe).toBe(true);
   });
+
   it("Returns true if log group has 1 existing Datadog subscription filter.", async () => {
     const aws = awsMock({
       "/aws/lambda/serverless-plugin-test-dev-hello": [
@@ -64,6 +65,7 @@ describe("canSubscribeLogGroup", () => {
     const canSubscribe = await canSubscribeLogGroup(aws, logGroupName, expectedSubName);
     expect(canSubscribe).toBe(true);
   });
+
   it("Returns true if log group has 1 existing non-Datadog subscription filter.", async () => {
     const aws = awsMock({ "/aws/lambda/serverless-plugin-test-dev-hello": [{ filterName: "unknown-filter-name" }] });
     const logGroupName: string = "/aws/lambda/serverless-plugin-test-dev-hello";
@@ -72,6 +74,7 @@ describe("canSubscribeLogGroup", () => {
     const canSubscribe = await canSubscribeLogGroup(aws, logGroupName, expectedSubName);
     expect(canSubscribe).toBe(true);
   });
+
   it("Returns true if log group has 2 existing subscription filters, 1 Datadog subscription filter, and 1 non-Datadog subscription filter.", async () => {
     const aws = awsMock({
       "/aws/lambda/serverless-plugin-test-dev-hello": [
@@ -85,6 +88,7 @@ describe("canSubscribeLogGroup", () => {
     const canSubscribe = await canSubscribeLogGroup(aws, logGroupName, expectedSubName);
     expect(canSubscribe).toBe(true);
   });
+
   it("Returns false if log group has 2 existing non-Datadog subscription filters.", async () => {
     const aws = awsMock({
       "/aws/lambda/serverless-plugin-test-dev-hello": [
@@ -177,6 +181,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       }
     `);
   });
+
   it("doesn't add subscription when two non-Datadog subscriptions already exist", async () => {
     const service = serviceWithResources({
       FirstGroup: {
@@ -203,6 +208,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       }
     `);
   });
+
   it("doesn't add subscription when cloudformation stack isn't available", async () => {
     const service = serviceWithResources(undefined);
 
@@ -215,6 +221,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       ]
     `);
   });
+
   it("adds a subscription when an known subscription already exists", async () => {
     const service = serviceWithResources(
       {
@@ -252,6 +259,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       }
     `);
   });
+
   it("adds a subscription when an known subscription already exists and the stack name is defined", async () => {
     const service = serviceWithResources(
       {
@@ -292,6 +300,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       }
     `);
   });
+
   it("throws DatadogForwarderNotFoundError when forwarder ARN is not found", async () => {
     const service = serviceWithResources({
       FirstGroup: {
