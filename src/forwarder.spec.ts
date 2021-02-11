@@ -1,6 +1,5 @@
 import Service from "serverless/classes/Service";
-import { addCloudWatchForwarderSubscriptions } from "./forwarder";
-import { canSubscribeLogGroup } from "./forwarder";
+import { addCloudWatchForwarderSubscriptions, CloudFormationObjectArn, canSubscribeLogGroup } from "./forwarder";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
 
 function serviceWithResources(resources?: Record<string, any>, serviceName = "my-service"): Service {
@@ -53,6 +52,7 @@ describe("canSubscribeLogGroup", () => {
     const canSubscribe = await canSubscribeLogGroup(aws, logGroupName, expectedSubName);
     expect(canSubscribe).toBe(true);
   });
+
   it("Returns true if log group has 1 existing Datadog subscription filter.", async () => {
     const aws = awsMock({
       "/aws/lambda/serverless-plugin-test-dev-hello": [
@@ -65,6 +65,7 @@ describe("canSubscribeLogGroup", () => {
     const canSubscribe = await canSubscribeLogGroup(aws, logGroupName, expectedSubName);
     expect(canSubscribe).toBe(true);
   });
+
   it("Returns true if log group has 1 existing non-Datadog subscription filter.", async () => {
     const aws = awsMock({ "/aws/lambda/serverless-plugin-test-dev-hello": [{ filterName: "unknown-filter-name" }] });
     const logGroupName: string = "/aws/lambda/serverless-plugin-test-dev-hello";
@@ -73,6 +74,7 @@ describe("canSubscribeLogGroup", () => {
     const canSubscribe = await canSubscribeLogGroup(aws, logGroupName, expectedSubName);
     expect(canSubscribe).toBe(true);
   });
+
   it("Returns true if log group has 2 existing subscription filters, 1 Datadog subscription filter, and 1 non-Datadog subscription filter.", async () => {
     const aws = awsMock({
       "/aws/lambda/serverless-plugin-test-dev-hello": [
@@ -86,6 +88,7 @@ describe("canSubscribeLogGroup", () => {
     const canSubscribe = await canSubscribeLogGroup(aws, logGroupName, expectedSubName);
     expect(canSubscribe).toBe(true);
   });
+
   it("Returns false if log group has 2 existing non-Datadog subscription filters.", async () => {
     const aws = awsMock({
       "/aws/lambda/serverless-plugin-test-dev-hello": [
@@ -178,6 +181,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       }
     `);
   });
+
   it("doesn't add subscription when two non-Datadog subscriptions already exist", async () => {
     const service = serviceWithResources({
       FirstGroup: {
@@ -204,6 +208,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       }
     `);
   });
+
   it("doesn't add subscription when cloudformation stack isn't available", async () => {
     const service = serviceWithResources(undefined);
 
@@ -216,6 +221,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       ]
     `);
   });
+
   it("adds a subscription when an known subscription already exists", async () => {
     const service = serviceWithResources(
       {
@@ -253,6 +259,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       }
     `);
   });
+
   it("adds a subscription when an known subscription already exists and the stack name is defined", async () => {
     const service = serviceWithResources(
       {
@@ -293,6 +300,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       }
     `);
   });
+
   it("throws DatadogForwarderNotFoundError when function ARN is not found", async () => {
     const service = serviceWithResources({
       FirstGroup: {
@@ -332,5 +340,22 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     expect(async () => await addCloudWatchForwarderSubscriptions(service, aws, "my-func")).rejects.toThrow(
       "Could not perform GetFunction on my-func.",
     );
+  });
+
+  it("skips doesFowarderExist when functionArn is defined with CloudFormation substitute variables", async () => {
+    const service = serviceWithResources({});
+    const aws = awsMock(
+      {
+        "/aws/lambda/serverless-plugin-test-dev-hello": [
+          { filterName: "serverless-plugin-test-dev-HelloLogGroupSubscription" },
+        ],
+      },
+      "myCustomStackName",
+      true,
+    );
+    const functionArn: CloudFormationObjectArn = {
+      "Fn::Sub": "!Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:datadog-logs-forwarder",
+    };
+    expect(async () => await addCloudWatchForwarderSubscriptions(service, aws, functionArn)).rejects.not.toThrow();
   });
 });
