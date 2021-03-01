@@ -13,8 +13,8 @@
 
 set -e
 
-LAYER_NAMES=("Datadog-Node8-10" "Datadog-Node10-x" "Datadog-Node12-x" "Datadog-Node14-x" "Datadog-Python27" "Datadog-Python36" "Datadog-Python37" "Datadog-Python38")
-JSON_LAYER_NAMES=("nodejs8.10" "nodejs10.x" "nodejs12.x" "nodejs14.x" "python2.7" "python3.6" "python3.7" "python3.8")
+LAYER_NAMES=("Datadog-Node8-10" "Datadog-Node10-x" "Datadog-Node12-x" "Datadog-Node14-x" "Datadog-Python27" "Datadog-Python36" "Datadog-Python37" "Datadog-Python38" "Datadog-Extension")
+JSON_LAYER_NAMES=("nodejs8.10" "nodejs10.x" "nodejs12.x" "nodejs14.x" "python2.7" "python3.6" "python3.7" "python3.8" "extension")
 AVAILABLE_REGIONS=$(aws ec2 describe-regions | jq -r '.[] | .[] | .RegionName')
 
 FILE_NAME="src/layers.json"

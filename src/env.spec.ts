@@ -85,6 +85,32 @@ describe("getConfig", () => {
       site: "datadoghq.com",
       enableXrayTracing: false,
       enableDDTracing: true,
+      enableDDExtension: false,
+      enableTags: true,
+      injectLogContext: true,
+      exclude: [],
+    });
+  });
+
+  it("gets a mixed configuration when enableDDExtension is set", () => {
+    const result = getConfig({
+      custom: {
+        datadog: {
+          apiKey: "1234",
+          logLevel: "debug",
+          enableDDExtension: true,
+        },
+      },
+    } as any);
+    expect(result).toEqual({
+      addLayers: true,
+      apiKey: "1234",
+      flushMetricsToLogs: true,
+      logLevel: "debug",
+      site: "datadoghq.com",
+      enableXrayTracing: false,
+      enableDDTracing: true,
+      enableDDExtension: true,
       enableTags: true,
       injectLogContext: true,
       exclude: [],
@@ -180,6 +206,7 @@ describe("setEnvConfiguration", () => {
         flushMetricsToLogs: true,
         enableXrayTracing: true,
         enableDDTracing: true,
+        enableDDExtension: false,
         enableTags: true,
         injectLogContext: false,
         exclude: ["dd-excluded-function"],
@@ -225,6 +252,7 @@ describe("setEnvConfiguration", () => {
         flushMetricsToLogs: false,
         enableXrayTracing: true,
         enableDDTracing: true,
+        enableDDExtension: false,
         enableTags: true,
         injectLogContext: true,
         exclude: [],

@@ -27,6 +27,8 @@ export interface Configuration {
   enableXrayTracing: boolean;
   // Enable tracing on Lambda function using dd-trace, datadog's APM library.
   enableDDTracing: boolean;
+  // Enable Datadog Lambda Extension to send data without the need of the Datadog Forwarder.
+  enableDDExtension: boolean;
 
   // When either is set, the plugin will subscribe the lambdas to the forwarder with the given arn.
   forwarderArn?: string;
@@ -56,6 +58,7 @@ export const defaultConfiguration: Configuration = {
   site: "datadoghq.com",
   enableXrayTracing: false,
   enableDDTracing: true,
+  enableDDExtension: false,
   enableTags: true,
   injectLogContext: true,
   exclude: [],

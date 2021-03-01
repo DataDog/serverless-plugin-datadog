@@ -12,6 +12,7 @@ import mock from "mock-fs";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
 import { FunctionDefinition } from "serverless";
 import { ExtendedFunctionDefinition } from "./index";
+import { Configuration, defaultConfiguration } from "./env";
 
 const SEM_VER_REGEX = /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$/;
 
@@ -219,6 +220,210 @@ describe("ServerlessPlugin", () => {
       });
     });
   });
+
+  describe("validateConfiguration", () => {
+    afterEach(() => {
+      mock.restore();
+    });
+
+    it("throws error if both API key and KMS API key are defined", async () => {
+      mock({});
+      const serverless = {
+        cli: {
+          log: () => {},
+        },
+        service: {
+          provider: {
+            region: "us-east-1",
+          },
+          functions: {
+            node1: {
+              handler: "my-func.ev",
+              runtime: "nodejs8.10",
+            },
+          },
+          custom: {
+            datadog: {
+              apiKey: "1234",
+              apiKMSKey: "5678",
+            },
+          },
+        },
+      };
+
+      const plugin = new ServerlessPlugin(serverless, {});
+      let threwError: boolean = false;
+      let thrownErrorMessage: string | undefined;
+      try {
+        await plugin.hooks["after:package:initialize"]();
+      } catch (e) {
+        threwError = true;
+        thrownErrorMessage = e.message;
+      }
+      expect(threwError).toBe(true);
+      expect(thrownErrorMessage).toEqual("`apiKey` and `apiKMSKey` should not be set at the same time.");
+    });
+
+    it("throws an error when site is set to an invalid site URL", async () => {
+      mock({});
+      const serverless = {
+        cli: {
+          log: () => {},
+        },
+        service: {
+          provider: {
+            region: "us-east-1",
+          },
+          functions: {
+            node1: {
+              handler: "my-func.ev",
+              runtime: "nodejs8.10",
+            },
+          },
+          custom: {
+            datadog: {
+              site: "datadogehq.com",
+            },
+          },
+        },
+      };
+
+      const plugin = new ServerlessPlugin(serverless, {});
+      let threwError: boolean = false;
+      let thrownErrorMessage: string | undefined;
+      try {
+        await plugin.hooks["after:package:initialize"]();
+      } catch (e) {
+        threwError = true;
+        thrownErrorMessage = e.message;
+      }
+      expect(threwError).toBe(true);
+      expect(thrownErrorMessage).toEqual(
+        "Warning: Invalid site URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, or ddog-gov.com.",
+      );
+    });
+
+    it("throws an error when enableDDExtension and forwarder are set", async () => {
+      mock({});
+      const serverless = {
+        cli: {
+          log: () => {},
+        },
+        service: {
+          provider: {
+            region: "us-east-1",
+          },
+          functions: {
+            node1: {
+              handler: "my-func.ev",
+              runtime: "nodejs8.10",
+            },
+          },
+          custom: {
+            datadog: {
+              forwarder: "forwarder",
+              enableDDExtension: true,
+            },
+          },
+        },
+      };
+
+      const plugin = new ServerlessPlugin(serverless, {});
+      let threwError: boolean = false;
+      let thrownErrorMessage: string | undefined;
+      try {
+        await plugin.hooks["after:package:initialize"]();
+      } catch (e) {
+        threwError = true;
+        thrownErrorMessage = e.message;
+      }
+      expect(threwError).toBe(true);
+      expect(thrownErrorMessage).toEqual(
+        "`enableDDExtension` and `forwarder`/`forwarderArn` should not be set at the same time.",
+      );
+    });
+
+    it("throws an error when enableDDExtension and forwarderArn are set", async () => {
+      mock({});
+      const serverless = {
+        cli: {
+          log: () => {},
+        },
+        service: {
+          provider: {
+            region: "us-east-1",
+          },
+          functions: {
+            node1: {
+              handler: "my-func.ev",
+              runtime: "nodejs8.10",
+            },
+          },
+          custom: {
+            datadog: {
+              forwarderArn: "forwarder",
+              enableDDExtension: true,
+            },
+          },
+        },
+      };
+
+      const plugin = new ServerlessPlugin(serverless, {});
+      let threwError: boolean = false;
+      let thrownErrorMessage: string | undefined;
+      try {
+        await plugin.hooks["after:package:initialize"]();
+      } catch (e) {
+        threwError = true;
+        thrownErrorMessage = e.message;
+      }
+      expect(threwError).toBe(true);
+      expect(thrownErrorMessage).toEqual(
+        "`enableDDExtension` and `forwarder`/`forwarderArn` should not be set at the same time.",
+      );
+    });
+
+    it("throws an error when `flushMetricsToLogs` and `enableDDExtension` are set", async () => {
+      mock({});
+      const serverless = {
+        cli: {
+          log: () => {},
+        },
+        service: {
+          provider: {
+            region: "us-east-1",
+          },
+          functions: {
+            node1: {
+              handler: "my-func.ev",
+              runtime: "nodejs8.10",
+            },
+          },
+          custom: {
+            datadog: {
+              flushMetricsToLogs: true,
+              enableDDExtension: true,
+            },
+          },
+        },
+      };
+
+      const plugin = new ServerlessPlugin(serverless, {});
+      let threwError: boolean = false;
+      let thrownErrorMessage: string | undefined;
+      try {
+        await plugin.hooks["after:package:initialize"]();
+      } catch (e) {
+        threwError = true;
+        thrownErrorMessage = e.message;
+      }
+      expect(threwError).toBe(true);
+      expect(thrownErrorMessage).toEqual(
+        "`enableDDExtension and `flushMetricsToLogs` should not be set at the same time.",
+      );
+    });
+  });
+
   describe("afterPackageFunction", () => {
     afterEach(() => {
       mock.restore();

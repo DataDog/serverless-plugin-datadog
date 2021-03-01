@@ -11,7 +11,7 @@ import * as layers from "./layers.json";
 import * as govLayers from "./layers-gov.json";
 import { version } from "../package.json";
 
-import { getConfig, setEnvConfiguration, forceExcludeDepsFromWebpack, hasWebpackPlugin } from "./env";
+import { getConfig, setEnvConfiguration, forceExcludeDepsFromWebpack, hasWebpackPlugin, Configuration } from "./env";
 import { applyLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
 import { TracingMode, enableTracing } from "./tracing";
 import { redirectHandlers } from "./wrapper";
@@ -66,6 +66,8 @@ module.exports = class ServerlessPlugin {
     const config = getConfig(this.serverless.service);
     if (config.enabled === false) return;
     this.serverless.cli.log("Auto instrumenting functions with Datadog");
+    if (config.enableDDExtension) this.serverless.cli.log("Utilizing the Datadog Extension");
+    validateConfiguration(config);
     setEnvConfiguration(config, this.serverless.service);
 
     const defaultRuntime = this.serverless.service.provider.runtime;
@@ -74,7 +76,7 @@ module.exports = class ServerlessPlugin {
       this.serverless.cli.log("Adding Lambda Layers to functions");
       this.debugLogHandlers(handlers);
       const allLayers = { regions: { ...layers.regions, ...govLayers.regions } };
-      applyLayers(this.serverless.service.provider.region, handlers, allLayers);
+      applyLayers(this.serverless.service.provider.region, handlers, allLayers, config.enableDDExtension);
       if (hasWebpackPlugin(this.serverless.service)) {
         forceExcludeDepsFromWebpack(this.serverless.service);
       }
@@ -100,24 +102,25 @@ module.exports = class ServerlessPlugin {
 
     let datadogForwarderArn;
     if (config.enabled === false) return;
-    if (forwarderArn && forwarder) {
-      throw new Error(
-        "Both 'forwarderArn' and 'forwarder' parameters are set. Please only use the 'forwarderArn' parameter.",
-      );
-    } else if (forwarderArn !== undefined && forwarder === undefined) {
-      datadogForwarderArn = forwarderArn;
-    } else if (forwarder !== undefined && forwarderArn === undefined) {
-      datadogForwarderArn = forwarder;
-    }
+    if (config.enableDDExtension === false) {
+      if (forwarderArn && forwarder) {
+        throw new Error(
+          "Both 'forwarderArn' and 'forwarder' parameters are set. Please only use the 'forwarderArn' parameter.",
+        );
+      } else if (forwarderArn !== undefined && forwarder === undefined) {
+        datadogForwarderArn = forwarderArn;
+      } else if (forwarder !== undefined && forwarderArn === undefined) {
+        datadogForwarderArn = forwarder;
+      }
 
-    if (datadogForwarderArn) {
-      const aws = this.serverless.getProvider("aws");
-      const errors = await addCloudWatchForwarderSubscriptions(this.serverless.service, aws, datadogForwarderArn);
-      for (const error of errors) {
-        this.serverless.cli.log(error);
+      if (datadogForwarderArn) {
+        const aws = this.serverless.getProvider("aws");
+        const errors = await addCloudWatchForwarderSubscriptions(this.serverless.service, aws, datadogForwarderArn);
+        for (const error of errors) {
+          this.serverless.cli.log(error);
+        }
       }
     }
-
     this.addPluginTag();
 
     if (config.enableTags) {
@@ -207,3 +210,24 @@ module.exports = class ServerlessPlugin {
     });
   }
 };
+
+function validateConfiguration(config: Configuration) {
+  const siteList: string[] = ["datadoghq.com", "datadoghq.eu", "us3.datadoghq.com", "ddog-gov.com"];
+  if (config.apiKey !== undefined && config.apiKMSKey !== undefined) {
+    throw new Error("`apiKey` and `apiKMSKey` should not be set at the same time.");
+  }
+
+  if (config.site !== undefined && !siteList.includes(config.site.toLowerCase())) {
+    throw new Error(
+      "Warning: Invalid site URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, or ddog-gov.com.",
+    );
+  }
+  if (config.enableDDExtension) {
+    if (config.forwarder || config.forwarderArn) {
+      throw new Error("`enableDDExtension` and `forwarder`/`forwarderArn` should not be set at the same time.");
+    }
+    if (config.flushMetricsToLogs) {
+      throw new Error("`enableDDExtension and `flushMetricsToLogs` should not be set at the same time.");
+    }
+  }
+}
