@@ -7,24 +7,19 @@
 
 set -e
 
+# Ensure on master, and pull the latest
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 if [ $BRANCH != "master" ]; then
     echo "Not on master, aborting"
     exit 1
+else
+    echo "Updating master"
+    git pull origin master
 fi
 
-if [ -z "$AWS_ACCESS_KEY_ID" ]; then
-    echo 'AWS_ACCESS_KEY_ID not set. Are you using aws-vault?'
-    exit 1
-fi
-
-if [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
-    echo 'AWS_SECRET_ACCESS_KEY not set. Are you using aws-vault?'
-    exit 1
-fi
-
-if [ -z "$AWS_SESSION_TOKEN" ]; then
-    echo 'AWS_SESSION_TOKEN not set. Are you using aws-vault?'
+# Ensure no uncommitted changes
+if [ -n "$(git status --porcelain)" ]; then 
+    echo "Detected uncommitted changes, aborting"
     exit 1
 fi
 
@@ -49,15 +44,26 @@ if [ "$CONT" != "y" ]; then
     exit 1
 fi
 
+# Verify NPM access before updating layer arns (slow)
 yarn login
 
-echo "Updating layer versions"
-./scripts/generate_layers_json.sh
+if [ "$UPDATE_LAYERS" == "true" ]; then
+    # Verify AWS access before running the time-consuming generate_layers_json.sh
+    saml2aws login -a govcloud-us1-fed-human-engineering
+    AWS_PROFILE=govcloud-us1-fed-human-engineering aws sts get-caller-identity
+    aws-vault exec prod-engineering -- aws sts get-caller-identity
 
-files_changed=$(git status --porcelain)
-if [[ $files_changed == *"src/layers.json"* ]]; then
-    echo "Layers updated, committing changes"
-    git commit src/layers.json -m "Update layer versions"
+    echo "Updating layer versions for GovCloud AWS accounts"
+    AWS_PROFILE=govcloud-us1-fed-human-engineering ./scripts/generate_layers_json.sh -g
+
+    echo "Updating layer versions for commercial AWS accounts"
+    aws-vault exec prod-engineering -- ./scripts/generate_layers_json.sh
+
+    # Commit layer updates if needed
+    if [[ $(git status --porcelain) == *"src/layers"* ]]; then
+        echo "Layers updated, committing changes"
+        git commit src/layers.json src/layers-gov.json -m "Update layer versions"
+    fi
 fi
 
 echo "Bumping the version number and committing the changes"
@@ -71,3 +77,6 @@ yarn publish --new-version "$VERSION"
 echo 'Pushing updates to github'
 git push origin master
 git push origin "refs/tags/v$VERSION"
+
+echo "DONE! Please create a new release using the link below."
+echo "https://github.com/DataDog/serverless-plugin-datadog/releases/new?tag=v$VERSION&title=v$VERSION"
