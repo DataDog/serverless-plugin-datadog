@@ -12,7 +12,7 @@ import * as govLayers from "./layers-gov.json";
 import { version } from "../package.json";
 
 import { getConfig, setEnvConfiguration, forceExcludeDepsFromWebpack, hasWebpackPlugin, Configuration } from "./env";
-import { applyLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
+import { applyExtensionLayer, applyLambdaLibraryLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
 import { TracingMode, enableTracing } from "./tracing";
 import { redirectHandlers } from "./wrapper";
 import { addCloudWatchForwarderSubscriptions } from "./forwarder";
@@ -66,22 +66,29 @@ module.exports = class ServerlessPlugin {
     const config = getConfig(this.serverless.service);
     if (config.enabled === false) return;
     this.serverless.cli.log("Auto instrumenting functions with Datadog");
-    if (config.enableDDExtension) this.serverless.cli.log("Utilizing the Datadog Extension");
     validateConfiguration(config);
     setEnvConfiguration(config, this.serverless.service);
 
     const defaultRuntime = this.serverless.service.provider.runtime;
     const handlers = findHandlers(this.serverless.service, config.exclude, defaultRuntime);
+    const allLayers = { regions: { ...layers.regions, ...govLayers.regions } };
     if (config.addLayers) {
-      this.serverless.cli.log("Adding Lambda Layers to functions");
+      this.serverless.cli.log("Adding Lambda library Layers to functions");
       this.debugLogHandlers(handlers);
-      const allLayers = { regions: { ...layers.regions, ...govLayers.regions } };
-      applyLayers(this.serverless.service.provider.region, handlers, allLayers, config.enableDDExtension);
+      applyLambdaLibraryLayers(this.serverless.service.provider.region, handlers, allLayers);
       if (hasWebpackPlugin(this.serverless.service)) {
         forceExcludeDepsFromWebpack(this.serverless.service);
       }
     } else {
-      this.serverless.cli.log("Skipping adding Lambda Layers, make sure you are packaging them yourself");
+      this.serverless.cli.log("Skipping adding Lambda library Layers, make sure you are packaging them yourself");
+    }
+
+    if (config.addExtension) {
+      this.serverless.cli.log("Adding Datadog Lambda Extension layer to functions");
+      this.debugLogHandlers(handlers);
+      applyExtensionLayer(this.serverless.service.provider.region, handlers, allLayers);
+    } else {
+      this.serverless.cli.log("Skipping adding Lambda Extension Layer");
     }
 
     let tracingMode = TracingMode.NONE;
@@ -102,7 +109,7 @@ module.exports = class ServerlessPlugin {
 
     let datadogForwarderArn;
     if (config.enabled === false) return;
-    if (config.enableDDExtension === false) {
+    if (config.addExtension === false) {
       if (forwarderArn && forwarder) {
         throw new Error(
           "Both 'forwarderArn' and 'forwarder' parameters are set. Please only use the 'forwarderArn' parameter.",
@@ -222,12 +229,17 @@ function validateConfiguration(config: Configuration) {
       "Warning: Invalid site URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, or ddog-gov.com.",
     );
   }
-  if (config.enableDDExtension) {
+  if (config.addExtension) {
     if (config.forwarder || config.forwarderArn) {
-      throw new Error("`enableDDExtension` and `forwarder`/`forwarderArn` should not be set at the same time.");
+      throw new Error("`addExtension` and `forwarder`/`forwarderArn` should not be set at the same time.");
     }
     if (config.flushMetricsToLogs) {
-      throw new Error("`enableDDExtension and `flushMetricsToLogs` should not be set at the same time.");
+      throw new Error(
+        "`addExtension` and `flushMetricsToLogs` should not be set to true at the same time. `flushMetricsToLogs` is true by default.",
+      );
+    }
+    if (config.apiKey === undefined && config.apiKMSKey === undefined) {
+      throw new Error("When `addExtension` is true, `apiKey` or `apiKMSKey` must also be set.");
     }
   }
 }

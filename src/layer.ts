@@ -62,7 +62,7 @@ export function findHandlers(service: Service, exclude: string[], defaultRuntime
     ) as FunctionInfo[];
 }
 
-export function applyLayers(region: string, handlers: FunctionInfo[], layers: LayerJSON, applyExtensionLayer: boolean) {
+export function applyLambdaLibraryLayers(region: string, handlers: FunctionInfo[], layers: LayerJSON) {
   const regionRuntimes = layers.regions[region];
   if (regionRuntimes === undefined) {
     return;
@@ -75,17 +75,29 @@ export function applyLayers(region: string, handlers: FunctionInfo[], layers: La
 
     const { runtime } = handler;
     const lambdaLayerARN = runtime !== undefined ? regionRuntimes[runtime] : undefined;
-    let extensionLayerARN: string | undefined;
-    if (applyExtensionLayer) extensionLayerARN = regionRuntimes[extensionLayerKey];
     let currentLayers = getLayers(handler);
 
-    if (lambdaLayerARN && extensionLayerARN) {
-      currentLayers = pushLayerARN([lambdaLayerARN, extensionLayerARN], currentLayers);
-      setLayers(handler, currentLayers);
-    } else if (lambdaLayerARN) {
+    if (lambdaLayerARN) {
       currentLayers = pushLayerARN([lambdaLayerARN], currentLayers);
       setLayers(handler, currentLayers);
-    } else if (extensionLayerARN) {
+    }
+  }
+}
+
+export function applyExtensionLayer(region: string, handlers: FunctionInfo[], layers: LayerJSON) {
+  const regionRuntimes = layers.regions[region];
+  if (regionRuntimes === undefined) {
+    return;
+  }
+
+  for (const handler of handlers) {
+    if (handler.type === RuntimeType.UNSUPPORTED) {
+      continue;
+    }
+    let extensionLayerARN: string | undefined;
+    extensionLayerARN = regionRuntimes[extensionLayerKey];
+    let currentLayers = getLayers(handler);
+    if (extensionLayerARN) {
       currentLayers = pushLayerARN([extensionLayerARN], currentLayers);
       setLayers(handler, currentLayers);
     }

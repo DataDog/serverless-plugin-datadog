@@ -49,7 +49,7 @@ describe("ServerlessPlugin", () => {
       mock.restore();
     });
 
-    it("adds lambda layers by default and doesn't change handler", async () => {
+    it("adds lambda library layers by default and doesn't change handler", async () => {
       mock({});
       const serverless = {
         cli: {
@@ -76,6 +76,99 @@ describe("ServerlessPlugin", () => {
             node1: {
               handler: "my-func.ev",
               layers: [expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:.*/)],
+              runtime: "nodejs8.10",
+            },
+          },
+          provider: {
+            region: "us-east-1",
+          },
+        },
+      });
+    });
+
+    it("only adds lambda Extension layer when `addExtension` is true and `addLayers` is false", async () => {
+      mock({});
+      const serverless = {
+        cli: {
+          log: () => {},
+        },
+        service: {
+          provider: {
+            region: "us-east-1",
+          },
+          functions: {
+            node1: {
+              handler: "my-func.ev",
+              runtime: "nodejs8.10",
+            },
+          },
+          custom: {
+            datadog: {
+              addExtension: true,
+              flushMetricsToLogs: false,
+              addLayers: false,
+              apiKMSKey: "1234",
+            },
+          },
+        },
+      };
+
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:initialize"]();
+      expect(serverless).toMatchObject({
+        service: {
+          functions: {
+            node1: {
+              handler: "my-func.ev",
+              layers: [expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:Datadog-Extension\:.*/)],
+              runtime: "nodejs8.10",
+            },
+          },
+          provider: {
+            region: "us-east-1",
+          },
+        },
+      });
+    });
+
+    it("adds the lambda Extension and library layers when `addExtension` and `addLayers` parameters are true", async () => {
+      mock({});
+      const serverless = {
+        cli: {
+          log: () => {},
+        },
+        service: {
+          provider: {
+            region: "us-east-1",
+          },
+          functions: {
+            node1: {
+              handler: "my-func.ev",
+              runtime: "nodejs8.10",
+            },
+          },
+          custom: {
+            datadog: {
+              addExtension: true,
+              flushMetricsToLogs: false,
+              addLayers: true, // defauts to true
+              apiKey: "1234",
+            },
+          },
+        },
+      };
+
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:initialize"]();
+      expect(serverless).toMatchObject({
+        service: {
+          functions: {
+            node1: {
+              handler: "my-func.ev",
+              layers: [
+                expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:.*/),
+                expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:Datadog-Extension\:.*/),
+              ],
               runtime: "nodejs8.10",
             },
           },
@@ -303,7 +396,7 @@ describe("ServerlessPlugin", () => {
       );
     });
 
-    it("throws an error when enableDDExtension and forwarder are set", async () => {
+    it("throws an error when addExtension and forwarder are set", async () => {
       mock({});
       const serverless = {
         cli: {
@@ -322,7 +415,7 @@ describe("ServerlessPlugin", () => {
           custom: {
             datadog: {
               forwarder: "forwarder",
-              enableDDExtension: true,
+              addExtension: true,
             },
           },
         },
@@ -339,11 +432,11 @@ describe("ServerlessPlugin", () => {
       }
       expect(threwError).toBe(true);
       expect(thrownErrorMessage).toEqual(
-        "`enableDDExtension` and `forwarder`/`forwarderArn` should not be set at the same time.",
+        "`addExtension` and `forwarder`/`forwarderArn` should not be set at the same time.",
       );
     });
 
-    it("throws an error when enableDDExtension and forwarderArn are set", async () => {
+    it("throws an error when addExtension and forwarderArn are set", async () => {
       mock({});
       const serverless = {
         cli: {
@@ -362,7 +455,7 @@ describe("ServerlessPlugin", () => {
           custom: {
             datadog: {
               forwarderArn: "forwarder",
-              enableDDExtension: true,
+              addExtension: true,
             },
           },
         },
@@ -379,11 +472,11 @@ describe("ServerlessPlugin", () => {
       }
       expect(threwError).toBe(true);
       expect(thrownErrorMessage).toEqual(
-        "`enableDDExtension` and `forwarder`/`forwarderArn` should not be set at the same time.",
+        "`addExtension` and `forwarder`/`forwarderArn` should not be set at the same time.",
       );
     });
 
-    it("throws an error when `flushMetricsToLogs` and `enableDDExtension` are set", async () => {
+    it("throws an error when flushMetricsToLogs and addExtension are set", async () => {
       mock({});
       const serverless = {
         cli: {
@@ -402,7 +495,7 @@ describe("ServerlessPlugin", () => {
           custom: {
             datadog: {
               flushMetricsToLogs: true,
-              enableDDExtension: true,
+              addExtension: true,
             },
           },
         },
@@ -419,8 +512,46 @@ describe("ServerlessPlugin", () => {
       }
       expect(threwError).toBe(true);
       expect(thrownErrorMessage).toEqual(
-        "`enableDDExtension and `flushMetricsToLogs` should not be set at the same time.",
+        "`addExtension` and `flushMetricsToLogs` should not be set to true at the same time. `flushMetricsToLogs` is true by default.",
       );
+    });
+
+    it("throws error when addExtension is true and both API key and KMS API key are undefined", async () => {
+      mock({});
+      const serverless = {
+        cli: {
+          log: () => {},
+        },
+        service: {
+          provider: {
+            region: "us-east-1",
+          },
+          functions: {
+            node1: {
+              handler: "my-func.ev",
+              runtime: "nodejs8.10",
+            },
+          },
+          custom: {
+            datadog: {
+              addExtension: true,
+              flushMetricsToLogs: false,
+            },
+          },
+        },
+      };
+
+      const plugin = new ServerlessPlugin(serverless, {});
+      let threwError: boolean = false;
+      let thrownErrorMessage: string | undefined;
+      try {
+        await plugin.hooks["after:package:initialize"]();
+      } catch (e) {
+        threwError = true;
+        thrownErrorMessage = e.message;
+      }
+      expect(threwError).toBe(true);
+      expect(thrownErrorMessage).toEqual("When `addExtension` is true, `apiKey` or `apiKMSKey` must also be set.");
     });
   });
 
