@@ -73,18 +73,18 @@ module.exports = class ServerlessPlugin {
     const handlers = findHandlers(this.serverless.service, config.exclude, defaultRuntime);
     const allLayers = { regions: { ...layers.regions, ...govLayers.regions } };
     if (config.addLayers) {
-      this.serverless.cli.log("Adding Lambda library Layers to functions");
+      this.serverless.cli.log("Adding Lambda Library Layers to functions");
       this.debugLogHandlers(handlers);
       applyLambdaLibraryLayers(this.serverless.service.provider.region, handlers, allLayers);
       if (hasWebpackPlugin(this.serverless.service)) {
         forceExcludeDepsFromWebpack(this.serverless.service);
       }
     } else {
-      this.serverless.cli.log("Skipping adding Lambda library Layers, make sure you are packaging them yourself");
+      this.serverless.cli.log("Skipping adding Lambda Library Layers, make sure you are packaging them yourself");
     }
 
     if (config.addExtension) {
-      this.serverless.cli.log("Adding Datadog Lambda Extension layer to functions");
+      this.serverless.cli.log("Adding Datadog Lambda Extension Layer to functions");
       this.debugLogHandlers(handlers);
       applyExtensionLayer(this.serverless.service.provider.region, handlers, allLayers);
     } else {
