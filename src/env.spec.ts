@@ -92,7 +92,7 @@ describe("getConfig", () => {
     });
   });
 
-  it("gets a mixed configuration when addExtension is set", () => {
+  it("sets addExtension to true", () => {
     const result = getConfig({
       custom: {
         datadog: {
