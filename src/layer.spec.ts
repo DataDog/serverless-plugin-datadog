@@ -6,7 +6,15 @@
  * Copyright 2019 Datadog, Inc.
  */
 
-import { FunctionInfo, LayerJSON, RuntimeType, applyLayers, findHandlers } from "./layer";
+import {
+  FunctionInfo,
+  LayerJSON,
+  RuntimeType,
+  applyLambdaLibraryLayers,
+  applyExtensionLayer,
+  findHandlers,
+  pushLayerARN,
+} from "./layer";
 
 import { FunctionDefinition, FunctionDefinitionHandler, FunctionDefinitionImage } from "serverless";
 import Service from "serverless/classes/Service";
@@ -91,6 +99,7 @@ describe("findHandlers", () => {
       },
     ]);
   });
+
   it("uses regular node runtime", () => {
     const mockService = createMockService("us-east-1", {
       "func-a": { handler: "myfile.handler" },
@@ -104,123 +113,185 @@ describe("findHandlers", () => {
       },
     ]);
   });
+});
 
-  describe("applyLayers", () => {
-    it("adds a layer array if none are present", () => {
-      const handler = {
-        handler: { runtime: "nodejs10.x" },
-        type: RuntimeType.NODE,
-        runtime: "nodejs10.x",
-      } as FunctionInfo;
-      const layers: LayerJSON = {
-        regions: { "us-east-1": { "nodejs10.x": "node:2" } },
-      };
-      applyLayers("us-east-1", [handler], layers);
-      expect(handler.handler).toEqual({
-        runtime: "nodejs10.x",
-        layers: ["node:2"],
-      });
+describe("applyLambdaLibraryLayers", () => {
+  it("adds a layer array if none are present", () => {
+    const handler = {
+      handler: { runtime: "nodejs10.x" },
+      type: RuntimeType.NODE,
+      runtime: "nodejs10.x",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: { "us-east-1": { "nodejs10.x": "node:2" } },
+    };
+    applyLambdaLibraryLayers("us-east-1", [handler], layers);
+    expect(handler.handler).toEqual({
+      runtime: "nodejs10.x",
+      layers: ["node:2"],
     });
-    it("appends to the layer array if already present", () => {
-      const handler = {
-        handler: { runtime: "nodejs10.x", layers: ["node:1"] } as any,
-        type: RuntimeType.NODE,
-        runtime: "nodejs10.x",
-      } as FunctionInfo;
-      const layers: LayerJSON = {
-        regions: { "us-east-1": { "nodejs10.x": "node:2" } },
-      };
-      applyLayers("us-east-1", [handler], layers);
-      expect(handler.handler).toEqual({
-        runtime: "nodejs10.x",
-        layers: ["node:1", "node:2"],
-      });
-    });
+  });
 
-    it("doesn't add duplicate layers", () => {
-      const handler = {
-        handler: { runtime: "nodejs10.x", layers: ["node:1"] } as any,
-        type: RuntimeType.NODE,
-        runtime: "nodejs10.x",
-      } as FunctionInfo;
-      const layers: LayerJSON = {
-        regions: { "us-east-1": { "nodejs10.x": "node:1" } },
-      };
-      applyLayers("us-east-1", [handler], layers);
-      expect(handler.handler).toEqual({
-        runtime: "nodejs10.x",
-        layers: ["node:1"],
-      });
+  it("appends to the layer array if already present", () => {
+    const handler = {
+      handler: { runtime: "nodejs10.x", layers: ["node:1"] } as any,
+      type: RuntimeType.NODE,
+      runtime: "nodejs10.x",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: { "us-east-1": { "nodejs10.x": "node:2" } },
+    };
+    applyLambdaLibraryLayers("us-east-1", [handler], layers);
+    expect(handler.handler).toEqual({
+      runtime: "nodejs10.x",
+      layers: ["node:1", "node:2"],
     });
-    it("only adds layer when region can be found", () => {
-      const handler = {
-        handler: { runtime: "nodejs10.x" } as any,
-        type: RuntimeType.NODE,
-        runtime: "nodejs10.x",
-      } as FunctionInfo;
-      const layers: LayerJSON = {
-        regions: { "us-east-1": { "nodejs10.x": "node:1" } },
-      };
-      applyLayers("us-east-2", [handler], layers);
-      expect(handler.handler).toEqual({
-        runtime: "nodejs10.x",
-      });
+  });
+
+  it("doesn't add duplicate layers", () => {
+    const handler = {
+      handler: { runtime: "nodejs10.x", layers: ["node:1"] } as any,
+      type: RuntimeType.NODE,
+      runtime: "nodejs10.x",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: { "us-east-1": { "nodejs10.x": "node:1" } },
+    };
+    applyLambdaLibraryLayers("us-east-1", [handler], layers);
+    expect(handler.handler).toEqual({
+      runtime: "nodejs10.x",
+      layers: ["node:1"],
     });
-    it("only adds layer when layer ARN can be found", () => {
-      const handler = {
-        handler: { runtime: "nodejs10.x" } as any,
-        type: RuntimeType.NODE,
-        runtime: "nodejs10.x",
-      } as FunctionInfo;
-      const layers: LayerJSON = {
-        regions: { "us-east-1": { "python2.7": "python:2" } },
-      };
-      applyLayers("us-east-1", [handler], layers);
-      expect(handler.handler).toEqual({
-        runtime: "nodejs10.x",
-      });
+  });
+
+  it("only adds layer when region can be found", () => {
+    const handler = {
+      handler: { runtime: "nodejs10.x" } as any,
+      type: RuntimeType.NODE,
+      runtime: "nodejs10.x",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: { "us-east-1": { "nodejs10.x": "node:1" } },
+    };
+    applyLambdaLibraryLayers("us-east-2", [handler], layers);
+    expect(handler.handler).toEqual({
+      runtime: "nodejs10.x",
     });
-    it("only adds layer when runtime present", () => {
-      const handler = {
-        handler: {} as any,
-        type: RuntimeType.NODE,
-        runtime: "nodejs10.x",
-      } as FunctionInfo;
-      const layers: LayerJSON = {
-        regions: { "us-east-1": { "python2.7": "python:2" } },
-      };
-      applyLayers("us-east-1", [handler], layers);
-      expect(handler.handler).toEqual({});
+  });
+
+  it("only adds layer when layer ARN can be found", () => {
+    const handler = {
+      handler: { runtime: "nodejs10.x" } as any,
+      type: RuntimeType.NODE,
+      runtime: "nodejs10.x",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: { "us-east-1": { "python2.7": "python:2" } },
+    };
+    applyLambdaLibraryLayers("us-east-1", [handler], layers);
+    expect(handler.handler).toEqual({
+      runtime: "nodejs10.x",
     });
-    it("only add layer when when supported runtime present", () => {
-      const handler = {
-        handler: {} as any,
-        type: RuntimeType.UNSUPPORTED,
-      } as FunctionInfo;
-      const layers: LayerJSON = {
-        regions: { "us-east-1": { "python2.7": "python:2" } },
-      };
-      applyLayers("us-east-1", [handler], layers);
-      expect(handler.handler).toEqual({});
-    });
-    it("detects when to use the GovCloud layers", () => {
-      const handler = {
-        handler: { runtime: "nodejs10.x" },
-        type: RuntimeType.NODE,
-        runtime: "nodejs10.x",
-      } as FunctionInfo;
-      const layers: LayerJSON = {
-        regions: {
-          "us-gov-east-1": {
-            "nodejs10.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node10-x:30",
-          },
+  });
+
+  it("only adds layer when runtime present", () => {
+    const handler = {
+      handler: {} as any,
+      type: RuntimeType.NODE,
+      runtime: "nodejs10.x",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: { "us-east-1": { "python2.7": "python:2" } },
+    };
+    applyLambdaLibraryLayers("us-east-1", [handler], layers);
+    expect(handler.handler).toEqual({});
+  });
+
+  it("only add layer when when supported runtime present", () => {
+    const handler = {
+      handler: {} as any,
+      type: RuntimeType.UNSUPPORTED,
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: { "us-east-1": { "python2.7": "python:2" } },
+    };
+    applyLambdaLibraryLayers("us-east-1", [handler], layers);
+    expect(handler.handler).toEqual({});
+  });
+
+  it("detects when to use the GovCloud layers", () => {
+    const handler = {
+      handler: { runtime: "nodejs10.x" },
+      type: RuntimeType.NODE,
+      runtime: "nodejs10.x",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: {
+        "us-gov-east-1": {
+          "nodejs10.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node10-x:30",
         },
-      };
-      applyLayers("us-gov-east-1", [handler], layers);
-      expect(handler.handler).toEqual({
-        runtime: "nodejs10.x",
-        layers: ["arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node10-x:30"],
-      });
+      },
+    };
+    applyLambdaLibraryLayers("us-gov-east-1", [handler], layers);
+    expect(handler.handler).toEqual({
+      runtime: "nodejs10.x",
+      layers: ["arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node10-x:30"],
     });
+  });
+
+  it("adds extension layer", () => {
+    const handler = {
+      handler: { runtime: "nodejs10.x" },
+      type: RuntimeType.NODE,
+      runtime: "nodejs10.x",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: { "us-east-1": { extension: "extension:5" } },
+    };
+    applyExtensionLayer("us-east-1", [handler], layers);
+    expect(handler.handler).toEqual({
+      runtime: "nodejs10.x",
+      layers: ["extension:5"],
+    });
+  });
+
+  it("adds a Lambda library and Extension layer", () => {
+    const handler = {
+      handler: { runtime: "nodejs10.x" },
+      type: RuntimeType.NODE,
+      runtime: "nodejs10.x",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: { "us-east-1": { "nodejs10.x": "node:2", extension: "extension:5" } },
+    };
+    applyLambdaLibraryLayers("us-east-1", [handler], layers);
+    applyExtensionLayer("us-east-1", [handler], layers);
+    expect(handler.handler).toEqual({
+      runtime: "nodejs10.x",
+      layers: ["node:2", "extension:5"],
+    });
+  });
+});
+
+describe("pushLayerARN", () => {
+  it("pushes two layers", () => {
+    const layerARNs: string[] = ["node:2", "extension:5"];
+    let currentLayers: string[] = [];
+    currentLayers = pushLayerARN(layerARNs, currentLayers);
+    expect(currentLayers).toEqual(["node:2", "extension:5"]);
+  });
+
+  it("appends a layer", () => {
+    const layerARNs: string[] = ["extension:5"];
+    let currentLayers: string[] = ["node:2"];
+    currentLayers = pushLayerARN(layerARNs, currentLayers);
+    expect(currentLayers).toEqual(["node:2", "extension:5"]);
+  });
+
+  it("does not re-append an existing layer", () => {
+    const layerARNs: string[] = ["extension:5"];
+    let currentLayers: string[] = ["extension:5"];
+    currentLayers = pushLayerARN(layerARNs, currentLayers);
+    expect(currentLayers).toEqual(["extension:5"]);
   });
 });
