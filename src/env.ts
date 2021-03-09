@@ -83,7 +83,7 @@ export function setEnvConfiguration(config: Configuration, service: Service) {
   if (environment[logLevelEnvVar] === undefined) {
     environment[logLevelEnvVar] = config.logLevel;
   }
-  if (environment[logForwardingEnvVar] === undefined) {
+  if (environment[logForwardingEnvVar] === undefined && config.addExtension === false) {
     environment[logForwardingEnvVar] = config.flushMetricsToLogs;
   }
   if (config.enableDDTracing !== undefined && environment[ddTracingEnabledEnvVar] === undefined) {

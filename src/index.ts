@@ -233,11 +233,6 @@ function validateConfiguration(config: Configuration) {
     if (config.forwarder || config.forwarderArn) {
       throw new Error("`addExtension` and `forwarder`/`forwarderArn` should not be set at the same time.");
     }
-    if (config.flushMetricsToLogs) {
-      throw new Error(
-        "`addExtension` and `flushMetricsToLogs` should not be set to true at the same time. `flushMetricsToLogs` is true by default.",
-      );
-    }
     if (config.apiKey === undefined && config.apiKMSKey === undefined) {
       throw new Error("When `addExtension` is true, `apiKey` or `apiKMSKey` must also be set.");
     }
