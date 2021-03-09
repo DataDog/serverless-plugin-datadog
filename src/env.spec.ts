@@ -273,4 +273,39 @@ describe("setEnvConfiguration", () => {
       },
     });
   });
+
+  it("does not define `DD_FLUSH_TO_LOG` when `addExtension` is true", () => {
+    const service = {
+      provider: {},
+    } as any;
+    setEnvConfiguration(
+      {
+        addLayers: false,
+        apiKey: "1234",
+        apiKMSKey: "5678",
+        site: "datadoghq.eu",
+        logLevel: "debug",
+        flushMetricsToLogs: true,
+        enableXrayTracing: true,
+        enableDDTracing: true,
+        addExtension: true,
+        enableTags: true,
+        injectLogContext: false,
+        exclude: ["dd-excluded-function"],
+      },
+      service,
+    );
+    expect(service).toEqual({
+      provider: {
+        environment: {
+          DD_API_KEY: "1234",
+          DD_KMS_API_KEY: "5678",
+          DD_LOG_LEVEL: "debug",
+          DD_SITE: "datadoghq.eu",
+          DD_TRACE_ENABLED: true,
+          DD_LOGS_INJECTION: false,
+        },
+      },
+    });
+  });
 });

@@ -476,46 +476,6 @@ describe("ServerlessPlugin", () => {
       );
     });
 
-    it("throws an error when flushMetricsToLogs and addExtension are set", async () => {
-      mock({});
-      const serverless = {
-        cli: {
-          log: () => {},
-        },
-        service: {
-          provider: {
-            region: "us-east-1",
-          },
-          functions: {
-            node1: {
-              handler: "my-func.ev",
-              runtime: "nodejs8.10",
-            },
-          },
-          custom: {
-            datadog: {
-              flushMetricsToLogs: true,
-              addExtension: true,
-            },
-          },
-        },
-      };
-
-      const plugin = new ServerlessPlugin(serverless, {});
-      let threwError: boolean = false;
-      let thrownErrorMessage: string | undefined;
-      try {
-        await plugin.hooks["after:package:initialize"]();
-      } catch (e) {
-        threwError = true;
-        thrownErrorMessage = e.message;
-      }
-      expect(threwError).toBe(true);
-      expect(thrownErrorMessage).toEqual(
-        "`addExtension` and `flushMetricsToLogs` should not be set to true at the same time. `flushMetricsToLogs` is true by default.",
-      );
-    });
-
     it("throws error when addExtension is true and both API key and KMS API key are undefined", async () => {
       mock({});
       const serverless = {
