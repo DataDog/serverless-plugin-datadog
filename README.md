@@ -47,7 +47,7 @@ custom:
   datadog:
     flushMetricsToLogs: true
     apiKey: "{Datadog_API_Key}"
-    apiKMSKey: "{Encripted_Datadog_API_Key}"
+    apiKMSKey: "{Encrypted_Datadog_API_Key}"
     addLayers: true
     logLevel: "info"
     enableXrayTracing: false
