@@ -38,11 +38,13 @@ fi
 
 cp .serverless/cloudformation-template-update-stack.json test_snapshot.json
 echo "Asserting test_snapshot.json against correct_snapshot.json"
+set +e # Dont exit right away if there is a diff in snapshots
 diff <(grep -vE "("S3Key".*)|(.HelloLambdaVersion.*)|("CodeSha256".*)" correct_snapshot.json) <(grep -vE "("S3Key".*)|(.HelloLambdaVersion.*)|("CodeSha256".*)" test_snapshot.json) 
 return_code=$?
 
+set -e
 if [[ $return_code -eq 0 ]]; then
-    echo "test_snapshot.json and correct_snapshot.json were the same, the integration test has passed."
+    echo "SUCCESS: test_snapshot.json and correct_snapshot.json were the same, the integration test has passed."
     if [ -n "$UPDATE_SNAPSHOTS" ]; then
         echo "Staging and commiting new correct_snapshot.json"
         cd $root_dir
@@ -51,6 +53,7 @@ if [[ $return_code -eq 0 ]]; then
     fi
     exit 0
 else
-    echo "test_snapshot.json differed from the correct_snapshot.json file, the integration test has failed. If you expected the snapshot to be different then use: UPDATE_SNAPSHOTS=true ./scripts/run_integration_tests.sh"
+    echo "FAILURE: test_snapshot.json differed from the correct_snapshot.json file, the integration."
+    echo "If you expected the snapshot to be different, generate new snapshots using: 'UPDATE_SNAPSHOTS=true ./scripts/run_integration_tests.sh'"
     exit 1
 fi
