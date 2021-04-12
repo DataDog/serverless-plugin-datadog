@@ -14,7 +14,29 @@ custom:
   datadog:
     addExtension: true
     apiKey: 1234
-    
+
 functions:
-  hello:
-    handler: handler.hello
+  PythonHello27:
+    handler: py_handler.hello
+    runtime: python2.7
+  PythonHello36:
+    handler: py_handler.hello
+    runtime: python3.6
+  PythonHello37:
+    handler: py_handler.hello
+    runtime: python3.7
+  PythonHello38:
+    handler: py_handler.hello
+    runtime: python3.8
+  JavascriptHello10-x:
+    handler: js_handler.hello
+    runtime: nodejs10.x
+  JavascriptHello12-x:
+    handler: js_handler.hello
+    runtime: nodejs12.x
+  JavascriptHello14-x:
+    handler: js_handler.hello
+    runtime: nodejs14.x
+  JavascriptHello8-10:
+    handler: js_handler.hello
+    runtime: nodejs8.10
