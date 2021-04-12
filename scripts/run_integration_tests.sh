@@ -53,7 +53,7 @@ if [[ $return_code -eq 0 ]]; then
     fi
     exit 0
 else
-    echo "FAILURE: test_snapshot.json differed from the correct_snapshot.json file, the integration."
-    echo "If you expected the snapshot to be different, generate new snapshots using: 'UPDATE_SNAPSHOTS=true ./scripts/run_integration_tests.sh'"
+    echo "FAILURE: test_snapshot.json differed from the correct_snapshot.json file, the integration test has failed."
+    echo "If you expected the snapshot to be different, generate a snapshot using: 'UPDATE_SNAPSHOTS=true ./scripts/run_integration_tests.sh'"
     exit 1
 fi
