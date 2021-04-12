@@ -49,7 +49,7 @@ if [[ $return_code -eq 0 ]]; then
         git add .
         git commit -m "Update correct_snapshot.json for integration test"
     fi
-
+    exit 0
 else
     echo "test_snapshot.json differed from the correct_snapshot.json file, the integration test has failed. If you expected the snapshot to be different then use: UPDATE_SNAPSHOTS=true ./scripts/run_integration_tests.sh"
     exit 1
