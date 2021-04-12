@@ -47,12 +47,13 @@ cp .serverless/cloudformation-template-update-stack.json test_extension_snapshot
 
 if [ -n "$UPDATE_SNAPSHOTS" ]; then
     echo "Overriding correct snapshots"
-    cp test_forwarder_snapshot correct_forwarder_snapshot.json
-    cp test_extension_snapshot correct_extension_snapshot.json
+    cp test_forwarder_snapshot.json correct_forwarder_snapshot.json
+    cp test_extension_snapshot.json correct_extension_snapshot.json
 fi
 
 echo "Performing diff of test_forwarder_snapshot.json against correct_forwarder_snapshot.json"
 set +e # Dont exit right away if there is a diff in snapshots
+# Use grep to remove fields following this regex as they are not consistent with each CFN template generation.
 diff <(grep -vE "("S3Key".*)|(.HelloLambdaVersion.*)|("CodeSha256".*)" correct_forwarder_snapshot.json) <(grep -vE "("S3Key".*)|(.HelloLambdaVersion.*)|("CodeSha256".*)" test_forwarder_snapshot.json) 
 forwarder_return_code=$?
 echo "===================================="
@@ -60,9 +61,10 @@ echo "Performing diff of test_extension_snapshot.json against correct_extension_
 diff <(grep -vE "("S3Key".*)|(.HelloLambdaVersion.*)|("CodeSha256".*)" correct_extension_snapshot.json) <(grep -vE "("S3Key".*)|(.HelloLambdaVersion.*)|("CodeSha256".*)" test_extension_snapshot.json) 
 extension_return_code=$?
 
+echo "===================================="
 set -e
-if [[ $forwarder_return_code -eq 0 && $extension_return_code -eq 0]]; then
-    echo "SUCCESS: Both forwarder and extension snapshot integration tests have passed."
+if [ $forwarder_return_code -eq 0 ] && [ $extension_return_code -eq 0 ]; then
+    echo "SUCCESS: Both forwarder and extension snapshot integration tests have passed. There were no differences between the test and correct snapshots"
     if [ -n "$UPDATE_SNAPSHOTS" ]; then
         echo "Staging and commiting new correct snapshots"
         cd $root_dir

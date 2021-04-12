@@ -6,4 +6,5 @@ coverage
 .DS_Store
 package-lock.json
 .serverless/
-test_snapshot.json
+test_forwarder_snapshot.json
+test_extension_snapshot.json
