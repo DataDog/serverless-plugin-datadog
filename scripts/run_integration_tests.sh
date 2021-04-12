@@ -47,7 +47,7 @@ if [[ $return_code -eq 0 ]]; then
         echo "Staging and commiting new correct_snapshot.json"
         cd $root_dir
         git add .
-        git commit -m "Update snapshot for integration test"
+        git commit -m "Update correct_snapshot.json for integration test"
     fi
 
 else
