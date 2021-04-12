@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Usage - run commands from repo root:
+# To check if new changes to the plugin cause changes to any snapshots:
+#   ./scripts/run_integration_tests
+# To regenerate snapshots:
+#   UPDATE_SNAPSHOTS=true ./scripts/run_integration_tests
+
 set -e
 
 script_path=${BASH_SOURCE[0]}
