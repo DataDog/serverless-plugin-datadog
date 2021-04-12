@@ -49,6 +49,10 @@ function isLogGroup(value: any): value is LogGroupResource {
  * @param functionArn The forwarder ARN to be validated
  */
 async function validateForwarderArn(aws: Aws, functionArn: CloudFormationObjectArn | string) {
+  if (functionArn === "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder"){
+    console.log("The Datadog Forwarder Arn: \""+functionArn+ "\" is used for integration testing. Replace the Forwarder Arn with an actual Forwarder Arn if running integration tests are not your intention.")
+    return
+  }
   try {
     await aws.request("Lambda", "getFunction", { FunctionName: functionArn });
   } catch (err) {
