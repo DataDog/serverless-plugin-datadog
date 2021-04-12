@@ -21,13 +21,13 @@ fi
 integration_tests_dir="$repo_dir/integration_tests"
 
 if [ -n "$UPDATE_SNAPSHOTS" ]; then
-    echo "Overwriting correct_snapshot.json in this execution"
+    echo "Overwriting snapshots in this execution"
 fi
 
 cd $integration_tests_dir
 yarn
 
-# Add local build to node_modules so `serverless-plugin.yml` also has access to local build.
+# Add local build to node_modules so `serverless-forwarder.yml` and `serverless-extension.yml` also have access to local build.
 cd $root_dir
 yarn
 yarn build
@@ -36,30 +36,42 @@ mkdir -p "$integration_tests_dir/node_modules/serverless-plugin-datadog"
 cp -r dist "$integration_tests_dir/node_modules/serverless-plugin-datadog"
 
 cd $integration_tests_dir
+echo "Running 'sls package' with 'serverless-forwarder.yml'"
 serverless package --config ./serverless-forwarder.yml
+cp .serverless/cloudformation-template-update-stack.json test_forwarder_snapshot.json
+echo "===================================="
+echo "Running 'sls package' with 'serverless-extension.yml'"
+serverless package --config ./serverless-extension.yml
+cp .serverless/cloudformation-template-update-stack.json test_extension_snapshot.json
+
 
 if [ -n "$UPDATE_SNAPSHOTS" ]; then
-    cp .serverless/cloudformation-template-update-stack.json correct_snapshot.json
+    echo "Overriding correct snapshots"
+    cp test_forwarder_snapshot correct_forwarder_snapshot.json
+    cp test_extension_snapshot correct_extension_snapshot.json
 fi
 
-cp .serverless/cloudformation-template-update-stack.json test_snapshot.json
-echo "Asserting test_snapshot.json against correct_snapshot.json"
+echo "Performing diff of test_forwarder_snapshot.json against correct_forwarder_snapshot.json"
 set +e # Dont exit right away if there is a diff in snapshots
-diff <(grep -vE "("S3Key".*)|(.HelloLambdaVersion.*)|("CodeSha256".*)" correct_snapshot.json) <(grep -vE "("S3Key".*)|(.HelloLambdaVersion.*)|("CodeSha256".*)" test_snapshot.json) 
-return_code=$?
+diff <(grep -vE "("S3Key".*)|(.HelloLambdaVersion.*)|("CodeSha256".*)" correct_forwarder_snapshot.json) <(grep -vE "("S3Key".*)|(.HelloLambdaVersion.*)|("CodeSha256".*)" test_forwarder_snapshot.json) 
+forwarder_return_code=$?
+echo "===================================="
+echo "Performing diff of test_extension_snapshot.json against correct_extension_snapshot.json"
+diff <(grep -vE "("S3Key".*)|(.HelloLambdaVersion.*)|("CodeSha256".*)" correct_extension_snapshot.json) <(grep -vE "("S3Key".*)|(.HelloLambdaVersion.*)|("CodeSha256".*)" test_extension_snapshot.json) 
+extension_return_code=$?
 
 set -e
-if [[ $return_code -eq 0 ]]; then
-    echo "SUCCESS: test_snapshot.json and correct_snapshot.json were the same, the integration test has passed."
+if [[ $forwarder_return_code -eq 0 && $extension_return_code -eq 0]]; then
+    echo "SUCCESS: Both forwarder and extension snapshot integration tests have passed."
     if [ -n "$UPDATE_SNAPSHOTS" ]; then
-        echo "Staging and commiting new correct_snapshot.json"
+        echo "Staging and commiting new correct snapshots"
         cd $root_dir
         git add .
-        git commit -m "Update correct_snapshot.json for integration test"
+        git commit -m "Update correct_forwarder_snapshot.json and correct_extension_snapshot.json for snapshot integration tests"
     fi
     exit 0
 else
-    echo "FAILURE: test_snapshot.json differed from the correct_snapshot.json file, the integration test has failed."
-    echo "If you expected the snapshot to be different, generate a snapshot using: 'UPDATE_SNAPSHOTS=true ./scripts/run_integration_tests.sh'"
+    echo "FAILURE: Either the forwarder, extension, or both snapshot integration tests failed. Review the diff output above."
+    echo "If you expected the snapshots to be different, generate new snapshots using: 'UPDATE_SNAPSHOTS=true ./scripts/run_integration_tests.sh'"
     exit 1
 fi
