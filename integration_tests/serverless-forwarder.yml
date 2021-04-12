@@ -35,6 +35,3 @@ functions:
   JavascriptHello14-x:
     handler: js_handler.hello
     runtime: nodejs14.x
-  JavascriptHello8-10:
-    handler: js_handler.hello
-    runtime: nodejs8.10
