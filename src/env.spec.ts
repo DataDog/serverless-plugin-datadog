@@ -89,6 +89,7 @@ describe("getConfig", () => {
       enableTags: true,
       injectLogContext: true,
       exclude: [],
+      validateForwarder: true,
     });
   });
 
@@ -114,6 +115,7 @@ describe("getConfig", () => {
       enableTags: true,
       injectLogContext: true,
       exclude: [],
+      validateForwarder: true,
     });
   });
 });

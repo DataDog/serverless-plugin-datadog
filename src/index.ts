@@ -122,7 +122,12 @@ module.exports = class ServerlessPlugin {
 
       if (datadogForwarderArn) {
         const aws = this.serverless.getProvider("aws");
-        const errors = await addCloudWatchForwarderSubscriptions(this.serverless.service, aws, datadogForwarderArn);
+        const errors = await addCloudWatchForwarderSubscriptions(
+          this.serverless.service,
+          aws,
+          datadogForwarderArn,
+          config.validateForwarder,
+        );
         for (const error of errors) {
           this.serverless.cli.log(error);
         }

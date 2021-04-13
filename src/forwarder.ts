@@ -1,4 +1,3 @@
-import { debug } from "console";
 import Service from "serverless/classes/Service";
 import Aws = require("serverless/plugins/aws/provider/awsProvider");
 
@@ -49,14 +48,6 @@ function isLogGroup(value: any): value is LogGroupResource {
  * @param functionArn The forwarder ARN to be validated
  */
 async function validateForwarderArn(aws: Aws, functionArn: CloudFormationObjectArn | string) {
-  if (functionArn === "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder") {
-    console.log(
-      'The Datadog Forwarder Arn: "' +
-        functionArn +
-        '" is used for integration testing. Replace the Forwarder Arn with an actual Forwarder Arn if running integration tests are not your intention.',
-    );
-    return;
-  }
   try {
     await aws.request("Lambda", "getFunction", { FunctionName: functionArn });
   } catch (err) {
@@ -68,6 +59,7 @@ export async function addCloudWatchForwarderSubscriptions(
   service: Service,
   aws: Aws,
   functionArn: CloudFormationObjectArn | string,
+  validateForwarder: boolean | undefined,
 ) {
   const resources = service.provider.compiledCloudFormationTemplate?.Resources;
   if (resources === undefined) {
@@ -76,6 +68,8 @@ export async function addCloudWatchForwarderSubscriptions(
   const errors = [];
   if (typeof functionArn !== "string") {
     errors.push("Skipping forwarder ARN validation because forwarder string defined with CloudFormation function.");
+  } else if (validateForwarder === false) {
+    errors.push("Skipping forwarder ARN validation because 'validateForwarder' is set to false");
   } else {
     await validateForwarderArn(aws, functionArn);
   }

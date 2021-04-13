@@ -33,6 +33,11 @@ export interface Configuration {
   // When either is set, the plugin will subscribe the lambdas to the forwarder with the given arn.
   forwarderArn?: string;
   forwarder?: string;
+
+  // When set, the plugin will validate the Forwarder ARN via an AWS request. Set this to false when
+  // you wish to run the integration tests.
+  validateForwarder?: boolean;
+
   // When set, the plugin will try to automatically tag customers' lambda functions with service and env,
   // but will not override existing tags set on function or provider levels. Defaults to true
   enableTags: boolean;
@@ -62,6 +67,7 @@ export const defaultConfiguration: Configuration = {
   enableTags: true,
   injectLogContext: true,
   exclude: [],
+  validateForwarder: true,
 };
 
 export function setEnvConfiguration(config: Configuration, service: Service) {
