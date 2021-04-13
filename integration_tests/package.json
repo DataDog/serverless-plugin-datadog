@@ -1,9 +1,0 @@
-{
-  "name": "integration_tests",
-  "description": "",
-  "version": "0.1.0",
-  "dependencies": {},
-  "devDependencies": {
-    "serverless-plugin-datadog": "^2.18.0"
-  }
-}

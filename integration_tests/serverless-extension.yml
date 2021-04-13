@@ -2,7 +2,8 @@ service: dd-sls-plugin-integration-test
 frameworkVersion: '2'
 
 plugins:
-  - serverless-plugin-datadog
+  - ../dist/src
+
 
 provider:
   name: aws
