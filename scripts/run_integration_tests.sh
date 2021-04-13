@@ -8,8 +8,9 @@
 
 set -e
 
-# When adding extra tests make sure the snapshots and yml file names all occur at the same index in their own respective arrays
-# Note: SERVERLESS_CONFIGS, TEST_SNAPSHOTS, and CORRECT_SNAPSHOTS should all have the same number of elements
+# To add new tests create a new yml file, append it to SERVERLESS_CONFIGS as well as creating a name for the snapshots that will be compared in your test.
+# Note: Each yml config, test, and correct snapshot file should be at the same index in their own array. e.g. All the files for the forwarder test are at index 0.
+#       In order for this script to work correctly these arrays should have the same amount of elements.
 SERVERLESS_CONFIGS=("./serverless-forwarder.yml" "./serverless-extension.yml")
 TEST_SNAPSHOTS=("test_forwarder_snapshot.json" "test_extension_snapshot.json")
 CORRECT_SNAPSHOTS=("correct_forwarder_snapshot.json" "correct_extension_snapshot.json")
@@ -51,7 +52,6 @@ for ((i = 0 ; i < ${#SERVERLESS_CONFIGS[@]} ; i++)); do
     set -e
     if [ $return_code -eq 0 ]; then
         echo "SUCCESS: There were no differences between the ${TEST_SNAPSHOTS[i]} and ${CORRECT_SNAPSHOTS[i]}"
-
     else
         echo "FAILURE: There were differences between the ${TEST_SNAPSHOTS[i]} and ${CORRECT_SNAPSHOTS[i]}. Review the diff output above."
         echo "If you expected the ${TEST_SNAPSHOTS[i]} to be different, generate new snapshots using: 'UPDATE_SNAPSHOTS=true ./scripts/run_integration_tests.sh'"
