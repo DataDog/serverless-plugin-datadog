@@ -143,9 +143,9 @@ module.exports = class ServerlessPlugin {
     const defaultRuntime = this.serverless.service.provider.runtime;
     const handlers = findHandlers(this.serverless.service, config.exclude, defaultRuntime);
     redirectHandlers(handlers, config.addLayers);
-    if (config.integrationTesting === false){
+    if (config.integrationTesting === false) {
       addOutputLinks(this.serverless, config.site);
-    }else{
+    } else {
       this.serverless.cli.log("Skipped adding output links because 'integrationTesting' is set true");
     }
   }
