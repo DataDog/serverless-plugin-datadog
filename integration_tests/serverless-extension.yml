@@ -15,6 +15,7 @@ custom:
   datadog:
     addExtension: true
     apiKey: 1234
+    integrationTesting: true
 
 functions:
   PythonHello27:

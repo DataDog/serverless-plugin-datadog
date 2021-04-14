@@ -126,7 +126,7 @@ module.exports = class ServerlessPlugin {
           this.serverless.service,
           aws,
           datadogForwarderArn,
-          config.validateForwarder,
+          config.integrationTesting,
         );
         for (const error of errors) {
           this.serverless.cli.log(error);
@@ -143,8 +143,11 @@ module.exports = class ServerlessPlugin {
     const defaultRuntime = this.serverless.service.provider.runtime;
     const handlers = findHandlers(this.serverless.service, config.exclude, defaultRuntime);
     redirectHandlers(handlers, config.addLayers);
-
-    addOutputLinks(this.serverless, config.site);
+    if (config.integrationTesting === false){
+      addOutputLinks(this.serverless, config.site);
+    }else{
+      this.serverless.cli.log("Skipped adding output links because 'integrationTesting' is set true");
+    }
   }
 
   private async afterDeploy() {

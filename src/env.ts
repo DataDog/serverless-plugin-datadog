@@ -34,9 +34,9 @@ export interface Configuration {
   forwarderArn?: string;
   forwarder?: string;
 
-  // When set, the plugin will validate the Forwarder ARN via an AWS request. Set this to false when
-  // you wish to run the integration tests.
-  validateForwarder?: boolean;
+  // Set this to true when you are running the Serverless Plugin's integration tests. This prevents the 
+  // plugin from validating the Forwarder ARN and adding Datadog Monitor output links. Defaults to false.
+  integrationTesting?: boolean;
 
   // When set, the plugin will try to automatically tag customers' lambda functions with service and env,
   // but will not override existing tags set on function or provider levels. Defaults to true
@@ -67,7 +67,7 @@ export const defaultConfiguration: Configuration = {
   enableTags: true,
   injectLogContext: true,
   exclude: [],
-  validateForwarder: true,
+  integrationTesting: false,
 };
 
 export function setEnvConfiguration(config: Configuration, service: Service) {

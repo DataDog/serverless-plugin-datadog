@@ -59,7 +59,7 @@ export async function addCloudWatchForwarderSubscriptions(
   service: Service,
   aws: Aws,
   functionArn: CloudFormationObjectArn | string,
-  validateForwarder: boolean | undefined,
+  integrationTesting: boolean | undefined,
 ) {
   const resources = service.provider.compiledCloudFormationTemplate?.Resources;
   if (resources === undefined) {
@@ -68,8 +68,8 @@ export async function addCloudWatchForwarderSubscriptions(
   const errors = [];
   if (typeof functionArn !== "string") {
     errors.push("Skipping forwarder ARN validation because forwarder string defined with CloudFormation function.");
-  } else if (validateForwarder === false) {
-    errors.push("Skipping forwarder ARN validation because 'validateForwarder' is set to false");
+  } else if (integrationTesting === true) {
+    errors.push("Skipping forwarder ARN validation because 'integrationTesting' is set to true");
   } else {
     await validateForwarderArn(aws, functionArn);
   }
