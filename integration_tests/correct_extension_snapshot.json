@@ -197,7 +197,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618268080359-2021-04-12T22:54:40.359Z/dd-sls-plugin-integration-test.zip"
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618443590964-2021-04-14T23:39:50.964Z/dd-sls-plugin-integration-test.zip"
         },
         "Handler": "datadog_lambda.handler.handler",
         "Runtime": "python2.7",
@@ -251,7 +251,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618268080359-2021-04-12T22:54:40.359Z/dd-sls-plugin-integration-test.zip"
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618443590964-2021-04-14T23:39:50.964Z/dd-sls-plugin-integration-test.zip"
         },
         "Handler": "datadog_lambda.handler.handler",
         "Runtime": "python3.6",
@@ -305,7 +305,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618268080359-2021-04-12T22:54:40.359Z/dd-sls-plugin-integration-test.zip"
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618443590964-2021-04-14T23:39:50.964Z/dd-sls-plugin-integration-test.zip"
         },
         "Handler": "datadog_lambda.handler.handler",
         "Runtime": "python3.7",
@@ -359,7 +359,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618268080359-2021-04-12T22:54:40.359Z/dd-sls-plugin-integration-test.zip"
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618443590964-2021-04-14T23:39:50.964Z/dd-sls-plugin-integration-test.zip"
         },
         "Handler": "datadog_lambda.handler.handler",
         "Runtime": "python3.8",
@@ -413,7 +413,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618268080359-2021-04-12T22:54:40.359Z/dd-sls-plugin-integration-test.zip"
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618443590964-2021-04-14T23:39:50.964Z/dd-sls-plugin-integration-test.zip"
         },
         "Handler": "/opt/nodejs/node_modules/datadog-lambda-js/handler.handler",
         "Runtime": "nodejs10.x",
@@ -467,7 +467,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618268080359-2021-04-12T22:54:40.359Z/dd-sls-plugin-integration-test.zip"
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618443590964-2021-04-14T23:39:50.964Z/dd-sls-plugin-integration-test.zip"
         },
         "Handler": "/opt/nodejs/node_modules/datadog-lambda-js/handler.handler",
         "Runtime": "nodejs12.x",
@@ -521,7 +521,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618268080359-2021-04-12T22:54:40.359Z/dd-sls-plugin-integration-test.zip"
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618443590964-2021-04-14T23:39:50.964Z/dd-sls-plugin-integration-test.zip"
         },
         "Handler": "/opt/nodejs/node_modules/datadog-lambda-js/handler.handler",
         "Runtime": "nodejs14.x",
@@ -568,74 +568,74 @@
         "JavascriptHello14DashxLogGroup"
       ]
     },
-    "PythonHello27LambdaVersion5gQJAum8NYVJgzefsHlnCOEkCMOXXEV9WoYnzXNfFM": {
+    "PythonHello27LambdaVersion7nhM5ksd8FziMCh0Vwchlweb6oO5SDgajUZWCrAgmg": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "PythonHello27LambdaFunction"
         },
-        "CodeSha256": "gOrlGlM+Vvx+zxup5v0pKXl1B9q3HMg6DQEClz2CCUk="
+        "CodeSha256": "laEHWZpINA4dtTbXWeyHR1xWuk/z13IqBhAUtNVbCqc="
       }
     },
-    "PythonHello36LambdaVersionSyAU9rP00X7ixHQBUvF3ItDXskn8eFxWn0Px9YGMhnE": {
+    "PythonHello36LambdaVersionbEYH89EqgU88dmEXUrZIXmwVlTL9OQCZ2Y5FGy7ck": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "PythonHello36LambdaFunction"
         },
-        "CodeSha256": "gOrlGlM+Vvx+zxup5v0pKXl1B9q3HMg6DQEClz2CCUk="
+        "CodeSha256": "laEHWZpINA4dtTbXWeyHR1xWuk/z13IqBhAUtNVbCqc="
       }
     },
-    "PythonHello37LambdaVersiongYss5eblGlIRxbIs1QAjmmA6EOXDvxForDIFEPYZR0": {
+    "PythonHello37LambdaVersionigS2REqKH5Si1NsSZv1tGTD5LfMiWqNklWeBjSb0RC8": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "PythonHello37LambdaFunction"
         },
-        "CodeSha256": "gOrlGlM+Vvx+zxup5v0pKXl1B9q3HMg6DQEClz2CCUk="
+        "CodeSha256": "laEHWZpINA4dtTbXWeyHR1xWuk/z13IqBhAUtNVbCqc="
       }
     },
-    "PythonHello38LambdaVersionAqliDktBdB50z36sqq7YIkmL0iureu6o1f9Ye0TR6qU": {
+    "PythonHello38LambdaVersionaOMSB09GwbKPeQKWJ3ArEIN44sdCcgDxusLXuhKQ": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "PythonHello38LambdaFunction"
         },
-        "CodeSha256": "gOrlGlM+Vvx+zxup5v0pKXl1B9q3HMg6DQEClz2CCUk="
+        "CodeSha256": "laEHWZpINA4dtTbXWeyHR1xWuk/z13IqBhAUtNVbCqc="
       }
     },
-    "JavascriptHello10DashxLambdaVersionN2LbsoGFcvCfgtwljaOCQqcDSUY2tmMTawUdyQwM": {
+    "JavascriptHello10DashxLambdaVersion5B1MimbgvAkXapSzm8sco3tY7nGBbx96Br3eaW9ImA": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "JavascriptHello10DashxLambdaFunction"
         },
-        "CodeSha256": "gOrlGlM+Vvx+zxup5v0pKXl1B9q3HMg6DQEClz2CCUk="
+        "CodeSha256": "laEHWZpINA4dtTbXWeyHR1xWuk/z13IqBhAUtNVbCqc="
       }
     },
-    "JavascriptHello12DashxLambdaVersionus8J29OtyzKgyHRz9vcFRPdUT8GQpcgpltDBtEIQ18": {
+    "JavascriptHello12DashxLambdaVersionxx1Q5Oh5cAm1PJ8XX5L9SDNTkH9sWMJTyXk5Qjxopg": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "JavascriptHello12DashxLambdaFunction"
         },
-        "CodeSha256": "gOrlGlM+Vvx+zxup5v0pKXl1B9q3HMg6DQEClz2CCUk="
+        "CodeSha256": "laEHWZpINA4dtTbXWeyHR1xWuk/z13IqBhAUtNVbCqc="
       }
     },
-    "JavascriptHello14DashxLambdaVersionry6sMPqeARbPpY1iIwWdZJQblASGHOL0LeRprlcBno": {
+    "JavascriptHello14DashxLambdaVersionoIY8GjqaZdCA8i8siPR4F4m40aFq6VkuR5wVLLzzuPo": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "JavascriptHello14DashxLambdaFunction"
         },
-        "CodeSha256": "gOrlGlM+Vvx+zxup5v0pKXl1B9q3HMg6DQEClz2CCUk="
+        "CodeSha256": "laEHWZpINA4dtTbXWeyHR1xWuk/z13IqBhAUtNVbCqc="
       }
     }
   },
@@ -648,43 +648,43 @@
     "PythonHello27LambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "PythonHello27LambdaVersion5gQJAum8NYVJgzefsHlnCOEkCMOXXEV9WoYnzXNfFM"
+        "Ref": "PythonHello27LambdaVersion7nhM5ksd8FziMCh0Vwchlweb6oO5SDgajUZWCrAgmg"
       }
     },
     "PythonHello36LambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "PythonHello36LambdaVersionSyAU9rP00X7ixHQBUvF3ItDXskn8eFxWn0Px9YGMhnE"
+        "Ref": "PythonHello36LambdaVersionbEYH89EqgU88dmEXUrZIXmwVlTL9OQCZ2Y5FGy7ck"
       }
     },
     "PythonHello37LambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "PythonHello37LambdaVersiongYss5eblGlIRxbIs1QAjmmA6EOXDvxForDIFEPYZR0"
+        "Ref": "PythonHello37LambdaVersionigS2REqKH5Si1NsSZv1tGTD5LfMiWqNklWeBjSb0RC8"
       }
     },
     "PythonHello38LambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "PythonHello38LambdaVersionAqliDktBdB50z36sqq7YIkmL0iureu6o1f9Ye0TR6qU"
+        "Ref": "PythonHello38LambdaVersionaOMSB09GwbKPeQKWJ3ArEIN44sdCcgDxusLXuhKQ"
       }
     },
     "JavascriptHello10DashxLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "JavascriptHello10DashxLambdaVersionN2LbsoGFcvCfgtwljaOCQqcDSUY2tmMTawUdyQwM"
+        "Ref": "JavascriptHello10DashxLambdaVersion5B1MimbgvAkXapSzm8sco3tY7nGBbx96Br3eaW9ImA"
       }
     },
     "JavascriptHello12DashxLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "JavascriptHello12DashxLambdaVersionus8J29OtyzKgyHRz9vcFRPdUT8GQpcgpltDBtEIQ18"
+        "Ref": "JavascriptHello12DashxLambdaVersionxx1Q5Oh5cAm1PJ8XX5L9SDNTkH9sWMJTyXk5Qjxopg"
       }
     },
     "JavascriptHello14DashxLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "JavascriptHello14DashxLambdaVersionry6sMPqeARbPpY1iIwWdZJQblASGHOL0LeRprlcBno"
+        "Ref": "JavascriptHello14DashxLambdaVersionoIY8GjqaZdCA8i8siPR4F4m40aFq6VkuR5wVLLzzuPo"
       }
     }
   }
