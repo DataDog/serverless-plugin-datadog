@@ -15,6 +15,8 @@ SERVERLESS_CONFIGS=("./serverless-forwarder.yml" "./serverless-extension.yml")
 TEST_SNAPSHOTS=("test_forwarder_snapshot.json" "test_extension_snapshot.json")
 CORRECT_SNAPSHOTS=("correct_forwarder_snapshot.json" "correct_extension_snapshot.json")
 
+script_utc_start_time=$(date -u +"%Y%m%dT%H%M%S")
+
 script_path=${BASH_SOURCE[0]}
 scripts_dir=$(dirname $script_path)
 repo_dir=$(dirname $scripts_dir)
@@ -25,7 +27,7 @@ if [[ "$root_dir" =~ .*"serverless-plugin-datadog/scripts".* ]]; then
 fi
 
 integration_tests_dir="$repo_dir/integration_tests"
-if [ -n "$UPDATE_SNAPSHOTS" ]; then
+if [ "$UPDATE_SNAPSHOTS" = "true" ]; then
     echo "Overwriting snapshots in this execution"
 fi
 
@@ -39,7 +41,7 @@ for ((i = 0 ; i < ${#SERVERLESS_CONFIGS[@]} ; i++)); do
     serverless package --config ${SERVERLESS_CONFIGS[i]}
     cp .serverless/cloudformation-template-update-stack.json ${TEST_SNAPSHOTS[i]}
     echo "===================================="
-    if [ -n "$UPDATE_SNAPSHOTS" ]; then
+    if [ "$UPDATE_SNAPSHOTS" = "true" ]; then
         echo "Overriding ${CORRECT_SNAPSHOTS[i]}"
         cp ${TEST_SNAPSHOTS[i]} ${CORRECT_SNAPSHOTS[i]}
     fi
@@ -61,11 +63,21 @@ for ((i = 0 ; i < ${#SERVERLESS_CONFIGS[@]} ; i++)); do
 
 done
 
-if [ -n "$UPDATE_SNAPSHOTS" ]; then
-        echo "Staging and commiting new correct snapshots"
+if [ "$UPDATE_SNAPSHOTS" = "true" ]; then
         cd $root_dir
-        git add .
-        git commit -m "Update correct_forwarder_snapshot.json and correct_extension_snapshot.json for snapshot integration tests"
+        BRANCH=$(git rev-parse --abbrev-ref HEAD)
+        if [ $BRANCH = "master" ]; then
+            echo "On master branch, creating a branch and pushing up new snapshot changes. Don't forget to create a PR!"
+            git checkout -b snapshot-update${script_utc_start_time}
+            git add .
+            git commit -m "Update snapshots for integration tests"
+            git push origin snapshot-update${script_utc_start_time}
+            
+        else
+            echo "On development branch, pushing up snapshot changes."
+            git add .
+            git commit -m "Update snapshots for integration tests"
+            git push origin $BRANCH
+        fi
 fi
 exit 0
-
