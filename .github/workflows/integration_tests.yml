@@ -1,14 +1,6 @@
 name: integration-tests
 
-on: 
-  push:
-
-  workflow_dispatch:
-    inputs:
-      UPDATE_SNAPSHOTS:
-        description: Regenerate correct snapshots based on this execution
-        default: "false"
-        required: true
+on: push
 
 jobs:
   integration-tests:
@@ -35,7 +27,6 @@ jobs:
 
       - name: Run tests
         env:
-          UPDATE_SNAPSHOTS: ${{ github.event.inputs.UPDATE_SNAPSHOTS }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: ./scripts/run_integration_tests.sh

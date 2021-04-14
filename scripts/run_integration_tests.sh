@@ -56,7 +56,7 @@ for ((i = 0 ; i < ${#SERVERLESS_CONFIGS[@]} ; i++)); do
         echo "SUCCESS: There were no differences between the ${TEST_SNAPSHOTS[i]} and ${CORRECT_SNAPSHOTS[i]}"
     else
         echo "FAILURE: There were differences between the ${TEST_SNAPSHOTS[i]} and ${CORRECT_SNAPSHOTS[i]}. Review the diff output above."
-        echo "If you expected the ${TEST_SNAPSHOTS[i]} to be different, generate new snapshots using: 'UPDATE_SNAPSHOTS=true ./scripts/run_integration_tests.sh'"
+        echo "If you expected the ${TEST_SNAPSHOTS[i]} to be different, to generate new snapshots run this command from a development branch on your local repository: 'UPDATE_SNAPSHOTS=true ./scripts/run_integration_tests.sh'"
         exit 1
     fi
     echo "===================================="
@@ -67,14 +67,10 @@ if [ "$UPDATE_SNAPSHOTS" = "true" ]; then
         cd $root_dir
         BRANCH=$(git rev-parse --abbrev-ref HEAD)
         if [ $BRANCH = "master" ]; then
-            echo "On master branch, creating a branch and pushing up new snapshot changes. Don't forget to create a PR!"
-            git checkout -b snapshot-update${script_utc_start_time}
-            git add .
-            git commit -m "Update snapshots for integration tests"
-            git push origin snapshot-update${script_utc_start_time}
-            
+            echo "Error: Cannot update snapshot files directly through the master branch, please create a development branch then run the script again."
+            exit 1            
         else
-            echo "On development branch, pushing up snapshot changes."
+            echo "Commiting and pushing up snapshot changes to ${BRANCH}. Please create a pull request on GitHub."
             git add .
             git commit -m "Update snapshots for integration tests"
             git push origin $BRANCH
