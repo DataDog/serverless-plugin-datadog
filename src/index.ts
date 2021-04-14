@@ -144,7 +144,7 @@ module.exports = class ServerlessPlugin {
     const handlers = findHandlers(this.serverless.service, config.exclude, defaultRuntime);
     redirectHandlers(handlers, config.addLayers);
     if (config.integrationTesting === false) {
-      addOutputLinks(this.serverless, config.site);
+      addOutputLinks(this.serverless, config.SITE);
     } else {
       this.serverless.cli.log("Skipped adding output links because 'integrationTesting' is set true");
     }
@@ -232,9 +232,9 @@ function validateConfiguration(config: Configuration) {
     throw new Error("`apiKey` and `apiKMSKey` should not be set at the same time.");
   }
 
-  if (config.site !== undefined && !siteList.includes(config.site.toLowerCase())) {
+  if (config.SITE !== undefined && !siteList.includes(config.SITE.toLowerCase())) {
     throw new Error(
-      "Warning: Invalid site URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, or ddog-gov.com.",
+      "Warning: Invalid SITE URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, or ddog-gov.com.",
     );
   }
   if (config.addExtension) {
