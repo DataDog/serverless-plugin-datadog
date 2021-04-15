@@ -9,7 +9,7 @@ const outputPrefix = "DatadogMonitor";
  * Builds the CloudFormation Outputs containing the alphanumeric key, description,
  * and value (URL) to the function in Datadog
  */
-export async function addOutputLinks(serverless: Serverless, SITE: string) {
+export async function addOutputLinks(serverless: Serverless, site: string) {
   const awsAccount = await serverless.getProvider("aws").getAccountId();
   const region = serverless.service.provider.region;
   const outputs = serverless.service.provider.compiledCloudFormationTemplate?.Outputs;
@@ -22,7 +22,7 @@ export async function addOutputLinks(serverless: Serverless, SITE: string) {
     const key = `${outputPrefix}${functionKey}`.replace(/[^a-z0-9]/gi, "");
     outputs[key] = {
       Description: `See ${functionKey} in Datadog`,
-      Value: `https://app.${SITE}/functions/${functionName}:${region}:${awsAccount}:aws?source=sls-plugin`,
+      Value: `https://app.${site}/functions/${functionName}:${region}:${awsAccount}:aws?source=sls-plugin`,
     };
   });
 }

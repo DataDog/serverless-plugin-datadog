@@ -18,7 +18,7 @@ export interface Configuration {
   // Datadog API Key encrypted using KMS, only necessary when using metrics without log forwarding
   apiKMSKey?: string;
   // Which Site to send to, (should be datadoghq.com or datadoghq.eu)
-  SITE: string;
+  site: string;
   // The log level, (set to DEBUG for extended logging)
   logLevel: string;
   // Whether the log forwarder integration is enabled by default
@@ -60,7 +60,7 @@ export const defaultConfiguration: Configuration = {
   addLayers: true,
   flushMetricsToLogs: true,
   logLevel: "info",
-  SITE: "datadoghq.com",
+  site: "datadoghq.com",
   enableXrayTracing: false,
   enableDDTracing: true,
   addExtension: false,
@@ -84,7 +84,7 @@ export function setEnvConfiguration(config: Configuration, service: Service) {
     environment[apiKeyKMSEnvVar] = config.apiKMSKey;
   }
   if (environment[siteURLEnvVar] === undefined) {
-    environment[siteURLEnvVar] = config.SITE;
+    environment[siteURLEnvVar] = config.site;
   }
   if (environment[logLevelEnvVar] === undefined) {
     environment[logLevelEnvVar] = config.logLevel;

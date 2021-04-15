@@ -15,8 +15,6 @@ SERVERLESS_CONFIGS=("./serverless-forwarder.yml" "./serverless-extension.yml")
 TEST_SNAPSHOTS=("test_forwarder_snapshot.json" "test_extension_snapshot.json")
 CORRECT_SNAPSHOTS=("correct_forwarder_snapshot.json" "correct_extension_snapshot.json")
 
-script_utc_start_time=$(date -u +"%Y%m%dT%H%M%S")
-
 script_path=${BASH_SOURCE[0]}
 scripts_dir=$(dirname $script_path)
 repo_dir=$(dirname $scripts_dir)
