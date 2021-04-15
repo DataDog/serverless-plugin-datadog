@@ -1,6 +1,6 @@
 // import { create } from "mock-fs/lib/filesystem";
 import { Response } from "node-fetch";
-import { SERVERLESS_MONITORS } from "./serverless_monitors";
+import { SERVERLESS_MONITORS } from "./serverless_monitors"
 import * as Serverless from "serverless";
 import { updateMonitor, searchMonitors, createMonitor, deleteMonitor } from "./monitor_api_requests";
 

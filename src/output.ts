@@ -1,4 +1,3 @@
-import { getCloudFormationStackId } from "monitor_api_requests";
 import * as Serverless from "serverless";
 
 const yellowFont = "\x1b[33m";
@@ -26,11 +25,6 @@ export async function addOutputLinks(serverless: Serverless, site: string) {
       Value: `https://app.${site}/functions/${functionName}:${region}:${awsAccount}:aws?source=sls-plugin`,
     };
   });
-  // outputs["monitors"] = {
-  //   Description: "See plugin-enabled monitors in Datadog",
-  //   Value: `https://app.${site}/monitors/manage?q=tag:"aws_cloudformation_stack-id:${cloudFormationStackId}:${region}:${awsAccount}:aws?source=sls-plugin"`,
-  // };
-
 }
 
 export async function printOutputs(serverless: Serverless) {
@@ -59,8 +53,6 @@ export async function printOutputs(serverless: Serverless) {
       logMessage(`${key}: ${output.OutputValue}`);
     }
   }
-  // logMessage(`stackid: ${describeStackOutput.Stacks[0].StackId}`);
-  // logMessage(`stackid: ${describeStackOutput.Stacks[0]["StackId"]}`);
 }
 
 function logHeader(message: string, underline = false) {
