@@ -357,7 +357,7 @@ describe("ServerlessPlugin", () => {
       expect(thrownErrorMessage).toEqual("`apiKey` and `apiKMSKey` should not be set at the same time.");
     });
 
-    it("throws an error when site is set to an invalid site URL", async () => {
+    it("throws an error when SITE is set to an invalid SITE URL", async () => {
       mock({});
       const serverless = {
         cli: {
@@ -375,7 +375,7 @@ describe("ServerlessPlugin", () => {
           },
           custom: {
             datadog: {
-              site: "datadogehq.com",
+              SITE: "datadogehq.com",
             },
           },
         },
@@ -392,7 +392,7 @@ describe("ServerlessPlugin", () => {
       }
       expect(threwError).toBe(true);
       expect(thrownErrorMessage).toEqual(
-        "Warning: Invalid site URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, or ddog-gov.com.",
+        "Warning: Invalid SITE URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, or ddog-gov.com.",
       );
     });
 

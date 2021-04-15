@@ -18,7 +18,7 @@ export interface Configuration {
   // Datadog API Key encrypted using KMS, only necessary when using metrics without log forwarding
   apiKMSKey?: string;
   // Which Site to send to, (should be datadoghq.com or datadoghq.eu)
-  site: string;
+  SITE: string;
   // The log level, (set to DEBUG for extended logging)
   logLevel: string;
   // Whether the log forwarder integration is enabled by default
@@ -50,7 +50,7 @@ export interface Configuration {
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
 const apiKeyKMSEnvVar = "DD_KMS_API_KEY";
-const siteURLEnvVar = "DD_SITE";
+const siteURLEnvVar = "site";
 const logLevelEnvVar = "DD_LOG_LEVEL";
 const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
 const ddTracingEnabledEnvVar = "DD_TRACE_ENABLED";
@@ -60,7 +60,7 @@ export const defaultConfiguration: Configuration = {
   addLayers: true,
   flushMetricsToLogs: true,
   logLevel: "info",
-  site: "datadoghq.com",
+  SITE: "datadoghq.com",
   enableXrayTracing: false,
   enableDDTracing: true,
   addExtension: false,
@@ -84,7 +84,7 @@ export function setEnvConfiguration(config: Configuration, service: Service) {
     environment[apiKeyKMSEnvVar] = config.apiKMSKey;
   }
   if (environment[siteURLEnvVar] === undefined) {
-    environment[siteURLEnvVar] = config.site;
+    environment[siteURLEnvVar] = config.SITE;
   }
   if (environment[logLevelEnvVar] === undefined) {
     environment[logLevelEnvVar] = config.logLevel;
