@@ -18,6 +18,7 @@ import { redirectHandlers } from "./wrapper";
 import { addCloudWatchForwarderSubscriptions } from "./forwarder";
 import { addOutputLinks, printOutputs } from "./output";
 import { FunctionDefinition } from "serverless";
+import { Monitor, setMonitors } from "./monitors";
 
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
 export interface ExtendedFunctionDefinition extends FunctionDefinition {
@@ -60,10 +61,12 @@ module.exports = class ServerlessPlugin {
       usage: "Automatically instruments your lambdas with DataDog",
     },
   };
-  constructor(private serverless: Serverless, _: Serverless.Options) {}
+  constructor(private serverless: Serverless, _: Serverless.Options) { }
 
   private async beforePackageFunction() {
     const config = getConfig(this.serverless.service);
+    this.serverless.cli.log("Hello World!");
+
     if (config.enabled === false) return;
     this.serverless.cli.log("Auto instrumenting functions with Datadog");
     validateConfiguration(config);
@@ -153,6 +156,26 @@ module.exports = class ServerlessPlugin {
   private async afterDeploy() {
     const config = getConfig(this.serverless.service);
     if (config.enabled === false) return;
+    if (config.monitors) {
+      const stackName = this.serverless.getProvider("aws").naming.getStackName();
+      const describeStackOutput = await this.serverless
+        .getProvider("aws")
+        .request(
+          "CloudFormation",
+          "describeStacks",
+          { StackName: stackName },
+          { region: this.serverless.getProvider("aws").getRegion() },
+        )
+        .catch((err) => {
+          // Ignore any request exceptions, fail silently and skip output logging
+        });
+      const cloudFormationStackId: string = describeStackOutput ? describeStackOutput.Stacks[0].StackId : "Unable to retrieve CloudFormation Stack ID";
+      const errors = await setMonitors(config.monitors, cloudFormationStackId);
+      for (const error of errors) {
+        this.serverless.cli.log(error.name);
+        this.serverless.cli.log(error.message);
+      }
+    }
     return printOutputs(this.serverless);
   }
 
