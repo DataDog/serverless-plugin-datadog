@@ -1,0 +1,33 @@
+name: integration-tests
+
+on: push
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Node 14
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+      
+      - name: Cache Node modules
+        id: cache-node-modules
+        uses: actions/cache@v2
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install Serverless Framework
+        run: sudo yarn global add serverless --prefix /usr/local
+
+      - name: Run tests
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: ./scripts/run_integration_tests.sh
+        

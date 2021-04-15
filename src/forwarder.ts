@@ -1,4 +1,3 @@
-import { debug } from "console";
 import Service from "serverless/classes/Service";
 import Aws = require("serverless/plugins/aws/provider/awsProvider");
 
@@ -60,6 +59,7 @@ export async function addCloudWatchForwarderSubscriptions(
   service: Service,
   aws: Aws,
   functionArn: CloudFormationObjectArn | string,
+  integrationTesting: boolean | undefined,
 ) {
   const resources = service.provider.compiledCloudFormationTemplate?.Resources;
   if (resources === undefined) {
@@ -68,6 +68,8 @@ export async function addCloudWatchForwarderSubscriptions(
   const errors = [];
   if (typeof functionArn !== "string") {
     errors.push("Skipping forwarder ARN validation because forwarder string defined with CloudFormation function.");
+  } else if (integrationTesting === true) {
+    errors.push("Skipping forwarder ARN validation because 'integrationTesting' is set to true");
   } else {
     await validateForwarderArn(aws, functionArn);
   }
