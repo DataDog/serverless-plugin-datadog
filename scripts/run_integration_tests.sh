@@ -29,7 +29,6 @@ if [ "$UPDATE_SNAPSHOTS" = "true" ]; then
     echo "Overwriting snapshots in this execution"
 fi
 
-
 yarn
 yarn build
 
@@ -54,7 +53,7 @@ for ((i = 0 ; i < ${#SERVERLESS_CONFIGS[@]} ; i++)); do
         echo "SUCCESS: There were no differences between the ${TEST_SNAPSHOTS[i]} and ${CORRECT_SNAPSHOTS[i]}"
     else
         echo "FAILURE: There were differences between the ${TEST_SNAPSHOTS[i]} and ${CORRECT_SNAPSHOTS[i]}. Review the diff output above."
-        echo "If you expected the ${TEST_SNAPSHOTS[i]} to be different, to generate new snapshots run this command from a development branch on your local repository: 'UPDATE_SNAPSHOTS=true ./scripts/run_integration_tests.sh'"
+        echo "If you expected the ${TEST_SNAPSHOTS[i]} to be different generate new snapshots by running this command from a development branch on your local repository: 'UPDATE_SNAPSHOTS=true ./scripts/run_integration_tests.sh'"
         exit 1
     fi
     echo "===================================="
