@@ -267,7 +267,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618443589221-2021-04-14T23:39:49.221Z/dd-sls-plugin-integration-test.zip"
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618590309860-2021-04-16T16:25:09.860Z/dd-sls-plugin-integration-test.zip"
         },
         "Handler": "datadog_lambda.handler.handler",
         "Runtime": "python2.7",
@@ -277,7 +277,7 @@
         "Tags": [
           {
             "Key": "dd_sls_plugin",
-            "Value": "v2.18.0"
+            "Value": "v2.20.0"
           },
           {
             "Key": "service",
@@ -306,7 +306,7 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python27:29"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python27:33"
         ]
       },
       "DependsOn": [
@@ -320,7 +320,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618443589221-2021-04-14T23:39:49.221Z/dd-sls-plugin-integration-test.zip"
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618590309860-2021-04-16T16:25:09.860Z/dd-sls-plugin-integration-test.zip"
         },
         "Handler": "datadog_lambda.handler.handler",
         "Runtime": "python3.6",
@@ -330,7 +330,7 @@
         "Tags": [
           {
             "Key": "dd_sls_plugin",
-            "Value": "v2.18.0"
+            "Value": "v2.20.0"
           },
           {
             "Key": "service",
@@ -359,7 +359,7 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python36:29"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python36:33"
         ]
       },
       "DependsOn": [
@@ -373,7 +373,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618443589221-2021-04-14T23:39:49.221Z/dd-sls-plugin-integration-test.zip"
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618590309860-2021-04-16T16:25:09.860Z/dd-sls-plugin-integration-test.zip"
         },
         "Handler": "datadog_lambda.handler.handler",
         "Runtime": "python3.7",
@@ -383,7 +383,7 @@
         "Tags": [
           {
             "Key": "dd_sls_plugin",
-            "Value": "v2.18.0"
+            "Value": "v2.20.0"
           },
           {
             "Key": "service",
@@ -412,7 +412,7 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python37:29"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python37:33"
         ]
       },
       "DependsOn": [
@@ -426,7 +426,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618443589221-2021-04-14T23:39:49.221Z/dd-sls-plugin-integration-test.zip"
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618590309860-2021-04-16T16:25:09.860Z/dd-sls-plugin-integration-test.zip"
         },
         "Handler": "datadog_lambda.handler.handler",
         "Runtime": "python3.8",
@@ -436,7 +436,7 @@
         "Tags": [
           {
             "Key": "dd_sls_plugin",
-            "Value": "v2.18.0"
+            "Value": "v2.20.0"
           },
           {
             "Key": "service",
@@ -465,7 +465,7 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python38:29"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python38:33"
         ]
       },
       "DependsOn": [
@@ -479,7 +479,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618443589221-2021-04-14T23:39:49.221Z/dd-sls-plugin-integration-test.zip"
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618590309860-2021-04-16T16:25:09.860Z/dd-sls-plugin-integration-test.zip"
         },
         "Handler": "/opt/nodejs/node_modules/datadog-lambda-js/handler.handler",
         "Runtime": "nodejs10.x",
@@ -489,7 +489,7 @@
         "Tags": [
           {
             "Key": "dd_sls_plugin",
-            "Value": "v2.18.0"
+            "Value": "v2.20.0"
           },
           {
             "Key": "service",
@@ -518,7 +518,7 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node10-x:49"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node10-x:52"
         ]
       },
       "DependsOn": [
@@ -532,7 +532,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618443589221-2021-04-14T23:39:49.221Z/dd-sls-plugin-integration-test.zip"
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618590309860-2021-04-16T16:25:09.860Z/dd-sls-plugin-integration-test.zip"
         },
         "Handler": "/opt/nodejs/node_modules/datadog-lambda-js/handler.handler",
         "Runtime": "nodejs12.x",
@@ -542,7 +542,7 @@
         "Tags": [
           {
             "Key": "dd_sls_plugin",
-            "Value": "v2.18.0"
+            "Value": "v2.20.0"
           },
           {
             "Key": "service",
@@ -571,7 +571,7 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node12-x:49"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node12-x:52"
         ]
       },
       "DependsOn": [
@@ -585,7 +585,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618443589221-2021-04-14T23:39:49.221Z/dd-sls-plugin-integration-test.zip"
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/1618590309860-2021-04-16T16:25:09.860Z/dd-sls-plugin-integration-test.zip"
         },
         "Handler": "/opt/nodejs/node_modules/datadog-lambda-js/handler.handler",
         "Runtime": "nodejs14.x",
@@ -595,7 +595,7 @@
         "Tags": [
           {
             "Key": "dd_sls_plugin",
-            "Value": "v2.18.0"
+            "Value": "v2.20.0"
           },
           {
             "Key": "service",
@@ -624,81 +624,81 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node14-x:49"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node14-x:52"
         ]
       },
       "DependsOn": [
         "JavascriptHello14DashxLogGroup"
       ]
     },
-    "PythonHello27LambdaVersionMXswomMw2XKkq1pDsqxBAkvjDndJwIkA5G0coUb9Ko": {
+    "PythonHello27LambdaVersionYTeTALn0wOowcsEqPFnewlWr1VDy9ICedIdomQ8Y6Nk": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "PythonHello27LambdaFunction"
         },
-        "CodeSha256": "Ye26grxZSHQykIsq7fgp2gCJpvkAmNovWzG66l8lYTI="
+        "CodeSha256": "EqXshXCwgufMk5fevg1Hr8U2oCT8FBnW1dtk5+zLDuE="
       }
     },
-    "PythonHello36LambdaVersionH6S1cDs1qwFrpDVU0RvOJEXKI0105b15eacbyB3sjkw": {
+    "PythonHello36LambdaVersiono7D4mxwWUHIrkH3ENnCg12qEPCIWHv7VcfsNEIFLM": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "PythonHello36LambdaFunction"
         },
-        "CodeSha256": "Ye26grxZSHQykIsq7fgp2gCJpvkAmNovWzG66l8lYTI="
+        "CodeSha256": "EqXshXCwgufMk5fevg1Hr8U2oCT8FBnW1dtk5+zLDuE="
       }
     },
-    "PythonHello37LambdaVersionKYK2pF87346U2NLN2Skm8vMq7hyJDL7GnVRbYkOdPs": {
+    "PythonHello37LambdaVersionrMKMxq4TBN1Tl0lb7ElcXp0WIX98IunnQeaSnC5gA": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "PythonHello37LambdaFunction"
         },
-        "CodeSha256": "Ye26grxZSHQykIsq7fgp2gCJpvkAmNovWzG66l8lYTI="
+        "CodeSha256": "EqXshXCwgufMk5fevg1Hr8U2oCT8FBnW1dtk5+zLDuE="
       }
     },
-    "PythonHello38LambdaVersionndzlLIq9hoee66zbVZlCCtIpOy6yOjzhKT5Z6vZr0jY": {
+    "PythonHello38LambdaVersiondzzHtxTSURjY9yTswqGRTrUxl9GhsAxiZyCl20ssQ4": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "PythonHello38LambdaFunction"
         },
-        "CodeSha256": "Ye26grxZSHQykIsq7fgp2gCJpvkAmNovWzG66l8lYTI="
+        "CodeSha256": "EqXshXCwgufMk5fevg1Hr8U2oCT8FBnW1dtk5+zLDuE="
       }
     },
-    "JavascriptHello10DashxLambdaVersionEkfl9Tzjc54gsrJ3CLjMAAYEOvqrhzOeD5vcsq9gQ": {
+    "JavascriptHello10DashxLambdaVersionEtWTOgzECdBLd1Dbwet6lAArwp8wZZAFjFFVFTMc": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "JavascriptHello10DashxLambdaFunction"
         },
-        "CodeSha256": "Ye26grxZSHQykIsq7fgp2gCJpvkAmNovWzG66l8lYTI="
+        "CodeSha256": "EqXshXCwgufMk5fevg1Hr8U2oCT8FBnW1dtk5+zLDuE="
       }
     },
-    "JavascriptHello12DashxLambdaVersiontUzb40cZxleUUp9HIaTU7Ejdw3ZKlgkc9svk4EtCC0": {
+    "JavascriptHello12DashxLambdaVersionYe1Mxj6GuoYE779YmIseXVAx0FPpEuoBxJ2PCYzNN8I": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "JavascriptHello12DashxLambdaFunction"
         },
-        "CodeSha256": "Ye26grxZSHQykIsq7fgp2gCJpvkAmNovWzG66l8lYTI="
+        "CodeSha256": "EqXshXCwgufMk5fevg1Hr8U2oCT8FBnW1dtk5+zLDuE="
       }
     },
-    "JavascriptHello14DashxLambdaVersionpghqkm8wloyuyHLzchaLAVbICubHwJfppP3XRpx8": {
+    "JavascriptHello14DashxLambdaVersion1V9GKj2zRroIjTNgzKWkcWP2bV6d6PMkwv7z1C9JAac": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "JavascriptHello14DashxLambdaFunction"
         },
-        "CodeSha256": "Ye26grxZSHQykIsq7fgp2gCJpvkAmNovWzG66l8lYTI="
+        "CodeSha256": "EqXshXCwgufMk5fevg1Hr8U2oCT8FBnW1dtk5+zLDuE="
       }
     }
   },
@@ -711,43 +711,43 @@
     "PythonHello27LambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "PythonHello27LambdaVersionMXswomMw2XKkq1pDsqxBAkvjDndJwIkA5G0coUb9Ko"
+        "Ref": "PythonHello27LambdaVersionYTeTALn0wOowcsEqPFnewlWr1VDy9ICedIdomQ8Y6Nk"
       }
     },
     "PythonHello36LambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "PythonHello36LambdaVersionH6S1cDs1qwFrpDVU0RvOJEXKI0105b15eacbyB3sjkw"
+        "Ref": "PythonHello36LambdaVersiono7D4mxwWUHIrkH3ENnCg12qEPCIWHv7VcfsNEIFLM"
       }
     },
     "PythonHello37LambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "PythonHello37LambdaVersionKYK2pF87346U2NLN2Skm8vMq7hyJDL7GnVRbYkOdPs"
+        "Ref": "PythonHello37LambdaVersionrMKMxq4TBN1Tl0lb7ElcXp0WIX98IunnQeaSnC5gA"
       }
     },
     "PythonHello38LambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "PythonHello38LambdaVersionndzlLIq9hoee66zbVZlCCtIpOy6yOjzhKT5Z6vZr0jY"
+        "Ref": "PythonHello38LambdaVersiondzzHtxTSURjY9yTswqGRTrUxl9GhsAxiZyCl20ssQ4"
       }
     },
     "JavascriptHello10DashxLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "JavascriptHello10DashxLambdaVersionEkfl9Tzjc54gsrJ3CLjMAAYEOvqrhzOeD5vcsq9gQ"
+        "Ref": "JavascriptHello10DashxLambdaVersionEtWTOgzECdBLd1Dbwet6lAArwp8wZZAFjFFVFTMc"
       }
     },
     "JavascriptHello12DashxLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "JavascriptHello12DashxLambdaVersiontUzb40cZxleUUp9HIaTU7Ejdw3ZKlgkc9svk4EtCC0"
+        "Ref": "JavascriptHello12DashxLambdaVersionYe1Mxj6GuoYE779YmIseXVAx0FPpEuoBxJ2PCYzNN8I"
       }
     },
     "JavascriptHello14DashxLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "JavascriptHello14DashxLambdaVersionpghqkm8wloyuyHLzchaLAVbICubHwJfppP3XRpx8"
+        "Ref": "JavascriptHello14DashxLambdaVersion1V9GKj2zRroIjTNgzKWkcWP2bV6d6PMkwv7z1C9JAac"
       }
     }
   }

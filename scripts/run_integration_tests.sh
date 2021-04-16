@@ -62,15 +62,9 @@ done
 
 if [ "$UPDATE_SNAPSHOTS" = "true" ]; then
         cd $root_dir
-        BRANCH=$(git rev-parse --abbrev-ref HEAD)
-        if [ $BRANCH = "master" ]; then
-            echo "Error: Cannot update snapshot files directly through the master branch, please create a development branch then run the script again."
-            exit 1            
-        else
-            echo "Commiting and pushing up snapshot changes to ${BRANCH}. Please create a pull request on GitHub."
-            git add .
-            git commit -m "Update snapshots for integration tests"
-            git push origin $BRANCH
-        fi
+        echo "Staging and commiting snapshot changes"
+        git add .
+        git commit -m "Update snapshots for integration tests"
+        echo "Push up your commit!"
 fi
 exit 0

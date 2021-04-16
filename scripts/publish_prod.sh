@@ -17,6 +17,12 @@ else
     git pull origin master
 fi
 
+root_dir=$(pwd)
+if [[ "$root_dir" =~ .*"serverless-plugin-datadog/scripts".* ]]; then
+    echo "Make sure to run this script from the root `serverless-plugin-datadog` directory, aborting"
+    exit 1
+fi
+
 # Ensure no uncommitted changes
 if [ -n "$(git status --porcelain)" ]; then 
     echo "Detected uncommitted changes, aborting"
@@ -69,9 +75,12 @@ fi
 echo "Bumping the version number and committing the changes"
 yarn version --new-version "$VERSION"
 
-echo 'Publishing to Node'
 yarn test
 yarn build
+echo "Updating snapshots for integration tests"
+UPDATE_SNAPSHOTS=true ./scripts/run_integration_tests.sh
+
+echo 'Publishing to Node'
 yarn publish --new-version "$VERSION"
 
 echo 'Pushing updates to github'
