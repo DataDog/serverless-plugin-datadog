@@ -18,7 +18,7 @@ The plugin automatically configures ingestion of metrics, traces, and logs from 
 
 To quickly get started, follow the installation instructions for [Python][1] or [Node.js][2], and view your function's enhanced metrics, traces, and logs in Datadog. These instructions will get you a basic working setup.
 
-## More configuration options
+## Configuration options
 
 To further configure your plugin, use the following custom parameters in your `serverless.yml`:
 
