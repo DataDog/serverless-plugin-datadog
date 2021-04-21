@@ -2,9 +2,9 @@
 
 # Usage - run commands from repo root:
 # To check if new changes to the plugin cause changes to any snapshots:
-#   ./scripts/run_integration_tests
+#   ./scripts/run_integration_tests.sh
 # To regenerate snapshots:
-#   UPDATE_SNAPSHOTS=true ./scripts/run_integration_tests
+#   UPDATE_SNAPSHOTS=true ./scripts/run_integration_tests.sh
 
 set -e
 
@@ -36,6 +36,12 @@ cd $integration_tests_dir
 for ((i = 0 ; i < ${#SERVERLESS_CONFIGS[@]} ; i++)); do
     echo "Running 'sls package' with ${SERVERLESS_CONFIGS[i]}"
     serverless package --config ${SERVERLESS_CONFIGS[i]}
+    # Normalize unstable values, perl substitution command: perl -p -i -e 's/(PATTERN TO FIND)/PATTERN TO SUBSTITUTE/g'
+    perl -p -i -e 's/("S3Key".*)/"S3Key": "serverless\/dd-sls-plugin-integration-test\/dev\/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX\/dd-sls-plugin-integration-test.zip"/g' .serverless/cloudformation-template-update-stack.json
+    perl -p -i -e 's/(LambdaVersion.*")/LambdaVersionXXXX"/g' .serverless/cloudformation-template-update-stack.json
+    perl -p -i -e 's/("CodeSha256":.*)/"CodeSha256": "XXXX"/g' .serverless/cloudformation-template-update-stack.json
+    perl -p -i -e 's/(v\d.\d\d.\d)/vX.XX.X/g' .serverless/cloudformation-template-update-stack.json
+    perl -p -i -e 's/(arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-(Python27|Python36|Python37|Python38|Node10-x|Node12-x|Node14-x|Extension):\d+)/arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Layer:XXX/g' .serverless/cloudformation-template-update-stack.json
     cp .serverless/cloudformation-template-update-stack.json ${TEST_SNAPSHOTS[i]}
     echo "===================================="
     if [ "$UPDATE_SNAPSHOTS" = "true" ]; then
@@ -45,8 +51,7 @@ for ((i = 0 ; i < ${#SERVERLESS_CONFIGS[@]} ; i++)); do
 
     echo "Performing diff of ${TEST_SNAPSHOTS[i]} against ${CORRECT_SNAPSHOTS[i]}"
     set +e # Dont exit right away if there is a diff in snapshots
-    # Use grep to remove fields following this regex as they are not consistent with each CFN template generation.
-    diff <(grep -vE "("S3Key".*)|(.*LambdaVersion.*)|("CodeSha256".*)" ${TEST_SNAPSHOTS[i]}) <(grep -vE "("S3Key".*)|(.*LambdaVersion.*)|("CodeSha256".*)" ${CORRECT_SNAPSHOTS[i]}) 
+    diff ${TEST_SNAPSHOTS[i]} ${CORRECT_SNAPSHOTS[i]}
     return_code=$?
     set -e
     if [ $return_code -eq 0 ]; then
@@ -57,7 +62,6 @@ for ((i = 0 ; i < ${#SERVERLESS_CONFIGS[@]} ; i++)); do
         exit 1
     fi
     echo "===================================="
-
 done
 
 if [ "$UPDATE_SNAPSHOTS" = "true" ]; then
@@ -67,10 +71,11 @@ if [ "$UPDATE_SNAPSHOTS" = "true" ]; then
             echo "Error: Cannot update snapshot files directly through the master branch, please create a development branch then run the script again."
             exit 1            
         else
-            echo "Commiting and pushing up snapshot changes to ${BRANCH}. Please create a pull request on GitHub."
+            echo "Commiting and pushing up snapshot changes to ${BRANCH}."
             git add .
             git commit -m "Update snapshots for integration tests"
             git push origin $BRANCH
+            echo "Please create a pull request on GitHub."
         fi
 fi
 exit 0
