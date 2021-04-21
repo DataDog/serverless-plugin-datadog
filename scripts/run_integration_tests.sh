@@ -8,7 +8,8 @@
 
 set -e
 
-# To add new tests create a new yml file in the 'integration_tests' directory, append it to SERVERLESS_CONFIGS as well as creating a name for the snapshots that will be compared in your test.
+# To add new tests create a new yml file in the 'integration_tests' directory, append it to the SERVERLESS_CONFIGS array as well as creating a name for the 
+# snapshots that will be compared in your test. Add those snapshot names to the TEST_SNAPSHOTS and CORRECT_SNAPSHOTS arrays.
 # Note: Each yml config, test, and correct snapshot file should be at the same index in their own array. e.g. All the files for the forwarder test are at index 0.
 #       In order for this script to work correctly these arrays should have the same amount of elements.
 SERVERLESS_CONFIGS=("./serverless-forwarder.yml" "./serverless-extension.yml")
