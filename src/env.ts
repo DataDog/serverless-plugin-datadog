@@ -48,7 +48,7 @@ export interface Configuration {
   exclude: string[];
 
   // API Gateway logging
-  enableAPIGatewayLogs?: boolean;
+  enableApiGatewayLogs?: boolean;
 }
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
@@ -72,7 +72,7 @@ export const defaultConfiguration: Configuration = {
   injectLogContext: true,
   exclude: [],
   integrationTesting: false,
-  enableAPIGatewayLogs: true,
+  enableApiGatewayLogs: true,
 };
 
 export function setEnvConfiguration(config: Configuration, service: Service) {
@@ -103,10 +103,9 @@ export function setEnvConfiguration(config: Configuration, service: Service) {
   if (config.injectLogContext !== undefined && environment[logInjectionEnvVar] === undefined) {
     environment[logInjectionEnvVar] = config.injectLogContext;
   }
-  if (config.enableAPIGatewayLogs !== undefined && environment[apiGatewayLogsEnvVar] === undefined){
-    environment[apiGatewayLogsEnvVar] = config.enableAPIGatewayLogs 
+  if (config.enableApiGatewayLogs !== undefined && environment[apiGatewayLogsEnvVar] === undefined) {
+    environment[apiGatewayLogsEnvVar] = config.enableApiGatewayLogs;
   }
-
 }
 
 export function getConfig(service: Service): Configuration {
