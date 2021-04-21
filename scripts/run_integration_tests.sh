@@ -33,16 +33,21 @@ yarn
 yarn build
 
 cd $integration_tests_dir
+RAW_CFN_TEMPLATE=".serverless/cloudformation-template-update-stack.json"
 for ((i = 0 ; i < ${#SERVERLESS_CONFIGS[@]} ; i++)); do
     echo "Running 'sls package' with ${SERVERLESS_CONFIGS[i]}"
     serverless package --config ${SERVERLESS_CONFIGS[i]}
-    # Normalize unstable values, perl substitution command: perl -p -i -e 's/(PATTERN TO FIND)/PATTERN TO SUBSTITUTE/g'
-    perl -p -i -e 's/("S3Key".*)/"S3Key": "serverless\/dd-sls-plugin-integration-test\/dev\/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX\/dd-sls-plugin-integration-test.zip"/g' .serverless/cloudformation-template-update-stack.json
-    perl -p -i -e 's/(LambdaVersion.*")/LambdaVersionXXXX"/g' .serverless/cloudformation-template-update-stack.json
-    perl -p -i -e 's/("CodeSha256":.*)/"CodeSha256": "XXXX"/g' .serverless/cloudformation-template-update-stack.json
-    perl -p -i -e 's/(v\d.\d\d.\d)/vX.XX.X/g' .serverless/cloudformation-template-update-stack.json
-    perl -p -i -e 's/(arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-(Python27|Python36|Python37|Python38|Node10-x|Node12-x|Node14-x|Extension):\d+)/arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Layer:XXX/g' .serverless/cloudformation-template-update-stack.json
-    cp .serverless/cloudformation-template-update-stack.json ${TEST_SNAPSHOTS[i]}
+    # Normalize S3Key timestamps
+    perl -p -i -e 's/("S3Key".*)/"S3Key": "serverless\/dd-sls-plugin-integration-test\/dev\/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX\/dd-sls-plugin-integration-test.zip"/g' ${RAW_CFN_TEMPLATE}
+    # Normalize LambdaVersion ID's
+    perl -p -i -e 's/(LambdaVersion.*")/LambdaVersionXXXX"/g' ${RAW_CFN_TEMPLATE}
+    # Normalize SHA256 hashes
+    perl -p -i -e 's/("CodeSha256":.*)/"CodeSha256": "XXXX"/g' ${RAW_CFN_TEMPLATE}
+    # Normalize dd_sls_plugin version tag value
+    perl -p -i -e 's/(v\d.\d\d.\d)/vX.XX.X/g' ${RAW_CFN_TEMPLATE}
+    # Normalize Datadog Layer Arn versions
+    perl -p -i -e 's/(arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-(Python27|Python36|Python37|Python38|Node10-x|Node12-x|Node14-x|Extension):\d+)/arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-\2:XXX/g' ${RAW_CFN_TEMPLATE}
+    cp ${RAW_CFN_TEMPLATE} ${TEST_SNAPSHOTS[i]}
     echo "===================================="
     if [ "$UPDATE_SNAPSHOTS" = "true" ]; then
         echo "Overriding ${CORRECT_SNAPSHOTS[i]}"
@@ -65,17 +70,6 @@ for ((i = 0 ; i < ${#SERVERLESS_CONFIGS[@]} ; i++)); do
 done
 
 if [ "$UPDATE_SNAPSHOTS" = "true" ]; then
-        cd $root_dir
-        BRANCH=$(git rev-parse --abbrev-ref HEAD)
-        if [ $BRANCH = "master" ]; then
-            echo "Error: Cannot update snapshot files directly through the master branch, please create a development branch then run the script again."
-            exit 1            
-        else
-            echo "Commiting and pushing up snapshot changes to ${BRANCH}."
-            git add .
-            git commit -m "Update snapshots for integration tests"
-            git push origin $BRANCH
-            echo "Please create a pull request on GitHub."
-        fi
+    echo "Commit the changes and create a PR"
 fi
 exit 0
