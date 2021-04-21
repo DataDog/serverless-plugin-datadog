@@ -90,6 +90,7 @@ describe("getConfig", () => {
       injectLogContext: true,
       exclude: [],
       integrationTesting: false,
+      enableAPIGatewayLogs: true,
     });
   });
 
@@ -116,6 +117,7 @@ describe("getConfig", () => {
       injectLogContext: true,
       exclude: [],
       integrationTesting: false,
+      enableAPIGatewayLogs: true,
     });
   });
 });

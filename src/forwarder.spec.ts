@@ -119,6 +119,12 @@ describe("addCloudWatchForwarderSubscriptions", () => {
           LogGroupName: "/aws/lambda/second-group",
         },
       },
+      ApiGatewayGroup: {
+        Type: "AWS::Logs::LogGroup",
+        Properties: {
+          LogGroupName: "/aws/api-gateway/gateway-group",
+        },
+      },
       NonLambdaGroup: {
         Type: "AWS::Logs::LogGroup",
         Properties: {
@@ -136,6 +142,22 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", false);
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
       Object {
+        "ApiGatewayGroup": Object {
+          "Properties": Object {
+            "LogGroupName": "/aws/api-gateway/gateway-group",
+          },
+          "Type": "AWS::Logs::LogGroup",
+        },
+        "ApiGatewayGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "my-func",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Ref": "ApiGatewayGroup",
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
+        },
         "FirstGroup": Object {
           "Properties": Object {
             "LogGroupName": "/aws/lambda/first-group",

@@ -74,7 +74,13 @@ export async function addCloudWatchForwarderSubscriptions(
     await validateForwarderArn(aws, functionArn);
   }
   for (const [name, resource] of Object.entries(resources)) {
-    if (!isLogGroup(resource) || !resource.Properties.LogGroupName.startsWith("/aws/lambda/")) {
+    if (
+      !isLogGroup(resource) ||
+      !(
+        resource.Properties.LogGroupName.startsWith("/aws/lambda/") ||
+        resource.Properties.LogGroupName.startsWith("/aws/api-gateway/")
+      )
+    ) {
       continue;
     }
     const logGroupName = resource.Properties.LogGroupName;
