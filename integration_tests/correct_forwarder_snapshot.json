@@ -122,37 +122,23 @@
             {
               "Effect": "Allow",
               "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
+                "Service": ["lambda.amazonaws.com"]
               },
-              "Action": [
-                "sts:AssumeRole"
-              ]
+              "Action": ["sts:AssumeRole"]
             }
           ]
         },
         "Policies": [
           {
             "PolicyName": {
-              "Fn::Join": [
-                "-",
-                [
-                  "dd-sls-plugin-integration-test",
-                  "dev",
-                  "lambda"
-                ]
-              ]
+              "Fn::Join": ["-", ["dd-sls-plugin-integration-test", "dev", "lambda"]]
             },
             "PolicyDocument": {
               "Version": "2012-10-17",
               "Statement": [
                 {
                   "Effect": "Allow",
-                  "Action": [
-                    "logs:CreateLogStream",
-                    "logs:CreateLogGroup"
-                  ],
+                  "Action": ["logs:CreateLogStream", "logs:CreateLogGroup"],
                   "Resource": [
                     {
                       "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/dd-sls-plugin-integration-test-dev*:*"
@@ -161,9 +147,7 @@
                 },
                 {
                   "Effect": "Allow",
-                  "Action": [
-                    "logs:PutLogEvents"
-                  ],
+                  "Action": ["logs:PutLogEvents"],
                   "Resource": [
                     {
                       "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/dd-sls-plugin-integration-test-dev*:*:*"
@@ -301,18 +285,11 @@
           }
         },
         "Role": {
-          "Fn::GetAtt": [
-            "IamRoleLambdaExecution",
-            "Arn"
-          ]
+          "Fn::GetAtt": ["IamRoleLambdaExecution", "Arn"]
         },
-        "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python27:XXX"
-        ]
+        "Layers": ["arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python27:XXX"]
       },
-      "DependsOn": [
-        "PythonHello27LogGroup"
-      ]
+      "DependsOn": ["PythonHello27LogGroup"]
     },
     "PythonHello36LambdaFunction": {
       "Type": "AWS::Lambda::Function",
@@ -355,18 +332,11 @@
           }
         },
         "Role": {
-          "Fn::GetAtt": [
-            "IamRoleLambdaExecution",
-            "Arn"
-          ]
+          "Fn::GetAtt": ["IamRoleLambdaExecution", "Arn"]
         },
-        "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python36:XXX"
-        ]
+        "Layers": ["arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python36:XXX"]
       },
-      "DependsOn": [
-        "PythonHello36LogGroup"
-      ]
+      "DependsOn": ["PythonHello36LogGroup"]
     },
     "PythonHello37LambdaFunction": {
       "Type": "AWS::Lambda::Function",
@@ -409,18 +379,11 @@
           }
         },
         "Role": {
-          "Fn::GetAtt": [
-            "IamRoleLambdaExecution",
-            "Arn"
-          ]
+          "Fn::GetAtt": ["IamRoleLambdaExecution", "Arn"]
         },
-        "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python37:XXX"
-        ]
+        "Layers": ["arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python37:XXX"]
       },
-      "DependsOn": [
-        "PythonHello37LogGroup"
-      ]
+      "DependsOn": ["PythonHello37LogGroup"]
     },
     "PythonHello38LambdaFunction": {
       "Type": "AWS::Lambda::Function",
@@ -463,18 +426,11 @@
           }
         },
         "Role": {
-          "Fn::GetAtt": [
-            "IamRoleLambdaExecution",
-            "Arn"
-          ]
+          "Fn::GetAtt": ["IamRoleLambdaExecution", "Arn"]
         },
-        "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python38:XXX"
-        ]
+        "Layers": ["arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python38:XXX"]
       },
-      "DependsOn": [
-        "PythonHello38LogGroup"
-      ]
+      "DependsOn": ["PythonHello38LogGroup"]
     },
     "JavascriptHello10DashxLambdaFunction": {
       "Type": "AWS::Lambda::Function",
@@ -517,18 +473,11 @@
           }
         },
         "Role": {
-          "Fn::GetAtt": [
-            "IamRoleLambdaExecution",
-            "Arn"
-          ]
+          "Fn::GetAtt": ["IamRoleLambdaExecution", "Arn"]
         },
-        "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node10-x:XXX"
-        ]
+        "Layers": ["arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node10-x:XXX"]
       },
-      "DependsOn": [
-        "JavascriptHello10DashxLogGroup"
-      ]
+      "DependsOn": ["JavascriptHello10DashxLogGroup"]
     },
     "JavascriptHello12DashxLambdaFunction": {
       "Type": "AWS::Lambda::Function",
@@ -571,18 +520,11 @@
           }
         },
         "Role": {
-          "Fn::GetAtt": [
-            "IamRoleLambdaExecution",
-            "Arn"
-          ]
+          "Fn::GetAtt": ["IamRoleLambdaExecution", "Arn"]
         },
-        "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node12-x:XXX"
-        ]
+        "Layers": ["arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node12-x:XXX"]
       },
-      "DependsOn": [
-        "JavascriptHello12DashxLogGroup"
-      ]
+      "DependsOn": ["JavascriptHello12DashxLogGroup"]
     },
     "JavascriptHello14DashxLambdaFunction": {
       "Type": "AWS::Lambda::Function",
@@ -625,18 +567,11 @@
           }
         },
         "Role": {
-          "Fn::GetAtt": [
-            "IamRoleLambdaExecution",
-            "Arn"
-          ]
+          "Fn::GetAtt": ["IamRoleLambdaExecution", "Arn"]
         },
-        "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node14-x:XXX"
-        ]
+        "Layers": ["arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node14-x:XXX"]
       },
-      "DependsOn": [
-        "JavascriptHello14DashxLogGroup"
-      ]
+      "DependsOn": ["JavascriptHello14DashxLogGroup"]
     },
     "PythonHello27LambdaVersionXXXX": {
       "Type": "AWS::Lambda::Version",
@@ -713,9 +648,7 @@
       "Properties": {
         "Name": "dev-dd-sls-plugin-integration-test",
         "EndpointConfiguration": {
-          "Types": [
-            "EDGE"
-          ]
+          "Types": ["EDGE"]
         },
         "Policy": ""
       }
@@ -724,10 +657,7 @@
       "Type": "AWS::ApiGateway::Resource",
       "Properties": {
         "ParentId": {
-          "Fn::GetAtt": [
-            "ApiGatewayRestApi",
-            "RootResourceId"
-          ]
+          "Fn::GetAtt": ["ApiGatewayRestApi", "RootResourceId"]
         },
         "PathPart": "users",
         "RestApiId": {
@@ -777,10 +707,7 @@
                 },
                 ":lambda:path/2015-03-31/functions/",
                 {
-                  "Fn::GetAtt": [
-                    "PythonHello27LambdaFunction",
-                    "Arn"
-                  ]
+                  "Fn::GetAtt": ["PythonHello27LambdaFunction", "Arn"]
                 },
                 "/invocations"
               ]
@@ -820,10 +747,7 @@
                 },
                 ":lambda:path/2015-03-31/functions/",
                 {
-                  "Fn::GetAtt": [
-                    "JavascriptHello10DashxLambdaFunction",
-                    "Arn"
-                  ]
+                  "Fn::GetAtt": ["JavascriptHello10DashxLambdaFunction", "Arn"]
                 },
                 "/invocations"
               ]
@@ -833,7 +757,7 @@
         "MethodResponses": []
       }
     },
-    "ApiGatewayDeployment1619102704009": {
+    "ApiGatewayDeploymentxxxx": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -841,19 +765,13 @@
         },
         "StageName": "dev"
       },
-      "DependsOn": [
-        "ApiGatewayMethodUsersCreateGet",
-        "ApiGatewayMethodUsersCreatePost"
-      ]
+      "DependsOn": ["ApiGatewayMethodUsersCreateGet", "ApiGatewayMethodUsersCreatePost"]
     },
     "PythonHello27LambdaPermissionApiGateway": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "FunctionName": {
-          "Fn::GetAtt": [
-            "PythonHello27LambdaFunction",
-            "Arn"
-          ]
+          "Fn::GetAtt": ["PythonHello27LambdaFunction", "Arn"]
         },
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -887,10 +805,7 @@
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "FunctionName": {
-          "Fn::GetAtt": [
-            "JavascriptHello10DashxLambdaFunction",
-            "Arn"
-          ]
+          "Fn::GetAtt": ["JavascriptHello10DashxLambdaFunction", "Arn"]
         },
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -931,10 +846,7 @@
       "Version": 1,
       "Properties": {
         "ServiceToken": {
-          "Fn::GetAtt": [
-            "CustomDashresourceDashapigwDashcwDashroleLambdaFunction",
-            "Arn"
-          ]
+          "Fn::GetAtt": ["CustomDashresourceDashapigwDashcwDashroleLambdaFunction", "Arn"]
         }
       }
     },
@@ -947,27 +859,16 @@
             {
               "Effect": "Allow",
               "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
+                "Service": ["lambda.amazonaws.com"]
               },
-              "Action": [
-                "sts:AssumeRole"
-              ]
+              "Action": ["sts:AssumeRole"]
             }
           ]
         },
         "Policies": [
           {
             "PolicyName": {
-              "Fn::Join": [
-                "-",
-                [
-                  "dev",
-                  "dd-sls-plugin-integration-test",
-                  "custom-resources-lambda"
-                ]
-              ]
+              "Fn::Join": ["-", ["dev", "dd-sls-plugin-integration-test", "custom-resources-lambda"]]
             },
             "PolicyDocument": {
               "Version": "2012-10-17",
@@ -990,12 +891,7 @@
                       ]
                     ]
                   },
-                  "Action": [
-                    "iam:AttachRolePolicy",
-                    "iam:CreateRole",
-                    "iam:ListAttachedRolePolicies",
-                    "iam:PassRole"
-                  ]
+                  "Action": ["iam:AttachRolePolicy", "iam:CreateRole", "iam:ListAttachedRolePolicies", "iam:PassRole"]
                 },
                 {
                   "Effect": "Allow",
@@ -1011,10 +907,7 @@
                       ]
                     ]
                   },
-                  "Action": [
-                    "apigateway:GET",
-                    "apigateway:PATCH"
-                  ]
+                  "Action": ["apigateway:GET", "apigateway:PATCH"]
                 }
               ]
             }
@@ -1037,15 +930,10 @@
         "Runtime": "nodejs12.x",
         "Timeout": 180,
         "Role": {
-          "Fn::GetAtt": [
-            "IamRoleCustomResourcesLambdaExecution",
-            "Arn"
-          ]
+          "Fn::GetAtt": ["IamRoleCustomResourcesLambdaExecution", "Arn"]
         }
       },
-      "DependsOn": [
-        "IamRoleCustomResourcesLambdaExecution"
-      ]
+      "DependsOn": ["IamRoleCustomResourcesLambdaExecution"]
     }
   },
   "Outputs": {
