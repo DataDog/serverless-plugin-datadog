@@ -8,6 +8,8 @@ provider:
   name: aws
   region: sa-east-1
   lambdaHashingVersion: 20201221
+  logs:
+    restApi: true
 
 custom:
   datadog:
@@ -18,6 +20,10 @@ functions:
   PythonHello27:
     handler: py_handler.hello
     runtime: python2.7
+    events:
+      - http:
+          path: users/create
+          method: get
   PythonHello36:
     handler: py_handler.hello
     runtime: python3.6
@@ -30,6 +36,10 @@ functions:
   JavascriptHello10-x:
     handler: js_handler.hello
     runtime: nodejs10.x
+    events:
+      - http:
+          path: users/create
+          method: post    
   JavascriptHello12-x:
     handler: js_handler.hello
     runtime: nodejs12.x
