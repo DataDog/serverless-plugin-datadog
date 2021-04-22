@@ -50,7 +50,6 @@ for ((i = 0; i < ${#SERVERLESS_CONFIGS[@]}; i++)); do
     perl -p -i -e 's/(arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-(Python27|Python36|Python37|Python38|Node10-x|Node12-x|Node14-x|Extension):\d+)/arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-\2:XXX/g' ${RAW_CFN_TEMPLATE}
     # Normalize API Gateway timestamps
     perl -p -i -e 's/("ApiGatewayDeployment.*")/"ApiGatewayDeploymentxxxx"/g' ${RAW_CFN_TEMPLATE}
-
     cp ${RAW_CFN_TEMPLATE} ${TEST_SNAPSHOTS[i]}
     echo "===================================="
     if [ "$UPDATE_SNAPSHOTS" = "true" ]; then
