@@ -1,5 +1,5 @@
 service: dd-sls-plugin-integration-test
-frameworkVersion: '2'
+frameworkVersion: "2"
 
 plugins:
   - ../dist/src
@@ -10,6 +10,8 @@ provider:
   lambdaHashingVersion: 20201221
   logs:
     restApi: true
+    httpApi: true
+    websocket: true
 
 custom:
   datadog:
@@ -24,6 +26,10 @@ functions:
       - http:
           path: users/create
           method: get
+      - httpApi:
+          path: /users/update
+          method: put
+      - websocket: $connect
   PythonHello36:
     handler: py_handler.hello
     runtime: python3.6
@@ -39,7 +45,11 @@ functions:
     events:
       - http:
           path: users/create
-          method: post    
+          method: post
+      - httpApi:
+          path: /users/remove
+          method: delete
+      - websocket: $connect
   JavascriptHello12-x:
     handler: js_handler.hello
     runtime: nodejs12.x

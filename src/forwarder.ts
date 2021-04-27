@@ -60,6 +60,7 @@ export async function addCloudWatchForwarderSubscriptions(
   aws: Aws,
   functionArn: CloudFormationObjectArn | string,
   integrationTesting: boolean | undefined,
+  subscribeToApiGatewayLogs: boolean,
 ) {
   const resources = service.provider.compiledCloudFormationTemplate?.Resources;
   if (resources === undefined) {
@@ -78,7 +79,9 @@ export async function addCloudWatchForwarderSubscriptions(
       !isLogGroup(resource) ||
       !(
         resource.Properties.LogGroupName.startsWith("/aws/lambda/") ||
-        resource.Properties.LogGroupName.startsWith("/aws/api-gateway/")
+        resource.Properties.LogGroupName.startsWith("/aws/api-gateway/") ||
+        resource.Properties.LogGroupName.startsWith("/aws/http-api/") ||
+        resource.Properties.LogGroupName.startsWith("/aws/websocket/")
       )
     ) {
       continue;
@@ -110,6 +113,34 @@ export async function addCloudWatchForwarderSubscriptions(
       },
     };
     resources[scopedSubName] = subscription;
+    // Create the Execution log group for API Gateway logging manually
+    if (subscribeToApiGatewayLogs && logGroupName.startsWith("/aws/api-gateway/")) {
+      const executionLogGroup = `{
+        "Fn::Join": [
+          "", [
+            "API-Gateway-Execution-Logs_",
+            {
+              "Ref": "ApiGatewayRestApi"
+            },
+            "/",
+            {
+              ${aws.getStage()}
+            }
+          ]
+        ]
+      }`;
+
+      const executionSubscription = {
+        Type: logGroupSubscriptionKey,
+        Properties: {
+          DestinationArn: functionArn,
+          FilterPattern: "",
+          LogGroupName: executionLogGroup,
+        },
+      };
+
+      resources["ExecutionLogGroupSubscription"] = executionSubscription;
+    }
   }
   return errors;
 }

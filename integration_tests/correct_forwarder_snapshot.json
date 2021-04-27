@@ -169,6 +169,17 @@
                       "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/dd-sls-plugin-integration-test-dev*:*:*"
                     }
                   ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "execute-api:ManageConnections"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:execute-api:*:*:*/@connections/*"
+                    }
+                  ]
                 }
               ]
             }
@@ -295,7 +306,9 @@
             "DD_FLUSH_TO_LOG": true,
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
-            "DD_API_GATEWAY_LOGS_ENABLED": true,
+            "DD_SUBSCRIBED_TO_API_GATEWAY_LOGS": true,
+            "DD_SUBSCRIBED_TO_HTTP_API_LOGS": true,
+            "DD_SUBSCRIBED_TO_WEBSOCKET_LOGS": true,
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LAMBDA_HANDLER": "py_handler.hello"
           }
@@ -349,7 +362,9 @@
             "DD_FLUSH_TO_LOG": true,
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
-            "DD_API_GATEWAY_LOGS_ENABLED": true,
+            "DD_SUBSCRIBED_TO_API_GATEWAY_LOGS": true,
+            "DD_SUBSCRIBED_TO_HTTP_API_LOGS": true,
+            "DD_SUBSCRIBED_TO_WEBSOCKET_LOGS": true,
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LAMBDA_HANDLER": "py_handler.hello"
           }
@@ -403,7 +418,9 @@
             "DD_FLUSH_TO_LOG": true,
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
-            "DD_API_GATEWAY_LOGS_ENABLED": true,
+            "DD_SUBSCRIBED_TO_API_GATEWAY_LOGS": true,
+            "DD_SUBSCRIBED_TO_HTTP_API_LOGS": true,
+            "DD_SUBSCRIBED_TO_WEBSOCKET_LOGS": true,
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LAMBDA_HANDLER": "py_handler.hello"
           }
@@ -457,7 +474,9 @@
             "DD_FLUSH_TO_LOG": true,
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
-            "DD_API_GATEWAY_LOGS_ENABLED": true,
+            "DD_SUBSCRIBED_TO_API_GATEWAY_LOGS": true,
+            "DD_SUBSCRIBED_TO_HTTP_API_LOGS": true,
+            "DD_SUBSCRIBED_TO_WEBSOCKET_LOGS": true,
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LAMBDA_HANDLER": "py_handler.hello"
           }
@@ -511,7 +530,9 @@
             "DD_FLUSH_TO_LOG": true,
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
-            "DD_API_GATEWAY_LOGS_ENABLED": true,
+            "DD_SUBSCRIBED_TO_API_GATEWAY_LOGS": true,
+            "DD_SUBSCRIBED_TO_HTTP_API_LOGS": true,
+            "DD_SUBSCRIBED_TO_WEBSOCKET_LOGS": true,
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LAMBDA_HANDLER": "js_handler.hello"
           }
@@ -565,7 +586,9 @@
             "DD_FLUSH_TO_LOG": true,
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
-            "DD_API_GATEWAY_LOGS_ENABLED": true,
+            "DD_SUBSCRIBED_TO_API_GATEWAY_LOGS": true,
+            "DD_SUBSCRIBED_TO_HTTP_API_LOGS": true,
+            "DD_SUBSCRIBED_TO_WEBSOCKET_LOGS": true,
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LAMBDA_HANDLER": "js_handler.hello"
           }
@@ -619,7 +642,9 @@
             "DD_FLUSH_TO_LOG": true,
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
-            "DD_API_GATEWAY_LOGS_ENABLED": true,
+            "DD_SUBSCRIBED_TO_API_GATEWAY_LOGS": true,
+            "DD_SUBSCRIBED_TO_HTTP_API_LOGS": true,
+            "DD_SUBSCRIBED_TO_WEBSOCKET_LOGS": true,
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LAMBDA_HANDLER": "js_handler.hello"
           }
@@ -1046,6 +1071,400 @@
       "DependsOn": [
         "IamRoleCustomResourcesLambdaExecution"
       ]
+    },
+    "WebsocketsApi": {
+      "Type": "AWS::ApiGatewayV2::Api",
+      "Properties": {
+        "Name": "dev-dd-sls-plugin-integration-test-websockets",
+        "RouteSelectionExpression": "$request.body.action",
+        "Description": "Serverless Websockets",
+        "ProtocolType": "WEBSOCKET"
+      }
+    },
+    "PythonHello27WebsocketsIntegration": {
+      "Type": "AWS::ApiGatewayV2::Integration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "WebsocketsApi"
+        },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":apigateway:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":lambda:path/2015-03-31/functions/",
+              {
+                "Fn::GetAtt": [
+                  "PythonHello27LambdaFunction",
+                  "Arn"
+                ]
+              },
+              "/invocations"
+            ]
+          ]
+        }
+      }
+    },
+    "JavascriptHello10DashxWebsocketsIntegration": {
+      "Type": "AWS::ApiGatewayV2::Integration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "WebsocketsApi"
+        },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":apigateway:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":lambda:path/2015-03-31/functions/",
+              {
+                "Fn::GetAtt": [
+                  "JavascriptHello10DashxLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "/invocations"
+            ]
+          ]
+        }
+      }
+    },
+    "PythonHello27LambdaPermissionWebsockets": {
+      "Type": "AWS::Lambda::Permission",
+      "DependsOn": [
+        "WebsocketsApi",
+        "PythonHello27LambdaFunction"
+      ],
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "PythonHello27LambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com"
+      }
+    },
+    "JavascriptHello10DashxLambdaPermissionWebsockets": {
+      "Type": "AWS::Lambda::Permission",
+      "DependsOn": [
+        "WebsocketsApi",
+        "JavascriptHello10DashxLambdaFunction"
+      ],
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "JavascriptHello10DashxLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com"
+      }
+    },
+    "SconnectWebsocketsRoute": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "WebsocketsApi"
+        },
+        "RouteKey": "$connect",
+        "AuthorizationType": "NONE",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "JavascriptHello10DashxWebsocketsIntegration"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "WebsocketsDeploymentStage": {
+      "Type": "AWS::ApiGatewayV2::Stage",
+      "Properties": {
+        "ApiId": {
+          "Ref": "WebsocketsApi"
+        },
+        "StageName": "dev",
+        "Description": "Serverless Websockets",
+        "AccessLogSettings": {
+          "DestinationArn": {
+            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:${WebsocketsLogGroup}"
+          },
+          "Format": "$context.identity.sourceIp $context.identity.caller $context.identity.user [$context.requestTime] \"$context.eventType $context.routeKey $context.connectionId\" $context.requestId"
+        },
+        "DefaultRouteSettings": {
+          "DataTraceEnabled": true,
+          "LoggingLevel": "INFO"
+        },
+        "DeploymentId": {
+          "Ref": "WebsocketsDeploymentMyF6XDJP4uiCx2izd6DzYCSpXtJ6qKoX0mjnNdi2fc"
+        }
+      }
+    },
+    "WebsocketsLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/websocket/dd-sls-plugin-integration-test-dev"
+      }
+    },
+    "WebsocketsDeploymentMyF6XDJP4uiCx2izd6DzYCSpXtJ6qKoX0mjnNdi2fc": {
+      "Type": "AWS::ApiGatewayV2::Deployment",
+      "DependsOn": [
+        "SconnectWebsocketsRoute",
+        "SconnectWebsocketsRoute"
+      ],
+      "Properties": {
+        "ApiId": {
+          "Ref": "WebsocketsApi"
+        },
+        "Description": "Serverless Websockets"
+      }
+    },
+    "HttpApi": {
+      "Type": "AWS::ApiGatewayV2::Api",
+      "Properties": {
+        "Name": "dev-dd-sls-plugin-integration-test",
+        "ProtocolType": "HTTP"
+      }
+    },
+    "HttpApiLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/http-api/dd-sls-plugin-integration-test-dev"
+      }
+    },
+    "HttpApiStage": {
+      "Type": "AWS::ApiGatewayV2::Stage",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "StageName": "$default",
+        "AutoDeploy": true,
+        "DefaultRouteSettings": {
+          "DetailedMetricsEnabled": false
+        },
+        "AccessLogSettings": {
+          "DestinationArn": {
+            "Fn::GetAtt": [
+              "HttpApiLogGroup",
+              "Arn"
+            ]
+          },
+          "Format": "{\"requestId\":\"$context.requestId\",\"ip\":\"$context.identity.sourceIp\",\"requestTime\":\"$context.requestTime\",\"httpMethod\":\"$context.httpMethod\",\"routeKey\":\"$context.routeKey\",\"status\":\"$context.status\",\"protocol\":\"$context.protocol\",\"responseLength\":\"$context.responseLength\"}"
+        }
+      },
+      "DependsOn": "HttpApiLogGroup"
+    },
+    "PythonHello27LambdaPermissionHttpApi": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "PythonHello27LambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "HttpApi"
+              },
+              "/*"
+            ]
+          ]
+        }
+      }
+    },
+    "HttpApiIntegrationPythonHello27": {
+      "Type": "AWS::ApiGatewayV2::Integration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": {
+          "Fn::GetAtt": [
+            "PythonHello27LambdaFunction",
+            "Arn"
+          ]
+        },
+        "PayloadFormatVersion": "2.0",
+        "TimeoutInMillis": 6500
+      }
+    },
+    "HttpApiRoutePutUsersUpdate": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "RouteKey": "PUT /users/update",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "HttpApiIntegrationPythonHello27"
+              }
+            ]
+          ]
+        }
+      },
+      "DependsOn": "HttpApiIntegrationPythonHello27"
+    },
+    "JavascriptHello10DashxLambdaPermissionHttpApi": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "JavascriptHello10DashxLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "HttpApi"
+              },
+              "/*"
+            ]
+          ]
+        }
+      }
+    },
+    "HttpApiIntegrationJavascriptHello10Dashx": {
+      "Type": "AWS::ApiGatewayV2::Integration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": {
+          "Fn::GetAtt": [
+            "JavascriptHello10DashxLambdaFunction",
+            "Arn"
+          ]
+        },
+        "PayloadFormatVersion": "2.0",
+        "TimeoutInMillis": 6500
+      }
+    },
+    "HttpApiRouteDeleteUsersRemove": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "RouteKey": "DELETE /users/remove",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "HttpApiIntegrationJavascriptHello10Dashx"
+              }
+            ]
+          ]
+        }
+      },
+      "DependsOn": "HttpApiIntegrationJavascriptHello10Dashx"
+    },
+    "ApiGatewayLogGroupSubscription": {
+      "Type": "AWS::Logs::SubscriptionFilter",
+      "Properties": {
+        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
+        "FilterPattern": "",
+        "LogGroupName": {
+          "Ref": "ApiGatewayLogGroup"
+        }
+      }
+    },
+    "ExecutionLogGroupSubscription": {
+      "Type": "AWS::Logs::SubscriptionFilter",
+      "Properties": {
+        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
+        "FilterPattern": "",
+        "LogGroupName": "{\n        \"Fn::Join\": [\n          \"\", [\n            \"API-Gateway-Execution-Logs_\",\n            {\n              \"Ref\": \"ApiGatewayRestApi\"\n            },\n            \"/\",\n            {\n              dev\n            }\n          ]\n        ]\n      }"
+      }
+    },
+    "WebsocketsLogGroupSubscription": {
+      "Type": "AWS::Logs::SubscriptionFilter",
+      "Properties": {
+        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
+        "FilterPattern": "",
+        "LogGroupName": {
+          "Ref": "WebsocketsLogGroup"
+        }
+      }
+    },
+    "HttpApiLogGroupSubscription": {
+      "Type": "AWS::Logs::SubscriptionFilter",
+      "Properties": {
+        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
+        "FilterPattern": "",
+        "LogGroupName": {
+          "Ref": "HttpApiLogGroup"
+        }
+      }
     }
   },
   "Outputs": {
@@ -1115,6 +1534,57 @@
               "Ref": "AWS::URLSuffix"
             },
             "/dev"
+          ]
+        ]
+      }
+    },
+    "ServiceEndpointWebsocket": {
+      "Description": "URL of the service endpoint",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "wss://",
+            {
+              "Ref": "WebsocketsApi"
+            },
+            ".execute-api.",
+            {
+              "Ref": "AWS::Region"
+            },
+            ".",
+            {
+              "Ref": "AWS::URLSuffix"
+            },
+            "/dev"
+          ]
+        ]
+      }
+    },
+    "HttpApiId": {
+      "Description": "Id of the HTTP API",
+      "Value": {
+        "Ref": "HttpApi"
+      }
+    },
+    "HttpApiUrl": {
+      "Description": "URL of the HTTP API",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Ref": "HttpApi"
+            },
+            ".execute-api.",
+            {
+              "Ref": "AWS::Region"
+            },
+            ".",
+            {
+              "Ref": "AWS::URLSuffix"
+            }
           ]
         ]
       }

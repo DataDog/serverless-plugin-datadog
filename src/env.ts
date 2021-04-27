@@ -48,7 +48,9 @@ export interface Configuration {
   exclude: string[];
 
   // API Gateway logging
-  enableApiGatewayLogs?: boolean;
+  subscribeToApiGatewayLogs: boolean;
+  subscribeToHttpApiLogs: boolean;
+  subscribeToWebsocketLogs: boolean;
 }
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
@@ -58,7 +60,9 @@ const logLevelEnvVar = "DD_LOG_LEVEL";
 const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
 const ddTracingEnabledEnvVar = "DD_TRACE_ENABLED";
 const logInjectionEnvVar = "DD_LOGS_INJECTION";
-const apiGatewayLogsEnvVar = "DD_API_GATEWAY_LOGS_ENABLED";
+const subToApiGatewayLogsEnvVar = "DD_SUBSCRIBED_TO_API_GATEWAY_LOGS";
+const subToApiLogsEnvVar = "DD_SUBSCRIBED_TO_HTTP_API_LOGS";
+const subToWebsocketLogsEnvVar = "DD_SUBSCRIBED_TO_WEBSOCKET_LOGS";
 
 export const defaultConfiguration: Configuration = {
   addLayers: true,
@@ -72,7 +76,9 @@ export const defaultConfiguration: Configuration = {
   injectLogContext: true,
   exclude: [],
   integrationTesting: false,
-  enableApiGatewayLogs: true,
+  subscribeToApiGatewayLogs: true,
+  subscribeToHttpApiLogs: true,
+  subscribeToWebsocketLogs: true,
 };
 
 export function setEnvConfiguration(config: Configuration, service: Service) {
@@ -103,8 +109,14 @@ export function setEnvConfiguration(config: Configuration, service: Service) {
   if (config.injectLogContext !== undefined && environment[logInjectionEnvVar] === undefined) {
     environment[logInjectionEnvVar] = config.injectLogContext;
   }
-  if (config.enableApiGatewayLogs !== undefined && environment[apiGatewayLogsEnvVar] === undefined) {
-    environment[apiGatewayLogsEnvVar] = config.enableApiGatewayLogs;
+  if (config.subscribeToApiGatewayLogs !== undefined && environment[subToApiGatewayLogsEnvVar] === undefined) {
+    environment[subToApiGatewayLogsEnvVar] = config.subscribeToApiGatewayLogs;
+  }
+  if (config.subscribeToHttpApiLogs !== undefined && environment[subToApiLogsEnvVar] === undefined) {
+    environment[subToApiLogsEnvVar] = config.subscribeToHttpApiLogs;
+  }
+  if (config.subscribeToWebsocketLogs !== undefined && environment[subToWebsocketLogsEnvVar] === undefined) {
+    environment[subToWebsocketLogsEnvVar] = config.subscribeToWebsocketLogs;
   }
 }
 

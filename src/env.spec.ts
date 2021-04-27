@@ -90,7 +90,9 @@ describe("getConfig", () => {
       injectLogContext: true,
       exclude: [],
       integrationTesting: false,
-      enableApiGatewayLogs: true,
+      subscribeToApiGatewayLogs: true,
+      subscribeToHttpApiLogs: true,
+      subscribeToWebsocketLogs: true,
     });
   });
 
@@ -117,7 +119,9 @@ describe("getConfig", () => {
       injectLogContext: true,
       exclude: [],
       integrationTesting: false,
-      enableApiGatewayLogs: true,
+      subscribeToApiGatewayLogs: true,
+      subscribeToHttpApiLogs: true,
+      subscribeToWebsocketLogs: true,
     });
   });
 });

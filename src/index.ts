@@ -42,6 +42,7 @@ module.exports = class ServerlessPlugin {
     "before:offline:start:init": this.beforePackageFunction.bind(this),
     "before:step-functions-offline:start": this.beforePackageFunction.bind(this),
     "after:deploy:deploy": this.afterDeploy.bind(this),
+    "after:package:compileEvents": this.afterPackageFunction.bind(this),
   };
 
   public commands = {
@@ -106,7 +107,6 @@ module.exports = class ServerlessPlugin {
     const config = getConfig(this.serverless.service);
     const forwarderArn: string | undefined = config.forwarderArn;
     const forwarder: string | undefined = config.forwarder;
-
     let datadogForwarderArn;
     if (config.enabled === false) return;
     if (config.addExtension === false) {
@@ -127,6 +127,7 @@ module.exports = class ServerlessPlugin {
           aws,
           datadogForwarderArn,
           config.integrationTesting,
+          config.subscribeToApiGatewayLogs,
         );
         for (const error of errors) {
           this.serverless.cli.log(error);
