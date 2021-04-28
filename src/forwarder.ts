@@ -127,7 +127,8 @@ export async function addCloudWatchForwarderSubscriptions(
       };
 
       // add api gateway execution log group
-      resources["ExecutionLogGroup"] = executionLogGroup;
+      const executionLogGroupKey = "ExecutionLogGroup";
+      resources[executionLogGroupKey] = executionLogGroup;
 
       const executionSubscription = {
         Type: logGroupSubscriptionKey,
@@ -139,7 +140,8 @@ export async function addCloudWatchForwarderSubscriptions(
       };
 
       // add subscription to execution log group
-      resources["ExecutionLogGroupSubscription"] = executionSubscription;
+      const subscriptionKey = "ExecutionLogGroupSubscription";
+      resources[subscriptionKey] = executionSubscription;
     }
   }
   return errors;
