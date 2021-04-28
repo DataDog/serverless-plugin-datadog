@@ -42,7 +42,7 @@ module.exports = class ServerlessPlugin {
     "before:offline:start:init": this.beforePackageFunction.bind(this),
     "before:step-functions-offline:start": this.beforePackageFunction.bind(this),
     "after:deploy:deploy": this.afterDeploy.bind(this),
-    "after:package:compileEvents": this.afterPackageFunction.bind(this),
+    "before:package:finalize": this.afterPackageFunction.bind(this),
   };
 
   public commands = {
