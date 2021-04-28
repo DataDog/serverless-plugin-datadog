@@ -48,9 +48,9 @@ export interface Configuration {
   exclude: string[];
 
   // API Gateway logging
-  subscribeToApiGatewayLogs: boolean;
-  subscribeToHttpApiLogs: boolean;
-  subscribeToWebsocketLogs: boolean;
+  subscribeToApiGatewayLogs?: boolean;
+  subscribeToHttpApiLogs?: boolean;
+  subscribeToWebsocketLogs?: boolean;
 }
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";

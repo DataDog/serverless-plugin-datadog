@@ -204,6 +204,7 @@ describe("setEnvConfiguration", () => {
     const service = {
       provider: {},
     } as any;
+
     setEnvConfiguration(
       {
         addLayers: false,
@@ -263,6 +264,9 @@ describe("setEnvConfiguration", () => {
         addExtension: false,
         enableTags: true,
         injectLogContext: true,
+        subscribeToApiGatewayLogs: true,
+        subscribeToHttpApiLogs: true,
+        subscribeToWebsocketLogs: true,
         exclude: [],
       },
       service,
@@ -277,6 +281,9 @@ describe("setEnvConfiguration", () => {
           DD_SITE: "datadoghq.eu",
           DD_TRACE_ENABLED: false,
           DD_LOGS_INJECTION: false,
+          DD_SUBSCRIBED_TO_API_GATEWAY_LOGS: true,
+          DD_SUBSCRIBED_TO_HTTP_API_LOGS: true,
+          DD_SUBSCRIBED_TO_WEBSOCKET_LOGS: true,
         },
       },
     });

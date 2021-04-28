@@ -170,6 +170,34 @@ describe("addCloudWatchForwarderSubscriptions", () => {
           },
           "Type": "AWS::Logs::SubscriptionFilter",
         },
+        "ExecutionLogGroup": Object {
+          "Properties": Object {
+            "LogGroupName": Object {
+              "Fn::Join": Array [
+                "",
+                Array [
+                  "API-Gateway-Execution-Logs_",
+                  Object {
+                    "Ref": "ApiGatewayRestApi",
+                  },
+                  "/",
+                  "dev",
+                ],
+              ],
+            },
+          },
+          "Type": "AWS::Logs::LogGroup",
+        },
+        "ExecutionLogGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "my-func",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Ref": "ExecutionLogGroup",
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
+        },
         "FirstGroup": Object {
           "Properties": Object {
             "LogGroupName": "/aws/lambda/first-group",

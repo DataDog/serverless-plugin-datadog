@@ -1438,12 +1438,32 @@
         }
       }
     },
+    "ExecutionLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "",
+            [
+              "API-Gateway-Execution-Logs_",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/",
+              "dev"
+            ]
+          ]
+        }
+      }
+    },
     "ExecutionLogGroupSubscription": {
       "Type": "AWS::Logs::SubscriptionFilter",
       "Properties": {
         "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
         "FilterPattern": "",
-        "LogGroupName": "{\n        \"Fn::Join\": [\n          \"\", [\n            \"API-Gateway-Execution-Logs_\",\n            {\n              \"Ref\": \"ApiGatewayRestApi\"\n            },\n            \"/\",\n            {\n              dev\n            }\n          ]\n        ]\n      }"
+        "LogGroupName": {
+          "Ref": "ExecutionLogGroup"
+        }
       }
     },
     "WebsocketsLogGroupSubscription": {
