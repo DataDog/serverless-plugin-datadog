@@ -706,48 +706,72 @@
     "ServerlessDeploymentBucketName": {
       "Value": {
         "Ref": "ServerlessDeploymentBucket"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-ServerlessDeploymentBucketName"
       }
     },
     "PythonHello27LambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
         "Ref": "PythonHello27LambdaVersionXXXX"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-PythonHello27LambdaFunctionQualifiedArn"
       }
     },
     "PythonHello36LambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
         "Ref": "PythonHello36LambdaVersionXXXX"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-PythonHello36LambdaFunctionQualifiedArn"
       }
     },
     "PythonHello37LambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
         "Ref": "PythonHello37LambdaVersionXXXX"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-PythonHello37LambdaFunctionQualifiedArn"
       }
     },
     "PythonHello38LambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
         "Ref": "PythonHello38LambdaVersionXXXX"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-PythonHello38LambdaFunctionQualifiedArn"
       }
     },
     "JavascriptHello10DashxLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
         "Ref": "JavascriptHello10DashxLambdaVersionXXXX"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-JavascriptHello10DashxLambdaFunctionQualifiedArn"
       }
     },
     "JavascriptHello12DashxLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
         "Ref": "JavascriptHello12DashxLambdaVersionXXXX"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-JavascriptHello12DashxLambdaFunctionQualifiedArn"
       }
     },
     "JavascriptHello14DashxLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
         "Ref": "JavascriptHello14DashxLambdaVersionXXXX"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-JavascriptHello14DashxLambdaFunctionQualifiedArn"
       }
     }
   }
