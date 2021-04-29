@@ -23,9 +23,7 @@ jobs:
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install Serverless Framework
-        run: |
-          node -pe "require('./package.json').devDependencies.serverless"
-          sudo yarn global add serverless@$SLS_VERSION --prefix /usr/local
+        run: sudo yarn global add serverless@node -pe "require('./package.json').devDependencies.serverless" --prefix /usr/local
 
       - name: Run tests
         env:
