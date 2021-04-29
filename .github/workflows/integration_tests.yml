@@ -24,7 +24,7 @@ jobs:
 
       - name: Install Serverless Framework
         run: |
-          SLS_VERSION=node -pe "require('./package.json').devDependencies.serverless"
+          node -pe "require('./package.json').devDependencies.serverless"
           sudo yarn global add serverless@$SLS_VERSION --prefix /usr/local
 
       - name: Run tests
