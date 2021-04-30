@@ -105,35 +105,25 @@ module.exports = class ServerlessPlugin {
 
   private async afterPackageFunction() {
     const config = getConfig(this.serverless.service);
-    const forwarderArn: string | undefined = config.forwarderArn;
-    const forwarder: string | undefined = config.forwarder;
     let datadogForwarderArn;
     if (config.enabled === false) return;
-    if (config.addExtension === false) {
-      if (forwarderArn && forwarder) {
-        throw new Error(
-          "Both 'forwarderArn' and 'forwarder' parameters are set. Please only use the 'forwarderArn' parameter.",
-        );
-      } else if (forwarderArn !== undefined && forwarder === undefined) {
-        datadogForwarderArn = forwarderArn;
-      } else if (forwarder !== undefined && forwarderArn === undefined) {
-        datadogForwarderArn = forwarder;
-      }
 
-      if (datadogForwarderArn) {
-        const aws = this.serverless.getProvider("aws");
-        const errors = await addCloudWatchForwarderSubscriptions(
-          this.serverless.service,
-          aws,
-          datadogForwarderArn,
-          config.integrationTesting,
-          config.subscribeToApiGatewayLogs,
-        );
-        for (const error of errors) {
-          this.serverless.cli.log(error);
-        }
+    datadogForwarderArn = setDatadogForwarder(config);
+    if (datadogForwarderArn) {
+      const aws = this.serverless.getProvider("aws");
+      const errors = await addCloudWatchForwarderSubscriptions(
+        this.serverless.service,
+        aws,
+        datadogForwarderArn,
+        config.integrationTesting,
+        config.subscribeToApiGatewayLogs,
+        config.addExtension,
+      );
+      for (const error of errors) {
+        this.serverless.cli.log(error);
       }
     }
+
     this.addPluginTag();
 
     if (config.enableTags) {
@@ -239,11 +229,22 @@ function validateConfiguration(config: Configuration) {
     );
   }
   if (config.addExtension) {
-    if (config.forwarder || config.forwarderArn) {
-      throw new Error("`addExtension` and `forwarder`/`forwarderArn` should not be set at the same time.");
-    }
     if (config.apiKey === undefined && config.apiKMSKey === undefined) {
       throw new Error("When `addExtension` is true, `apiKey` or `apiKMSKey` must also be set.");
     }
+  }
+}
+
+function setDatadogForwarder(config: Configuration) {
+  const forwarderArn: string | undefined = config.forwarderArn;
+  const forwarder: string | undefined = config.forwarder;
+  if (forwarderArn && forwarder) {
+    throw new Error(
+      "Both 'forwarderArn' and 'forwarder' parameters are set. Please only use the 'forwarderArn' parameter.",
+    );
+  } else if (forwarderArn !== undefined && forwarder === undefined) {
+    return forwarderArn;
+  } else if (forwarder !== undefined && forwarderArn === undefined) {
+    return forwarder;
   }
 }

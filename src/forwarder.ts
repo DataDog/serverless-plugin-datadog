@@ -61,6 +61,7 @@ export async function addCloudWatchForwarderSubscriptions(
   functionArn: CloudFormationObjectArn | string,
   integrationTesting: boolean | undefined,
   subscribeToApiGatewayLogs: boolean,
+  extensionEnabled: boolean,
 ) {
   const resources = service.provider.compiledCloudFormationTemplate?.Resources;
   if (resources === undefined) {
@@ -75,8 +76,22 @@ export async function addCloudWatchForwarderSubscriptions(
     await validateForwarderArn(aws, functionArn);
   }
   for (const [name, resource] of Object.entries(resources)) {
+    if (!isLogGroup(resource)) {
+      continue;
+    }
+    // if the extension is enabled, we don't want to subscribe to lambda log groups
     if (
-      !isLogGroup(resource) ||
+      extensionEnabled &&
+      !(
+        resource.Properties.LogGroupName.startsWith("/aws/api-gateway/") ||
+        resource.Properties.LogGroupName.startsWith("/aws/http-api/") ||
+        resource.Properties.LogGroupName.startsWith("/aws/websocket/")
+      )
+    ) {
+      continue;
+    }
+    // if the extension is disabled, we should subscribe to lambda log groups
+    if (
       !(
         resource.Properties.LogGroupName.startsWith("/aws/lambda/") ||
         resource.Properties.LogGroupName.startsWith("/aws/api-gateway/") ||
@@ -103,45 +118,19 @@ export async function addCloudWatchForwarderSubscriptions(
       );
       continue;
     }
-
-    const subscription = {
-      Type: logGroupSubscriptionKey,
-      Properties: {
-        DestinationArn: functionArn,
-        FilterPattern: "",
-        LogGroupName: { Ref: name },
-      },
-    };
+    // Create subscriptions for each log group
+    const subscription = subscribeToLogGroup(functionArn, name);
     resources[scopedSubName] = subscription;
     // Create the Execution log group for API Gateway logging manually
     if (subscribeToApiGatewayLogs && logGroupName.startsWith("/aws/api-gateway/")) {
-      const executionLogGroupName = {
-        "Fn::Join": ["", ["API-Gateway-Execution-Logs_", { Ref: "ApiGatewayRestApi" }, "/", aws.getStage()]],
-      };
-
-      const executionLogGroup = {
-        Type: "AWS::Logs::LogGroup",
-        Properties: {
-          LogGroupName: executionLogGroupName,
-        },
-      };
-
       // add api gateway execution log group
+      const executionLogGroup = createExecutionLogGroup(aws, subscribeToApiGatewayLogs, logGroupName);
       const executionLogGroupKey = "ExecutionLogGroup";
       resources[executionLogGroupKey] = executionLogGroup;
-
-      const executionSubscription = {
-        Type: logGroupSubscriptionKey,
-        Properties: {
-          DestinationArn: functionArn,
-          FilterPattern: "",
-          LogGroupName: { Ref: "ExecutionLogGroup" },
-        },
-      };
-
       // add subscription to execution log group
-      const subscriptionKey = "ExecutionLogGroupSubscription";
-      resources[subscriptionKey] = executionSubscription;
+      const executionSubscription = subscribeToExecutionLogGroup(functionArn);
+      const executionSubscriptionKey = "ExecutionLogGroupSubscription";
+      resources[executionSubscriptionKey] = executionSubscription;
     }
   }
   return errors;
@@ -178,4 +167,42 @@ export async function describeSubscriptionFilters(aws: Aws, logGroupName: string
     // An error will occur if the log group doesn't exist, so we swallow this and return an empty list.
     return [];
   }
+}
+
+export function subscribeToLogGroup(functionArn: string | CloudFormationObjectArn, name: string) {
+  const subscription = {
+    Type: logGroupSubscriptionKey,
+    Properties: {
+      DestinationArn: functionArn,
+      FilterPattern: "",
+      LogGroupName: { Ref: name },
+    },
+  };
+  return subscription;
+}
+export function createExecutionLogGroup(aws: Aws, subscribeToLogs: boolean, logGroupName: string) {
+  // Create the Execution log group for API Gateway logging manually
+  const executionLogGroupName = {
+    "Fn::Join": ["", ["API-Gateway-Execution-Logs_", { Ref: "ApiGatewayRestApi" }, "/", aws.getStage()]],
+  };
+
+  const executionLogGroup = {
+    Type: "AWS::Logs::LogGroup",
+    Properties: {
+      LogGroupName: executionLogGroupName,
+    },
+  };
+  return executionLogGroup;
+}
+
+export function subscribeToExecutionLogGroup(functionArn: string | CloudFormationObjectArn) {
+  const executionSubscription = {
+    Type: logGroupSubscriptionKey,
+    Properties: {
+      DestinationArn: functionArn,
+      FilterPattern: "",
+      LogGroupName: { Ref: "ExecutionLogGroup" },
+    },
+  };
+  return executionSubscription;
 }
