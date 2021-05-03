@@ -127,7 +127,6 @@ export async function addCloudWatchForwarderSubscriptions(
     const subscription = subscribeToLogGroup(functionArn, name);
     resources[scopedSubName] = subscription;
     // Create the Execution log group for API Gateway logging manually so we can subscribe
-    let subscribeToApiGatewayLogGroup = forwarderConfigs.SubToApiGatewayLogGroup;
     if (validateApiGatweaySubscription(resource, forwarderConfigs.SubToApiGatewayLogGroup)) {
       // add api gateway execution log group
       const executionLogGroup = createExecutionLogGroup(aws, forwarderConfigs.SubToApiGatewayLogGroup, logGroupName);
