@@ -109,10 +109,10 @@ module.exports = class ServerlessPlugin {
 
     // Create an object that contains some of our booleans for the forwarder
     const forwarderConfigs = {
-      SubToApiGatewayLogGroup: config.subscribeToApiGatewayLogs,
       AddExtension: config.addExtension,
-      SubToHttpApiLogGroup: config.subscribeToHttpApiLogs,
       IntegrationTesting: config.integrationTesting,
+      SubToApiGatewayLogGroup: config.subscribeToApiGatewayLogs,
+      SubToHttpApiLogGroup: config.subscribeToHttpApiLogs,
       SubToWebsocketLogGroup: config.subscribeToWebsocketLogs,
     };
 
