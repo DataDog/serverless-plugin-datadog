@@ -60,9 +60,6 @@ const logLevelEnvVar = "DD_LOG_LEVEL";
 const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
 const ddTracingEnabledEnvVar = "DD_TRACE_ENABLED";
 const logInjectionEnvVar = "DD_LOGS_INJECTION";
-const subToApiGatewayLogsEnvVar = "DD_SUBSCRIBE_TO_API_GATEWAY_LOGS";
-const subToApiLogsEnvVar = "DD_SUBSCRIBE_TO_HTTP_API_LOGS";
-const subToWebsocketLogsEnvVar = "DD_SUBSCRIBE_TO_WEBSOCKET_LOGS";
 
 export const defaultConfiguration: Configuration = {
   addLayers: true,
@@ -108,15 +105,6 @@ export function setEnvConfiguration(config: Configuration, service: Service) {
   }
   if (config.injectLogContext !== undefined && environment[logInjectionEnvVar] === undefined) {
     environment[logInjectionEnvVar] = config.injectLogContext;
-  }
-  if (config.subscribeToApiGatewayLogs !== undefined && environment[subToApiGatewayLogsEnvVar] === undefined) {
-    environment[subToApiGatewayLogsEnvVar] = config.subscribeToApiGatewayLogs;
-  }
-  if (config.subscribeToHttpApiLogs !== undefined && environment[subToApiLogsEnvVar] === undefined) {
-    environment[subToApiLogsEnvVar] = config.subscribeToHttpApiLogs;
-  }
-  if (config.subscribeToWebsocketLogs !== undefined && environment[subToWebsocketLogsEnvVar] === undefined) {
-    environment[subToWebsocketLogsEnvVar] = config.subscribeToWebsocketLogs;
   }
 }
 

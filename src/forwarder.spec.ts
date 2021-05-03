@@ -285,7 +285,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     `);
   });
 
-  it("it does not add subscriptions for log groups that have their subscriptions diabled", async () => {
+  it("does not add subscriptions for log groups that have their subscriptions diabled", async () => {
     const service = serviceWithResources({
       FirstGroup: {
         Type: "AWS::Logs::LogGroup",

@@ -81,29 +81,7 @@ export async function addCloudWatchForwarderSubscriptions(
     await validateForwarderArn(aws, functionArn);
   }
   for (const [name, resource] of Object.entries(resources)) {
-    if (!isLogGroup(resource)) {
-      continue;
-    }
-    // if the extension is enabled, we don't want to subscribe to lambda log groups
-    if (
-      forwarderConfigs.AddExtension &&
-      !(
-        validateApiGatweaySubscription(resource, forwarderConfigs.SubToApiGatewayLogGroup) ||
-        validateHttpApiSubscription(resource, forwarderConfigs.SubToHttpApiLogGroup) ||
-        validateWebsocketSubscription(resource, forwarderConfigs.SubToWebsocketLogGroup)
-      )
-    ) {
-      continue;
-    }
-    // if the extension is disabled, we should subscribe to lambda log groups
-    if (
-      !(
-        resource.Properties.LogGroupName.startsWith("/aws/lambda/") ||
-        validateApiGatweaySubscription(resource, forwarderConfigs.SubToApiGatewayLogGroup) ||
-        validateHttpApiSubscription(resource, forwarderConfigs.SubToHttpApiLogGroup) ||
-        validateWebsocketSubscription(resource, forwarderConfigs.SubToWebsocketLogGroup)
-      )
-    ) {
+    if (shouldNotSubscribe(resource, forwarderConfigs)) {
       continue;
     }
     const logGroupName = resource.Properties.LogGroupName;
@@ -127,7 +105,7 @@ export async function addCloudWatchForwarderSubscriptions(
     const subscription = subscribeToLogGroup(functionArn, name);
     resources[scopedSubName] = subscription;
     // Create the Execution log group for API Gateway logging manually so we can subscribe
-    if (validateApiGatweaySubscription(resource, forwarderConfigs.SubToApiGatewayLogGroup)) {
+    if (validateApiGatewaySubscription(resource, forwarderConfigs.SubToApiGatewayLogGroup)) {
       // add api gateway execution log group
       const executionLogGroup = createExecutionLogGroup(aws);
       const executionLogGroupKey = "ExecutionLogGroup";
@@ -175,7 +153,7 @@ export async function describeSubscriptionFilters(aws: Aws, logGroupName: string
 }
 
 // Helper functions to validate we have a particular log group and if we should subscribe to it
-function validateApiGatweaySubscription(resource: any, subscribe: boolean) {
+function validateApiGatewaySubscription(resource: any, subscribe: boolean) {
   return resource.Properties.LogGroupName.startsWith("/aws/api-gateway/") && subscribe;
 }
 function validateHttpApiSubscription(resource: any, subscribe: boolean) {
@@ -183,6 +161,35 @@ function validateHttpApiSubscription(resource: any, subscribe: boolean) {
 }
 function validateWebsocketSubscription(resource: any, subscribe: boolean) {
   return resource.Properties.LogGroupName.startsWith("/aws/websocket/") && subscribe;
+}
+
+function shouldNotSubscribe(resource: any, forwarderConfigs: ForwarderConfigs) {
+  if (!isLogGroup(resource)) {
+    return true;
+  }
+  // if the extension is enabled, we don't want to subscribe to lambda log groups
+  if (
+    forwarderConfigs.AddExtension &&
+    !(
+      validateApiGatewaySubscription(resource, forwarderConfigs.SubToApiGatewayLogGroup) ||
+      validateHttpApiSubscription(resource, forwarderConfigs.SubToHttpApiLogGroup) ||
+      validateWebsocketSubscription(resource, forwarderConfigs.SubToWebsocketLogGroup)
+    )
+  ) {
+    return true;
+  }
+  // if the extension is disabled, we should subscribe to lambda log groups
+  if (
+    !(
+      resource.Properties.LogGroupName.startsWith("/aws/lambda/") ||
+      validateApiGatewaySubscription(resource, forwarderConfigs.SubToApiGatewayLogGroup) ||
+      validateHttpApiSubscription(resource, forwarderConfigs.SubToHttpApiLogGroup) ||
+      validateWebsocketSubscription(resource, forwarderConfigs.SubToWebsocketLogGroup)
+    )
+  ) {
+    return true;
+  }
+  return false;
 }
 
 function subscribeToLogGroup(functionArn: string | CloudFormationObjectArn, name: string) {

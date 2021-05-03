@@ -235,9 +235,6 @@ describe("setEnvConfiguration", () => {
           DD_SITE: "datadoghq.eu",
           DD_TRACE_ENABLED: true,
           DD_LOGS_INJECTION: false,
-          DD_SUBSCRIBE_TO_API_GATEWAY_LOGS: true,
-          DD_SUBSCRIBE_TO_HTTP_API_LOGS: true,
-          DD_SUBSCRIBE_TO_WEBSOCKET_LOGS: true,
         },
       },
     });
@@ -254,9 +251,6 @@ describe("setEnvConfiguration", () => {
           DD_SITE: "datadoghq.eu",
           DD_TRACE_ENABLED: false,
           DD_LOGS_INJECTION: false,
-          DD_SUBSCRIBE_TO_API_GATEWAY_LOGS: true,
-          DD_SUBSCRIBE_TO_HTTP_API_LOGS: true,
-          DD_SUBSCRIBE_TO_WEBSOCKET_LOGS: true,
         },
       },
     } as any;
@@ -290,9 +284,6 @@ describe("setEnvConfiguration", () => {
           DD_SITE: "datadoghq.eu",
           DD_TRACE_ENABLED: false,
           DD_LOGS_INJECTION: false,
-          DD_SUBSCRIBE_TO_API_GATEWAY_LOGS: true,
-          DD_SUBSCRIBE_TO_HTTP_API_LOGS: true,
-          DD_SUBSCRIBE_TO_WEBSOCKET_LOGS: true,
         },
       },
     });
@@ -331,9 +322,6 @@ describe("setEnvConfiguration", () => {
           DD_SITE: "datadoghq.eu",
           DD_TRACE_ENABLED: true,
           DD_LOGS_INJECTION: false,
-          DD_SUBSCRIBE_TO_API_GATEWAY_LOGS: true,
-          DD_SUBSCRIBE_TO_HTTP_API_LOGS: true,
-          DD_SUBSCRIBE_TO_WEBSOCKET_LOGS: true,
         },
       },
     });
