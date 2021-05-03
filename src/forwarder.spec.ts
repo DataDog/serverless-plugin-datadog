@@ -151,7 +151,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const aws = awsMock({});
 
-    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", false, true);
+    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", false, true, false);
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
       Object {
         "ApiGatewayGroup": Object {
@@ -290,7 +290,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       "/aws/lambda/first-group": [{ filterName: "unknown-filter-name1" }, { filterName: "unknown-filter-name2" }],
     });
 
-    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", false, true);
+    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", false, true, true);
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
       Object {
         "FirstGroup": Object {
@@ -308,7 +308,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const aws = awsMock({});
 
-    const errors = await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", false, true);
+    const errors = await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", false, true, true);
     expect(errors).toMatchInlineSnapshot(`
       Array [
         "No cloudformation stack available. Skipping subscribing Datadog forwarder.",
@@ -331,7 +331,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const aws = awsMock({ "/aws/lambda/first-group": [{ filterName: "my-service-dev-FirstGroupSubscription-XXXX" }] });
 
-    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", false, true);
+    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", false, true, false);
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
       Object {
         "FirstGroup": Object {
@@ -372,7 +372,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       "myCustomStackName",
     );
 
-    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", false, true);
+    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", false, true, false);
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
       Object {
         "FirstGroup": Object {
@@ -431,9 +431,9 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       true,
     );
 
-    expect(async () => await addCloudWatchForwarderSubscriptions(service, aws, "my-func", false, true)).rejects.toThrow(
-      "Could not perform GetFunction on my-func.",
-    );
+    expect(
+      async () => await addCloudWatchForwarderSubscriptions(service, aws, "my-func", false, true, true),
+    ).rejects.toThrow("Could not perform GetFunction on my-func.");
   });
 
   it("skips doesFowarderExist when functionArn is defined with CloudFormation substitute variables", async () => {
@@ -450,7 +450,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const functionArn: CloudFormationObjectArn = {
       "Fn::Sub": "!Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:datadog-logs-forwarder",
     };
-    const errors: string[] = await addCloudWatchForwarderSubscriptions(service, aws, functionArn, false, true);
+    const errors: string[] = await addCloudWatchForwarderSubscriptions(service, aws, functionArn, false, true, true);
     expect(
       errors.includes(
         "Skipping forwarder ARN validation because forwarder string defined with CloudFormation function.",
@@ -470,7 +470,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       true,
     );
     const functionArn: string = "forwarderArn";
-    const errors: string[] = await addCloudWatchForwarderSubscriptions(service, aws, functionArn, true, true);
+    const errors: string[] = await addCloudWatchForwarderSubscriptions(service, aws, functionArn, true, true, true);
     expect(errors.includes("Skipping forwarder ARN validation because 'integrationTesting' is set to true")).toBe(true);
   });
 });
