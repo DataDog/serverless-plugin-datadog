@@ -236,9 +236,9 @@
             "DD_LOG_LEVEL": "info",
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
-            "DD_SUBSCRIBED_TO_API_GATEWAY_LOGS": true,
-            "DD_SUBSCRIBED_TO_HTTP_API_LOGS": true,
-            "DD_SUBSCRIBED_TO_WEBSOCKET_LOGS": true,
+            "DD_SUBSCRIBE_TO_API_GATEWAY_LOGS": true,
+            "DD_SUBSCRIBE_TO_HTTP_API_LOGS": true,
+            "DD_SUBSCRIBE_TO_WEBSOCKET_LOGS": true,
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LAMBDA_HANDLER": "py_handler.hello"
           }
@@ -293,9 +293,9 @@
             "DD_LOG_LEVEL": "info",
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
-            "DD_SUBSCRIBED_TO_API_GATEWAY_LOGS": true,
-            "DD_SUBSCRIBED_TO_HTTP_API_LOGS": true,
-            "DD_SUBSCRIBED_TO_WEBSOCKET_LOGS": true,
+            "DD_SUBSCRIBE_TO_API_GATEWAY_LOGS": true,
+            "DD_SUBSCRIBE_TO_HTTP_API_LOGS": true,
+            "DD_SUBSCRIBE_TO_WEBSOCKET_LOGS": true,
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LAMBDA_HANDLER": "py_handler.hello"
           }
@@ -350,9 +350,9 @@
             "DD_LOG_LEVEL": "info",
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
-            "DD_SUBSCRIBED_TO_API_GATEWAY_LOGS": true,
-            "DD_SUBSCRIBED_TO_HTTP_API_LOGS": true,
-            "DD_SUBSCRIBED_TO_WEBSOCKET_LOGS": true,
+            "DD_SUBSCRIBE_TO_API_GATEWAY_LOGS": true,
+            "DD_SUBSCRIBE_TO_HTTP_API_LOGS": true,
+            "DD_SUBSCRIBE_TO_WEBSOCKET_LOGS": true,
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LAMBDA_HANDLER": "py_handler.hello"
           }
@@ -407,9 +407,9 @@
             "DD_LOG_LEVEL": "info",
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
-            "DD_SUBSCRIBED_TO_API_GATEWAY_LOGS": true,
-            "DD_SUBSCRIBED_TO_HTTP_API_LOGS": true,
-            "DD_SUBSCRIBED_TO_WEBSOCKET_LOGS": true,
+            "DD_SUBSCRIBE_TO_API_GATEWAY_LOGS": true,
+            "DD_SUBSCRIBE_TO_HTTP_API_LOGS": true,
+            "DD_SUBSCRIBE_TO_WEBSOCKET_LOGS": true,
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LAMBDA_HANDLER": "py_handler.hello"
           }
@@ -464,9 +464,9 @@
             "DD_LOG_LEVEL": "info",
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
-            "DD_SUBSCRIBED_TO_API_GATEWAY_LOGS": true,
-            "DD_SUBSCRIBED_TO_HTTP_API_LOGS": true,
-            "DD_SUBSCRIBED_TO_WEBSOCKET_LOGS": true,
+            "DD_SUBSCRIBE_TO_API_GATEWAY_LOGS": true,
+            "DD_SUBSCRIBE_TO_HTTP_API_LOGS": true,
+            "DD_SUBSCRIBE_TO_WEBSOCKET_LOGS": true,
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LAMBDA_HANDLER": "js_handler.hello"
           }
@@ -521,9 +521,9 @@
             "DD_LOG_LEVEL": "info",
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
-            "DD_SUBSCRIBED_TO_API_GATEWAY_LOGS": true,
-            "DD_SUBSCRIBED_TO_HTTP_API_LOGS": true,
-            "DD_SUBSCRIBED_TO_WEBSOCKET_LOGS": true,
+            "DD_SUBSCRIBE_TO_API_GATEWAY_LOGS": true,
+            "DD_SUBSCRIBE_TO_HTTP_API_LOGS": true,
+            "DD_SUBSCRIBE_TO_WEBSOCKET_LOGS": true,
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LAMBDA_HANDLER": "js_handler.hello"
           }
@@ -578,9 +578,9 @@
             "DD_LOG_LEVEL": "info",
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
-            "DD_SUBSCRIBED_TO_API_GATEWAY_LOGS": true,
-            "DD_SUBSCRIBED_TO_HTTP_API_LOGS": true,
-            "DD_SUBSCRIBED_TO_WEBSOCKET_LOGS": true,
+            "DD_SUBSCRIBE_TO_API_GATEWAY_LOGS": true,
+            "DD_SUBSCRIBE_TO_HTTP_API_LOGS": true,
+            "DD_SUBSCRIBE_TO_WEBSOCKET_LOGS": true,
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LAMBDA_HANDLER": "js_handler.hello"
           }
