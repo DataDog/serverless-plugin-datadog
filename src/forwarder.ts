@@ -129,7 +129,7 @@ export async function addCloudWatchForwarderSubscriptions(
     // Create the Execution log group for API Gateway logging manually so we can subscribe
     if (validateApiGatweaySubscription(resource, forwarderConfigs.SubToApiGatewayLogGroup)) {
       // add api gateway execution log group
-      const executionLogGroup = createExecutionLogGroup(aws, forwarderConfigs.SubToApiGatewayLogGroup, logGroupName);
+      const executionLogGroup = createExecutionLogGroup(aws);
       const executionLogGroupKey = "ExecutionLogGroup";
       resources[executionLogGroupKey] = executionLogGroup;
       // add subscription to execution log group
@@ -196,7 +196,7 @@ function subscribeToLogGroup(functionArn: string | CloudFormationObjectArn, name
   };
   return subscription;
 }
-function createExecutionLogGroup(aws: Aws, subscribeToLogs: boolean, logGroupName: string) {
+function createExecutionLogGroup(aws: Aws) {
   // Create the Execution log group for API Gateway logging manually
   const executionLogGroupName = {
     "Fn::Join": ["", ["API-Gateway-Execution-Logs_", { Ref: "ApiGatewayRestApi" }, "/", aws.getStage()]],
