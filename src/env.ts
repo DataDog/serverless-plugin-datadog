@@ -60,9 +60,9 @@ const logLevelEnvVar = "DD_LOG_LEVEL";
 const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
 const ddTracingEnabledEnvVar = "DD_TRACE_ENABLED";
 const logInjectionEnvVar = "DD_LOGS_INJECTION";
-const subToApiGatewayLogsEnvVar = "DD_SUBSCRIBED_TO_API_GATEWAY_LOGS";
-const subToApiLogsEnvVar = "DD_SUBSCRIBED_TO_HTTP_API_LOGS";
-const subToWebsocketLogsEnvVar = "DD_SUBSCRIBED_TO_WEBSOCKET_LOGS";
+const subToApiGatewayLogsEnvVar = "DD_SUBSCRIBE_TO_API_GATEWAY_LOGS";
+const subToApiLogsEnvVar = "DD_SUBSCRIBE_TO_HTTP_API_LOGS";
+const subToWebsocketLogsEnvVar = "DD_SUBSCRIBE_TO_WEBSOCKET_LOGS";
 
 export const defaultConfiguration: Configuration = {
   addLayers: true,

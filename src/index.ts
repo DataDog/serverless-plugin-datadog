@@ -105,9 +105,18 @@ module.exports = class ServerlessPlugin {
 
   private async afterPackageFunction() {
     const config = getConfig(this.serverless.service);
-    let datadogForwarderArn;
     if (config.enabled === false) return;
 
+    // Create an object that contains some of our booleans for the forwarder
+    const forwarderConfigs = {
+      SubToApiGatewayLogGroup: config.subscribeToApiGatewayLogs,
+      AddExtension: config.addExtension,
+      SubToHttpApiLogGroup: config.subscribeToHttpApiLogs,
+      IntegrationTesting: config.integrationTesting,
+      SubToWebsocketLogGroup: config.subscribeToWebsocketLogs,
+    };
+
+    let datadogForwarderArn;
     datadogForwarderArn = setDatadogForwarder(config);
     if (datadogForwarderArn) {
       const aws = this.serverless.getProvider("aws");
@@ -115,9 +124,7 @@ module.exports = class ServerlessPlugin {
         this.serverless.service,
         aws,
         datadogForwarderArn,
-        config.integrationTesting,
-        config.subscribeToApiGatewayLogs,
-        config.addExtension,
+        forwarderConfigs,
       );
       for (const error of errors) {
         this.serverless.cli.log(error);
