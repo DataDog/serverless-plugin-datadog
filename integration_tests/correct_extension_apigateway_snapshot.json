@@ -201,76 +201,6 @@
         }
       }
     },
-    "PythonHello27LogGroupSubscription": {
-      "Type": "AWS::Logs::SubscriptionFilter",
-      "Properties": {
-        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
-        "FilterPattern": "",
-        "LogGroupName": {
-          "Ref": "PythonHello27LogGroup"
-        }
-      }
-    },
-    "PythonHello36LogGroupSubscription": {
-      "Type": "AWS::Logs::SubscriptionFilter",
-      "Properties": {
-        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
-        "FilterPattern": "",
-        "LogGroupName": {
-          "Ref": "PythonHello36LogGroup"
-        }
-      }
-    },
-    "PythonHello37LogGroupSubscription": {
-      "Type": "AWS::Logs::SubscriptionFilter",
-      "Properties": {
-        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
-        "FilterPattern": "",
-        "LogGroupName": {
-          "Ref": "PythonHello37LogGroup"
-        }
-      }
-    },
-    "PythonHello38LogGroupSubscription": {
-      "Type": "AWS::Logs::SubscriptionFilter",
-      "Properties": {
-        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
-        "FilterPattern": "",
-        "LogGroupName": {
-          "Ref": "PythonHello38LogGroup"
-        }
-      }
-    },
-    "JavascriptHello10DashxLogGroupSubscription": {
-      "Type": "AWS::Logs::SubscriptionFilter",
-      "Properties": {
-        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
-        "FilterPattern": "",
-        "LogGroupName": {
-          "Ref": "JavascriptHello10DashxLogGroup"
-        }
-      }
-    },
-    "JavascriptHello12DashxLogGroupSubscription": {
-      "Type": "AWS::Logs::SubscriptionFilter",
-      "Properties": {
-        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
-        "FilterPattern": "",
-        "LogGroupName": {
-          "Ref": "JavascriptHello12DashxLogGroup"
-        }
-      }
-    },
-    "JavascriptHello14DashxLogGroupSubscription": {
-      "Type": "AWS::Logs::SubscriptionFilter",
-      "Properties": {
-        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
-        "FilterPattern": "",
-        "LogGroupName": {
-          "Ref": "JavascriptHello14DashxLogGroup"
-        }
-      }
-    },
     "PythonHello27LambdaFunction": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
@@ -301,9 +231,9 @@
         ],
         "Environment": {
           "Variables": {
+            "DD_API_KEY": 1234,
             "DD_SITE": "datadoghq.com",
             "DD_LOG_LEVEL": "info",
-            "DD_FLUSH_TO_LOG": true,
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
             "DD_MERGE_XRAY_TRACES": false,
@@ -317,7 +247,8 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python27:XXX"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python27:XXX",
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
       },
       "DependsOn": [
@@ -354,9 +285,9 @@
         ],
         "Environment": {
           "Variables": {
+            "DD_API_KEY": 1234,
             "DD_SITE": "datadoghq.com",
             "DD_LOG_LEVEL": "info",
-            "DD_FLUSH_TO_LOG": true,
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
             "DD_MERGE_XRAY_TRACES": false,
@@ -370,7 +301,8 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python36:XXX"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python36:XXX",
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
       },
       "DependsOn": [
@@ -407,9 +339,9 @@
         ],
         "Environment": {
           "Variables": {
+            "DD_API_KEY": 1234,
             "DD_SITE": "datadoghq.com",
             "DD_LOG_LEVEL": "info",
-            "DD_FLUSH_TO_LOG": true,
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
             "DD_MERGE_XRAY_TRACES": false,
@@ -423,7 +355,8 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python37:XXX"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python37:XXX",
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
       },
       "DependsOn": [
@@ -460,9 +393,9 @@
         ],
         "Environment": {
           "Variables": {
+            "DD_API_KEY": 1234,
             "DD_SITE": "datadoghq.com",
             "DD_LOG_LEVEL": "info",
-            "DD_FLUSH_TO_LOG": true,
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
             "DD_MERGE_XRAY_TRACES": false,
@@ -476,7 +409,8 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python38:XXX"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python38:XXX",
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
       },
       "DependsOn": [
@@ -513,9 +447,9 @@
         ],
         "Environment": {
           "Variables": {
+            "DD_API_KEY": 1234,
             "DD_SITE": "datadoghq.com",
             "DD_LOG_LEVEL": "info",
-            "DD_FLUSH_TO_LOG": true,
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
             "DD_MERGE_XRAY_TRACES": false,
@@ -529,7 +463,8 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node10-x:XXX"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node10-x:XXX",
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
       },
       "DependsOn": [
@@ -566,9 +501,9 @@
         ],
         "Environment": {
           "Variables": {
+            "DD_API_KEY": 1234,
             "DD_SITE": "datadoghq.com",
             "DD_LOG_LEVEL": "info",
-            "DD_FLUSH_TO_LOG": true,
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
             "DD_MERGE_XRAY_TRACES": false,
@@ -582,7 +517,8 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node12-x:XXX"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node12-x:XXX",
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
       },
       "DependsOn": [
@@ -619,9 +555,9 @@
         ],
         "Environment": {
           "Variables": {
+            "DD_API_KEY": 1234,
             "DD_SITE": "datadoghq.com",
             "DD_LOG_LEVEL": "info",
-            "DD_FLUSH_TO_LOG": true,
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
             "DD_MERGE_XRAY_TRACES": false,
@@ -635,7 +571,8 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node14-x:XXX"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node14-x:XXX",
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
       },
       "DependsOn": [

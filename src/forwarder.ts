@@ -20,6 +20,13 @@ interface LogGroupResource {
   };
 }
 
+interface ForwarderConfigs {
+  AddExtension: boolean;
+  IntegrationTesting: boolean | undefined;
+  SubToApiGatewayLogGroup: boolean;
+  SubToHttpApiLogGroup: boolean;
+  SubToWebsocketLogGroup: boolean;
+}
 interface DescribeSubscriptionFiltersResponse {
   subscriptionFilters: {
     creationTime: number;
@@ -59,7 +66,7 @@ export async function addCloudWatchForwarderSubscriptions(
   service: Service,
   aws: Aws,
   functionArn: CloudFormationObjectArn | string,
-  integrationTesting: boolean | undefined,
+  forwarderConfigs: ForwarderConfigs,
 ) {
   const resources = service.provider.compiledCloudFormationTemplate?.Resources;
   if (resources === undefined) {
@@ -68,13 +75,13 @@ export async function addCloudWatchForwarderSubscriptions(
   const errors = [];
   if (typeof functionArn !== "string") {
     errors.push("Skipping forwarder ARN validation because forwarder string defined with CloudFormation function.");
-  } else if (integrationTesting === true) {
+  } else if (forwarderConfigs.IntegrationTesting === true) {
     errors.push("Skipping forwarder ARN validation because 'integrationTesting' is set to true");
   } else {
     await validateForwarderArn(aws, functionArn);
   }
   for (const [name, resource] of Object.entries(resources)) {
-    if (!isLogGroup(resource) || !resource.Properties.LogGroupName.startsWith("/aws/lambda/")) {
+    if (!shouldSubscribe(resource, forwarderConfigs)) {
       continue;
     }
     const logGroupName = resource.Properties.LogGroupName;
@@ -94,16 +101,20 @@ export async function addCloudWatchForwarderSubscriptions(
       );
       continue;
     }
-
-    const subscription = {
-      Type: logGroupSubscriptionKey,
-      Properties: {
-        DestinationArn: functionArn,
-        FilterPattern: "",
-        LogGroupName: { Ref: name },
-      },
-    };
+    // Create subscriptions for each log group
+    const subscription = subscribeToLogGroup(functionArn, name);
     resources[scopedSubName] = subscription;
+    // Create the Execution log group for API Gateway logging manually so we can subscribe
+    if (validateApiGatewaySubscription(resource, forwarderConfigs.SubToApiGatewayLogGroup)) {
+      // add api gateway execution log group
+      const executionLogGroup = createExecutionLogGroup(aws);
+      const executionLogGroupKey = "ExecutionLogGroup";
+      resources[executionLogGroupKey] = executionLogGroup;
+      // add subscription to execution log group
+      const executionSubscription = subscribeToExecutionLogGroup(functionArn);
+      const executionSubscriptionKey = "ExecutionLogGroupSubscription";
+      resources[executionSubscriptionKey] = executionSubscription;
+    }
   }
   return errors;
 }
@@ -139,4 +150,81 @@ export async function describeSubscriptionFilters(aws: Aws, logGroupName: string
     // An error will occur if the log group doesn't exist, so we swallow this and return an empty list.
     return [];
   }
+}
+
+// Helper functions to validate we have a particular log group and if we should subscribe to it
+function validateApiGatewaySubscription(resource: any, subscribe: boolean) {
+  return resource.Properties.LogGroupName.startsWith("/aws/api-gateway/") && subscribe;
+}
+function validateHttpApiSubscription(resource: any, subscribe: boolean) {
+  return resource.Properties.LogGroupName.startsWith("/aws/http-api/") && subscribe;
+}
+function validateWebsocketSubscription(resource: any, subscribe: boolean) {
+  return resource.Properties.LogGroupName.startsWith("/aws/websocket/") && subscribe;
+}
+
+function shouldSubscribe(resource: any, forwarderConfigs: ForwarderConfigs) {
+  if (!isLogGroup(resource)) {
+    return false;
+  }
+  // if the extension is enabled, we don't want to subscribe to lambda log groups
+  if (
+    forwarderConfigs.AddExtension &&
+    !(
+      validateApiGatewaySubscription(resource, forwarderConfigs.SubToApiGatewayLogGroup) ||
+      validateHttpApiSubscription(resource, forwarderConfigs.SubToHttpApiLogGroup) ||
+      validateWebsocketSubscription(resource, forwarderConfigs.SubToWebsocketLogGroup)
+    )
+  ) {
+    return false;
+  }
+  // if the extension is disabled, we should subscribe to lambda log groups
+  if (
+    !(
+      resource.Properties.LogGroupName.startsWith("/aws/lambda/") ||
+      validateApiGatewaySubscription(resource, forwarderConfigs.SubToApiGatewayLogGroup) ||
+      validateHttpApiSubscription(resource, forwarderConfigs.SubToHttpApiLogGroup) ||
+      validateWebsocketSubscription(resource, forwarderConfigs.SubToWebsocketLogGroup)
+    )
+  ) {
+    return false;
+  }
+  return true;
+}
+
+function subscribeToLogGroup(functionArn: string | CloudFormationObjectArn, name: string) {
+  const subscription = {
+    Type: logGroupSubscriptionKey,
+    Properties: {
+      DestinationArn: functionArn,
+      FilterPattern: "",
+      LogGroupName: { Ref: name },
+    },
+  };
+  return subscription;
+}
+function createExecutionLogGroup(aws: Aws) {
+  // Create the Execution log group for API Gateway logging manually
+  const executionLogGroupName = {
+    "Fn::Join": ["", ["API-Gateway-Execution-Logs_", { Ref: "ApiGatewayRestApi" }, "/", aws.getStage()]],
+  };
+
+  const executionLogGroup = {
+    Type: "AWS::Logs::LogGroup",
+    Properties: {
+      LogGroupName: executionLogGroupName,
+    },
+  };
+  return executionLogGroup;
+}
+function subscribeToExecutionLogGroup(functionArn: string | CloudFormationObjectArn) {
+  const executionSubscription = {
+    Type: logGroupSubscriptionKey,
+    Properties: {
+      DestinationArn: functionArn,
+      FilterPattern: "",
+      LogGroupName: { Ref: "ExecutionLogGroup" },
+    },
+  };
+  return executionSubscription;
 }

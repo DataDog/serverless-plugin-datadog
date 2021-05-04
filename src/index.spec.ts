@@ -396,86 +396,6 @@ describe("ServerlessPlugin", () => {
       );
     });
 
-    it("throws an error when addExtension and forwarder are set", async () => {
-      mock({});
-      const serverless = {
-        cli: {
-          log: () => {},
-        },
-        service: {
-          provider: {
-            region: "us-east-1",
-          },
-          functions: {
-            node1: {
-              handler: "my-func.ev",
-              runtime: "nodejs8.10",
-            },
-          },
-          custom: {
-            datadog: {
-              forwarder: "forwarder",
-              addExtension: true,
-            },
-          },
-        },
-      };
-
-      const plugin = new ServerlessPlugin(serverless, {});
-      let threwError: boolean = false;
-      let thrownErrorMessage: string | undefined;
-      try {
-        await plugin.hooks["after:package:initialize"]();
-      } catch (e) {
-        threwError = true;
-        thrownErrorMessage = e.message;
-      }
-      expect(threwError).toBe(true);
-      expect(thrownErrorMessage).toEqual(
-        "`addExtension` and `forwarder`/`forwarderArn` should not be set at the same time.",
-      );
-    });
-
-    it("throws an error when addExtension and forwarderArn are set", async () => {
-      mock({});
-      const serverless = {
-        cli: {
-          log: () => {},
-        },
-        service: {
-          provider: {
-            region: "us-east-1",
-          },
-          functions: {
-            node1: {
-              handler: "my-func.ev",
-              runtime: "nodejs8.10",
-            },
-          },
-          custom: {
-            datadog: {
-              forwarderArn: "forwarder",
-              addExtension: true,
-            },
-          },
-        },
-      };
-
-      const plugin = new ServerlessPlugin(serverless, {});
-      let threwError: boolean = false;
-      let thrownErrorMessage: string | undefined;
-      try {
-        await plugin.hooks["after:package:initialize"]();
-      } catch (e) {
-        threwError = true;
-        thrownErrorMessage = e.message;
-      }
-      expect(threwError).toBe(true);
-      expect(thrownErrorMessage).toEqual(
-        "`addExtension` and `forwarder`/`forwarderArn` should not be set at the same time.",
-      );
-    });
-
     it("throws error when addExtension is true and both API key and KMS API key are undefined", async () => {
       mock({});
       const serverless = {
@@ -587,6 +507,89 @@ describe("ServerlessPlugin", () => {
       );
     });
 
+    it("does not subscribe to lambda log groups when the extension is enabled", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: awsMock,
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            compiledCloudFormationTemplate: {
+              Resources: {
+                FirstGroup: {
+                  Type: "AWS::Logs::LogGroup",
+                  Properties: {
+                    LogGroupName: "/aws/lambda/first-group",
+                  },
+                },
+              },
+            },
+          },
+          functions: {},
+          custom: {
+            datadog: {
+              forwarder: "some-arn",
+              addExtension: true,
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).not.toHaveProperty(
+        "FirstGroupSubscription",
+      );
+    });
+    it("does subscribe to non-lambda log groups when the extension is enabled", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: awsMock,
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            logs: { restApi: true },
+            compiledCloudFormationTemplate: {
+              Resources: {
+                ApiGroup: {
+                  Type: "AWS::Logs::LogGroup",
+                  Properties: {
+                    LogGroupName: "/aws/api-gateway/first-group",
+                  },
+                },
+                HttpGroup: {
+                  Type: "AWS::Logs::LogGroup",
+                  Properties: {
+                    LogGroupName: "/aws/http-api/second-group",
+                  },
+                },
+                WebsocketGroup: {
+                  Type: "AWS::Logs::LogGroup",
+                  Properties: {
+                    LogGroupName: "/aws/websocket/third-group",
+                  },
+                },
+              },
+            },
+          },
+          functions: {},
+          custom: {
+            datadog: {
+              forwarder: "some-arn",
+              addExtension: true,
+              subscribeToApiGatewayLogs: true,
+            },
+          },
+        },
+      };
+
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).toHaveProperty(
+        "ApiGroupSubscription",
+      );
+    });
     it("throws an error when forwarderArn and forwarder are set", async () => {
       const serverless = {
         cli: { log: () => {} },

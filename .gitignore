@@ -8,3 +8,4 @@ package-lock.json
 .serverless/
 test_forwarder_snapshot.json
 test_extension_snapshot.json
+test_extension_apigateway.json

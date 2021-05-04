@@ -8,20 +8,20 @@
 
 set -e
 
-# To add new tests create a new yml file in the 'integration_tests' directory, append it to the SERVERLESS_CONFIGS array as well as creating a name for the 
+# To add new tests create a new yml file in the 'integration_tests' directory, append it to the SERVERLESS_CONFIGS array as well as creating a name for the
 # snapshots that will be compared in your test. Add those snapshot names to the TEST_SNAPSHOTS and CORRECT_SNAPSHOTS arrays.
 # Note: Each yml config, test, and correct snapshot file should be at the same index in their own array. e.g. All the files for the forwarder test are at index 0.
 #       In order for this script to work correctly these arrays should have the same amount of elements.
-SERVERLESS_CONFIGS=("./serverless-forwarder.yml" "./serverless-extension.yml")
-TEST_SNAPSHOTS=("test_forwarder_snapshot.json" "test_extension_snapshot.json")
-CORRECT_SNAPSHOTS=("correct_forwarder_snapshot.json" "correct_extension_snapshot.json")
+SERVERLESS_CONFIGS=("./serverless-forwarder.yml" "./serverless-extension.yml" "./serverless-extension-apigateway.yml")
+TEST_SNAPSHOTS=("test_forwarder_snapshot.json" "test_extension_snapshot.json" "test_extension_apigateway.json")
+CORRECT_SNAPSHOTS=("correct_forwarder_snapshot.json" "correct_extension_snapshot.json" "correct_extension_apigateway_snapshot.json")
 
 script_path=${BASH_SOURCE[0]}
 scripts_dir=$(dirname $script_path)
 repo_dir=$(dirname $scripts_dir)
 root_dir=$(pwd)
 if [[ "$root_dir" =~ .*"serverless-plugin-datadog/scripts".* ]]; then
-    echo "Make sure to run this script from the root `serverless-plugin-datadog` directory, aborting"
+    echo "Make sure to run this script from the root $(serverless-plugin-datadog) directory, aborting"
     exit 1
 fi
 
@@ -35,7 +35,7 @@ yarn build
 
 cd $integration_tests_dir
 RAW_CFN_TEMPLATE=".serverless/cloudformation-template-update-stack.json"
-for ((i = 0 ; i < ${#SERVERLESS_CONFIGS[@]} ; i++)); do
+for ((i = 0; i < ${#SERVERLESS_CONFIGS[@]}; i++)); do
     echo "Running 'sls package' with ${SERVERLESS_CONFIGS[i]}"
     serverless package --config ${SERVERLESS_CONFIGS[i]}
     # Normalize S3Key timestamps
@@ -48,6 +48,8 @@ for ((i = 0 ; i < ${#SERVERLESS_CONFIGS[@]} ; i++)); do
     perl -p -i -e 's/(v\d.\d\d.\d)/vX.XX.X/g' ${RAW_CFN_TEMPLATE}
     # Normalize Datadog Layer Arn versions
     perl -p -i -e 's/(arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-(Python27|Python36|Python37|Python38|Node10-x|Node12-x|Node14-x|Extension):\d+)/arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-\2:XXX/g' ${RAW_CFN_TEMPLATE}
+    # Normalize API Gateway timestamps
+    perl -p -i -e 's/("ApiGatewayDeployment.*")/"ApiGatewayDeploymentxxxx"/g' ${RAW_CFN_TEMPLATE}
     cp ${RAW_CFN_TEMPLATE} ${TEST_SNAPSHOTS[i]}
     echo "===================================="
     if [ "$UPDATE_SNAPSHOTS" = "true" ]; then
