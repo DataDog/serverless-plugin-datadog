@@ -81,7 +81,7 @@ export async function addCloudWatchForwarderSubscriptions(
     await validateForwarderArn(aws, functionArn);
   }
   for (const [name, resource] of Object.entries(resources)) {
-    if (shouldNotSubscribe(resource, forwarderConfigs)) {
+    if (!shouldSubscribe(resource, forwarderConfigs)) {
       continue;
     }
     const logGroupName = resource.Properties.LogGroupName;
@@ -163,9 +163,9 @@ function validateWebsocketSubscription(resource: any, subscribe: boolean) {
   return resource.Properties.LogGroupName.startsWith("/aws/websocket/") && subscribe;
 }
 
-function shouldNotSubscribe(resource: any, forwarderConfigs: ForwarderConfigs) {
+function shouldSubscribe(resource: any, forwarderConfigs: ForwarderConfigs) {
   if (!isLogGroup(resource)) {
-    return true;
+    return false;
   }
   // if the extension is enabled, we don't want to subscribe to lambda log groups
   if (
@@ -176,7 +176,7 @@ function shouldNotSubscribe(resource: any, forwarderConfigs: ForwarderConfigs) {
       validateWebsocketSubscription(resource, forwarderConfigs.SubToWebsocketLogGroup)
     )
   ) {
-    return true;
+    return false;
   }
   // if the extension is disabled, we should subscribe to lambda log groups
   if (
@@ -187,9 +187,9 @@ function shouldNotSubscribe(resource: any, forwarderConfigs: ForwarderConfigs) {
       validateWebsocketSubscription(resource, forwarderConfigs.SubToWebsocketLogGroup)
     )
   ) {
-    return true;
+    return false;
   }
-  return false;
+  return true;
 }
 
 function subscribeToLogGroup(functionArn: string | CloudFormationObjectArn, name: string) {
