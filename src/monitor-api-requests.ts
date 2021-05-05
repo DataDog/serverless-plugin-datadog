@@ -1,6 +1,5 @@
 const fetch = require("node-fetch");
 const batchRequest = require('batch-request-js');
-import { Server } from "http";
 import { Monitor, MonitorParams } from "monitors";
 import { Response } from "node-fetch";
 import * as Serverless from "serverless";
@@ -22,7 +21,7 @@ class InvalidSyntaxError extends Error {
 }
 
 export async function createMonitor(monitorParams: MonitorParams, serverlessMonitorId?: string, monitorsApiKey?: string, monitorsAppKey?: string) {
-    const request = await fetch("https://api.datadoghq.com/api/v1/monitor", {
+    const response: Response = await fetch("https://api.datadoghq.com/api/v1/monitor", {
         method: "POST",
         headers: {
             "DD-API-KEY": monitorsApiKey,
@@ -32,13 +31,13 @@ export async function createMonitor(monitorParams: MonitorParams, serverlessMoni
         body: JSON.stringify(monitorParams),
     });
 
-    console.log("create" + request.status);
-    console.log(request);
-    if (request.status === 200) {
+    console.log("create" + response.status);
+
+    if (response.status === 200) {
         return true;
-    } else if (request.status === 403) {
+    } else if (response.status === 403) {
         throw new InvalidAuthenticationError('Could not perform request due to invalid authentication');
-    } else if (request.status === 400) {
+    } else if (response.status === 400) {
         console.log(`Invalid Syntax Error: Could not perform request due to incorrect syntax for ${serverlessMonitorId}`)
     }
 
@@ -46,7 +45,7 @@ export async function createMonitor(monitorParams: MonitorParams, serverlessMoni
 }
 
 export async function updateMonitor(monitorId: number, serverlessMonitorId: string, monitorParams: MonitorParams, monitorsApiKey: string, monitorsAppKey: string) {
-    const request = await fetch(`https://api.datadoghq.com/api/v1/monitor/${monitorId}`, {
+    const response: Response = await fetch(`https://api.datadoghq.com/api/v1/monitor/${monitorId}`, {
         method: "PUT",
         headers: {
             "DD-API-KEY": monitorsApiKey,
@@ -56,13 +55,13 @@ export async function updateMonitor(monitorId: number, serverlessMonitorId: stri
         body: JSON.stringify(monitorParams),
     })
 
-    console.log("update" + request.status);
-    if (request.status === 200) {
+    console.log("update" + response.status);
+    if (response.status === 200) {
         return true;
     }
-    else if (request.status === 403) {
+    else if (response.status === 403) {
         throw new InvalidAuthenticationError('Could not perform request due to invalid authentication');
-    } else if (request.status === 400) {
+    } else if (response.status === 400) {
         console.log(`Invalid Syntax Error: Could not perform request due to incorrect syntax for ${serverlessMonitorId}`)
     }
 
@@ -70,7 +69,7 @@ export async function updateMonitor(monitorId: number, serverlessMonitorId: stri
 }
 
 export async function deleteMonitor(monitorId: number, serverlessMonitorId: string, monitorsApiKey: string, monitorsAppKey: string) {
-    const response = await fetch(`https://api.datadoghq.com/api/v1/monitor/${monitorId}`, {
+    const response: Response = await fetch(`https://api.datadoghq.com/api/v1/monitor/${monitorId}`, {
         method: "DELETE",
         headers: {
             "DD-API-KEY": monitorsApiKey,
@@ -93,7 +92,7 @@ export async function deleteMonitor(monitorId: number, serverlessMonitorId: stri
 
 export async function searchMonitors(queryTag: string, monitorsApiKey: string, monitorsAppKey: string) {
     const query = `tag:"${queryTag}"`;
-    const request: Response = await fetch(`https://api.datadoghq.com/api/v1/monitor/search?query=${query}`, {
+    const response: Response = await fetch(`https://api.datadoghq.com/api/v1/monitor/search?query=${query}`, {
         method: "GET",
         headers: {
             "DD-API-KEY": monitorsApiKey,
@@ -101,15 +100,12 @@ export async function searchMonitors(queryTag: string, monitorsApiKey: string, m
             "Content-Type": "application/json",
         },
     });
-    if (request.status === 403) {
+    if (response.status === 403) {
         throw new InvalidAuthenticationError('Could not perform request due to invalid authentication');
     }
 
-    console.log(request);
-    const json: any = await request.json();
-    console.log(json);
+    const json: any = await response.json();
     const monitors = json.monitors;
-    console.log(monitors);
     return monitors;
 }
 
