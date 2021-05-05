@@ -56,8 +56,6 @@ export interface Configuration {
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
 const apiKeyKMSEnvVar = "DD_KMS_API_KEY";
-// const monitorsApiKeyEnvVar = "DD_MONITORS_API_KEY";
-// const monitorsAppKeyEnvVar = "DD_MONITORS_APP_KEY";
 const siteURLEnvVar = "DD_SITE";
 const logLevelEnvVar = "DD_LOG_LEVEL";
 const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
@@ -76,7 +74,6 @@ export const defaultConfiguration: Configuration = {
   injectLogContext: true,
   exclude: [],
   integrationTesting: false,
-  // monitors: [{ example_monitor: { threshold: 0.2, name: "Example Monitor" } }]
 };
 
 export function setEnvConfiguration(config: Configuration, service: Service) {

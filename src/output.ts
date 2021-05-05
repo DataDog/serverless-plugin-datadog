@@ -45,7 +45,6 @@ export async function printOutputs(serverless: Serverless, site: String) {
   if (describeStackOutput === undefined) {
     return;
   }
-  // const cloudFormationStackId: string = describeStackOutput ? describeStackOutput.Stacks[0].StackId : "";
 
   logHeader("Datadog Monitoring", true);
   logHeader("functions");
@@ -57,7 +56,6 @@ export async function printOutputs(serverless: Serverless, site: String) {
     }
   }
   logHeader("View Serverless Monitors", true);
-  // logMessage(`https://app.${site}/monitors/manage?q=tag:"aws_cloudformation_stack-id:${cloudFormationStackId}"`)
   logMessage(`https://app.${site}/monitors/manage?q=tag%3A%28%22env%3A${env}%22AND%22service%3A${service}%22%29`)
 }
 

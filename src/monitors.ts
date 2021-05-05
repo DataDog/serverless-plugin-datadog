@@ -79,7 +79,6 @@ function doesMonitorExist(serverlessMonitorId: string, pluginMonitors: { [key: s
 }
 
 // Deletes monitors that are no longer included in the serverless.yml file 
-// function deleteRemovedMonitors(currentMonitors: Monitor[], pluginMonitorIds: { [key: string]: number }) {
 async function deleteRemovedMonitors(currentMonitors: Monitor[], pluginMonitorIds: { [key: string]: number }, monitorsApiKey: string, monitorsAppKey: string) {
   const successfullyDeletedMonitors: string[] = [];
   const currentMonitorIds: string[] = [];

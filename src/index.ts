@@ -19,7 +19,7 @@ import { addCloudWatchForwarderSubscriptions } from "./forwarder";
 import { addOutputLinks, printOutputs } from "./output";
 import { FunctionDefinition } from "serverless";
 import { Monitor, setMonitors } from "./monitors";
-import { getCloudFormationStackId } from "./monitor_api_requests";
+import { getCloudFormationStackId } from "./monitor-api-requests";
 
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
 export interface ExtendedFunctionDefinition extends FunctionDefinition {
@@ -154,15 +154,6 @@ module.exports = class ServerlessPlugin {
 
   private async afterDeploy() {
     const config = getConfig(this.serverless.service);
-    // if (this.serverless.service.service) {
-    //   process.env.SERVICE = this.serverless.service.service;
-    // }
-    // if (config.monitorsApiKey) {
-    //   process.env.MONITORS_API_KEY = config.monitorsApiKey;
-    // }
-    // if (config.monitorsAppKey) {
-    //   process.env.MONITORS_APP_KEY = config.monitorsAppKey;
-    // }
     const service = this.serverless.service.getServiceName();
     const env = this.serverless.getProvider("aws").getStage();
 
