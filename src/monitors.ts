@@ -123,13 +123,13 @@ export async function setMonitors(monitors: Monitor[], monitorsApiKey: string, m
   const successfullyDeletedMonitors = await deleteRemovedMonitors(monitors, monitorIdsMap, monitorsApiKey, monitorsAppKey);
   const logStatements: string[] = [];
   if (succesfullyUpdatedMonitors.length > 0) {
-    logStatements.push(`Succesfully updated${succesfullyUpdatedMonitors}`)
+    logStatements.push(`Successfully updated${succesfullyUpdatedMonitors}`)
   }
   if (successfullyCreatedMonitors.length > 0) {
-    logStatements.push(`Succesfully created${successfullyCreatedMonitors}`)
+    logStatements.push(`Successfully created${successfullyCreatedMonitors}`)
   }
   if (successfullyDeletedMonitors.length > 0) {
-    logStatements.push(`Succesfully deleted${successfullyDeletedMonitors}`)
+    logStatements.push(`Successfully deleted${successfullyDeletedMonitors}`)
   }
   return logStatements;
 }
