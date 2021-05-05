@@ -86,7 +86,6 @@ async function deleteRemovedMonitors(currentMonitors: Monitor[], pluginMonitorId
   currentMonitors.forEach(currentMonitor => currentMonitorIds.push(Object.keys(currentMonitor)[0]));
   for (const pluginMonitorId of Object.keys(pluginMonitorIds)) {
     if (!currentMonitorIds.includes(pluginMonitorId)) {
-      // monitorsToRemove[pluginMonitorIds[pluginMonitorId]] = pluginMonitorId; 
       const response = await deleteMonitor(pluginMonitorIds[pluginMonitorId], pluginMonitorId, monitorsApiKey, monitorsAppKey);
       if (response) {
         successfullyDeletedMonitors.push(` ${pluginMonitorId}`);
