@@ -17,6 +17,10 @@ export interface Configuration {
   apiKey?: string;
   // Datadog API Key encrypted using KMS, only necessary when using metrics without log forwarding
   apiKMSKey?: string;
+  // Datadog API Key used for enabling monitor configuration through plugin 
+  monitorsApiKey?: string;
+  // Datadog App Key used for enabling monitor configuratio throguh plugin 
+  monitorsAppKey?: string;
   // Which Site to send to, (should be datadoghq.com or datadoghq.eu)
   site: string;
   // The log level, (set to DEBUG for extended logging)
@@ -46,10 +50,14 @@ export interface Configuration {
 
   // When set, this plugin will not try to redirect the handlers of these specified functions;
   exclude: string[];
+  // When set, this plugin will configure the specified monitors for the function
+  monitors?: { [id: string]: { [key: string]: any } }[];
 }
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
 const apiKeyKMSEnvVar = "DD_KMS_API_KEY";
+// const monitorsApiKeyEnvVar = "DD_MONITORS_API_KEY";
+// const monitorsAppKeyEnvVar = "DD_MONITORS_APP_KEY";
 const siteURLEnvVar = "DD_SITE";
 const logLevelEnvVar = "DD_LOG_LEVEL";
 const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
@@ -68,6 +76,7 @@ export const defaultConfiguration: Configuration = {
   injectLogContext: true,
   exclude: [],
   integrationTesting: false,
+  // monitors: [{ example_monitor: { threshold: 0.2, name: "Example Monitor" } }]
 };
 
 export function setEnvConfiguration(config: Configuration, service: Service) {

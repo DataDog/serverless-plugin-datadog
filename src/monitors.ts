@@ -1,35 +1,33 @@
-// import { create } from "mock-fs/lib/filesystem";
-import { Response } from "node-fetch";
 import { SERVERLESS_MONITORS } from "./serverless_monitors"
-import * as Serverless from "serverless";
-import { updateMonitor, searchMonitors, createMonitor, deleteMonitor } from "./monitor_api_requests";
-
+import { updateMonitor, searchMonitors, createMonitor, deleteMonitor, getExistingMonitors } from "./monitor-api-requests";
+import { create } from "mock-fs/lib/filesystem";
 const fetch = require("node-fetch");
 
 export const errors: Error[] = [];
 
+export interface MonitorParams {
+  [key: string]: any;
+}
 export interface Monitor {
-  [key: string]: {
-    [key: string]: any;
-  };
+  [key: string]: MonitorParams;
 }
 
 // Adds appropriate tags and default parameter values
-function cleanData(monitor: Monitor, cloudFormationStackId: string) {
-  const monitorId = Object.keys(monitor)[0];
-  if (!monitor[monitorId]) {
-    monitor[monitorId] = {};
+export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: string, service: string, env: string) {
+  const serverlessMonitorId = Object.keys(monitor)[0]; // is there a better way to get the id? 
+
+  if (!monitor[serverlessMonitorId]) {
+    monitor[serverlessMonitorId] = {};
   }
-  const monitorParams = monitor[monitorId];
+
+  const monitorParams = monitor[serverlessMonitorId];
 
   if (!monitorParams.tags) {
     monitorParams.tags = [];
   }
-
   if (!monitorParams.options) {
     monitorParams.options = {}
   }
-
   if (monitorParams.type === undefined) {
     monitorParams.type = "metric alert";
   }
@@ -37,23 +35,25 @@ function cleanData(monitor: Monitor, cloudFormationStackId: string) {
     monitorParams.thresholds = { critical: `${monitorParams.threshold}` };
   }
 
-  monitorParams.tags.push("serverless:single_function");
-  monitorParams.tags.push(`serverless_id:${monitorId}`);
+  monitorParams.tags.push("serverless_monitor_type:single_function");
+  monitorParams.tags.push(`serverless_monitor_id:${serverlessMonitorId}`);
   monitorParams.tags.push(`aws_cloudformation_stack-id:${cloudFormationStackId}`);
+  monitorParams.tags.push("created_by:dd_sls_plugin");
+  monitorParams.tags.push(`env:${env}`);
+  monitorParams.tags.push(`service:${service}`);
 
-  if (checkIfServerlessMonitor(monitorId)) {
-    monitorParams.tags.push("serverless_monitor");
-    monitorParams.query = SERVERLESS_MONITORS[monitorId].query;
+  if (checkIfServerlessMonitor(serverlessMonitorId)) {
+    monitorParams.query = SERVERLESS_MONITORS[serverlessMonitorId].query(cloudFormationStackId);
     if (!monitorParams.thresholds) {
-      monitorParams.thresholds = SERVERLESS_MONITORS[monitorId].threshold;
+      monitorParams.thresholds = SERVERLESS_MONITORS[serverlessMonitorId].threshold;
     }
     if (!monitorParams.message) {
-      monitorParams.message = SERVERLESS_MONITORS[monitorId].message;
+      monitorParams.message = SERVERLESS_MONITORS[serverlessMonitorId].message;
     }
     if (!monitorParams.name) {
-      monitorParams.name = SERVERLESS_MONITORS[monitorId].name;
+      monitorParams.name = SERVERLESS_MONITORS[serverlessMonitorId].name;
     }
-    if (monitorParams.threshold) {
+    if (monitorParams.threshold) { // not sure if this is still needed
       const threshold = typeof monitorParams.threshold === "number" ? monitorParams.threshold
         : monitorParams.threshold.critical ? monitorParams.threshold.critical
           : monitorParams.threshold;
@@ -65,60 +65,73 @@ function cleanData(monitor: Monitor, cloudFormationStackId: string) {
       monitorParams.query = monitorParams.query.substr(0, thresholdIndex + 1) + `${threshold}`;
     }
   }
-
   return monitorParams;
 }
 
 // Checks to see if a given monitor object is a serverless recommended monitor
-function checkIfServerlessMonitor(monitorIdString: string) {
-  return Object.keys(SERVERLESS_MONITORS).includes(monitorIdString);
+function checkIfServerlessMonitor(serverlessMonitorId: string) {
+  return Object.keys(SERVERLESS_MONITORS).includes(serverlessMonitorId);
 }
 
 // Checks to see if a monitor defined in the plugin has already been created
-function doesMonitorExist(monitorId: string, pluginMonitors: { [key: string]: number }) {
-  return Object.keys(pluginMonitors).includes(monitorId);
+function doesMonitorExist(serverlessMonitorId: string, pluginMonitors: { [key: string]: number }) {
+  return Object.keys(pluginMonitors).includes(serverlessMonitorId);
 }
 
 // Deletes monitors that are no longer included in the serverless.yml file 
-function deleteRemovedMonitors(monitors: Monitor[], pluginMonitorIds: { [key: string]: number }) {
-  const monitorIds: string[] = [];
-  monitors.forEach(monitor => monitorIds.push(Object.keys(monitor)[0]));
+// function deleteRemovedMonitors(currentMonitors: Monitor[], pluginMonitorIds: { [key: string]: number }) {
+async function deleteRemovedMonitors(currentMonitors: Monitor[], pluginMonitorIds: { [key: string]: number }, monitorsApiKey: string, monitorsAppKey: string) {
+  const successfullyDeletedMonitors: string[] = [];
+  const currentMonitorIds: string[] = [];
+  const monitorsToRemove: { [key: number]: string } = {};
+  currentMonitors.forEach(currentMonitor => currentMonitorIds.push(Object.keys(currentMonitor)[0]));
   for (const pluginMonitorId of Object.keys(pluginMonitorIds)) {
-    if (!monitorIds.includes(pluginMonitorId)) {
-      deleteMonitor(pluginMonitorIds[pluginMonitorId]);
-    }
-  }
-}
-
-async function getExistingMonitors(cloudFormationStackId: string) {
-  const pluginDefinedMonitors = await searchMonitors(`aws_cloudformation_stack-id:${cloudFormationStackId}`);
-  const pluginMonitorIdsMap: { [key: string]: number } = {};
-  for (const pluginDefinedMonitor of pluginDefinedMonitors) {
-    for (const pluginMonitorTag of pluginDefinedMonitor.tags) {
-      if (pluginMonitorTag.startsWith('serverless_id:')) {
-        const pluginMonitorIdString = pluginMonitorTag.substring(pluginMonitorTag.indexOf(':') + 1);
-        pluginMonitorIdsMap[pluginMonitorIdString] = pluginDefinedMonitor.id;
+    if (!currentMonitorIds.includes(pluginMonitorId)) {
+      // monitorsToRemove[pluginMonitorIds[pluginMonitorId]] = pluginMonitorId; 
+      const response = await deleteMonitor(pluginMonitorIds[pluginMonitorId], pluginMonitorId, monitorsApiKey, monitorsAppKey);
+      if (response) {
+        successfullyDeletedMonitors.push(` ${pluginMonitorId}`);
       }
     }
   }
-  return pluginMonitorIdsMap;
+  return successfullyDeletedMonitors;
 }
 
 // Updates, deletes, and creates the appropriate monitors according to the configuration defined in the serverless.yml file
-export async function setMonitors(monitors: Monitor[], cloudFormationStackId: string) {
-  const pluginMonitorIdsMap = await getExistingMonitors(cloudFormationStackId);
-  console.log(pluginMonitorIdsMap);
+export async function setMonitors(monitors: Monitor[], monitorsApiKey: string, monitorsAppKey: string, cloudFormationStackId: string, service: string, env: string) {
+  const monitorIdsMap = await getExistingMonitors(cloudFormationStackId, monitorsApiKey, monitorsAppKey);
+  const succesfullyUpdatedMonitors: string[] = [];
+  const successfullyCreatedMonitors: string[] = [];
+
   for (const monitor of monitors) {
-    const monitorIdString = Object.keys(monitor)[0];
-    const cleanMonitorParams = cleanData(monitor, cloudFormationStackId);
-    const monitorExists = await doesMonitorExist(monitorIdString, pluginMonitorIdsMap);
+    const serverlessMonitorId = Object.keys(monitor)[0];
+    const monitorIdNumber = monitorIdsMap[serverlessMonitorId];
+    const monitorParams = buildMonitorParams(monitor, cloudFormationStackId, service, env);
+    const monitorExists = await doesMonitorExist(serverlessMonitorId, monitorIdsMap);
+
     if (monitorExists) {
-      await updateMonitor(pluginMonitorIdsMap[monitorIdString], cleanMonitorParams)
+      const response = await updateMonitor(monitorIdNumber, serverlessMonitorId, monitorParams, monitorsApiKey, monitorsAppKey);
+      if (response) {
+        succesfullyUpdatedMonitors.push(` ${serverlessMonitorId}`);
+      }
     }
     else {
-      await createMonitor(cleanMonitorParams);
+      const response = await createMonitor(monitorParams, serverlessMonitorId, monitorsApiKey, monitorsAppKey);
+      if (response) {
+        successfullyCreatedMonitors.push(` ${serverlessMonitorId}`);
+      }
     }
   }
-  await deleteRemovedMonitors(monitors, pluginMonitorIdsMap);
-  return errors;
+  const successfullyDeletedMonitors = await deleteRemovedMonitors(monitors, monitorIdsMap, monitorsApiKey, monitorsAppKey);
+  const logStatements: string[] = [];
+  if (succesfullyUpdatedMonitors.length > 0) {
+    logStatements.push(`Succesfully updated${succesfullyUpdatedMonitors}`)
+  }
+  if (successfullyCreatedMonitors.length > 0) {
+    logStatements.push(`Succesfully created${successfullyCreatedMonitors}`)
+  }
+  if (successfullyDeletedMonitors.length > 0) {
+    logStatements.push(`Succesfully deleted${successfullyDeletedMonitors}`)
+  }
+  return logStatements;
 }

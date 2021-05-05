@@ -18,6 +18,8 @@ import { redirectHandlers } from "./wrapper";
 import { addCloudWatchForwarderSubscriptions } from "./forwarder";
 import { addOutputLinks, printOutputs } from "./output";
 import { FunctionDefinition } from "serverless";
+import { Monitor, setMonitors } from "./monitors";
+import { getCloudFormationStackId } from "./monitor_api_requests";
 
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
 export interface ExtendedFunctionDefinition extends FunctionDefinition {
@@ -60,7 +62,7 @@ module.exports = class ServerlessPlugin {
       usage: "Automatically instruments your lambdas with DataDog",
     },
   };
-  constructor(private serverless: Serverless, _: Serverless.Options) {}
+  constructor(private serverless: Serverless, _: Serverless.Options) { }
 
   private async beforePackageFunction() {
     const config = getConfig(this.serverless.service);
@@ -152,8 +154,27 @@ module.exports = class ServerlessPlugin {
 
   private async afterDeploy() {
     const config = getConfig(this.serverless.service);
+    // if (this.serverless.service.service) {
+    //   process.env.SERVICE = this.serverless.service.service;
+    // }
+    // if (config.monitorsApiKey) {
+    //   process.env.MONITORS_API_KEY = config.monitorsApiKey;
+    // }
+    // if (config.monitorsAppKey) {
+    //   process.env.MONITORS_APP_KEY = config.monitorsAppKey;
+    // }
+    const service = this.serverless.service.getServiceName();
+    const env = this.serverless.getProvider("aws").getStage();
+
     if (config.enabled === false) return;
-    return printOutputs(this.serverless);
+    if (config.monitors && config.monitorsApiKey && config.monitorsAppKey) {
+      const cloudFormationStackId = await getCloudFormationStackId(this.serverless);
+      const logStatements = await setMonitors(config.monitors, config.monitorsApiKey, config.monitorsAppKey, cloudFormationStackId, service, env);
+      for (const logStatement of logStatements) {
+        this.serverless.cli.log(logStatement);
+      }
+    }
+    return printOutputs(this.serverless, config.site);
   }
 
   private debugLogHandlers(handlers: FunctionInfo[]) {
