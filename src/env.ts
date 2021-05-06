@@ -17,9 +17,9 @@ export interface Configuration {
   apiKey?: string;
   // Datadog API Key encrypted using KMS, only necessary when using metrics without log forwarding
   apiKMSKey?: string;
-  // Datadog API Key used for enabling monitor configuration through plugin 
+  // Datadog API Key used for enabling monitor configuration through plugin
   monitorsApiKey?: string;
-  // Datadog App Key used for enabling monitor configuratio throguh plugin 
+  // Datadog App Key used for enabling monitor configuratio throguh plugin
   monitorsAppKey?: string;
   // Which Site to send to, (should be datadoghq.com or datadoghq.eu)
   site: string;

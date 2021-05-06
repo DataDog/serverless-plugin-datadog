@@ -1,4 +1,3 @@
-// import fetch from "node-fetch";
 import { MonitorParams } from "monitors";
 import { Response } from "node-fetch";
 import * as Serverless from "serverless";
@@ -13,14 +12,18 @@ export class InvalidAuthenticationError extends Error {
 }
 
 interface QueriedMonitor {
-    query: string,
-    id: number,
-    name: string,
-    tags: string[],
+    query: string;
+    id: number;
+    name: string;
+    tags: string[];
 }
 
-
-export async function createMonitor(serverlessMonitorId: string, monitorParams: MonitorParams, monitorsApiKey: string, monitorsAppKey: string) {
+export async function createMonitor(
+    serverlessMonitorId: string,
+    monitorParams: MonitorParams,
+    monitorsApiKey: string,
+    monitorsAppKey: string,
+) {
     const response: Response = await fetch("https://api.datadoghq.com/api/v1/monitor", {
         method: "POST",
         headers: {
@@ -34,14 +37,20 @@ export async function createMonitor(serverlessMonitorId: string, monitorParams: 
     if (response.status === 200) {
         return true;
     } else if (response.status === 403) {
-        throw new InvalidAuthenticationError('Could not perform request due to invalid authentication');
+        throw new InvalidAuthenticationError("Could not perform request due to invalid authentication");
     } else if (response.status === 400) {
-        console.log(`Invalid Syntax Error: Could not perform request due to incorrect syntax for ${serverlessMonitorId}`)
+        console.log(`Invalid Syntax Error: Could not perform request due to incorrect syntax for ${serverlessMonitorId}`);
     }
     return false;
 }
 
-export async function updateMonitor(monitorId: number, serverlessMonitorId: string, monitorParams: MonitorParams, monitorsApiKey: string, monitorsAppKey: string) {
+export async function updateMonitor(
+    monitorId: number,
+    serverlessMonitorId: string,
+    monitorParams: MonitorParams,
+    monitorsApiKey: string,
+    monitorsAppKey: string,
+) {
     const response: Response = await fetch(`https://api.datadoghq.com/api/v1/monitor/${monitorId}`, {
         method: "PUT",
         headers: {
@@ -50,21 +59,25 @@ export async function updateMonitor(monitorId: number, serverlessMonitorId: stri
             "Content-Type": "application/json",
         },
         body: JSON.stringify(monitorParams),
-    })
+    });
 
     if (response.status === 200) {
         return true;
-    }
-    else if (response.status === 403) {
-        throw new InvalidAuthenticationError('Could not perform request due to invalid authentication');
+    } else if (response.status === 403) {
+        throw new InvalidAuthenticationError("Could not perform request due to invalid authentication");
     } else if (response.status === 400) {
-        console.log(`Invalid Syntax Error: Could not perform request due to incorrect syntax for ${serverlessMonitorId}`)
+        console.log(`Invalid Syntax Error: Could not perform request due to incorrect syntax for ${serverlessMonitorId}`);
     }
 
     return false;
 }
 
-export async function deleteMonitor(monitorId: number, serverlessMonitorId: string, monitorsApiKey: string, monitorsAppKey: string) {
+export async function deleteMonitor(
+    monitorId: number,
+    serverlessMonitorId: string,
+    monitorsApiKey: string,
+    monitorsAppKey: string,
+) {
     const response: Response = await fetch(`https://api.datadoghq.com/api/v1/monitor/${monitorId}`, {
         method: "DELETE",
         headers: {
@@ -76,11 +89,10 @@ export async function deleteMonitor(monitorId: number, serverlessMonitorId: stri
 
     if (response.status === 200) {
         return true;
-    }
-    else if (response.status === 403) {
-        throw new InvalidAuthenticationError('Could not perform request due to invalid authentication');
+    } else if (response.status === 403) {
+        throw new InvalidAuthenticationError("Could not perform request due to invalid authentication");
     } else if (response.status === 400) {
-        console.log(`Invalid Syntax Error: Could not perform request due to incorrect syntax for ${serverlessMonitorId}`)
+        console.log(`Invalid Syntax Error: Could not perform request due to incorrect syntax for ${serverlessMonitorId}`);
     }
 
     return false;
@@ -97,7 +109,7 @@ export async function searchMonitors(queryTag: string, monitorsApiKey: string, m
         },
     });
     if (response.status === 403) {
-        throw new InvalidAuthenticationError('Could not perform request due to invalid authentication');
+        throw new InvalidAuthenticationError("Could not perform request due to invalid authentication");
     }
 
     const json = await response.json();
@@ -123,13 +135,21 @@ export async function getCloudFormationStackId(serverless: Serverless) {
     return cloudFormationStackId;
 }
 
-export async function getExistingMonitors(cloudFormationStackId: string, monitorsApiKey: string, monitorsAppKey: string) {
-    const existingMonitors = await searchMonitors(`aws_cloudformation_stack-id:${cloudFormationStackId}`, monitorsApiKey, monitorsAppKey);
+export async function getExistingMonitors(
+    cloudFormationStackId: string,
+    monitorsApiKey: string,
+    monitorsAppKey: string,
+) {
+    const existingMonitors = await searchMonitors(
+        `aws_cloudformation_stack-id:${cloudFormationStackId}`,
+        monitorsApiKey,
+        monitorsAppKey,
+    );
     const serverlessMonitorIdToMonitorId: { [key: string]: number } = {};
     for (const existingMonitor of existingMonitors) {
         for (const tag of existingMonitor.tags) {
-            if (tag.startsWith('serverless_monitor_id:')) {
-                const serverlessMonitorId = tag.substring(tag.indexOf(':') + 1);
+            if (tag.startsWith("serverless_monitor_id:")) {
+                const serverlessMonitorId = tag.substring(tag.indexOf(":") + 1);
                 serverlessMonitorIdToMonitorId[serverlessMonitorId] = existingMonitor.id;
             }
         }
