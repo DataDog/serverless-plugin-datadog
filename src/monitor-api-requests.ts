@@ -24,7 +24,7 @@ export class InvalidAuthenticationError extends Error {
 //     Monitor[]
 // }
 
-export async function createMonitor(monitorParams: MonitorParams, serverlessMonitorId?: string, monitorsApiKey?: string, monitorsAppKey?: string) {
+export async function createMonitor(serverlessMonitorId: string, monitorParams: MonitorParams, monitorsApiKey: string, monitorsAppKey: string) {
     const response: Response = await fetch("https://api.datadoghq.com/api/v1/monitor", {
         method: "POST",
         headers: {
@@ -34,8 +34,6 @@ export async function createMonitor(monitorParams: MonitorParams, serverlessMoni
         },
         body: JSON.stringify(monitorParams),
     });
-
-    console.log("create" + response.status);
 
     if (response.status === 200) {
         return true;
@@ -59,7 +57,6 @@ export async function updateMonitor(monitorId: number, serverlessMonitorId: stri
         body: JSON.stringify(monitorParams),
     })
 
-    console.log("update" + response.status);
     if (response.status === 200) {
         return true;
     }
@@ -81,7 +78,7 @@ export async function deleteMonitor(monitorId: number, serverlessMonitorId: stri
             "Content-Type": "application/json",
         },
     });
-    console.log("delete" + response.status);
+
     if (response.status === 200) {
         return true;
     }
@@ -135,14 +132,14 @@ export async function getCloudFormationStackId(serverless: Serverless) {
 
 export async function getExistingMonitors(cloudFormationStackId: string, monitorsApiKey: string, monitorsAppKey: string) {
     const existingMonitors = await searchMonitors(`aws_cloudformation_stack-id:${cloudFormationStackId}`, monitorsApiKey, monitorsAppKey);
-    const monitorIdsMap: { [key: string]: number } = {};
+    const serverlessMonitorIdToMonitorId: { [key: string]: number } = {};
     for (const existingMonitor of existingMonitors) {
         for (const tag of existingMonitor.tags) {
             if (tag.startsWith('serverless_monitor_id:')) {
                 const serverlessMonitorId = tag.substring(tag.indexOf(':') + 1);
-                monitorIdsMap[serverlessMonitorId] = existingMonitor.id;
+                serverlessMonitorIdToMonitorId[serverlessMonitorId] = existingMonitor.id;
             }
         }
     }
-    return monitorIdsMap;
+    return serverlessMonitorIdToMonitorId;
 }

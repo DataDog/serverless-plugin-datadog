@@ -21,7 +21,7 @@ const monitorParams: MonitorParams = {
     name: 'High Error Rate on {{functionname.name}} in {{region.name}} for {{aws_account.name}}'
 }
 
-// invalid because it's missing the required options parameter
+// Invalid monitor missing options parameter
 const invalidMonitorParams: MonitorParams = {
     tags: [
         'serverless_monitor_type:single_function',
@@ -46,14 +46,14 @@ describe("createMonitor", () => {
     })
     it("returns true when syntax is valid", async () => {
         (fetch as unknown as jest.Mock).mockReturnValue({ status: 200 });
-        const wasMonitorCreated = await createMonitor(monitorParams, "high_error_rate", "apikey", "appkey");
+        const wasMonitorCreated = await createMonitor("high_error_rate", monitorParams, "apikey", "appkey");
         expect(wasMonitorCreated).toBe(true);
         expect((fetch as unknown as jest.Mock)).toHaveBeenCalledWith("https://api.datadoghq.com/api/v1/monitor", validRequestBody);
     });
     it("returns false and logs an Invalid Syntax Error when syntax is invalid", async () => {
         console.log = jest.fn();
         (fetch as unknown as jest.Mock).mockReturnValue({ status: 400 });
-        const wasMonitorCreated = await createMonitor(invalidMonitorParams, "high_error_rate", "apikey", "appkey");
+        const wasMonitorCreated = await createMonitor("high_error_rate", invalidMonitorParams, "apikey", "appkey");
         expect(wasMonitorCreated).toBe(false);
         expect(console.log).toHaveBeenCalledWith("Invalid Syntax Error: Could not perform request due to incorrect syntax for high_error_rate");
         expect((fetch as unknown as jest.Mock)).toHaveBeenCalledWith("https://api.datadoghq.com/api/v1/monitor", invalidRequestBody);
@@ -61,7 +61,7 @@ describe("createMonitor", () => {
     });
     it("throws an Invalid Authentication Error when authentication is invalid", async () => {
         (fetch as unknown as jest.Mock).mockReturnValue({ status: 403 });
-        expect(async () => await createMonitor(monitorParams, "high_error_rate", "apikey", "appkey")).rejects.toThrow(InvalidAuthenticationError);
+        expect(async () => await createMonitor("high_error_rate", monitorParams, "apikey", "appkey")).rejects.toThrow(InvalidAuthenticationError);
     });
 })
 
