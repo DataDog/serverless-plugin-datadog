@@ -56,8 +56,6 @@
     ]
   },
   "dependencies": {
-    "batch-request-js": "^2.0.2",
-    "dotenv": "^8.2.0",
     "node-fetch": "^2.6.1"
   }
 }

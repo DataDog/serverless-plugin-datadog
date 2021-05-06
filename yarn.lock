@@ -1408,11 +1408,6 @@ base@^0.11.1:
     mixin-deep "^1.2.0"
     pascalcase "^0.1.1"
 
-batch-request-js@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.npmjs.org/batch-request-js/-/batch-request-js-2.0.2.tgz"
-  integrity sha512-LPwEMrWW5SoMqUxpNkkoEoRdEUR5YB2x8aohtKXR1EZ9SZBMwxNz/0MkpQ6sDWaJZGPiFZkkv1YbXczlkWxmUQ==
-
 bcrypt-pbkdf@^1.0.0:
   version "1.0.2"
   resolved "https://registry.npmjs.org/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.2.tgz"

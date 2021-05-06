@@ -10,10 +10,10 @@ export interface Monitor {
 
 /**
  * Adds the appropriate tags and required parameters that will be passed as part of the request body for creating and updating monitors 
- * @param monitor Monitor Object that is defined in the serverless.yml file
- * @param cloudFormationStackId Cloud Formation Stack ID
- * @param service Service
- * @param env Env
+ * @param monitor - the Monitor object that is defined in the serverless.yml file
+ * @param cloudFormationStackId - the Cloud Formation Stack ID
+ * @param service - the Service
+ * @param env  - the Environment
  * @returns valid monitor parameters 
  */
 export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: string, service: string, env: string) {
@@ -60,7 +60,7 @@ export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: stri
 
 /**
  * Checks to see if the given monitor is a serverless recommended monitor
- * @param serverlessMonitorId Unique ID string defined for each serverless monitor
+ * @param serverlessMonitorId - Unique ID string defined for each serverless monitor
  * @returns true if a given monitor is a serverless recommended monitor
  */
 function checkIfServerlessMonitor(serverlessMonitorId: string) {
@@ -69,8 +69,8 @@ function checkIfServerlessMonitor(serverlessMonitorId: string) {
 
 /**
  * Checks to see if the monitor already exists
- * @param serverlessMonitorId Unique ID string defined for each serverless monitor
- * @param existingMonitors Monitors that already been created
+ * @param serverlessMonitorId - Unique ID string defined for each serverless monitor
+ * @param existingMonitors - Monitors that have already been created
  * @returns true if given monitor already exists
  */
 function doesMonitorExist(serverlessMonitorId: string, existingMonitors: { [key: string]: number }) {
@@ -112,12 +112,12 @@ async function deleteRemovedMonitors(
 
 /**
  * Creates, updates, and deletes the appropriate monitor configurations as defined in the serverless.yml file 
- * @param monitors Monitors defined in the serverless.yml file
- * @param monitorsApiKey API Key
- * @param monitorsAppKey Application Key
- * @param cloudFormationStackId Cloud Formation Stack ID
- * @param service Service
- * @param env Env
+ * @param monitors - Monitors defined in the serverless.yml file
+ * @param monitorsApiKey - the API Key
+ * @param monitorsAppKey - the Application Key
+ * @param cloudFormationStackId - the Cloud Formation Stack ID
+ * @param service - the Service
+ * @param env - the Environment
  * @returns monitors that have been successfully created, updated, and deleted according to the configuration defined in the plugin
  */
 export async function setMonitors(
