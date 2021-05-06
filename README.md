@@ -142,13 +142,13 @@ Serverless has seven recommended monitors with default values pre-configured.
 
 | Monitor              | Metrics                                                                                   | Default Threshold | Serverless Monitor ID |
 |----------------------|-------------------------------------------------------------------------------------------|-------------------|-----------------------|
-| High Error Rate      | `aws.lambda.errors`/`aws.lambda.invocations`                                                  | >= 10%            | `high_error_rate`       |
-| Timeout              | `aws.lambda.duration.max`/`aws.lambda.timeout`                                                | >= 1              | `timeout`               |
-| Out of Memory        | `aws.lambda.lambda.enhanced.max_memory_used`/<br>`aws.lambda.memorysize`                  | >= 1              | `out_of_memory`         |
-| High Iterator Age    | `aws.lambda.iterator_age.maximum`                                                          | >= 24 hrs         | `high_iterator_age`     |
-| High Cold Start Rate | `aws.lambda.enhanced.invaocations(cold_start:true)`/<br>`aws.lambda.enhanced.invocations` | >= 20%            | `high_cold_start_rate`  |
-| High Throttles       | `aws.lambda.throttles`/`aws.lambda.invocations`                                           | >= 20%            | `high_throttles`        |
-| Increased Cost       | `aws.lambda.enhanced.estimated_cost`                                                      | &#8593;20%        | `increased_cost`        |
+| High Error Rate      | `aws.lambda.errors`/`aws.lambda.invocations`                                              | >= 10%            | `high_error_rate`     |
+| Timeout              | `aws.lambda.duration.max`/`aws.lambda.timeout`                                            | >= 1              | `timeout`             |
+| Out of Memory        | `aws.lambda.lambda.enhanced.max_memory_used`/<br>`aws.lambda.memorysize`                  | >= 1              | `out_of_memory`       |
+| High Iterator Age    | `aws.lambda.iterator_age.maximum`                                                         | >= 24 hrs         | `high_iterator_age`   |
+| High Cold Start Rate | `aws.lambda.enhanced.invaocations(cold_start:true)`/<br>`aws.lambda.enhanced.invocations` | >= 20%            | `high_cold_start_rate`|
+| High Throttles       | `aws.lambda.throttles`/`aws.lambda.invocations`                                           | >= 20%            | `high_throttles`      |
+| Increased Cost       | `aws.lambda.enhanced.estimated_cost`                                                      | &#8593;20%        | `increased_cost`      |
  
 #### To Enable and Configure a Recommended Serverless Monitor 
 
