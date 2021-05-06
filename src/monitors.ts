@@ -34,36 +34,18 @@ export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: stri
   if (monitorParams.type === undefined) {
     monitorParams.type = "metric alert";
   }
-  // Not necessary because the critical threshold will just be defined by the query anyways 
-  // Also not necessary because thresholds and threshold are still valid in the api 
-  // if (typeof monitorParams.thresholds === "string") {
-  //   monitorParams.thresholds = { critical: `${monitorParams.threshold}` };
-  // }
 
   monitorParams.tags = [...monitorParams.tags, "serverless_monitor_type:single_function", `serverless_monitor_id:${serverlessMonitorId}`, `aws_cloudformation_stack-id:${cloudFormationStackId}`, "created_by:dd_sls_plugin", `env:${env}`, `service:${service}`];
 
   if (checkIfServerlessMonitor(serverlessMonitorId)) {
     monitorParams.query = SERVERLESS_MONITORS[serverlessMonitorId].query(cloudFormationStackId);
-    // if (!monitorParams.thresholds) {
-    //   monitorParams.thresholds = SERVERLESS_MONITORS[serverlessMonitorId].threshold;
-    // }
+
     if (!monitorParams.message) {
       monitorParams.message = SERVERLESS_MONITORS[serverlessMonitorId].message;
     }
     if (!monitorParams.name) {
       monitorParams.name = SERVERLESS_MONITORS[serverlessMonitorId].name;
     }
-    // if (monitorParams.threshold) { // not sure if this is still needed
-    //   const threshold = typeof monitorParams.threshold === "number" ? monitorParams.threshold
-    //     : monitorParams.threshold.critical ? monitorParams.threshold.critical
-    //       : monitorParams.threshold;
-
-    //   const thresholdIndex = monitorParams.query.lastIndexOf("=") ? monitorParams.query.lastIndexOf("=") + 1
-    //     : monitorParams.query.lastIndexOf("<") ? monitorParams.query.lastIndexOf("<") + 1
-    //       : monitorParams.query.lastIndexOf(">") ? monitorParams.query.lastIndeOf(">") + 1
-    //         : monitorParams.query.length;
-    //   monitorParams.query = monitorParams.query.substr(0, thresholdIndex + 1) + `${threshold}`;
-    // }
   }
   return monitorParams;
 }

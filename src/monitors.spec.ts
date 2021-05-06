@@ -37,8 +37,7 @@ const UPDATED_CUSTOM_MONITOR_2: Monitor = {
     "custom_monitor_2": {
         "name": "Custom Monitor 2",
         "query": "avg(last_15m):anomalies(avg:system.load.1{*}, 'basic', 2, direction='both') >= 1",
-        "message": "This is a custom monitor",
-        "threshold": 0.2
+        "message": "This is a custom monitor"
     }
 }
 
@@ -50,7 +49,7 @@ const INCREASED_COST_MONITOR: Monitor = {
         "options": {
             "renotify_interval": 0,
             "timeout_h": 0,
-            "thresholds": { "critical": 1 },
+            "thresholds": { "warning": 1 },
             "notify_no_data": false,
             "no_data_timeframe": 2,
             "notify_audit": false,
@@ -116,7 +115,6 @@ const UPDATED_CUSTOM_MONITOR_2_PARAMS = {
         'service:service'
 
     ],
-    threshold: 0.2,
     message: 'This is a custom monitor',
     options: {},
     type: 'metric alert'
@@ -128,7 +126,7 @@ const INCREASED_COST_MONITOR_PARAMS = {
     options: {
         renotify_interval: 0,
         timeout_h: 0,
-        thresholds: { critical: 1 },
+        thresholds: { warning: 1 },
         notify_no_data: false,
         no_data_timeframe: 2,
         notify_audit: false,
@@ -143,7 +141,6 @@ const INCREASED_COST_MONITOR_PARAMS = {
         'service:service'
     ],
     type: 'metric alert',
-    thresholds: 0.2
 };
 const TIMEOUT_MONITOR_PARAMS = {
     name: 'Modified Timeout Monitor',
@@ -158,7 +155,6 @@ const TIMEOUT_MONITOR_PARAMS = {
     ],
     options: {},
     type: 'metric alert',
-    thresholds: 1,
     message: 'At least one invocation in the selected time range timed out. This occurs when your function runs for longer than the configured timeout or the global Lambda timeout. Resolution: [Distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing) can help you pinpoint slow requests to APIs and other microservices. You can also consider increasing the timeout of your function. Note that this could affect your AWS bill.'
 };
 

@@ -42,7 +42,6 @@ export async function createMonitor(serverlessMonitorId: string, monitorParams: 
     } else if (response.status === 400) {
         console.log(`Invalid Syntax Error: Could not perform request due to incorrect syntax for ${serverlessMonitorId}`)
     }
-
     return false;
 }
 
