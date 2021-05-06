@@ -9,12 +9,12 @@ export interface Monitor {
 }
 
 /**
- *
+ * Adds the appropriate tags and required parameters that will be passed as part of the request body for creating and updating monitors 
  * @param monitor Monitor Object that is defined in the serverless.yml file
  * @param cloudFormationStackId Cloud Formation Stack ID
  * @param service Service
  * @param env Env
- * @returns valid monitor parameters to pass into the API call
+ * @returns valid monitor parameters 
  */
 export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: string, service: string, env: string) {
   const serverlessMonitorId = Object.keys(monitor)[0];
@@ -59,7 +59,7 @@ export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: stri
 }
 
 /**
- *
+ * Checks to see if the given monitor is a serverless recommended monitor
  * @param serverlessMonitorId Unique ID string defined for each serverless monitor
  * @returns true if a given monitor is a serverless recommended monitor
  */
@@ -68,7 +68,7 @@ function checkIfServerlessMonitor(serverlessMonitorId: string) {
 }
 
 /**
- *
+ * Checks to see if the monitor already exists
  * @param serverlessMonitorId Unique ID string defined for each serverless monitor
  * @param existingMonitors Monitors that already been created
  * @returns true if given monitor already exists
@@ -78,12 +78,12 @@ function doesMonitorExist(serverlessMonitorId: string, existingMonitors: { [key:
 }
 
 /**
- *
+ * Deletes the monitors that have been removed from the plugin
  * @param pluginMonitors Monitors that are currently defined in the plugin
  * @param existingMonitors Monitors that have already been created
  * @param monitorsApiKey API Key
  * @param monitorsAppKey Application Key
- * @returns an array of successfully deleted monitors that were removed from the plugin
+ * @returns an array of successfully deleted monitors
  */
 async function deleteRemovedMonitors(
   pluginMonitors: Monitor[],
@@ -111,7 +111,7 @@ async function deleteRemovedMonitors(
 }
 
 /**
- *
+ * Creates, updates, and deletes the appropriate monitor configurations as defined in the serverless.yml file 
  * @param monitors Monitors defined in the serverless.yml file
  * @param monitorsApiKey API Key
  * @param monitorsAppKey Application Key

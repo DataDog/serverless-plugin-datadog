@@ -28,7 +28,7 @@ const monitorParams: MonitorParams = {
     name: "High Error Rate on {{functionname.name}} in {{region.name}} for {{aws_account.name}}",
 };
 
-// Invalid monitor missing options parameter
+// Invalid – monitor missing options parameter
 const invalidMonitorParams: MonitorParams = {
     tags: [
         "serverless_monitor_type:single_function",
