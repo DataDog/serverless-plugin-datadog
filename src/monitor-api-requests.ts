@@ -12,17 +12,26 @@ export class InvalidAuthenticationError extends Error {
     }
 }
 
-// interface Monitors {
-//     query: string,
-//     id: number,
-//     name: string,
-//     tags: string[],
-//     type: string
-// }
+interface QueriedMonitor {
+    // status: string,
+    // scopes: string[],
+    // classification: string,
+    // creator: Object,
+    // metrics: string[],
+    // notifications: string[],
+    // muted_until_ts: null,
+    query: string,
+    id: number,
+    // last_triggered_ts: number,
+    name: string,
+    tags: string[],
+    // org_id: number,
+    // priority: number,
+    // overall_state_modified: number,
+    // restricted_roles: string[],
+    // type: string
+}
 
-// interface MonitorsJSON {
-//     Monitor[]
-// }
 
 export async function createMonitor(serverlessMonitorId: string, monitorParams: MonitorParams, monitorsApiKey: string, monitorsAppKey: string) {
     const response: Response = await fetch("https://api.datadoghq.com/api/v1/monitor", {
@@ -103,12 +112,10 @@ export async function searchMonitors(queryTag: string, monitorsApiKey: string, m
     if (response.status === 403) {
         throw new InvalidAuthenticationError('Could not perform request due to invalid authentication');
     }
-    // TODO: interface for json response 
-    const json: any = await response.json();
-    console.log("this is the json");
-    console.log(json);
-    const monitors = json.monitors;
-    // console.log(monitors);
+
+    const json = await response.json();
+    const monitors: QueriedMonitor[] = json.monitors;
+
     return monitors;
 }
 
