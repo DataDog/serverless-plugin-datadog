@@ -13,23 +13,10 @@ export class InvalidAuthenticationError extends Error {
 }
 
 interface QueriedMonitor {
-    // status: string,
-    // scopes: string[],
-    // classification: string,
-    // creator: Object,
-    // metrics: string[],
-    // notifications: string[],
-    // muted_until_ts: null,
     query: string,
     id: number,
-    // last_triggered_ts: number,
     name: string,
     tags: string[],
-    // org_id: number,
-    // priority: number,
-    // overall_state_modified: number,
-    // restricted_roles: string[],
-    // type: string
 }
 
 
