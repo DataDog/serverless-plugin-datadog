@@ -141,7 +141,7 @@ custom:
 Serverless has seven recommended monitors with default values pre-configured. 
 
 | Monitor              | Metrics                                                                                   | Default Threshold | Serverless Monitor ID |
-|----------------------|-------------------------------------------------------------------------------------------|-------------------|-----------------------|
+|:--------------------:|:-----------------------------------------------------------------------------------------:|:-----------------:|:---------------------:|
 | High Error Rate      | `aws.lambda.errors`/`aws.lambda.invocations`                                              | >= 10%            | `high_error_rate`     |
 | Timeout              | `aws.lambda.duration.max`/`aws.lambda.timeout`                                            | >= 1              | `timeout`             |
 | Out of Memory        | `aws.lambda.lambda.enhanced.max_memory_used`/<br>`aws.lambda.memorysize`                  | >= 1              | `out_of_memory`       |
