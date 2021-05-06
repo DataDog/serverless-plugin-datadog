@@ -1,7 +1,5 @@
 import { SERVERLESS_MONITORS } from "./serverless_monitors"
-import { updateMonitor, searchMonitors, createMonitor, deleteMonitor, getExistingMonitors } from "./monitor-api-requests";
-import { create } from "mock-fs/lib/filesystem";
-const fetch = require("node-fetch");
+import { updateMonitor, createMonitor, deleteMonitor, getExistingMonitors } from "./monitor-api-requests";
 
 export const errors: Error[] = [];
 
@@ -14,13 +12,13 @@ export interface Monitor {
 
 // Adds appropriate tags and default parameter values
 export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: string, service: string, env: string) {
-  const serverlessMonitorId = Object.keys(monitor)[0]; // is there a better way to get the id? 
+  const serverlessMonitorId = Object.keys(monitor)[0];
 
   if (!monitor[serverlessMonitorId]) {
     monitor[serverlessMonitorId] = {};
   }
 
-  const monitorParams = monitor[serverlessMonitorId];
+  const monitorParams = { ...monitor[serverlessMonitorId] };
 
   if (!monitorParams.tags) {
     monitorParams.tags = [];
@@ -35,12 +33,7 @@ export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: stri
     monitorParams.thresholds = { critical: `${monitorParams.threshold}` };
   }
 
-  monitorParams.tags.push("serverless_monitor_type:single_function");
-  monitorParams.tags.push(`serverless_monitor_id:${serverlessMonitorId}`);
-  monitorParams.tags.push(`aws_cloudformation_stack-id:${cloudFormationStackId}`);
-  monitorParams.tags.push("created_by:dd_sls_plugin");
-  monitorParams.tags.push(`env:${env}`);
-  monitorParams.tags.push(`service:${service}`);
+  monitorParams.tags = [...monitorParams.tags, "serverless_monitor_type:single_function", `serverless_monitor_id:${serverlessMonitorId}`, `aws_cloudformation_stack-id:${cloudFormationStackId}`, "created_by:dd_sls_plugin", `env:${env}`, `service:${service}`];
 
   if (checkIfServerlessMonitor(serverlessMonitorId)) {
     monitorParams.query = SERVERLESS_MONITORS[serverlessMonitorId].query(cloudFormationStackId);

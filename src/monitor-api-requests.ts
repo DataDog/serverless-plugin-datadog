@@ -1,6 +1,5 @@
-const fetch = require("node-fetch");
-const batchRequest = require('batch-request-js');
-import { Monitor, MonitorParams } from "monitors";
+import fetch from "node-fetch";
+import { MonitorParams } from "monitors";
 import { Response } from "node-fetch";
 import * as Serverless from "serverless";
 
@@ -12,13 +11,17 @@ export class InvalidAuthenticationError extends Error {
     }
 }
 
-class InvalidSyntaxError extends Error {
-    constructor(message: string) {
-        super(...message);
-        this.name = "Invalid Syntax Error";
-        this.message = message;
-    }
-}
+// interface Monitors {
+//     query: string,
+//     id: number,
+//     name: string,
+//     tags: string[],
+//     type: string
+// }
+
+// interface MonitorsJSON {
+//     Monitor[]
+// }
 
 export async function createMonitor(monitorParams: MonitorParams, serverlessMonitorId?: string, monitorsApiKey?: string, monitorsAppKey?: string) {
     const response: Response = await fetch("https://api.datadoghq.com/api/v1/monitor", {
@@ -86,8 +89,8 @@ export async function deleteMonitor(monitorId: number, serverlessMonitorId: stri
     } else if (response.status === 400) {
         console.log(`Invalid Syntax Error: Could not perform request due to incorrect syntax for ${serverlessMonitorId}`)
     }
-    return false;
 
+    return false;
 }
 
 export async function searchMonitors(queryTag: string, monitorsApiKey: string, monitorsAppKey: string) {
@@ -103,9 +106,12 @@ export async function searchMonitors(queryTag: string, monitorsApiKey: string, m
     if (response.status === 403) {
         throw new InvalidAuthenticationError('Could not perform request due to invalid authentication');
     }
-
+    // TODO: interface for json response 
     const json: any = await response.json();
+    console.log("this is the json");
+    console.log(json);
     const monitors = json.monitors;
+    // console.log(monitors);
     return monitors;
 }
 
