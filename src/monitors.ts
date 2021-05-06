@@ -9,12 +9,12 @@ export interface Monitor {
 }
 
 /**
- * Adds the appropriate tags and required parameters that will be passed as part of the request body for creating and updating monitors 
+ * Adds the appropriate tags and required parameters that will be passed as part of the request body for creating and updating monitors
  * @param monitor - the Monitor object that is defined in the serverless.yml file
  * @param cloudFormationStackId - the Cloud Formation Stack ID
  * @param service - the Service
  * @param env  - the Environment
- * @returns valid monitor parameters 
+ * @returns valid monitor parameters
  */
 export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: string, service: string, env: string) {
   const serverlessMonitorId = Object.keys(monitor)[0];
@@ -111,7 +111,7 @@ async function deleteRemovedMonitors(
 }
 
 /**
- * Creates, updates, and deletes the appropriate monitor configurations as defined in the serverless.yml file 
+ * Creates, updates, and deletes the appropriate monitor configurations as defined in the serverless.yml file
  * @param monitors - Monitors defined in the serverless.yml file
  * @param monitorsApiKey - the API Key
  * @param monitorsAppKey - the Application Key
