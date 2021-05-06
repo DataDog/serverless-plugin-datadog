@@ -136,6 +136,84 @@ custom:
   datadog:
     enabled: ${self:custom.staged.dd_enabled, true}
 ```
+### Serverless Monitors 
+
+Serverless has seven recommended monitors with default values pre-configured. 
+
+| Monitor              | Metrics                                                                                   | Default Threshold | Serverless Monitor ID |
+|----------------------|-------------------------------------------------------------------------------------------|-------------------|-----------------------|
+| High Error Rate      | `aws.lambda.errors`/`aws.lambda.invocations`                                                  | >= 10%            | `high_error_rate`       |
+| Timeout              | `aws.lambda.duration.max`/`aws.lambda.timeout`                                                | >= 1              | `timeout`               |
+| Out of Memory        | `aws.lambda.lambda.enhanced.max_memory_used`/<br>`aws.lambda.memorysize`                  | >= 1              | `out_of_memory`         |
+| High Iterator Age    | `aws.lambda.iterator_age.maximum`                                                          | >= 24 hrs         | `high_iterator_age`     |
+| High Cold Start Rate | `aws.lambda.enhanced.invaocations(cold_start:true)`/<br>`aws.lambda.enhanced.invocations` | >= 20%            | `high_cold_start_rate`  |
+| High Throttles       | `aws.lambda.throttles`/`aws.lambda.invocations`                                           | >= 20%            | `high_throttles`        |
+| Increased Cost       | `aws.lambda.enhanced.estimated_cost`                                                      | &#8593;20%        | `increased_cost`        |
+ 
+#### To Enable and Configure a Recommended Serverless Monitor 
+
+To create a serverless monitor, you must use its respective  serverless monitor ID in addition to passing in the API key and Application key in the `serverless.yml` file. If you’d like to further configure the specific parameter values for a recommended monitor, you can directly define parameters below the serverless monitor ID. Parameters not specified under a recommended monitor will use the default recommended value. For further documentation on monitor parameters, see the [Datadog Monitors API](https://docs.datadoghq.com/api/latest/monitors/#create-a-monitor). You can directly update a monitor by changing the parameter values. To delete a monitor, remove the monitor from the `serverless.yml` template. 
+
+##### To create a recommended monitor with the default values
+Define the appropriate serverless monitor ID without specifying any parameter values
+
+```
+custom:
+ datadog:
+   addLayers: true
+   monitorsApiKey: ${file(./config.json):monitorsApiKey}
+   monitorsAppKey: ${file(./config.json):monitorsAppKey}
+   monitors:
+     - high_error_rate:
+```
+
+##### To configure a recommended monitor
+```
+custom:
+ datadog:
+   addLayers: true
+   monitorsApiKey: ${file(./config.json):monitorsApiKey}
+   monitorsAppKey: ${file(./config.json):monitorsAppKey}
+   monitors:
+     - high_error_rate:
+        name: "High Error Rate with Modified Warning Threshold"
+        options: {
+          thresholds: {
+            warning: 0.05
+          }
+        }
+```
+
+##### To delete a monitor 
+Removing the serverless monitor ID and its parameters will delete the monitor. 
+```
+custom:
+ datadog:
+   addLayers: true
+   monitorsApiKey: ${file(./config.json):monitorsApiKey}
+   monitorsAppKey: ${file(./config.json):monitorsAppKey}
+   monitors:
+```
+
+#### To Enable and Configure a Custom Monitor
+
+To define a custom monitor, you must define a unique serverless monitor ID string in addition to passing in the API key and Application key. The `query` parameter is required but every other parameter is optional. 
+
+
+##### To create a custom monitor 
+Define a unique serverless monitor ID string and specify the necessary parameters below. For further documentation on monitor parameters, see the [Datadog Monitors API](https://docs.datadoghq.com/api/latest/monitors/#create-a-monitor).
+
+```
+custom:
+  datadog:
+    addLayers: true
+    monitorsApiKey: ${file(./config.json):monitorsApiKey}
+    monitorsAppKey: ${file(./config.json):monitorsAppKey}
+    monitors:
+      - custom_monitor_id_1:
+          name: "Custom Monitor 1"
+          query: "max(next_1w):forecast(avg:system.load.1{*}, 'linear', 1, interval='60m', history='1w', model='default') >= 3"
+```
 
 ## Opening Issues
 
