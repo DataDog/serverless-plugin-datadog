@@ -27,7 +27,7 @@ export async function addOutputLinks(serverless: Serverless, site: string) {
   });
 }
 
-export async function printOutputs(serverless: Serverless, site: String) {
+export async function printOutputs(serverless: Serverless, site: string) {
   const stackName = serverless.getProvider("aws").naming.getStackName();
   const service = serverless.service.getServiceName();
   const env = serverless.getProvider("aws").getStage();
