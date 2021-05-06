@@ -90,6 +90,9 @@ describe("getConfig", () => {
       injectLogContext: true,
       exclude: [],
       integrationTesting: false,
+      subscribeToApiGatewayLogs: true,
+      subscribeToHttpApiLogs: true,
+      subscribeToWebsocketLogs: true,
     });
   });
 
@@ -116,6 +119,9 @@ describe("getConfig", () => {
       injectLogContext: true,
       exclude: [],
       integrationTesting: false,
+      subscribeToApiGatewayLogs: true,
+      subscribeToHttpApiLogs: true,
+      subscribeToWebsocketLogs: true,
     });
   });
 });
@@ -198,6 +204,7 @@ describe("setEnvConfiguration", () => {
     const service = {
       provider: {},
     } as any;
+
     setEnvConfiguration(
       {
         addLayers: false,
@@ -211,6 +218,9 @@ describe("setEnvConfiguration", () => {
         addExtension: false,
         enableTags: true,
         injectLogContext: false,
+        subscribeToApiGatewayLogs: true,
+        subscribeToHttpApiLogs: true,
+        subscribeToWebsocketLogs: true,
         exclude: ["dd-excluded-function"],
       },
       service,
@@ -257,6 +267,9 @@ describe("setEnvConfiguration", () => {
         addExtension: false,
         enableTags: true,
         injectLogContext: true,
+        subscribeToApiGatewayLogs: true,
+        subscribeToHttpApiLogs: true,
+        subscribeToWebsocketLogs: true,
         exclude: [],
       },
       service,
@@ -290,6 +303,9 @@ describe("setEnvConfiguration", () => {
         flushMetricsToLogs: true,
         enableXrayTracing: true,
         enableDDTracing: true,
+        subscribeToApiGatewayLogs: true,
+        subscribeToHttpApiLogs: true,
+        subscribeToWebsocketLogs: true,
         addExtension: true,
         enableTags: true,
         injectLogContext: false,

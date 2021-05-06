@@ -1,7 +1,8 @@
-import fetch from "node-fetch";
+// import fetch from "node-fetch";
 import { MonitorParams } from "monitors";
 import { Response } from "node-fetch";
 import * as Serverless from "serverless";
+const fetch = require("node-fetch");
 
 export class InvalidAuthenticationError extends Error {
     constructor(message: string) {

@@ -52,6 +52,11 @@ export interface Configuration {
   exclude: string[];
   // When set, this plugin will configure the specified monitors for the function
   monitors?: { [id: string]: { [key: string]: any } }[];
+
+  // API Gateway logging
+  subscribeToApiGatewayLogs: boolean;
+  subscribeToHttpApiLogs: boolean;
+  subscribeToWebsocketLogs: boolean;
 }
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
@@ -74,6 +79,9 @@ export const defaultConfiguration: Configuration = {
   injectLogContext: true,
   exclude: [],
   integrationTesting: false,
+  subscribeToApiGatewayLogs: true,
+  subscribeToHttpApiLogs: true,
+  subscribeToWebsocketLogs: true,
 };
 
 export function setEnvConfiguration(config: Configuration, service: Service) {
@@ -101,7 +109,6 @@ export function setEnvConfiguration(config: Configuration, service: Service) {
   if (config.enableDDTracing !== undefined && environment[ddTracingEnabledEnvVar] === undefined) {
     environment[ddTracingEnabledEnvVar] = config.enableDDTracing;
   }
-
   if (config.injectLogContext !== undefined && environment[logInjectionEnvVar] === undefined) {
     environment[logInjectionEnvVar] = config.injectLogContext;
   }
