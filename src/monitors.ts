@@ -128,7 +128,7 @@ export async function setMonitors(
   service: string,
   env: string,
 ) {
-  const pluginMonitorIdToMonitorId = await getExistingMonitors(
+  const pluginMonitorIdByMonitorId = await getExistingMonitors(
     cloudFormationStackId,
     monitorsApiKey,
     monitorsAppKey,
@@ -138,9 +138,9 @@ export async function setMonitors(
 
   for (const monitor of monitors) {
     const pluginMonitorId = Object.keys(monitor)[0];
-    const monitorIdNumber = pluginMonitorIdToMonitorId[pluginMonitorId];
+    const monitorIdNumber = pluginMonitorIdByMonitorId[pluginMonitorId];
     const monitorParams = buildMonitorParams(monitor, cloudFormationStackId, service, env);
-    const monitorExists = await doesMonitorExist(pluginMonitorId, pluginMonitorIdToMonitorId);
+    const monitorExists = await doesMonitorExist(pluginMonitorId, pluginMonitorIdByMonitorId);
 
     if (monitorExists) {
       const response = await updateMonitor(
@@ -162,7 +162,7 @@ export async function setMonitors(
   }
   const successfullyDeletedMonitors = await deleteRemovedMonitors(
     monitors,
-    pluginMonitorIdToMonitorId,
+    pluginMonitorIdByMonitorId,
     monitorsApiKey,
     monitorsAppKey,
   );
