@@ -17,13 +17,13 @@ export interface Monitor {
  * @returns valid monitor parameters
  */
 export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: string, service: string, env: string) {
-  const serverlessMonitorId = Object.keys(monitor)[0];
+  const pluginMonitorId = Object.keys(monitor)[0];
 
-  if (!monitor[serverlessMonitorId]) {
-    monitor[serverlessMonitorId] = {};
+  if (!monitor[pluginMonitorId]) {
+    monitor[pluginMonitorId] = {};
   }
 
-  const monitorParams = { ...monitor[serverlessMonitorId] };
+  const monitorParams = { ...monitor[pluginMonitorId] };
 
   if (!monitorParams.tags) {
     monitorParams.tags = [];
@@ -38,21 +38,21 @@ export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: stri
   monitorParams.tags = [
     ...monitorParams.tags,
     "serverless_monitor_type:single_function",
-    `serverless_monitor_id:${serverlessMonitorId}`,
+    `serverless_monitor_id:${pluginMonitorId}`,
     `aws_cloudformation_stack-id:${cloudFormationStackId}`,
     "created_by:dd_sls_plugin",
     `env:${env}`,
     `service:${service}`,
   ];
 
-  if (checkIfRecommendedMonitor(serverlessMonitorId)) {
-    monitorParams.query = SERVERLESS_MONITORS[serverlessMonitorId].query(cloudFormationStackId);
+  if (checkIfRecommendedMonitor(pluginMonitorId)) {
+    monitorParams.query = SERVERLESS_MONITORS[pluginMonitorId].query(cloudFormationStackId);
 
     if (!monitorParams.message) {
-      monitorParams.message = SERVERLESS_MONITORS[serverlessMonitorId].message;
+      monitorParams.message = SERVERLESS_MONITORS[pluginMonitorId].message;
     }
     if (!monitorParams.name) {
-      monitorParams.name = SERVERLESS_MONITORS[serverlessMonitorId].name;
+      monitorParams.name = SERVERLESS_MONITORS[pluginMonitorId].name;
     }
   }
   return monitorParams;
@@ -60,21 +60,21 @@ export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: stri
 
 /**
  * Checks to see if the given monitor is a serverless recommended monitor
- * @param serverlessMonitorId - Unique ID string defined for each serverless monitor
+ * @param pluginMonitorId - Unique ID string defined for each serverless monitor
  * @returns true if a given monitor is a serverless recommended monitor
  */
-function checkIfRecommendedMonitor(serverlessMonitorId: string) {
-  return Object.keys(SERVERLESS_MONITORS).includes(serverlessMonitorId);
+function checkIfRecommendedMonitor(pluginMonitorId: string) {
+  return Object.keys(SERVERLESS_MONITORS).includes(pluginMonitorId);
 }
 
 /**
  * Checks to see if the monitor already exists
- * @param serverlessMonitorId - Unique ID string defined for each serverless monitor
+ * @param pluginMonitorId - Unique ID string defined for each serverless monitor
  * @param existingMonitors - Monitors that have already been created
  * @returns true if given monitor already exists
  */
-function doesMonitorExist(serverlessMonitorId: string, existingMonitors: { [key: string]: number }) {
-  return Object.keys(existingMonitors).includes(serverlessMonitorId);
+function doesMonitorExist(pluginMonitorId: string, existingMonitors: { [key: string]: number }) {
+  return Object.keys(existingMonitors).includes(pluginMonitorId);
 }
 
 /**
@@ -128,47 +128,47 @@ export async function setMonitors(
   service: string,
   env: string,
 ) {
-  const serverlessMonitorIdToMonitorId = await getExistingMonitors(
+  const pluginMonitorIdToMonitorId = await getExistingMonitors(
     cloudFormationStackId,
     monitorsApiKey,
     monitorsAppKey,
   );
-  const succesfullyUpdatedMonitors: string[] = [];
+  const successfullyUpdatedMonitors: string[] = [];
   const successfullyCreatedMonitors: string[] = [];
 
   for (const monitor of monitors) {
-    const serverlessMonitorId = Object.keys(monitor)[0];
-    const monitorIdNumber = serverlessMonitorIdToMonitorId[serverlessMonitorId];
+    const pluginMonitorId = Object.keys(monitor)[0];
+    const monitorIdNumber = pluginMonitorIdToMonitorId[pluginMonitorId];
     const monitorParams = buildMonitorParams(monitor, cloudFormationStackId, service, env);
-    const monitorExists = await doesMonitorExist(serverlessMonitorId, serverlessMonitorIdToMonitorId);
+    const monitorExists = await doesMonitorExist(pluginMonitorId, pluginMonitorIdToMonitorId);
 
     if (monitorExists) {
       const response = await updateMonitor(
         monitorIdNumber,
-        serverlessMonitorId,
+        pluginMonitorId,
         monitorParams,
         monitorsApiKey,
         monitorsAppKey,
       );
       if (response) {
-        succesfullyUpdatedMonitors.push(` ${serverlessMonitorId}`);
+        successfullyUpdatedMonitors.push(` ${pluginMonitorId}`);
       }
     } else {
-      const response = await createMonitor(serverlessMonitorId, monitorParams, monitorsApiKey, monitorsAppKey);
+      const response = await createMonitor(pluginMonitorId, monitorParams, monitorsApiKey, monitorsAppKey);
       if (response) {
-        successfullyCreatedMonitors.push(` ${serverlessMonitorId}`);
+        successfullyCreatedMonitors.push(` ${pluginMonitorId}`);
       }
     }
   }
   const successfullyDeletedMonitors = await deleteRemovedMonitors(
     monitors,
-    serverlessMonitorIdToMonitorId,
+    pluginMonitorIdToMonitorId,
     monitorsApiKey,
     monitorsAppKey,
   );
   const logStatements: string[] = [];
-  if (succesfullyUpdatedMonitors.length > 0) {
-    logStatements.push(`Successfully updated${succesfullyUpdatedMonitors}`);
+  if (successfullyUpdatedMonitors.length > 0) {
+    logStatements.push(`Successfully updated${successfullyUpdatedMonitors}`);
   }
   if (successfullyCreatedMonitors.length > 0) {
     logStatements.push(`Successfully created${successfullyCreatedMonitors}`);
