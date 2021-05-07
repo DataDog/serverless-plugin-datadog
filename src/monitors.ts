@@ -45,7 +45,7 @@ export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: stri
     `service:${service}`,
   ];
 
-  if (checkIfServerlessMonitor(serverlessMonitorId)) {
+  if (checkIfRecommendedMonitor(serverlessMonitorId)) {
     monitorParams.query = SERVERLESS_MONITORS[serverlessMonitorId].query(cloudFormationStackId);
 
     if (!monitorParams.message) {
@@ -63,7 +63,7 @@ export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: stri
  * @param serverlessMonitorId - Unique ID string defined for each serverless monitor
  * @returns true if a given monitor is a serverless recommended monitor
  */
-function checkIfServerlessMonitor(serverlessMonitorId: string) {
+function checkIfRecommendedMonitor(serverlessMonitorId: string) {
   return Object.keys(SERVERLESS_MONITORS).includes(serverlessMonitorId);
 }
 
