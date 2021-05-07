@@ -19,7 +19,7 @@ interface QueriedMonitor {
 }
 
 export async function createMonitor(
-  serverlessMonitorId: string,
+  pluginMonitorId: string,
   monitorParams: MonitorParams,
   monitorsApiKey: string,
   monitorsAppKey: string,
@@ -39,14 +39,14 @@ export async function createMonitor(
   } else if (response.status === 403) {
     throw new InvalidAuthenticationError("Could not perform request due to invalid authentication");
   } else if (response.status === 400) {
-    console.log(`Invalid Syntax Error: Could not perform request due to incorrect syntax for ${serverlessMonitorId}`);
+    console.log(`Invalid Syntax Error: Could not perform request due to incorrect syntax for ${pluginMonitorId}`);
   }
   return false;
 }
 
 export async function updateMonitor(
   monitorId: number,
-  serverlessMonitorId: string,
+  pluginMonitorId: string,
   monitorParams: MonitorParams,
   monitorsApiKey: string,
   monitorsAppKey: string,
@@ -66,7 +66,7 @@ export async function updateMonitor(
   } else if (response.status === 403) {
     throw new InvalidAuthenticationError("Could not perform request due to invalid authentication");
   } else if (response.status === 400) {
-    console.log(`Invalid Syntax Error: Could not perform request due to incorrect syntax for ${serverlessMonitorId}`);
+    console.log(`Invalid Syntax Error: Could not perform request due to incorrect syntax for ${pluginMonitorId}`);
   }
 
   return false;
@@ -74,7 +74,7 @@ export async function updateMonitor(
 
 export async function deleteMonitor(
   monitorId: number,
-  serverlessMonitorId: string,
+  pluginMonitorId: string,
   monitorsApiKey: string,
   monitorsAppKey: string,
 ) {
@@ -92,7 +92,7 @@ export async function deleteMonitor(
   } else if (response.status === 403) {
     throw new InvalidAuthenticationError("Could not perform request due to invalid authentication");
   } else if (response.status === 400) {
-    console.log(`Invalid Syntax Error: Could not perform request due to incorrect syntax for ${serverlessMonitorId}`);
+    console.log(`Invalid Syntax Error: Could not perform request due to incorrect syntax for ${pluginMonitorId}`);
   }
 
   return false;
@@ -145,14 +145,14 @@ export async function getExistingMonitors(
     monitorsApiKey,
     monitorsAppKey,
   );
-  const serverlessMonitorIdToMonitorId: { [key: string]: number } = {};
+  const pluginMonitorIdByMonitorId: { [key: string]: number } = {};
   for (const existingMonitor of existingMonitors) {
     for (const tag of existingMonitor.tags) {
       if (tag.startsWith("serverless_monitor_id:")) {
-        const serverlessMonitorId = tag.substring(tag.indexOf(":") + 1);
-        serverlessMonitorIdToMonitorId[serverlessMonitorId] = existingMonitor.id;
+        const pluginMonitorId = tag.substring(tag.indexOf(":") + 1);
+        pluginMonitorIdByMonitorId[pluginMonitorId] = existingMonitor.id;
       }
     }
   }
-  return serverlessMonitorIdToMonitorId;
+  return pluginMonitorIdByMonitorId;
 }
