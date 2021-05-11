@@ -50,7 +50,7 @@ const INCREASED_COST_MONITOR: Monitor = {
     options: {
       renotify_interval: 0,
       timeout_h: 0,
-      thresholds: { warning: 1, critical: 25 }, // modified critical threshold value
+      thresholds: { warning: 1, critical: 25 }, // custom critical threshold value
       notify_no_data: false,
       no_data_timeframe: 2,
       notify_audit: false,
