@@ -50,7 +50,7 @@ const INCREASED_COST_MONITOR: Monitor = {
     options: {
       renotify_interval: 0,
       timeout_h: 0,
-      thresholds: { warning: 1 },
+      thresholds: { warning: 1, critical: 25 }, // modified critical threshold value
       notify_no_data: false,
       no_data_timeframe: 2,
       notify_audit: false,
@@ -122,12 +122,12 @@ const UPDATED_CUSTOM_MONITOR_2_PARAMS = {
 const INCREASED_COST_MONITOR_PARAMS = {
   name: "Increased Cost",
   query:
-    "pct_change(avg(last_5m),last_5m):avg:aws.lambda.enhanced.estimated_cost{aws_cloudformation_stack-id:cloud_formation_id} > 20",
+    "pct_change(avg(last_5m),last_5m):avg:aws.lambda.enhanced.estimated_cost{aws_cloudformation_stack-id:cloud_formation_id} > 25",
   message: "This is an increased cost monitor",
   options: {
     renotify_interval: 0,
     timeout_h: 0,
-    thresholds: { warning: 1 },
+    thresholds: { warning: 1, critical: 25 },
     notify_no_data: false,
     no_data_timeframe: 2,
     notify_audit: false,
