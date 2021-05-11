@@ -138,7 +138,7 @@ custom:
 ```
 ### Serverless Monitors 
 
-Serverless has seven recommended monitors with default values pre-configured. 
+There are seven recommended monitors with default values pre-configured. 
 
 | Monitor              | Metrics                                                                                   | Default Threshold | Serverless Monitor ID |
 |:--------------------:|:-----------------------------------------------------------------------------------------:|:-----------------:|:---------------------:|
@@ -186,14 +186,6 @@ custom:
 
 ##### To delete a monitor 
 Removing the serverless monitor ID and its parameters will delete the monitor. 
-```
-custom:
- datadog:
-   addLayers: true
-   monitorsApiKey: ${file(./config.json):monitorsApiKey}
-   monitorsAppKey: ${file(./config.json):monitorsAppKey}
-   monitors:
-```
 
 #### To Enable and Configure a Custom Monitor
 
