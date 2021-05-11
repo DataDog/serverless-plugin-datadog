@@ -1,5 +1,6 @@
 export interface ServerlessMonitor {
   name: string;
+  threshold: number;
   query: (cloudFormationStackId: string, critical_threshold: number) => string;
   message: string;
   type?: string;
@@ -7,6 +8,7 @@ export interface ServerlessMonitor {
 
 export const HIGH_ERROR_RATE: ServerlessMonitor = {
   name: "High Error Rate on {{functionname.name}} in {{region.name}} for {{aws_account.name}}",
+  threshold: 0.1,
   query: (cloudFormationStackId: string, critical_threshold: number) => {
     return `avg(last_15m):sum:aws.lambda.errors{aws_cloudformation_stack-id:${cloudFormationStackId}} by {functionname,region,aws_account}.as_count() / sum:aws.lambda.invocations{aws_cloudformation_stack-id:${cloudFormationStackId}} by {functionname,region,aws_account}.as_count() >= ${critical_threshold}`;
   },
@@ -16,6 +18,7 @@ export const HIGH_ERROR_RATE: ServerlessMonitor = {
 
 export const TIMEOUT: ServerlessMonitor = {
   name: "Timeout on {{functionname.name}} in {{region.name}} for {{aws_account.name}}",
+  threshold: 1,
   query: (cloudFormationStackId: string, critical_threshold: number) => {
     return `avg(last_15m):sum:aws.lambda.duration.maximum{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() / (sum:aws.lambda.timeout{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() * 1000) >= ${critical_threshold}`;
   },
@@ -25,6 +28,7 @@ export const TIMEOUT: ServerlessMonitor = {
 
 export const OUT_OF_MEMORY: ServerlessMonitor = {
   name: "Out of Memory on {{functionname.name}} in {{region.name}} for {{aws_account.name}}",
+  threshold: 1,
   query: (cloudFormationStackId: string, critical_threshold: number) => {
     return `avg(last_15m):sum:aws.lambda.enhanced.max_memory_used{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() / sum:aws.lambda.memorysize{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() >= ${critical_threshold}`;
   },
@@ -34,6 +38,7 @@ export const OUT_OF_MEMORY: ServerlessMonitor = {
 
 export const HIGH_ITERATOR_AGE: ServerlessMonitor = {
   name: "High Iterator Age on {{functionname.name}} in {{region.name}} for {{aws_account.name}}",
+  threshold: 86400,
   query: (cloudFormationStackId: string, critical_threshold: number) => {
     return `avg(last_15m):min:aws.lambda.iterator_age.maximum{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,region,functionname} >= ${critical_threshold}`;
   },
@@ -43,6 +48,7 @@ export const HIGH_ITERATOR_AGE: ServerlessMonitor = {
 
 export const HIGH_COLD_START_RATE: ServerlessMonitor = {
   name: "High Cold Start Rate on {{functionname.name}} in {{region.name}} for {{aws_account.name}}",
+  threshold: 0.2,
   query: (cloudFormationStackId: string, critical_threshold: number) => {
     return `avg(last_15m):sum:aws.lambda.enhanced.invocations{cold_start:true AND aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() / sum:aws.lambda.enhanced.invocations{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() >= ${critical_threshold}`;
   },
@@ -52,6 +58,7 @@ export const HIGH_COLD_START_RATE: ServerlessMonitor = {
 
 export const HIGH_THROTTLES: ServerlessMonitor = {
   name: "High Throttles on {{functionname.name}} in {{region.name}} for {{aws_account.name}}",
+  threshold: 0.2,
   query: (cloudFormationStackId: string, critical_threshold: number) => {
     return `avg(last_15m):sum:aws.lambda.throttles {aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,region,functionname}.as_count() / sum:aws.lambda.invocations{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,region,functionname}.as_count() >= ${critical_threshold}`;
   },
@@ -61,6 +68,7 @@ export const HIGH_THROTTLES: ServerlessMonitor = {
 
 export const INCREASED_COST: ServerlessMonitor = {
   name: "Increased Cost on {{functionname.name}} in {{region.name}} for {{aws_account.name}}",
+  threshold: 0.2,
   query: (cloudFormationStackId: string, critical_threshold: number) => {
     return `pct_change(avg(last_5m),last_5m):avg:aws.lambda.enhanced.estimated_cost{aws_cloudformation_stack-id:${cloudFormationStackId}} > ${critical_threshold}`;
   },
