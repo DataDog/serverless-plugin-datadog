@@ -46,7 +46,7 @@ export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: stri
   ];
 
   if (checkIfRecommendedMonitor(pluginMonitorId)) {
-    monitorParams.query = SERVERLESS_MONITORS[pluginMonitorId].query(cloudFormationStackId);
+    monitorParams.query = SERVERLESS_MONITORS[pluginMonitorId].query(cloudFormationStackId, critical_threshold);
 
     if (!monitorParams.message) {
       monitorParams.message = SERVERLESS_MONITORS[pluginMonitorId].message;
