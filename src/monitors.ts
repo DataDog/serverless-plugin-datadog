@@ -44,7 +44,7 @@ export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: stri
     `env:${env}`,
     `service:${service}`,
   ];
-  
+
   if (checkIfRecommendedMonitor(serverlessMonitorId)) {
     let critical_threshold = SERVERLESS_MONITORS[serverlessMonitorId].threshold;
     if (monitorParams.options) {
@@ -56,8 +56,6 @@ export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: stri
     }
 
     monitorParams.query = SERVERLESS_MONITORS[serverlessMonitorId].query(cloudFormationStackId, critical_threshold);
-
-    console.log(monitorParams.query);
 
     if (!monitorParams.message) {
       monitorParams.message = SERVERLESS_MONITORS[serverlessMonitorId].message;
