@@ -19,7 +19,7 @@ export interface Configuration {
   apiKMSKey?: string;
   // Datadog API Key used for enabling monitor configuration through plugin
   monitorsApiKey?: string;
-  // Datadog App Key used for enabling monitor configuration through plugin
+  // Datadog App Key used for enabling monitor configuration through plugin; separate from the apiKey that is deployed with your function
   monitorsAppKey?: string;
   // Which Site to send to, (should be datadoghq.com or datadoghq.eu)
   site: string;
