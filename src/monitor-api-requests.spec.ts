@@ -3,10 +3,9 @@ import {
   createMonitor,
   updateMonitor,
   deleteMonitor,
-  searchMonitors,
-  InvalidAuthenticationError,
+  searchMonitors
 } from "./monitor-api-requests";
-import { MonitorParams } from "./monitors";
+import { MonitorParams, handleMonitorsApiResponse } from "./monitors";
 
 jest.mock("node-fetch");
 
@@ -64,30 +63,31 @@ describe("createMonitor", () => {
   });
   it("returns true when syntax is valid", async () => {
     ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 200 });
-    const wasMonitorCreated = await createMonitor("high_error_rate", monitorParams, "apikey", "appkey");
-    expect(wasMonitorCreated).toBe(true);
+    const response = await createMonitor(monitorParams, "apikey", "appkey");
+    expect(response.status).toBe(200);
     expect((fetch as unknown) as jest.Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v1/monitor",
       validRequestBody,
     );
   });
-  it("returns false and logs an Invalid Syntax Error when syntax is invalid", async () => {
+  it("returns false and logs a 400 Bad Request when syntax is invalid", async () => {
     console.log = jest.fn();
     ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 400 });
-    const wasMonitorCreated = await createMonitor("high_error_rate", invalidMonitorParams, "apikey", "appkey");
-    expect(wasMonitorCreated).toBe(false);
+    const response = await createMonitor(invalidMonitorParams, "apikey", "appkey");
+    const handledResponse = handleMonitorsApiResponse(response, 'high_error_rate');
+    expect(response.status).toBe(400);
     expect(console.log).toHaveBeenCalledWith(
-      "Invalid Syntax Error: Could not perform request due to incorrect syntax for high_error_rate",
+      "400 Bad Request: This could be due to incorrect syntax for high_error_rate",
     );
     expect((fetch as unknown) as jest.Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v1/monitor",
       invalidRequestBody,
     );
   });
-  it("throws an Invalid Authentication Error when authentication is invalid", async () => {
+  it("throws an Error", async () => {
     ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 403 });
-    expect(async () => await createMonitor("high_error_rate", monitorParams, "apikey", "appkey")).rejects.toThrow(
-      InvalidAuthenticationError,
+    expect(async () => await createMonitor(monitorParams, "apikey", "appkey")).rejects.toThrow(
+      Error,
     );
   });
 });
@@ -110,31 +110,32 @@ describe("updateMonitor", () => {
   });
   it("returns true when syntax is valid", async () => {
     ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 200 });
-    const wasMonitorUpdated = await updateMonitor(12345, "high_error_rate", monitorParams, "apikey", "appkey");
-    expect(wasMonitorUpdated).toBe(true);
+    const response = await updateMonitor(12345, monitorParams, "apikey", "appkey");
+    expect(response.status).toBe(200);
     expect((fetch as unknown) as jest.Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v1/monitor/12345",
       validRequestBody,
     );
   });
-  it("returns false and logs an Invalid Syntax Error when syntax is invalid", async () => {
+  it("returns false and logs 400 Bad Request when syntax is invalid", async () => {
     console.log = jest.fn();
     ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 400 });
-    const wasMonitorUpdated = await updateMonitor(12345, "high_error_rate", invalidMonitorParams, "apikey", "appkey");
-    expect(wasMonitorUpdated).toBe(false);
+    const response = await updateMonitor(12345, invalidMonitorParams, "apikey", "appkey");
+    const handledResponse = handleMonitorsApiResponse(response, 'high_error_rate');
+    expect(response.status).toBe(400);
     expect((fetch as unknown) as jest.Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v1/monitor/12345",
       invalidRequestBody,
     );
     expect(console.log).toHaveBeenCalledWith(
-      "Invalid Syntax Error: Could not perform request due to incorrect syntax for high_error_rate",
+      "400 Bad Request: This could be due to incorrect syntax for high_error_rate",
     );
   });
   it("throws an Invalid Authentication Error when authentication is invalid", async () => {
     ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 403 });
     expect(
-      async () => await updateMonitor(12345, "high_error_rate", monitorParams, "apikey", "appkey"),
-    ).rejects.toThrow(InvalidAuthenticationError);
+      async () => await updateMonitor(12345, monitorParams, "apikey", "appkey"),
+    ).rejects.toThrow(Error);
   });
 });
 
@@ -148,17 +149,17 @@ describe("deleteMonitor", () => {
   });
   it("returns true when syntax is valid", async () => {
     ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 200 });
-    const wasMonitorDeleted = await deleteMonitor(12345, "high_error_rate", "apikey", "appkey");
-    expect(wasMonitorDeleted).toBe(true);
+    const response = await deleteMonitor(12345, "apikey", "appkey");
+    expect(response.status).toBe(200);
     expect((fetch as unknown) as jest.Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v1/monitor/12345",
       validRequestBody,
     );
   });
-  it("returns false and throws an Invalid Authentication Error when authentication is invalid", async () => {
+  it("returns false and throws an Error", async () => {
     ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 403 });
-    expect(async () => await deleteMonitor(1234, "high_error_rate", "apikey", "appkey")).rejects.toThrow(
-      InvalidAuthenticationError,
+    expect(async () => await deleteMonitor(1234, "apikey", "appkey")).rejects.toThrow(
+      Error,
     );
   });
 });

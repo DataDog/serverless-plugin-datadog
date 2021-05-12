@@ -115,8 +115,7 @@ async function deleteRemovedMonitors(
  * @param response Monitor API Response
  * @param serverlessMonitorId Serverless Monitor ID
  */
-function handleMonitorsApiResponse(response: Response, serverlessMonitorId?: string) {
-  console.log(response.statusText);
+export function handleMonitorsApiResponse(response: Response, serverlessMonitorId?: string) {
   if (response.status === 200) {
     return true;
   } else if (response.status === 400) {
