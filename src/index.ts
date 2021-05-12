@@ -264,7 +264,7 @@ function validateConfiguration(config: Configuration) {
     }
   }
   if (config.monitors) {
-    if (config.monitorsApiKey === undefined || config.monitorsAppKey == undefined) {
+    if (config.monitorsApiKey === undefined || config.monitorsAppKey === undefined) {
       throw new Error("When `monitors` is defined, `monitorsApiKey` and `monitorsAppKey` must also be defined");
     }
   }

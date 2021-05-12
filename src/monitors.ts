@@ -111,7 +111,7 @@ async function deleteRemovedMonitors(
   return successfullyDeletedMonitors;
 }
 /**
- * Handles the Monitor API response and logs the appropriate error 
+ * Handles the Monitor API response and logs the appropriate error
  * @param response Monitor API Response
  * @param serverlessMonitorId Serverless Monitor ID
  */

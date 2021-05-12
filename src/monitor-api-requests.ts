@@ -82,7 +82,7 @@ export async function searchMonitors(queryTag: string, monitorsApiKey: string, m
       "Content-Type": "application/json",
     },
   });
-  
+
   try {
     throw new Error(`${response.status} ${response.statusText}`);
   } catch (err) {
