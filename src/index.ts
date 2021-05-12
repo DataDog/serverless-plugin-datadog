@@ -259,6 +259,11 @@ function validateConfiguration(config: Configuration) {
       throw new Error("When `addExtension` is true, `apiKey` or `apiKMSKey` must also be set.");
     }
   }
+  if (config.monitors) {
+    if (config.monitorsApiKey === undefined || config.monitorsAppKey == undefined) {
+      throw new Error("When `monitors` is defined, `monitorsApiKey` and `monitorsAppKey` must also be defined");
+    }
+  }
 }
 
 function setDatadogForwarder(config: Configuration) {

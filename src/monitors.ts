@@ -1,5 +1,6 @@
 import { SERVERLESS_MONITORS } from "./serverless_monitors";
 import { updateMonitor, createMonitor, deleteMonitor, getExistingMonitors, InvalidAuthenticationError } from "./monitor-api-requests";
+import { Response } from "node-fetch";
 
 export interface MonitorParams {
   [key: string]: any;
@@ -98,11 +99,11 @@ async function deleteRemovedMonitors(
     if (!currentMonitorIds.includes(pluginMonitorId)) {
       const response = await deleteMonitor(
         existingMonitors[pluginMonitorId],
-        pluginMonitorId,
         monitorsApiKey,
         monitorsAppKey,
       );
-      if (response) {
+      const successfullyDeleted = handleMonitorsApiResponse(response, pluginMonitorId);
+      if (successfullyDeleted) {
         successfullyDeletedMonitors.push(` ${pluginMonitorId}`);
       }
     }
@@ -110,13 +111,14 @@ async function deleteRemovedMonitors(
   return successfullyDeletedMonitors;
 }
 
-function processResponse(responseStatus: number, serverlessMonitorId: string) {
-  if (responseStatus === 200) {
+function handleMonitorsApiResponse(response: Response, serverlessMonitorId?: string) {
+  console.log(response.statusText);
+  if (response.status === 200) {
     return true;
-  } else if (responseStatus === 403) {
-    throw new InvalidAuthenticationError("Could not perform request due to invalid authentication");
-  } else if (responseStatus === 400) {
-    console.log(`Invalid Syntax Error: Could not perform request due to incorrect syntax for ${serverlessMonitorId}`);
+  } else if (response.status === 400) {
+    console.log(`400 Bad Request: This could be due to incorrect syntax for ${serverlessMonitorId}`);
+  } else {
+    console.log(new Error(`${response.status} ${response.statusText}`));
   }
   return false;
 }
@@ -153,42 +155,21 @@ export async function setMonitors(
     const monitorParams = buildMonitorParams(monitor, cloudFormationStackId, service, env);
     const monitorExists = await doesMonitorExist(serverlessMonitorId, serverlessMonitorIdByMonitorId);
 
-    // if (monitorExists) {
-    //   const response = await updateMonitor(
-    //     monitorIdNumber,
-    //     serverlessMonitorId,
-    //     monitorParams,
-    //     monitorsApiKey,
-    //     monitorsAppKey,
-    //   );
-    //   if (response) {
-    //     successfullyUpdatedMonitors.push(` ${serverlessMonitorId}`);
-    //   }
-    // } else {
-    //   const response = await createMonitor(serverlessMonitorId, monitorParams, monitorsApiKey, monitorsAppKey);
-    //   if (response) {
-    //     successfullyCreatedMonitors.push(` ${serverlessMonitorId}`);
-    //   }
-    // }
     if (monitorExists) {
       const response = await updateMonitor(
         monitorIdNumber,
-        // serverlessMonitorId,
         monitorParams,
         monitorsApiKey,
         monitorsAppKey,
       );
-      const successfullyCreated = processResponse(response, serverlessMonitorId);
+      const successfullyCreated = handleMonitorsApiResponse(response, serverlessMonitorId);
       if (successfullyCreated) {
-      // if (response) {
         successfullyUpdatedMonitors.push(` ${serverlessMonitorId}`);
       }
     } else {
-      // const response = await createMonitor(serverlessMonitorId, monitorParams, monitorsApiKey, monitorsAppKey);
       const response = await createMonitor(monitorParams, monitorsApiKey, monitorsAppKey);
-      const successfullyUpdated = processResponse(response, serverlessMonitorId);
+      const successfullyUpdated = handleMonitorsApiResponse(response, serverlessMonitorId);
       if (successfullyUpdated) {
-      // if (response) {
         successfullyCreatedMonitors.push(` ${serverlessMonitorId}`);
       }
     }
