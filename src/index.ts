@@ -158,16 +158,20 @@ module.exports = class ServerlessPlugin {
     if (config.enabled === false) return;
     if (config.monitors && config.monitorsApiKey && config.monitorsAppKey) {
       const cloudFormationStackId = await getCloudFormationStackId(this.serverless);
-      const logStatements = await setMonitors(
-        config.monitors,
-        config.monitorsApiKey,
-        config.monitorsAppKey,
-        cloudFormationStackId,
-        service,
-        env,
-      );
-      for (const logStatement of logStatements) {
-        this.serverless.cli.log(logStatement);
+      try {
+        const logStatements = await setMonitors(
+          config.monitors,
+          config.monitorsApiKey,
+          config.monitorsAppKey,
+          cloudFormationStackId,
+          service,
+          env,
+        );
+        for (const logStatement of logStatements) {
+          this.serverless.cli.log(logStatement);
+        }
+      } catch (err) {
+        this.serverless.cli.log('Error occurred when configuring monitors.')
       }
     }
     return printOutputs(this.serverless, config.site);

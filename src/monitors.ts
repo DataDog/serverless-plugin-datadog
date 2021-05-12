@@ -110,7 +110,11 @@ async function deleteRemovedMonitors(
   }
   return successfullyDeletedMonitors;
 }
-
+/**
+ * Handles the Monitor API response and logs the appropriate error 
+ * @param response Monitor API Response
+ * @param serverlessMonitorId Serverless Monitor ID
+ */
 function handleMonitorsApiResponse(response: Response, serverlessMonitorId?: string) {
   console.log(response.statusText);
   if (response.status === 200) {
@@ -118,7 +122,11 @@ function handleMonitorsApiResponse(response: Response, serverlessMonitorId?: str
   } else if (response.status === 400) {
     console.log(`400 Bad Request: This could be due to incorrect syntax for ${serverlessMonitorId}`);
   } else {
-    console.log(new Error(`${response.status} ${response.statusText}`));
+    try {
+      throw new Error(`${response.status} ${response.statusText}`);
+    } catch (err) {
+      console.error(err);
+    }
   }
   return false;
 }
