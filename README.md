@@ -45,7 +45,7 @@ To further configure your plugin, use the following custom parameters in your `s
 | `exclude`              | When set, this plugin will ignore all specified functions. Use this parameter if you have any functions that should not include Datadog functionality. Defaults to `[]`.                                                                                                                                                                                                                                            |
 | `enabled`              | When set to false, the Datadog plugin will stay inactive. Defaults to `true`. You can control this option using an environment variable, e.g. `enabled: ${strToBool(${env:DD_PLUGIN_ENABLED, true})}`, to activate/deactivate the plugin during deployment. Alernatively, you can also use the value passed in through `--stage` to control this option, [see example.](#disable-plugin-for-particular-environment)
                                                                                                           |
-| `monitors`             | When defined, the Datadog plugin will configure monitors for the deployed function. You must also have `monitorsApiKey` and `monitorsAppKey` defined. To learn how to define monitors, see [To Enable and Configure a Recommended Serverless Monitor](#to-enable-and-configure-a-recommended-serverless-monitor) |
+| `monitors`             | When defined, the Datadog plugin will configure monitors for the deployed function. You must also have `monitorsApiKey` and `monitorsAppKey` defined. To learn how to define monitors, see [To Enable and Configure a Recommended Serverless Monitor.](#to-enable-and-configure-a-recommended-serverless-monitor)  |                                                                                          
 
 To use any of these parameters, add a `custom` > `datadog` section to your `serverless.yml` similar to this example:
 
@@ -165,7 +165,7 @@ Monitor creation occurs after the function is deployed. In the event that a moni
 ##### To create a recommended monitor with the default values
 Define the appropriate serverless monitor ID without specifying any parameter values
 
-```
+```yaml
 custom:
  datadog:
    addLayers: true
@@ -176,7 +176,7 @@ custom:
 ```
 
 ##### To configure a recommended monitor
-```
+```yaml
 custom:
  datadog:
    addLayers: true
@@ -199,7 +199,7 @@ Removing the serverless monitor ID and its parameters will delete the monitor.
 
 To define a custom monitor, you must define a unique serverless monitor ID string in addition to passing in the API key and Application key. The `query` parameter is required but every other parameter is optional. Define a unique serverless monitor ID string and specify the necessary parameters below. For further documentation on monitor parameters, see the [Datadog Monitors API](https://docs.datadoghq.com/api/latest/monitors/#create-a-monitor).
 
-```
+```yaml
 custom:
   datadog:
     addLayers: true
