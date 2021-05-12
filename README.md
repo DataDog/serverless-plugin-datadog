@@ -51,6 +51,8 @@ custom:
     flushMetricsToLogs: true
     apiKey: "{Datadog_API_Key}"
     apiKMSKey: "{Encrypted_Datadog_API_Key}"
+    monitorsApiKey: "{Datadog_API_Key}"
+    monitorsAppKey: "{Datadog_Application_Key}"
     addLayers: true
     logLevel: "info"
     enableXrayTracing: false
@@ -152,7 +154,7 @@ There are seven recommended monitors with default values pre-configured.
  
 #### To Enable and Configure a Recommended Serverless Monitor 
 
-To create a serverless monitor, you must use its respective serverless monitor ID.  Note that you must also set the `monitorApiKey` and `monitorAppKey` (separately from `apiKey`). If you’d like to further configure the specific parameter values for a recommended monitor, you can directly define parameters below the serverless monitor ID. Parameters not specified under a recommended monitor will use the default recommended value. At this time, the query parameters for recommended monitors cannot be overridden or customized. Any custom queries will be overriden by the defined recommended query. As such, the critical threshold value and query for recommended monitors will default to the recommended monitor. For further documentation on monitor parameters, see the [Datadog Monitors API](https://docs.datadoghq.com/api/latest/monitors/#create-a-monitor). You can directly update a monitor by changing the parameter values. To delete a monitor, remove the monitor from the `serverless.yml` template. 
+To create a serverless monitor, you must use its respective serverless monitor ID.  Note that you must also set the `monitorApiKey` and `monitorAppKey` (separately from `apiKey`– the `monitorsApiKey` is used to create monitors whereas the `apiKey` is deployed with your serverless function). If you’d like to further configure the specific parameter values for a recommended monitor, you can directly define parameters below the serverless monitor ID. Parameters not specified under a recommended monitor will use the default recommended value. At this time, the query parameters for recommended monitors cannot be overridden or customized. Any custom queries will be overriden by the defined recommended query. As such, the critical threshold value and query for recommended monitors will default to the recommended monitor. For further documentation on monitor parameters, see the [Datadog Monitors API](https://docs.datadoghq.com/api/latest/monitors/#create-a-monitor). You can directly update a monitor by changing the parameter values. To delete a monitor, remove the monitor from the `serverless.yml` template. 
 
 Monitor creation occurs after the function is deployed. In the event that a monitor is unsuccessfully created, the function will still be successfully deployed. 
 
