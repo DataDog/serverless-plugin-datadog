@@ -46,16 +46,16 @@ export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: stri
   ];
 
   if (checkIfRecommendedMonitor(serverlessMonitorId)) {
-    let critical_threshold = SERVERLESS_MONITORS[serverlessMonitorId].threshold;
+    let criticalThreshold = SERVERLESS_MONITORS[serverlessMonitorId].threshold;
     if (monitorParams.options) {
       if (monitorParams.options.thresholds) {
         if (monitorParams.options.thresholds.critical) {
-          critical_threshold = monitorParams.options.thresholds.critical;
+          criticalThreshold = monitorParams.options.thresholds.critical;
         }
       }
     }
 
-    monitorParams.query = SERVERLESS_MONITORS[serverlessMonitorId].query(cloudFormationStackId, critical_threshold);
+    monitorParams.query = SERVERLESS_MONITORS[serverlessMonitorId].query(cloudFormationStackId, criticalThreshold);
 
     if (!monitorParams.message) {
       monitorParams.message = SERVERLESS_MONITORS[serverlessMonitorId].message;
