@@ -207,11 +207,7 @@ describe("setMonitors", () => {
       "env",
     );
     expect(logStatements).toEqual(["Successfully created custom_monitor_1"]);
-    expect((createMonitor as unknown) as jest.Mock).toHaveBeenCalledWith(
-      CUSTOM_MONITOR_1_PARAMS,
-      "apikey",
-      "appkey",
-    );
+    expect((createMonitor as unknown) as jest.Mock).toHaveBeenCalledWith(CUSTOM_MONITOR_1_PARAMS, "apikey", "appkey");
   });
   it("returns 'Successfully updated custom_monitor_1', 'Successfully created custom_monitor_2, increased_cost'", async () => {
     ((getExistingMonitors as unknown) as jest.Mock).mockReturnValue({ custom_monitor_1: 123456 });
@@ -227,11 +223,7 @@ describe("setMonitors", () => {
       "apikey",
       "appkey",
     );
-    expect((createMonitor as unknown) as jest.Mock).toHaveBeenCalledWith(
-      CUSTOM_MONITOR_2_PARAMS,
-      "apikey",
-      "appkey",
-    );
+    expect((createMonitor as unknown) as jest.Mock).toHaveBeenCalledWith(CUSTOM_MONITOR_2_PARAMS, "apikey", "appkey");
   });
   it("returns 'Successfully updated custom_monitor_1, custom_monitor_2', 'Successfully created timeout', 'Successfully deleted increased_cost'", async () => {
     ((getExistingMonitors as unknown) as jest.Mock).mockReturnValue({
@@ -260,11 +252,7 @@ describe("setMonitors", () => {
       "apikey",
       "appkey",
     ); //make sure to use the UPDATED_Monitors?
-    expect((createMonitor as unknown) as jest.Mock).toHaveBeenCalledWith(
-      TIMEOUT_MONITOR_PARAMS,
-      "apikey",
-      "appkey",
-    );
+    expect((createMonitor as unknown) as jest.Mock).toHaveBeenCalledWith(TIMEOUT_MONITOR_PARAMS, "apikey", "appkey");
     expect((deleteMonitor as unknown) as jest.Mock).toHaveBeenCalledWith(123456, "apikey", "appkey");
   });
   it("returns 'Succcessfully updated custom_monitor_1, 'Successfully created increased_cost', 'Successfully deleted timeout'", async () => {
@@ -288,11 +276,7 @@ describe("setMonitors", () => {
       "apikey",
       "appkey",
     );
-    expect((deleteMonitor as unknown) as jest.Mock).toHaveBeenCalledWith(
-      123456,
-      "apikey",
-      "appkey",
-    );
+    expect((deleteMonitor as unknown) as jest.Mock).toHaveBeenCalledWith(123456, "apikey", "appkey");
     expect((deleteMonitor as unknown) as jest.Mock).toHaveBeenCalledWith(123456, "apikey", "appkey");
     expect((createMonitor as unknown) as jest.Mock).toHaveBeenCalledWith(
       INCREASED_COST_MONITOR_PARAMS,

@@ -18,11 +18,7 @@ interface QueriedMonitor {
   tags: string[];
 }
 
-export async function createMonitor(
-  monitorParams: MonitorParams,
-  monitorsApiKey: string,
-  monitorsAppKey: string,
-) {
+export async function createMonitor(monitorParams: MonitorParams, monitorsApiKey: string, monitorsAppKey: string) {
   const response: Response = await fetch("https://api.datadoghq.com/api/v1/monitor", {
     method: "POST",
     headers: {
@@ -36,12 +32,12 @@ export async function createMonitor(
   return response;
 }
 
-  export async function updateMonitor(
-    monitorId: number,
-    monitorParams: MonitorParams,
-    monitorsApiKey: string,
-    monitorsAppKey: string,
-  ) {
+export async function updateMonitor(
+  monitorId: number,
+  monitorParams: MonitorParams,
+  monitorsApiKey: string,
+  monitorsAppKey: string,
+) {
   const response: Response = await fetch(`https://api.datadoghq.com/api/v1/monitor/${monitorId}`, {
     method: "PUT",
     headers: {
@@ -55,11 +51,7 @@ export async function createMonitor(
   return response;
 }
 
-export async function deleteMonitor(
-  monitorId: number,
-  monitorsApiKey: string,
-  monitorsAppKey: string,
-) {
+export async function deleteMonitor(monitorId: number, monitorsApiKey: string, monitorsAppKey: string) {
   const response: Response = await fetch(`https://api.datadoghq.com/api/v1/monitor/${monitorId}`, {
     method: "DELETE",
     headers: {

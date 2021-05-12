@@ -1,5 +1,11 @@
 import { SERVERLESS_MONITORS } from "./serverless_monitors";
-import { updateMonitor, createMonitor, deleteMonitor, getExistingMonitors, InvalidAuthenticationError } from "./monitor-api-requests";
+import {
+  updateMonitor,
+  createMonitor,
+  deleteMonitor,
+  getExistingMonitors,
+  InvalidAuthenticationError,
+} from "./monitor-api-requests";
 import { Response } from "node-fetch";
 
 export interface MonitorParams {
@@ -97,11 +103,7 @@ async function deleteRemovedMonitors(
   pluginMonitors.forEach((currentMonitor) => currentMonitorIds.push(Object.keys(currentMonitor)[0]));
   for (const pluginMonitorId of Object.keys(existingMonitors)) {
     if (!currentMonitorIds.includes(pluginMonitorId)) {
-      const response = await deleteMonitor(
-        existingMonitors[pluginMonitorId],
-        monitorsApiKey,
-        monitorsAppKey,
-      );
+      const response = await deleteMonitor(existingMonitors[pluginMonitorId], monitorsApiKey, monitorsAppKey);
       const successfullyDeleted = handleMonitorsApiResponse(response, pluginMonitorId);
       if (successfullyDeleted) {
         successfullyDeletedMonitors.push(` ${pluginMonitorId}`);
@@ -163,12 +165,7 @@ export async function setMonitors(
     const monitorExists = await doesMonitorExist(serverlessMonitorId, serverlessMonitorIdByMonitorId);
 
     if (monitorExists) {
-      const response = await updateMonitor(
-        monitorIdNumber,
-        monitorParams,
-        monitorsApiKey,
-        monitorsAppKey,
-      );
+      const response = await updateMonitor(monitorIdNumber, monitorParams, monitorsApiKey, monitorsAppKey);
       const successfullyCreated = handleMonitorsApiResponse(response, serverlessMonitorId);
       if (successfullyCreated) {
         successfullyUpdatedMonitors.push(` ${serverlessMonitorId}`);
