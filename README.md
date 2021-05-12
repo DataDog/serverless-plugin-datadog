@@ -179,13 +179,20 @@ custom:
 custom:
  datadog:
    addLayers: true
-   monitorsApiKey: ${file(./config.json):monitorsApiKey}
-   monitorsAppKey: ${file(./config.json):monitorsAppKey}
+   monitorsApiKey: "{Datadog_API_Key}"
+   monitorsAppKey: "{Datadog_APP_Key}"
    monitors:
      - high_error_rate:
         name: "High Error Rate with Modified Warning Threshold"
+        message: "More than 10% of the function’s invocations were errors in the selected time range. Notify @hannah.jiang@datadoghq.com @slack-serverless-                 monitors"
+        tags: ["modified_error_rate", "serverless", "error_rate"]
+        require_full_window: true
+        priority: 2
         options: {
+          include_tags: true
+          notify_audit:true
           thresholds: {
+            ok: 0.025
             warning: 0.05
           }
         }
@@ -202,12 +209,26 @@ To define a custom monitor, you must define a unique serverless monitor ID strin
 custom:
   datadog:
     addLayers: true
-    monitorsApiKey: ${file(./config.json):monitorsApiKey}
-    monitorsAppKey: ${file(./config.json):monitorsAppKey}
+    monitorsApiKey: "{Datadog_API_Key}"
+    monitorsAppKey: "{Datadog_APP_Key}"
     monitors:
-      - custom_monitor_id_1:
-          name: "Custom Monitor 1"
+      - custom_monitor_id:
+          name: "Custom Monitor"
           query: "max(next_1w):forecast(avg:system.load.1{*}, 'linear', 1, interval='60m', history='1w', model='default') >= 3"
+          message: "Custom message for custom monitor. Notify @hannah.jiang@datadoghq.com @slack-serverless-monitors"
+          tags: ["custom_monitor", "serverless"]
+          priority: 3
+          options: {
+            enable_logs_sample: true
+            require_full_window: true
+            include_tags: false
+            notify_audit:true
+            notify_no_data: false
+            thresholds: {
+              ok: 1
+              warning: 2
+            }
+          }
 ```
 
 ## Opening Issues
