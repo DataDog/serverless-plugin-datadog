@@ -27,8 +27,10 @@ export async function addOutputLinks(serverless: Serverless, site: string) {
   });
 }
 
-export async function printOutputs(serverless: Serverless) {
+export async function printOutputs(serverless: Serverless, site: string) {
   const stackName = serverless.getProvider("aws").naming.getStackName();
+  const service = serverless.service.getServiceName();
+  const env = serverless.getProvider("aws").getStage();
   const describeStackOutput = await serverless
     .getProvider("aws")
     .request(
@@ -53,6 +55,8 @@ export async function printOutputs(serverless: Serverless) {
       logMessage(`${key}: ${output.OutputValue}`);
     }
   }
+  logHeader("View Serverless Monitors", true);
+  logMessage(`https://app.${site}/monitors/manage?q=tag%3A%28%22env%3A${env}%22AND%22service%3A${service}%22%29`);
 }
 
 function logHeader(message: string, underline = false) {

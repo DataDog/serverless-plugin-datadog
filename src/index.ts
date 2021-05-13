@@ -18,6 +18,8 @@ import { redirectHandlers } from "./wrapper";
 import { addCloudWatchForwarderSubscriptions } from "./forwarder";
 import { addOutputLinks, printOutputs } from "./output";
 import { FunctionDefinition } from "serverless";
+import { setMonitors } from "./monitors";
+import { getCloudFormationStackId } from "./monitor-api-requests";
 
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
 export interface ExtendedFunctionDefinition extends FunctionDefinition {
@@ -150,8 +152,29 @@ module.exports = class ServerlessPlugin {
 
   private async afterDeploy() {
     const config = getConfig(this.serverless.service);
+    const service = this.serverless.service.getServiceName();
+    const env = this.serverless.getProvider("aws").getStage();
+
     if (config.enabled === false) return;
-    return printOutputs(this.serverless);
+    if (config.monitors && config.monitorsApiKey && config.monitorsAppKey) {
+      const cloudFormationStackId = await getCloudFormationStackId(this.serverless);
+      try {
+        const logStatements = await setMonitors(
+          config.monitors,
+          config.monitorsApiKey,
+          config.monitorsAppKey,
+          cloudFormationStackId,
+          service,
+          env,
+        );
+        for (const logStatement of logStatements) {
+          this.serverless.cli.log(logStatement);
+        }
+      } catch (err) {
+        this.serverless.cli.log("Error occurred when configuring monitors.");
+      }
+    }
+    return printOutputs(this.serverless, config.site);
   }
 
   private debugLogHandlers(handlers: FunctionInfo[]) {
@@ -238,6 +261,11 @@ function validateConfiguration(config: Configuration) {
   if (config.addExtension) {
     if (config.apiKey === undefined && config.apiKMSKey === undefined) {
       throw new Error("When `addExtension` is true, `apiKey` or `apiKMSKey` must also be set.");
+    }
+  }
+  if (config.monitors) {
+    if (config.monitorsApiKey === undefined || config.monitorsAppKey === undefined) {
+      throw new Error("When `monitors` is defined, `monitorsApiKey` and `monitorsAppKey` must also be defined");
     }
   }
 }

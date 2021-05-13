@@ -20,6 +20,7 @@
     "@types/jest": "^26.0.20",
     "@types/mock-fs": "4.13.0",
     "@types/node": "^14.14.20",
+    "@types/node-fetch": "^2.5.10",
     "@types/serverless": "1.78.19",
     "jest": "^26.6.3",
     "mock-fs": "4.13.0",
@@ -53,5 +54,8 @@
     "collectCoverageFrom": [
       "src/**/*.ts"
     ]
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.1"
   }
 }
