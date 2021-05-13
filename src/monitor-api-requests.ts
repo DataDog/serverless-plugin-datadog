@@ -74,7 +74,7 @@ export async function searchMonitors(queryTag: string, monitorsApiKey: string, m
       "Content-Type": "application/json",
     },
   });
-  
+
   if (response.status !== 200) {
     try {
       throw new Error(`${response.status} ${response.statusText}`);
@@ -82,7 +82,7 @@ export async function searchMonitors(queryTag: string, monitorsApiKey: string, m
       console.error(err);
     }
   }
-  
+
   const json = await response.json();
   const monitors: QueriedMonitor[] = json.monitors;
 
