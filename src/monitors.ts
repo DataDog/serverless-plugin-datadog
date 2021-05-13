@@ -53,7 +53,16 @@ export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: stri
   ];
 
   if (checkIfRecommendedMonitor(serverlessMonitorId)) {
-    monitorParams.query = SERVERLESS_MONITORS[serverlessMonitorId].query(cloudFormationStackId);
+    let criticalThreshold = SERVERLESS_MONITORS[serverlessMonitorId].threshold;
+    if (monitorParams.options) {
+      if (monitorParams.options.thresholds) {
+        if (monitorParams.options.thresholds.critical) {
+          criticalThreshold = monitorParams.options.thresholds.critical;
+        }
+      }
+    }
+
+    monitorParams.query = SERVERLESS_MONITORS[serverlessMonitorId].query(cloudFormationStackId, criticalThreshold);
 
     if (!monitorParams.message) {
       monitorParams.message = SERVERLESS_MONITORS[serverlessMonitorId].message;
@@ -67,7 +76,7 @@ export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: stri
 
 /**
  * Checks to see if the given monitor is a serverless recommended monitor
- * @param serverlessMonitorId - Unique ID string defined for each serverless monitor
+ * @param serverlessMonitorId - Unique ID string defined for each monitor
  * @returns true if a given monitor is a serverless recommended monitor
  */
 function checkIfRecommendedMonitor(serverlessMonitorId: string) {
