@@ -157,7 +157,7 @@ There are seven recommended monitors with default values pre-configured.
  
 #### To Enable and Configure a Recommended Serverless Monitor 
 
-To create a recommended monitor, you must use its respective serverless monitor ID.  Note that you must also set the `monitorApiKey` and `monitorAppKey`. In the case that the monitors are defined without `monitorsApiKey` or `monitorsAppKey`, the function will not be deployed.  
+To create a recommended monitor, you must use its respective serverless monitor ID.  Note that you must also set the `monitorApiKey` and `monitorAppKey`.
 
 If you’d like to further configure the parameters for a recommended monitor, you can directly define the parameter values below the serverless monitor ID. Parameters not specified under a recommended monitor will use the default recommended value. The `query` parameter for recommended monitors cannot be directly modified and will default to using the `query` valued as defined above; however, you may change the threshold value in `query` by re-defining it within the `options` parameter. To delete a monitor, remove the monitor from the `serverless.yml` template. For further documentation on how to define monitor parameters, see the [Datadog Monitors API](https://docs.datadoghq.com/api/latest/monitors/#create-a-monitor). 
 
