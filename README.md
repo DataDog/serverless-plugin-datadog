@@ -168,8 +168,8 @@ Define the appropriate serverless monitor ID without specifying any parameter va
 custom:
  datadog:
    addLayers: true
-   monitorsApiKey: ${file(./config.json):monitorsApiKey}
-   monitorsAppKey: ${file(./config.json):monitorsAppKey}
+   monitorsApiKey: "{Datadog_API_Key}"
+   monitorsAppKey: "{Datadog_APP_Key}"
    monitors:
      - high_error_rate:
 ```
@@ -184,7 +184,7 @@ custom:
    monitors:
      - high_error_rate:
         name: "High Error Rate with Modified Warning Threshold"
-        message: "More than 10% of the function’s invocations were errors in the selected time range. Notify @hannah.jiang@datadoghq.com @slack-serverless-                 monitors"
+        message: "More than 10% of the function’s invocations were errors in the selected time range. Notify @data.dog@datadoghq.com @slack-serverless-                 monitors"
         tags: ["modified_error_rate", "serverless", "error_rate"]
         require_full_window: true
         priority: 2
@@ -215,7 +215,7 @@ custom:
       - custom_monitor_id:
           name: "Custom Monitor"
           query: "max(next_1w):forecast(avg:system.load.1{*}, 'linear', 1, interval='60m', history='1w', model='default') >= 3"
-          message: "Custom message for custom monitor. Notify @hannah.jiang@datadoghq.com @slack-serverless-monitors"
+          message: "Custom message for custom monitor. Notify @data.dog@datadoghq.com @slack-serverless-monitors"
           tags: ["custom_monitor", "serverless"]
           priority: 3
           options: {
