@@ -75,10 +75,8 @@ export async function searchMonitors(queryTag: string, monitorsApiKey: string, m
     },
   });
 
-  try {
-    throw new Error(`${response.status} ${response.statusText}`);
-  } catch (err) {
-    console.error(err);
+  if (response.status !== 200) {
+    console.error(new Error(`${response.status} ${response.statusText}`));
   }
 
   const json = await response.json();
