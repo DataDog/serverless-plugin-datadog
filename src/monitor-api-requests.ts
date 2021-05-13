@@ -74,13 +74,15 @@ export async function searchMonitors(queryTag: string, monitorsApiKey: string, m
       "Content-Type": "application/json",
     },
   });
-
-  try {
-    throw new Error(`${response.status} ${response.statusText}`);
-  } catch (err) {
-    console.error(err);
+  
+  if (response.status !== 200) {
+    try {
+      throw new Error(`${response.status} ${response.statusText}`);
+    } catch (err) {
+      console.error(err);
+    }
   }
-
+  
   const json = await response.json();
   const monitors: QueriedMonitor[] = json.monitors;
 
