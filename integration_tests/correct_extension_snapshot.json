@@ -222,7 +222,6 @@
           "Variables": {
             "DD_API_KEY": 1234,
             "DD_SITE": "datadoghq.com",
-            "DD_LOG_LEVEL": "info",
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
             "DD_MERGE_XRAY_TRACES": false,
@@ -276,7 +275,6 @@
           "Variables": {
             "DD_API_KEY": 1234,
             "DD_SITE": "datadoghq.com",
-            "DD_LOG_LEVEL": "info",
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
             "DD_MERGE_XRAY_TRACES": false,
@@ -330,7 +328,6 @@
           "Variables": {
             "DD_API_KEY": 1234,
             "DD_SITE": "datadoghq.com",
-            "DD_LOG_LEVEL": "info",
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
             "DD_MERGE_XRAY_TRACES": false,
@@ -384,7 +381,6 @@
           "Variables": {
             "DD_API_KEY": 1234,
             "DD_SITE": "datadoghq.com",
-            "DD_LOG_LEVEL": "info",
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
             "DD_MERGE_XRAY_TRACES": false,
@@ -438,7 +434,6 @@
           "Variables": {
             "DD_API_KEY": 1234,
             "DD_SITE": "datadoghq.com",
-            "DD_LOG_LEVEL": "info",
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
             "DD_MERGE_XRAY_TRACES": false,
@@ -492,7 +487,6 @@
           "Variables": {
             "DD_API_KEY": 1234,
             "DD_SITE": "datadoghq.com",
-            "DD_LOG_LEVEL": "info",
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
             "DD_MERGE_XRAY_TRACES": false,
@@ -546,7 +540,6 @@
           "Variables": {
             "DD_API_KEY": 1234,
             "DD_SITE": "datadoghq.com",
-            "DD_LOG_LEVEL": "info",
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
             "DD_MERGE_XRAY_TRACES": false,

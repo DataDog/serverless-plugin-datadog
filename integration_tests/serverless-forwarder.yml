@@ -17,6 +17,7 @@ custom:
   datadog:
     forwarderArn: arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder
     integrationTesting: true
+    logLevel: "info"
 
 functions:
   PythonHello27:
