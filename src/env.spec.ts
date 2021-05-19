@@ -326,4 +326,79 @@ describe("setEnvConfiguration", () => {
       },
     });
   });
+
+  it("does not define `DD_LOG_LEVEL` by default when logLevel is undefined", () => {
+    const service = {
+      provider: {},
+    } as any;
+    setEnvConfiguration(
+      {
+        addLayers: false,
+        apiKey: "1234",
+        apiKMSKey: "5678",
+        site: "datadoghq.eu",
+        logLevel: undefined,
+        flushMetricsToLogs: true,
+        enableXrayTracing: true,
+        enableDDTracing: true,
+        subscribeToApiGatewayLogs: true,
+        subscribeToHttpApiLogs: true,
+        subscribeToWebsocketLogs: true,
+        addExtension: true,
+        enableTags: true,
+        injectLogContext: false,
+        exclude: ["dd-excluded-function"],
+      },
+      service,
+    );
+    expect(service).toEqual({
+      provider: {
+        environment: {
+          DD_API_KEY: "1234",
+          DD_KMS_API_KEY: "5678",
+          DD_SITE: "datadoghq.eu",
+          DD_TRACE_ENABLED: true,
+          DD_LOGS_INJECTION: false,
+        },
+      },
+    });
+  });
+
+  it("defines `DD_LOG_LEVEL` when logLevel is defined", () => {
+    const service = {
+      provider: {},
+    } as any;
+    setEnvConfiguration(
+      {
+        addLayers: false,
+        apiKey: "1234",
+        apiKMSKey: "5678",
+        site: "datadoghq.eu",
+        logLevel: "info",
+        flushMetricsToLogs: true,
+        enableXrayTracing: true,
+        enableDDTracing: true,
+        subscribeToApiGatewayLogs: true,
+        subscribeToHttpApiLogs: true,
+        subscribeToWebsocketLogs: true,
+        addExtension: true,
+        enableTags: true,
+        injectLogContext: false,
+        exclude: ["dd-excluded-function"],
+      },
+      service,
+    );
+    expect(service).toEqual({
+      provider: {
+        environment: {
+          DD_API_KEY: "1234",
+          DD_KMS_API_KEY: "5678",
+          DD_SITE: "datadoghq.eu",
+          DD_TRACE_ENABLED: true,
+          DD_LOGS_INJECTION: false,
+          DD_LOG_LEVEL: "info",
+        },
+      },
+    });
+  });
 });
