@@ -24,7 +24,7 @@ export interface Configuration {
   // Which Site to send to, (should be datadoghq.com or datadoghq.eu)
   site: string;
   // The log level, (set to DEBUG for extended logging)
-  logLevel: string;
+  logLevel: string | undefined;
   // Whether the log forwarder integration is enabled by default
   flushMetricsToLogs: boolean;
   // Enable tracing on Lambda functions and API Gateway integrations using X-Ray. Defaults to true
@@ -70,7 +70,7 @@ const logInjectionEnvVar = "DD_LOGS_INJECTION";
 export const defaultConfiguration: Configuration = {
   addLayers: true,
   flushMetricsToLogs: true,
-  logLevel: "info",
+  logLevel: undefined,
   site: "datadoghq.com",
   enableXrayTracing: false,
   enableDDTracing: true,
