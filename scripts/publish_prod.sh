@@ -70,7 +70,7 @@ echo "Bumping the version number and committing the changes"
 yarn version --new-version "$VERSION"
 
 echo 'Publishing to Node'
-yarn test
+yarn
 yarn build
 yarn publish --new-version "$VERSION"
 
