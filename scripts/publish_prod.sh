@@ -3,7 +3,13 @@
 # Unless explicitly stated otherwise all files in this repository are licensed
 # under the Apache License Version 2.0.
 # This product includes software developed at Datadog (https://www.datadoghq.com/).
-# Copyright 2019 Datadog, Inc.
+# Copyright 2021 Datadog, Inc.
+
+# Usage - run commands from repo root:
+# To publish a new version:
+#   ./scripts/publish_prod.sh <VERSION_NUMBER>
+# To publish a new version without updating the layer versions:
+#   UPDATE_LAYERS=false ./scripts/publish_prod.sh <VERSION_NUMBER>
 
 set -e
 
@@ -38,16 +44,24 @@ else
 fi
 
 # Confirm to proceed
-read -p "About to bump the version from ${CURRENT_VERSION} to ${VERSION}, and publish. Continue (y/n)?" CONT
+read -p "About to bump the version from ${CURRENT_VERSION} to ${VERSION}, and publish. Continue? (y/n)" CONT
 if [ "$CONT" != "y" ]; then
     echo "Exiting"
     exit 1
 fi
 
+if [ "$UPDATE_LAYERS" != "false" ]; then
+    read -p "About to update layer versions to the latest available from AWS. Continue? (y/n)" CONT
+    if [ "$CONT" != "y" ]; then
+        echo "Exiting"
+        exit 1
+    fi
+fi
+
 # Verify NPM access before updating layer arns (slow)
 yarn login
 
-if [ "$UPDATE_LAYERS" == "true" ]; then
+if [ "$UPDATE_LAYERS" != "false" ]; then
     # Verify AWS access before running the time-consuming generate_layers_json.sh
     saml2aws login -a govcloud-us1-fed-human-engineering
     AWS_PROFILE=govcloud-us1-fed-human-engineering aws sts get-caller-identity
@@ -66,17 +80,21 @@ if [ "$UPDATE_LAYERS" == "true" ]; then
     fi
 fi
 
+echo
 echo "Bumping the version number and committing the changes"
 yarn version --new-version "$VERSION"
 
-echo 'Publishing to Node'
+echo
+echo 'Publishing to npm'
 yarn
 yarn build
 yarn publish --new-version "$VERSION"
 
-echo 'Pushing updates to github'
+echo
+echo 'Pushing updates to GitHub'
 git push origin master
 git push origin "refs/tags/v$VERSION"
 
+echo
 echo "DONE! Please create a new release using the link below."
 echo "https://github.com/DataDog/serverless-plugin-datadog/releases/new?tag=v$VERSION&title=v$VERSION"
