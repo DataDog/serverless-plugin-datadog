@@ -59,7 +59,7 @@ custom:
     logLevel: "info"
     enableXrayTracing: false
     enableDDTracing: true
-    enableAPIGatewayLogs: true
+    subscribeToApiGatewayLogs: true
     forwarderArn: arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder
     enableTags: true
     injectLogContext: true
