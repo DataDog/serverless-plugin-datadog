@@ -26,6 +26,7 @@ interface ForwarderConfigs {
   SubToApiGatewayLogGroup: boolean;
   SubToHttpApiLogGroup: boolean;
   SubToWebsocketLogGroup: boolean;
+  Exclude: string[];
 }
 interface DescribeSubscriptionFiltersResponse {
   subscriptionFilters: {
@@ -81,7 +82,7 @@ export async function addCloudWatchForwarderSubscriptions(
     await validateForwarderArn(aws, functionArn);
   }
   for (const [name, resource] of Object.entries(resources)) {
-    if (!shouldSubscribe(resource, forwarderConfigs)) {
+    if (!shouldSubscribe(name, resource, forwarderConfigs)) {
       continue;
     }
     const logGroupName = resource.Properties.LogGroupName;
@@ -163,8 +164,15 @@ function validateWebsocketSubscription(resource: any, subscribe: boolean) {
   return resource.Properties.LogGroupName.startsWith("/aws/websocket/") && subscribe;
 }
 
-function shouldSubscribe(resource: any, forwarderConfigs: ForwarderConfigs) {
+function shouldSubscribe(name: string, resource: any, forwarderConfigs: ForwarderConfigs) {
   if (!isLogGroup(resource)) {
+    return false;
+  }
+  // If the function is excluded we don't want to subscribe it's log group.
+  if (
+    forwarderConfigs.Exclude !== undefined &&
+    forwarderConfigs.Exclude.some((exclude) => `${exclude}LogGroup` === name)
+  ) {
     return false;
   }
   // if the extension is enabled, we don't want to subscribe to lambda log groups

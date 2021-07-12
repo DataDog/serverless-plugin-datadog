@@ -800,5 +800,48 @@ describe("ServerlessPlugin", () => {
       // The service and env tags will be set with the values given in the provider instead
       expect(functionWithTags).toHaveProperty("tags", { dd_sls_plugin: expect.stringMatching(SEM_VER_REGEX) });
     });
+
+    it("does not override tags on an excluded function", async () => {
+      const function_ = functionMock({});
+      const functionWithTags: ExtendedFunctionDefinition = function_;
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: awsMock,
+        service: {
+          getServiceName: () => "my-service",
+          getAllFunctions: () => ["node1"],
+          getFunction: () => function_,
+          provider: {
+            region: "us-east-1",
+            tags: {
+              service: "service-name",
+            },
+            stackTags: {
+              env: "dev",
+            },
+          },
+          functions: {
+            node1: {
+              handler: "my-func.ev",
+              layers: [],
+              runtime: "nodejs8.10",
+              tags: {
+                service: "test",
+              },
+            },
+          },
+          custom: {
+            datadog: {
+              exclude: ["node1"],
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+
+      // The service and env tags will be set with the values given in the provider instead
+      expect(functionWithTags).toHaveProperty("tags", {});
+    });
   });
 });

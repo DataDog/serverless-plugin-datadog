@@ -202,7 +202,9 @@ describe("forceExcludeDepsFromWebpack", () => {
 describe("setEnvConfiguration", () => {
   it("sets env vars", () => {
     const service = {
-      provider: {},
+      functions: {
+        func1: {},
+      },
     } as any;
 
     setEnvConfiguration(
@@ -226,15 +228,17 @@ describe("setEnvConfiguration", () => {
       service,
     );
     expect(service).toEqual({
-      provider: {
-        environment: {
-          DD_API_KEY: "1234",
-          DD_FLUSH_TO_LOG: true,
-          DD_KMS_API_KEY: "5678",
-          DD_LOG_LEVEL: "debug",
-          DD_SITE: "datadoghq.eu",
-          DD_TRACE_ENABLED: true,
-          DD_LOGS_INJECTION: false,
+      functions: {
+        func1: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_FLUSH_TO_LOG: true,
+            DD_KMS_API_KEY: "5678",
+            DD_LOG_LEVEL: "debug",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_LOGS_INJECTION: false,
+          },
         },
       },
     });
@@ -251,6 +255,19 @@ describe("setEnvConfiguration", () => {
           DD_SITE: "datadoghq.eu",
           DD_TRACE_ENABLED: false,
           DD_LOGS_INJECTION: false,
+        },
+      },
+      functions: {
+        func1: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_FLUSH_TO_LOG: true,
+            DD_KMS_API_KEY: "5678",
+            DD_LOG_LEVEL: "debug",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: false,
+            DD_LOGS_INJECTION: false,
+          },
         },
       },
     } as any;
@@ -286,12 +303,27 @@ describe("setEnvConfiguration", () => {
           DD_LOGS_INJECTION: false,
         },
       },
+      functions: {
+        func1: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_FLUSH_TO_LOG: true,
+            DD_KMS_API_KEY: "5678",
+            DD_LOG_LEVEL: "debug",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: false,
+            DD_LOGS_INJECTION: false,
+          },
+        },
+      },
     });
   });
 
   it("does not define `DD_FLUSH_TO_LOG` when `addExtension` is true", () => {
     const service = {
-      provider: {},
+      functions: {
+        func1: {},
+      },
     } as any;
     setEnvConfiguration(
       {
@@ -314,14 +346,16 @@ describe("setEnvConfiguration", () => {
       service,
     );
     expect(service).toEqual({
-      provider: {
-        environment: {
-          DD_API_KEY: "1234",
-          DD_KMS_API_KEY: "5678",
-          DD_LOG_LEVEL: "debug",
-          DD_SITE: "datadoghq.eu",
-          DD_TRACE_ENABLED: true,
-          DD_LOGS_INJECTION: false,
+      functions: {
+        func1: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_KMS_API_KEY: "5678",
+            DD_LOG_LEVEL: "debug",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_LOGS_INJECTION: false,
+          },
         },
       },
     });
@@ -329,7 +363,9 @@ describe("setEnvConfiguration", () => {
 
   it("does not define `DD_LOG_LEVEL` by default when logLevel is undefined", () => {
     const service = {
-      provider: {},
+      functions: {
+        func1: {},
+      },
     } as any;
     setEnvConfiguration(
       {
@@ -352,13 +388,15 @@ describe("setEnvConfiguration", () => {
       service,
     );
     expect(service).toEqual({
-      provider: {
-        environment: {
-          DD_API_KEY: "1234",
-          DD_KMS_API_KEY: "5678",
-          DD_SITE: "datadoghq.eu",
-          DD_TRACE_ENABLED: true,
-          DD_LOGS_INJECTION: false,
+      functions: {
+        func1: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_KMS_API_KEY: "5678",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_LOGS_INJECTION: false,
+          },
         },
       },
     });
@@ -366,7 +404,9 @@ describe("setEnvConfiguration", () => {
 
   it("defines `DD_LOG_LEVEL` when logLevel is defined", () => {
     const service = {
-      provider: {},
+      functions: {
+        func1: {},
+      },
     } as any;
     setEnvConfiguration(
       {
@@ -389,15 +429,61 @@ describe("setEnvConfiguration", () => {
       service,
     );
     expect(service).toEqual({
-      provider: {
-        environment: {
-          DD_API_KEY: "1234",
-          DD_KMS_API_KEY: "5678",
-          DD_SITE: "datadoghq.eu",
-          DD_TRACE_ENABLED: true,
-          DD_LOGS_INJECTION: false,
-          DD_LOG_LEVEL: "info",
+      functions: {
+        func1: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_KMS_API_KEY: "5678",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_LOGS_INJECTION: false,
+            DD_LOG_LEVEL: "info",
+          },
         },
+      },
+    });
+  });
+
+  it("doesn't add function environment variables to a function on the exclude list", () => {
+    const service = {
+      functions: {
+        func1: {},
+        func2: {},
+      },
+    } as any;
+    setEnvConfiguration(
+      {
+        addLayers: false,
+        apiKey: "1234",
+        apiKMSKey: "5678",
+        site: "datadoghq.eu",
+        logLevel: "info",
+        flushMetricsToLogs: true,
+        enableXrayTracing: true,
+        enableDDTracing: true,
+        subscribeToApiGatewayLogs: true,
+        subscribeToHttpApiLogs: true,
+        subscribeToWebsocketLogs: true,
+        addExtension: true,
+        enableTags: true,
+        injectLogContext: false,
+        exclude: ["func2"],
+      },
+      service,
+    );
+    expect(service).toEqual({
+      functions: {
+        func1: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_KMS_API_KEY: "5678",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_LOGS_INJECTION: false,
+            DD_LOG_LEVEL: "info",
+          },
+        },
+        func2: {},
       },
     });
   });
