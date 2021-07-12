@@ -134,11 +134,11 @@ module.exports = class ServerlessPlugin {
       }
     }
 
-    this.addPluginTag();
+    this.addPluginTag(config.exclude);
 
     if (config.enableTags) {
       this.serverless.cli.log("Adding service and environment tags to functions");
-      this.addServiceAndEnvTags();
+      this.addServiceAndEnvTags(config.exclude);
     }
 
     const defaultRuntime = this.serverless.service.provider.runtime;
@@ -197,7 +197,7 @@ module.exports = class ServerlessPlugin {
    * as well as function level. Automatically create tags for service and env with
    * properties from deployment configurations if needed; does not override any existing values.
    */
-  private addServiceAndEnvTags() {
+  private addServiceAndEnvTags(exclude: string[]) {
     let providerServiceTagExists = false;
     let providerEnvTagExists = false;
 
@@ -217,6 +217,10 @@ module.exports = class ServerlessPlugin {
 
     if (!providerServiceTagExists || !providerEnvTagExists) {
       this.serverless.service.getAllFunctions().forEach((functionName) => {
+        // Skip if it is excluded
+        if (exclude !== undefined && exclude.includes(functionName)) {
+          return;
+        }
         const functionDefintion: ExtendedFunctionDefinition = this.serverless.service.getFunction(functionName);
         if (!functionDefintion.tags) {
           functionDefintion.tags = {};
@@ -234,10 +238,14 @@ module.exports = class ServerlessPlugin {
   /**
    * Tags the function(s) with plugin version
    */
-  private async addPluginTag() {
+  private async addPluginTag(exclude: string[]) {
     this.serverless.cli.log(`Adding Plugin Version ${version}`);
 
     this.serverless.service.getAllFunctions().forEach((functionName) => {
+      // Skip if it is excluded
+      if (exclude !== undefined && exclude.includes(functionName)) {
+        return;
+      }
       const functionDefintion: ExtendedFunctionDefinition = this.serverless.service.getFunction(functionName);
       if (!functionDefintion.tags) {
         functionDefintion.tags = {};
