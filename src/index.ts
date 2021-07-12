@@ -109,13 +109,14 @@ module.exports = class ServerlessPlugin {
     const config = getConfig(this.serverless.service);
     if (config.enabled === false) return;
 
-    // Create an object that contains some of our booleans for the forwarder
+    // Create an object that contains config for our forwarder
     const forwarderConfigs = {
       AddExtension: config.addExtension,
       IntegrationTesting: config.integrationTesting,
       SubToApiGatewayLogGroup: config.subscribeToApiGatewayLogs,
       SubToHttpApiLogGroup: config.subscribeToHttpApiLogs,
       SubToWebsocketLogGroup: config.subscribeToWebsocketLogs,
+      Exclude: config.exclude,
     };
 
     let datadogForwarderArn;
