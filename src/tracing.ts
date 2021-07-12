@@ -18,7 +18,7 @@ export enum TracingMode {
   NONE,
 }
 
-export function enableTracing(service: Service, tracingMode: TracingMode) {
+export function enableTracing(service: Service, tracingMode: TracingMode, exclude: string[]) {
   const provider = service.provider as any;
   if (tracingMode === TracingMode.XRAY || tracingMode === TracingMode.HYBRID) {
     provider.tracing = {
@@ -27,9 +27,16 @@ export function enableTracing(service: Service, tracingMode: TracingMode) {
     };
   }
   if (tracingMode === TracingMode.HYBRID || tracingMode === TracingMode.DD_TRACE) {
-    const environment: Record<string, boolean> = provider.environment ?? {};
-    environment[ddTraceEnabledEnvVar] = true;
-    environment[ddMergeXrayTracesEnvVar] = tracingMode === TracingMode.HYBRID;
-    provider.environment = environment;
+    Object.entries(service.functions).forEach(([functionName, properties]) => {
+      if (exclude !== undefined && exclude.includes(functionName)) {
+        return;
+      }
+      if (properties.environment === undefined) {
+        properties.environment = {};
+      }
+      const environment = properties.environment as any;
+      environment[ddTraceEnabledEnvVar] = true;
+      environment[ddMergeXrayTracesEnvVar] = tracingMode === TracingMode.HYBRID;
+    });
   }
 }

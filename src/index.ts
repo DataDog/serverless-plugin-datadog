@@ -102,7 +102,7 @@ module.exports = class ServerlessPlugin {
     } else if (config.enableXrayTracing) {
       tracingMode = TracingMode.XRAY;
     }
-    enableTracing(this.serverless.service, tracingMode);
+    enableTracing(this.serverless.service, tracingMode, config.exclude);
   }
 
   private async afterPackageFunction() {
