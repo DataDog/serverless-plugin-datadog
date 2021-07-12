@@ -85,33 +85,38 @@ export const defaultConfiguration: Configuration = {
 };
 
 export function setEnvConfiguration(config: Configuration, service: Service) {
-  const provider = service.provider as any;
+  Object.entries(service.functions).forEach(([functionName, properties]) => {
+    // Skip if it is excluded
+    if (config.exclude !== undefined && config.exclude.includes(functionName)) {
+      return;
+    }
 
-  if (provider.environment === undefined) {
-    provider.environment = {};
-  }
-  const environment = provider.environment as any;
-  if (config.apiKey !== undefined && environment[apiKeyEnvVar] === undefined) {
-    environment[apiKeyEnvVar] = config.apiKey;
-  }
-  if (config.apiKMSKey !== undefined && environment[apiKeyKMSEnvVar] === undefined) {
-    environment[apiKeyKMSEnvVar] = config.apiKMSKey;
-  }
-  if (environment[siteURLEnvVar] === undefined) {
-    environment[siteURLEnvVar] = config.site;
-  }
-  if (environment[logLevelEnvVar] === undefined) {
-    environment[logLevelEnvVar] = config.logLevel;
-  }
-  if (environment[logForwardingEnvVar] === undefined && config.addExtension === false) {
-    environment[logForwardingEnvVar] = config.flushMetricsToLogs;
-  }
-  if (config.enableDDTracing !== undefined && environment[ddTracingEnabledEnvVar] === undefined) {
-    environment[ddTracingEnabledEnvVar] = config.enableDDTracing;
-  }
-  if (config.injectLogContext !== undefined && environment[logInjectionEnvVar] === undefined) {
-    environment[logInjectionEnvVar] = config.injectLogContext;
-  }
+    if (properties.environment === undefined) {
+      properties.environment = {};
+    }
+    const environment = properties.environment as any;
+    if (config.apiKey !== undefined && environment[apiKeyEnvVar] === undefined) {
+      environment[apiKeyEnvVar] = config.apiKey;
+    }
+    if (config.apiKMSKey !== undefined && environment[apiKeyKMSEnvVar] === undefined) {
+      environment[apiKeyKMSEnvVar] = config.apiKMSKey;
+    }
+    if (environment[siteURLEnvVar] === undefined) {
+      environment[siteURLEnvVar] = config.site;
+    }
+    if (environment[logLevelEnvVar] === undefined) {
+      environment[logLevelEnvVar] = config.logLevel;
+    }
+    if (environment[logForwardingEnvVar] === undefined && config.addExtension === false) {
+      environment[logForwardingEnvVar] = config.flushMetricsToLogs;
+    }
+    if (config.enableDDTracing !== undefined && environment[ddTracingEnabledEnvVar] === undefined) {
+      environment[ddTracingEnabledEnvVar] = config.enableDDTracing;
+    }
+    if (config.injectLogContext !== undefined && environment[logInjectionEnvVar] === undefined) {
+      environment[logInjectionEnvVar] = config.injectLogContext;
+    }
+  });
 }
 
 export function getConfig(service: Service): Configuration {
