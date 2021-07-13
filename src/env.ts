@@ -31,6 +31,8 @@ export interface Configuration {
   enableXrayTracing: boolean;
   // Enable tracing on Lambda function using dd-trace, datadog's APM library.
   enableDDTracing: boolean;
+  // Enable forwarding Logs
+  enableDDLogs: boolean;
   // Whether to add the Datadog Lambda Extension to send data without the need of the Datadog Forwarder.
   addExtension: boolean;
 
@@ -66,6 +68,7 @@ const logLevelEnvVar = "DD_LOG_LEVEL";
 const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
 const ddTracingEnabledEnvVar = "DD_TRACE_ENABLED";
 const logInjectionEnvVar = "DD_LOGS_INJECTION";
+const ddLogsEnabledEnvVar = "DD_SERVERLESS_LOGS_ENABLED";
 
 export const defaultConfiguration: Configuration = {
   addLayers: true,
@@ -82,6 +85,7 @@ export const defaultConfiguration: Configuration = {
   subscribeToApiGatewayLogs: true,
   subscribeToHttpApiLogs: true,
   subscribeToWebsocketLogs: true,
+  enableDDLogs: true
 };
 
 export function setEnvConfiguration(config: Configuration, service: Service) {
@@ -111,6 +115,9 @@ export function setEnvConfiguration(config: Configuration, service: Service) {
   }
   if (config.injectLogContext !== undefined && environment[logInjectionEnvVar] === undefined) {
     environment[logInjectionEnvVar] = config.injectLogContext;
+  }
+  if (config.enableDDLogs !== undefined && environment[ddLogsEnabledEnvVar] === undefined) {
+    environment[ddLogsEnabledEnvVar] = config.enableDDLogs
   }
 }
 
