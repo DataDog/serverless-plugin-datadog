@@ -85,7 +85,7 @@ export const defaultConfiguration: Configuration = {
   subscribeToApiGatewayLogs: true,
   subscribeToHttpApiLogs: true,
   subscribeToWebsocketLogs: true,
-  enableDDLogs: true
+  enableDDLogs: true,
 };
 
 export function setEnvConfiguration(config: Configuration, service: Service) {
@@ -117,7 +117,7 @@ export function setEnvConfiguration(config: Configuration, service: Service) {
     environment[logInjectionEnvVar] = config.injectLogContext;
   }
   if (config.enableDDLogs !== undefined && environment[ddLogsEnabledEnvVar] === undefined) {
-    environment[ddLogsEnabledEnvVar] = config.enableDDLogs
+    environment[ddLogsEnabledEnvVar] = config.enableDDLogs;
   }
 }
 
