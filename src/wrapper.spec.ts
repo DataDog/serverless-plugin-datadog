@@ -141,4 +141,50 @@ describe("redirectHandlers", () => {
     );
     expect(funcDef).toEqual(origFuncDef);
   });
+
+  it("sets custom handlers correctly for nodejs", async () => {
+    mock({});
+    const customHandler = '/src/custom-handler.handler'
+    const handler = {
+      name: "my-lambda",
+      package: {} as any,
+      handler: "mydir/func.myhandler",
+      events: [],
+    };
+    redirectHandlers(
+      [
+        {
+          name: "my-lambda",
+          type: RuntimeType.NODE,
+          handler: handler,
+        },
+      ],
+      false,
+      customHandler,
+    );
+    expect(handler.handler).toEqual(customHandler);
+  });
+
+  it("sets custom handlers correctly for python", async () => {
+    mock({});
+    const customHandler = '/src/custom-handler.handler'
+    const handler = {
+      name: "my-lambda",
+      package: {} as any,
+      handler: "mydir/func.myhandler",
+      events: [],
+    };
+    redirectHandlers(
+      [
+        {
+          name: "my-lambda",
+          type: RuntimeType.PYTHON,
+          handler: handler,
+        },
+      ],
+      false,
+      customHandler,
+    );
+    expect(handler.handler).toEqual(customHandler);
+  });
 });

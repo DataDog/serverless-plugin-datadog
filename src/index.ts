@@ -142,7 +142,7 @@ module.exports = class ServerlessPlugin {
 
     const defaultRuntime = this.serverless.service.provider.runtime;
     const handlers = findHandlers(this.serverless.service, config.exclude, defaultRuntime);
-    redirectHandlers(handlers, config.addLayers);
+    redirectHandlers(handlers, config.addLayers, config.customHandler);
     if (config.integrationTesting === false) {
       addOutputLinks(this.serverless, config.site);
     } else {
