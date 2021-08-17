@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { FunctionInfo } from "layer";
 import Service from "serverless/classes/Service";
 import Aws = require("serverless/plugins/aws/provider/awsProvider");
@@ -196,12 +197,25 @@ function shouldSubscribe(name: string, resource: any, forwarderConfigs: Forwarde
   // If the LogGroup is not in our list of filtered handlers we don't want to subscribe it's log group.
   if (
     resource.Properties.LogGroupName.startsWith("/aws/lambda/") &&
-    !handlers.some(({ name: functionKey }) => `${functionKey}LogGroup` === name)
+    !handlers.some(({ name: functionKey }) => getLogGroupLogicalId(functionKey) === name)
   ) {
     return false;
   }
 
   return true;
+}
+
+function normalizeName(name: string) {
+  return `${_.upperFirst(name)}`;
+}
+
+function getNormalizedResourceName(resourceName: string) {
+  return normalizeName(resourceName.replace(/-/g, "Dash").replace(/_/g, "Underscore"));
+}
+
+// https://github.com/serverless/serverless/blob/f4c9b58b10a45ae342934e9a61dcdea0c2ef11e2/lib/plugins/aws/lib/naming.js#L125
+function getLogGroupLogicalId(functionName: string) {
+  return `${getNormalizedResourceName(functionName)}LogGroup`;
 }
 
 function subscribeToLogGroup(functionArn: string | CloudFormationObjectArn, name: string) {
