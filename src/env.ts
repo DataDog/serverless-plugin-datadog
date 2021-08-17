@@ -6,6 +6,7 @@
  * Copyright 2021 Datadog, Inc.
  */
 
+import { FunctionInfo } from "layer";
 import Service from "serverless/classes/Service";
 
 export interface Configuration {
@@ -88,17 +89,12 @@ export const defaultConfiguration: Configuration = {
   enableDDLogs: true,
 };
 
-export function setEnvConfiguration(config: Configuration, service: Service) {
-  Object.entries(service.functions).forEach(([functionName, properties]) => {
-    // Skip if it is excluded
-    if (config.exclude !== undefined && config.exclude.includes(functionName)) {
-      return;
+export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]) {
+  handlers.forEach(({ handler }) => {
+    if (handler.environment === undefined) {
+      handler.environment = {};
     }
-
-    if (properties.environment === undefined) {
-      properties.environment = {};
-    }
-    const environment = properties.environment as any;
+    const environment = handler.environment as any;
     if (config.apiKey !== undefined && environment[apiKeyEnvVar] === undefined) {
       environment[apiKeyEnvVar] = config.apiKey;
     }

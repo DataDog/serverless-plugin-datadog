@@ -1,3 +1,4 @@
+import { FunctionInfo } from "layer";
 import Service from "serverless/classes/Service";
 import Aws = require("serverless/plugins/aws/provider/awsProvider");
 
@@ -26,7 +27,6 @@ interface ForwarderConfigs {
   SubToApiGatewayLogGroup: boolean;
   SubToHttpApiLogGroup: boolean;
   SubToWebsocketLogGroup: boolean;
-  Exclude: string[];
 }
 interface DescribeSubscriptionFiltersResponse {
   subscriptionFilters: {
@@ -68,6 +68,7 @@ export async function addCloudWatchForwarderSubscriptions(
   aws: Aws,
   functionArn: CloudFormationObjectArn | string,
   forwarderConfigs: ForwarderConfigs,
+  handlers: FunctionInfo[],
 ) {
   const resources = service.provider.compiledCloudFormationTemplate?.Resources;
   if (resources === undefined) {
@@ -82,7 +83,7 @@ export async function addCloudWatchForwarderSubscriptions(
     await validateForwarderArn(aws, functionArn);
   }
   for (const [name, resource] of Object.entries(resources)) {
-    if (!shouldSubscribe(name, resource, forwarderConfigs)) {
+    if (!shouldSubscribe(name, resource, forwarderConfigs, handlers)) {
       continue;
     }
     const logGroupName = resource.Properties.LogGroupName;
@@ -164,17 +165,11 @@ function validateWebsocketSubscription(resource: any, subscribe: boolean) {
   return resource.Properties.LogGroupName.startsWith("/aws/websocket/") && subscribe;
 }
 
-function shouldSubscribe(name: string, resource: any, forwarderConfigs: ForwarderConfigs) {
+function shouldSubscribe(name: string, resource: any, forwarderConfigs: ForwarderConfigs, handlers: FunctionInfo[]) {
   if (!isLogGroup(resource)) {
     return false;
   }
-  // If the function is excluded we don't want to subscribe it's log group.
-  if (
-    forwarderConfigs.Exclude !== undefined &&
-    forwarderConfigs.Exclude.some((exclude) => `${exclude}LogGroup` === name)
-  ) {
-    return false;
-  }
+
   // if the extension is enabled, we don't want to subscribe to lambda log groups
   if (
     forwarderConfigs.AddExtension &&
@@ -197,6 +192,15 @@ function shouldSubscribe(name: string, resource: any, forwarderConfigs: Forwarde
   ) {
     return false;
   }
+
+  // If the LogGroup is not in our list of filtered handlers we don't want to subscribe it's log group.
+  if (
+    resource.Properties.LogGroupName.startsWith("/aws/lambda/") &&
+    !handlers.some(({ name: functionKey }) => `${functionKey}LogGroup` === name)
+  ) {
+    return false;
+  }
+
   return true;
 }
 

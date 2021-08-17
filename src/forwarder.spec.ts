@@ -2,6 +2,7 @@ import Service from "serverless/classes/Service";
 import { addCloudWatchForwarderSubscriptions, CloudFormationObjectArn, canSubscribeLogGroup } from "./forwarder";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
 import { resolveConfigFile } from "prettier";
+import { FunctionInfo, RuntimeType } from "./layer";
 
 function serviceWithResources(resources?: Record<string, any>, serviceName = "my-service"): Service {
   const service: Partial<Service> = {
@@ -108,13 +109,13 @@ describe("canSubscribeLogGroup", () => {
 describe("addCloudWatchForwarderSubscriptions", () => {
   it("adds a subscription for each log group", async () => {
     const service = serviceWithResources({
-      FirstGroup: {
+      FirstLogGroup: {
         Type: "AWS::Logs::LogGroup",
         Properties: {
           LogGroupName: "/aws/lambda/first-group",
         },
       },
-      SecondGroup: {
+      SecondLogGroup: {
         Type: "AWS::Logs::LogGroup",
         Properties: {
           LogGroupName: "/aws/lambda/second-group",
@@ -158,10 +159,28 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       SubToApiGatewayLogGroup: true,
       SubToHttpApiLogGroup: true,
       SubToWebsocketLogGroup: true,
-      Exclude: [],
     };
 
-    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs);
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "First",
+        type: RuntimeType.NODE,
+      },
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "Second",
+        type: RuntimeType.NODE,
+      },
+    ];
+
+    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs, handlers);
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
       Object {
         "ApiGatewayGroup": Object {
@@ -208,18 +227,18 @@ describe("addCloudWatchForwarderSubscriptions", () => {
           },
           "Type": "AWS::Logs::SubscriptionFilter",
         },
-        "FirstGroup": Object {
+        "FirstLogGroup": Object {
           "Properties": Object {
             "LogGroupName": "/aws/lambda/first-group",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "FirstGroupSubscription": Object {
+        "FirstLogGroupSubscription": Object {
           "Properties": Object {
             "DestinationArn": "my-func",
             "FilterPattern": "",
             "LogGroupName": Object {
-              "Ref": "FirstGroup",
+              "Ref": "FirstLogGroup",
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
@@ -246,18 +265,18 @@ describe("addCloudWatchForwarderSubscriptions", () => {
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "SecondGroup": Object {
+        "SecondLogGroup": Object {
           "Properties": Object {
             "LogGroupName": "/aws/lambda/second-group",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "SecondGroupSubscription": Object {
+        "SecondLogGroupSubscription": Object {
           "Properties": Object {
             "DestinationArn": "my-func",
             "FilterPattern": "",
             "LogGroupName": Object {
-              "Ref": "SecondGroup",
+              "Ref": "SecondLogGroup",
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
@@ -286,15 +305,15 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     `);
   });
 
-  it("does not add subscriptions for log groups that have their subscriptions diabled", async () => {
+  it("does not add subscriptions for log groups that have their subscriptions disabled", async () => {
     const service = serviceWithResources({
-      FirstGroup: {
+      FirstLogGroup: {
         Type: "AWS::Logs::LogGroup",
         Properties: {
           LogGroupName: "/aws/lambda/first-group",
         },
       },
-      SecondGroup: {
+      SecondLogGroup: {
         Type: "AWS::Logs::LogGroup",
         Properties: {
           LogGroupName: "/aws/lambda/second-group",
@@ -338,10 +357,28 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       SubToApiGatewayLogGroup: false,
       SubToHttpApiLogGroup: false,
       SubToWebsocketLogGroup: true,
-      Exclude: [],
     };
 
-    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs);
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "First",
+        type: RuntimeType.NODE,
+      },
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "Second",
+        type: RuntimeType.NODE,
+      },
+    ];
+
+    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs, handlers);
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
       Object {
         "ApiGatewayGroup": Object {
@@ -350,18 +387,18 @@ describe("addCloudWatchForwarderSubscriptions", () => {
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "FirstGroup": Object {
+        "FirstLogGroup": Object {
           "Properties": Object {
             "LogGroupName": "/aws/lambda/first-group",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "FirstGroupSubscription": Object {
+        "FirstLogGroupSubscription": Object {
           "Properties": Object {
             "DestinationArn": "my-func",
             "FilterPattern": "",
             "LogGroupName": Object {
-              "Ref": "FirstGroup",
+              "Ref": "FirstLogGroup",
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
@@ -378,18 +415,18 @@ describe("addCloudWatchForwarderSubscriptions", () => {
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "SecondGroup": Object {
+        "SecondLogGroup": Object {
           "Properties": Object {
             "LogGroupName": "/aws/lambda/second-group",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "SecondGroupSubscription": Object {
+        "SecondLogGroupSubscription": Object {
           "Properties": Object {
             "DestinationArn": "my-func",
             "FilterPattern": "",
             "LogGroupName": Object {
-              "Ref": "SecondGroup",
+              "Ref": "SecondLogGroup",
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
@@ -420,7 +457,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
   it("doesn't add subscription when two non-Datadog subscriptions already exist", async () => {
     const service = serviceWithResources({
-      FirstGroup: {
+      FirstLogGroup: {
         Type: "AWS::Logs::LogGroup",
         Properties: {
           LogGroupName: "/aws/lambda/first-group",
@@ -438,13 +475,23 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       SubToApiGatewayLogGroup: true,
       SubToHttpApiLogGroup: true,
       SubToWebsocketLogGroup: true,
-      Exclude: [],
     };
 
-    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs);
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "First",
+        type: RuntimeType.NODE,
+      },
+    ];
+
+    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs, handlers);
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
       Object {
-        "FirstGroup": Object {
+        "FirstLogGroup": Object {
           "Properties": Object {
             "LogGroupName": "/aws/lambda/first-group",
           },
@@ -465,10 +512,26 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       SubToApiGatewayLogGroup: true,
       SubToHttpApiLogGroup: true,
       SubToWebsocketLogGroup: true,
-      Exclude: [],
     };
 
-    const errors = await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs);
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "First",
+        type: RuntimeType.NODE,
+      },
+    ];
+
+    const errors = await addCloudWatchForwarderSubscriptions(
+      service as Service,
+      aws,
+      "my-func",
+      forwarderConfigs,
+      handlers,
+    );
     expect(errors).toMatchInlineSnapshot(`
       Array [
         "No cloudformation stack available. Skipping subscribing Datadog forwarder.",
@@ -479,7 +542,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
   it("adds a subscription when an known subscription already exists", async () => {
     const service = serviceWithResources(
       {
-        FirstGroup: {
+        FirstLogGroup: {
           Type: "AWS::Logs::LogGroup",
           Properties: {
             LogGroupName: "/aws/lambda/first-group",
@@ -489,7 +552,9 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       "my-service",
     );
 
-    const aws = awsMock({ "/aws/lambda/first-group": [{ filterName: "my-service-dev-FirstGroupSubscription-XXXX" }] });
+    const aws = awsMock({
+      "/aws/lambda/first-group": [{ filterName: "my-service-dev-FirstLogGroupSubscription-XXXX" }],
+    });
 
     const forwarderConfigs = {
       AddExtension: false,
@@ -497,24 +562,34 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       SubToApiGatewayLogGroup: true,
       SubToHttpApiLogGroup: true,
       SubToWebsocketLogGroup: true,
-      Exclude: [],
     };
 
-    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs);
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "First",
+        type: RuntimeType.NODE,
+      },
+    ];
+
+    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs, handlers);
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
       Object {
-        "FirstGroup": Object {
+        "FirstLogGroup": Object {
           "Properties": Object {
             "LogGroupName": "/aws/lambda/first-group",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "FirstGroupSubscription": Object {
+        "FirstLogGroupSubscription": Object {
           "Properties": Object {
             "DestinationArn": "my-func",
             "FilterPattern": "",
             "LogGroupName": Object {
-              "Ref": "FirstGroup",
+              "Ref": "FirstLogGroup",
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
@@ -526,7 +601,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
   it("adds a subscription when an known subscription already exists and the stack name is defined", async () => {
     const service = serviceWithResources(
       {
-        FirstGroup: {
+        FirstLogGroup: {
           Type: "AWS::Logs::LogGroup",
           Properties: {
             LogGroupName: "/aws/lambda/first-group",
@@ -537,7 +612,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     );
 
     const aws = awsMock(
-      { "/aws/lambda/first-group": [{ filterName: "myCustomStackName-FirstGroupSubscription-XXXX" }] },
+      { "/aws/lambda/first-group": [{ filterName: "myCustomStackName-FirstLogGroupSubscription-XXXX" }] },
       "myCustomStackName",
     );
 
@@ -547,24 +622,34 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       SubToApiGatewayLogGroup: true,
       SubToHttpApiLogGroup: true,
       SubToWebsocketLogGroup: true,
-      Exclude: [],
     };
 
-    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs);
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "First",
+        type: RuntimeType.NODE,
+      },
+    ];
+
+    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs, handlers);
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
       Object {
-        "FirstGroup": Object {
+        "FirstLogGroup": Object {
           "Properties": Object {
             "LogGroupName": "/aws/lambda/first-group",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "FirstGroupSubscription": Object {
+        "FirstLogGroupSubscription": Object {
           "Properties": Object {
             "DestinationArn": "my-func",
             "FilterPattern": "",
             "LogGroupName": Object {
-              "Ref": "FirstGroup",
+              "Ref": "FirstLogGroup",
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
@@ -575,13 +660,13 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
   it("throws DatadogForwarderNotFoundError when function ARN is not found", async () => {
     const service = serviceWithResources({
-      FirstGroup: {
+      FirstLogGroup: {
         Type: "AWS::Logs::LogGroup",
         Properties: {
           LogGroupName: "/aws/lambda/first-group",
         },
       },
-      SecondGroup: {
+      SecondLogGroup: {
         Type: "AWS::Logs::LogGroup",
         Properties: {
           LogGroupName: "/aws/lambda/second-group",
@@ -615,11 +700,29 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       SubToApiGatewayLogGroup: true,
       SubToHttpApiLogGroup: true,
       SubToWebsocketLogGroup: true,
-      Exclude: [],
     };
 
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "First",
+        type: RuntimeType.NODE,
+      },
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "Second",
+        type: RuntimeType.NODE,
+      },
+    ];
+
     expect(
-      async () => await addCloudWatchForwarderSubscriptions(service, aws, "my-func", forwarderConfigs),
+      async () => await addCloudWatchForwarderSubscriptions(service, aws, "my-func", forwarderConfigs, handlers),
     ).rejects.toThrow("Could not perform GetFunction on my-func.");
   });
 
@@ -644,10 +747,26 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       SubToApiGatewayLogGroup: true,
       SubToHttpApiLogGroup: true,
       SubToWebsocketLogGroup: true,
-      Exclude: [],
     };
 
-    const errors: string[] = await addCloudWatchForwarderSubscriptions(service, aws, functionArn, forwarderConfigs);
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "First",
+        type: RuntimeType.NODE,
+      },
+    ];
+
+    const errors: string[] = await addCloudWatchForwarderSubscriptions(
+      service,
+      aws,
+      functionArn,
+      forwarderConfigs,
+      handlers,
+    );
     expect(
       errors.includes(
         "Skipping forwarder ARN validation because forwarder string defined with CloudFormation function.",
@@ -673,13 +792,29 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       SubToApiGatewayLogGroup: true,
       SubToHttpApiLogGroup: true,
       SubToWebsocketLogGroup: true,
-      Exclude: [],
     };
-    const errors: string[] = await addCloudWatchForwarderSubscriptions(service, aws, functionArn, forwarderConfigs);
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "First",
+        type: RuntimeType.NODE,
+      },
+    ];
+
+    const errors: string[] = await addCloudWatchForwarderSubscriptions(
+      service,
+      aws,
+      functionArn,
+      forwarderConfigs,
+      handlers,
+    );
     expect(errors.includes("Skipping forwarder ARN validation because 'integrationTesting' is set to true")).toBe(true);
   });
 
-  it("skips creating a forwarder for the SecondLogGroup when the function Second is excluded", async () => {
+  it("skips creating a forwarder for the SecondLogGroup when the function Second is not in the list of handlers", async () => {
     const service = serviceWithResources({
       FirstLogGroup: {
         Type: "AWS::Logs::LogGroup",
@@ -706,7 +841,18 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       Exclude: ["Second"],
     };
 
-    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs);
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "First",
+        type: RuntimeType.NODE,
+      },
+    ];
+
+    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs, handlers);
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
       Object {
         "FirstLogGroup": Object {

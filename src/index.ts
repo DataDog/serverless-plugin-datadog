@@ -70,10 +70,12 @@ module.exports = class ServerlessPlugin {
     if (config.enabled === false) return;
     this.serverless.cli.log("Auto instrumenting functions with Datadog");
     validateConfiguration(config);
-    setEnvConfiguration(config, this.serverless.service);
 
     const defaultRuntime = this.serverless.service.provider.runtime;
     const handlers = findHandlers(this.serverless.service, config.exclude, defaultRuntime);
+
+    setEnvConfiguration(config, handlers);
+
     const allLayers = { regions: { ...layers.regions, ...govLayers.regions } };
     if (config.addLayers) {
       this.serverless.cli.log("Adding Lambda Library Layers to functions");
@@ -102,7 +104,7 @@ module.exports = class ServerlessPlugin {
     } else if (config.enableXrayTracing) {
       tracingMode = TracingMode.XRAY;
     }
-    enableTracing(this.serverless.service, tracingMode, config.exclude);
+    enableTracing(handlers, this.serverless.service, tracingMode);
   }
 
   private async afterPackageFunction() {
@@ -116,8 +118,10 @@ module.exports = class ServerlessPlugin {
       SubToApiGatewayLogGroup: config.subscribeToApiGatewayLogs,
       SubToHttpApiLogGroup: config.subscribeToHttpApiLogs,
       SubToWebsocketLogGroup: config.subscribeToWebsocketLogs,
-      Exclude: config.exclude,
     };
+
+    const defaultRuntime = this.serverless.service.provider.runtime;
+    const handlers = findHandlers(this.serverless.service, config.exclude, defaultRuntime);
 
     let datadogForwarderArn;
     datadogForwarderArn = setDatadogForwarder(config);
@@ -128,24 +132,18 @@ module.exports = class ServerlessPlugin {
         aws,
         datadogForwarderArn,
         forwarderConfigs,
+        handlers,
       );
       for (const error of errors) {
         this.serverless.cli.log(error);
       }
     }
 
-    this.addPluginTag(config.exclude);
+    this.addTags(handlers, config);
 
-    if (config.enableTags) {
-      this.serverless.cli.log("Adding service and environment tags to functions");
-      this.addServiceAndEnvTags(config.exclude);
-    }
-
-    const defaultRuntime = this.serverless.service.provider.runtime;
-    const handlers = findHandlers(this.serverless.service, config.exclude, defaultRuntime);
     redirectHandlers(handlers, config.addLayers);
     if (config.integrationTesting === false) {
-      addOutputLinks(this.serverless, config.site, config.exclude);
+      addOutputLinks(handlers, this.serverless, config.site);
     } else {
       this.serverless.cli.log("Skipped adding output links because 'integrationTesting' is set true");
     }
@@ -197,61 +195,25 @@ module.exports = class ServerlessPlugin {
    * as well as function level. Automatically create tags for service and env with
    * properties from deployment configurations if needed; does not override any existing values.
    */
-  private addServiceAndEnvTags(exclude: string[]) {
-    let providerServiceTagExists = false;
-    let providerEnvTagExists = false;
-
+  private addTags(handlers: FunctionInfo[], config: Configuration) {
     const provider = this.serverless.service.provider as any;
 
-    const providerTags = provider.tags;
-    if (providerTags !== undefined) {
-      providerServiceTagExists = providerTags[TagKeys.Service] !== undefined;
-      providerEnvTagExists = providerTags[TagKeys.Env] !== undefined;
-    }
+    handlers.forEach(({ handler }) => {
+      handler.tags ??= {};
 
-    const providerStackTags = provider.stackTags;
-    if (providerStackTags !== undefined) {
-      providerServiceTagExists = providerServiceTagExists || providerStackTags[TagKeys.Service] !== undefined;
-      providerEnvTagExists = providerEnvTagExists || providerStackTags[TagKeys.Env] !== undefined;
-    }
+      if (config.enableTags) {
+        this.serverless.cli.log("Adding service and environment tags to functions");
+        if (!provider.tags?.[TagKeys.Service] && !provider.stackTags?.[TagKeys.Service]) {
+          handler.tags[TagKeys.Service] ??= this.serverless.service.getServiceName();
+        }
 
-    if (!providerServiceTagExists || !providerEnvTagExists) {
-      this.serverless.service.getAllFunctions().forEach((functionName) => {
-        // Skip if it is excluded
-        if (exclude !== undefined && exclude.includes(functionName)) {
-          return;
+        if (!provider.tags?.[TagKeys.Env] && !provider.stackTags?.[TagKeys.Env]) {
+          handler.tags[TagKeys.Env] ??= this.serverless.getProvider("aws").getStage();
         }
-        const functionDefintion: ExtendedFunctionDefinition = this.serverless.service.getFunction(functionName);
-        if (!functionDefintion.tags) {
-          functionDefintion.tags = {};
-        }
-        if (!providerServiceTagExists && !functionDefintion.tags[TagKeys.Service]) {
-          functionDefintion.tags[TagKeys.Service] = this.serverless.service.getServiceName();
-        }
-        if (!providerEnvTagExists && !functionDefintion.tags[TagKeys.Env]) {
-          functionDefintion.tags[TagKeys.Env] = this.serverless.getProvider("aws").getStage();
-        }
-      });
-    }
-  }
-
-  /**
-   * Tags the function(s) with plugin version
-   */
-  private async addPluginTag(exclude: string[]) {
-    this.serverless.cli.log(`Adding Plugin Version ${version}`);
-
-    this.serverless.service.getAllFunctions().forEach((functionName) => {
-      // Skip if it is excluded
-      if (exclude !== undefined && exclude.includes(functionName)) {
-        return;
-      }
-      const functionDefintion: ExtendedFunctionDefinition = this.serverless.service.getFunction(functionName);
-      if (!functionDefintion.tags) {
-        functionDefintion.tags = {};
       }
 
-      functionDefintion.tags[TagKeys.Plugin] = `v${version}`;
+      this.serverless.cli.log(`Adding Plugin Version ${version}`);
+      handler.tags[TagKeys.Plugin] = `v${version}`;
     });
   }
 };
