@@ -198,11 +198,14 @@ module.exports = class ServerlessPlugin {
   private addTags(handlers: FunctionInfo[], config: Configuration) {
     const provider = this.serverless.service.provider as any;
 
+    if (config.enableTags) {
+      this.serverless.cli.log("Adding service and environment tags to functions");
+    }
+    this.serverless.cli.log(`Adding Plugin Version ${version}`);
     handlers.forEach(({ handler }) => {
       handler.tags ??= {};
 
       if (config.enableTags) {
-        this.serverless.cli.log("Adding service and environment tags to functions");
         if (!provider.tags?.[TagKeys.Service] && !provider.stackTags?.[TagKeys.Service]) {
           handler.tags[TagKeys.Service] ??= this.serverless.service.getServiceName();
         }
@@ -212,7 +215,6 @@ module.exports = class ServerlessPlugin {
         }
       }
 
-      this.serverless.cli.log(`Adding Plugin Version ${version}`);
       handler.tags[TagKeys.Plugin] = `v${version}`;
     });
   }
