@@ -91,9 +91,7 @@ export const defaultConfiguration: Configuration = {
 
 export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]) {
   handlers.forEach(({ handler }) => {
-    if (handler.environment === undefined) {
-      handler.environment = {};
-    }
+    handler.environment ??= {};
     const environment = handler.environment as any;
     if (config.apiKey !== undefined && environment[apiKeyEnvVar] === undefined) {
       environment[apiKeyEnvVar] = config.apiKey;

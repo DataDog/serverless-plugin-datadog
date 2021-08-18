@@ -143,7 +143,7 @@ module.exports = class ServerlessPlugin {
 
     redirectHandlers(handlers, config.addLayers);
     if (config.integrationTesting === false) {
-      addOutputLinks(handlers, this.serverless, config.site);
+      addOutputLinks(this.serverless, config.site, handlers);
     } else {
       this.serverless.cli.log("Skipped adding output links because 'integrationTesting' is set true");
     }

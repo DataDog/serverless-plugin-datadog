@@ -29,9 +29,7 @@ export function enableTracing(handlers: FunctionInfo[], service: Service, tracin
   }
   if (tracingMode === TracingMode.HYBRID || tracingMode === TracingMode.DD_TRACE) {
     handlers.forEach(({ handler }) => {
-      if (handler.environment === undefined) {
-        handler.environment = {};
-      }
+      handler.environment ??= {};
       const environment = handler.environment as any;
       environment[ddTraceEnabledEnvVar] = true;
       environment[ddMergeXrayTracesEnvVar] = tracingMode === TracingMode.HYBRID;
