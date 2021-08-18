@@ -1,7 +1,7 @@
 import { FunctionInfo } from "layer";
 import Service from "serverless/classes/Service";
+import { getLogGroupLogicalId } from "serverless/lib/plugins/aws/lib/naming";
 import Aws = require("serverless/plugins/aws/provider/awsProvider");
-import Naming = require("serverless/lib/plugins/aws/lib/naming");
 
 const logGroupKey = "AWS::Logs::LogGroup";
 const logGroupSubscriptionKey = "AWS::Logs::SubscriptionFilter";
@@ -202,7 +202,7 @@ function shouldSubscribe(
   // If the log group does not belong to our list of handlers, we don't want to subscribe to it
   if (
     resource.Properties.LogGroupName.startsWith("/aws/lambda/") &&
-    !handlers.some(({ name }) => Naming.getLogGroupLogicalId(name) === resourceName)
+    !handlers.some(({ name }) => getLogGroupLogicalId(name) === resourceName)
   ) {
     return false;
   }
