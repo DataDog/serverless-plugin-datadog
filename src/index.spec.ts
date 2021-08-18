@@ -452,7 +452,7 @@ describe("ServerlessPlugin", () => {
                 FirstLogGroup: {
                   Type: "AWS::Logs::LogGroup",
                   Properties: {
-                    LogGroupName: "/aws/lambda/first-group",
+                    LogGroupName: "/aws/lambda/First",
                   },
                 },
               },
@@ -488,7 +488,7 @@ describe("ServerlessPlugin", () => {
                 FirstLogGroup: {
                   Type: "AWS::Logs::LogGroup",
                   Properties: {
-                    LogGroupName: "/aws/lambda/first-group",
+                    LogGroupName: "/aws/lambda/First",
                   },
                 },
               },
@@ -524,7 +524,7 @@ describe("ServerlessPlugin", () => {
                 FirstLogGroup: {
                   Type: "AWS::Logs::LogGroup",
                   Properties: {
-                    LogGroupName: "/aws/lambda/first-group",
+                    LogGroupName: "/aws/lambda/First",
                   },
                 },
               },
