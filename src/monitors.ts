@@ -130,11 +130,10 @@ export function handleMonitorsApiResponse(response: Response, serverlessMonitorI
   if (response.status === 200) {
     return true;
   } else if (response.status === 400) {
-    console.log(`400 Bad Request: This could be due to incorrect syntax for ${serverlessMonitorId}`);
+    throw new Error(`400 Bad Request: This could be due to incorrect syntax for ${serverlessMonitorId}`);
   } else {
-    console.error(new Error(`${response.status} ${response.statusText}`));
+    throw new Error(`${response.status} ${response.statusText}`);
   }
-  return false;
 }
 
 /**

@@ -143,7 +143,7 @@ module.exports = class ServerlessPlugin {
 
     redirectHandlers(handlers, config.addLayers);
     if (config.integrationTesting === false) {
-      addOutputLinks(this.serverless, config.site, handlers);
+      await addOutputLinks(this.serverless, config.site, handlers);
     } else {
       this.serverless.cli.log("Skipped adding output links because 'integrationTesting' is set true");
     }
@@ -199,10 +199,13 @@ module.exports = class ServerlessPlugin {
     const provider = this.serverless.service.provider as any;
     this.serverless.cli.log(`Adding Plugin Version ${version} tag`);
 
+    if (enableTags) {
+      this.serverless.cli.log(`Adding service and environment tags`);
+    }
+
     handlers.forEach(({ handler }) => {
       handler.tags ??= {};
       if (enableTags) {
-        this.serverless.cli.log(`Adding service and environment tags to function ${handler.name}`);
         if (!provider.tags?.[TagKeys.Service] && !provider.stackTags?.[TagKeys.Service]) {
           handler.tags[TagKeys.Service] ??= this.serverless.service.getServiceName();
         }

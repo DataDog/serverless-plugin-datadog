@@ -76,7 +76,7 @@ export async function searchMonitors(queryTag: string, monitorsApiKey: string, m
   });
 
   if (response.status !== 200) {
-    console.error(new Error(`${response.status} ${response.statusText}`));
+    throw new Error(`Can't fetch monitors. Status code: ${response.status}. Message: ${response.statusText}`);
   }
 
   const json = await response.json();
