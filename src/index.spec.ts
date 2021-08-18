@@ -452,14 +452,14 @@ describe("ServerlessPlugin", () => {
                 FirstGroup: {
                   Type: "AWS::Logs::LogGroup",
                   Properties: {
-                    LogGroupName: "/aws/lambda/First",
+                    LogGroupName: "/aws/lambda/first",
                   },
                 },
               },
             },
           },
           functions: {
-            First: {},
+            first: {},
           },
           custom: {
             datadog: {
@@ -488,14 +488,14 @@ describe("ServerlessPlugin", () => {
                 FirstGroup: {
                   Type: "AWS::Logs::LogGroup",
                   Properties: {
-                    LogGroupName: "/aws/lambda/First",
+                    LogGroupName: "/aws/lambda/first",
                   },
                 },
               },
             },
           },
           functions: {
-            First: {},
+            first: {},
           },
           custom: {
             datadog: {
