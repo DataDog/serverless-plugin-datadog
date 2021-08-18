@@ -104,14 +104,14 @@ module.exports = class ServerlessPlugin {
     } else if (config.enableXrayTracing) {
       tracingMode = TracingMode.XRAY;
     }
-    enableTracing(handlers, this.serverless.service, tracingMode);
+    enableTracing(this.serverless.service, tracingMode, handlers);
   }
 
   private async afterPackageFunction() {
     const config = getConfig(this.serverless.service);
     if (config.enabled === false) return;
 
-    // Create an object that contains config for our forwarder
+    // Create an object that contains some of our booleans for the forwarder
     const forwarderConfigs = {
       AddExtension: config.addExtension,
       IntegrationTesting: config.integrationTesting,

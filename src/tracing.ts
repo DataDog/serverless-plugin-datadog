@@ -19,7 +19,7 @@ export enum TracingMode {
   NONE,
 }
 
-export function enableTracing(handlers: FunctionInfo[], service: Service, tracingMode: TracingMode) {
+export function enableTracing(service: Service, tracingMode: TracingMode, handlers: FunctionInfo[]) {
   const provider = service.provider as any;
   if (tracingMode === TracingMode.XRAY || tracingMode === TracingMode.HYBRID) {
     provider.tracing = {

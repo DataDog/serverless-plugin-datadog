@@ -449,7 +449,7 @@ describe("ServerlessPlugin", () => {
           provider: {
             compiledCloudFormationTemplate: {
               Resources: {
-                FirstLogGroup: {
+                FirstGroup: {
                   Type: "AWS::Logs::LogGroup",
                   Properties: {
                     LogGroupName: "/aws/lambda/First",
@@ -471,7 +471,7 @@ describe("ServerlessPlugin", () => {
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
       expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).toHaveProperty(
-        "FirstLogGroupSubscription",
+        "FirstGroupSubscription",
       );
     });
 
@@ -485,7 +485,7 @@ describe("ServerlessPlugin", () => {
           provider: {
             compiledCloudFormationTemplate: {
               Resources: {
-                FirstLogGroup: {
+                FirstGroup: {
                   Type: "AWS::Logs::LogGroup",
                   Properties: {
                     LogGroupName: "/aws/lambda/First",
@@ -507,7 +507,7 @@ describe("ServerlessPlugin", () => {
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
       expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).toHaveProperty(
-        "FirstLogGroupSubscription",
+        "FirstGroupSubscription",
       );
     });
 
@@ -521,7 +521,7 @@ describe("ServerlessPlugin", () => {
           provider: {
             compiledCloudFormationTemplate: {
               Resources: {
-                FirstLogGroup: {
+                FirstGroup: {
                   Type: "AWS::Logs::LogGroup",
                   Properties: {
                     LogGroupName: "/aws/lambda/First",
@@ -544,7 +544,7 @@ describe("ServerlessPlugin", () => {
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
       expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).not.toHaveProperty(
-        "FirstLogGroupSubscription",
+        "FirstGroupSubscription",
       );
     });
     it("does subscribe to non-lambda log groups when the extension is enabled", async () => {
