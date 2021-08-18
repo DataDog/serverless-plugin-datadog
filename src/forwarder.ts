@@ -1,6 +1,7 @@
 import { FunctionInfo } from "layer";
 import Service from "serverless/classes/Service";
 import Aws = require("serverless/plugins/aws/provider/awsProvider");
+import Naming = require("serverless/lib/plugins/aws/lib/naming");
 
 const logGroupKey = "AWS::Logs::LogGroup";
 const logGroupSubscriptionKey = "AWS::Logs::SubscriptionFilter";
@@ -83,7 +84,7 @@ export async function addCloudWatchForwarderSubscriptions(
     await validateForwarderArn(aws, functionArn);
   }
   for (const [name, resource] of Object.entries(resources)) {
-    if (!shouldSubscribe(resource, forwarderConfigs, handlers)) {
+    if (!shouldSubscribe(name, resource, forwarderConfigs, handlers)) {
       continue;
     }
     const logGroupName = resource.Properties.LogGroupName;
@@ -165,7 +166,12 @@ function validateWebsocketSubscription(resource: any, subscribe: boolean) {
   return resource.Properties.LogGroupName.startsWith("/aws/websocket/") && subscribe;
 }
 
-function shouldSubscribe(resource: any, forwarderConfigs: ForwarderConfigs, handlers: FunctionInfo[]) {
+function shouldSubscribe(
+  resourceName: string,
+  resource: any,
+  forwarderConfigs: ForwarderConfigs,
+  handlers: FunctionInfo[],
+) {
   if (!isLogGroup(resource)) {
     return false;
   }
@@ -196,7 +202,7 @@ function shouldSubscribe(resource: any, forwarderConfigs: ForwarderConfigs, hand
   // If the log group does not belong to our list of handlers, we don't want to subscribe to it
   if (
     resource.Properties.LogGroupName.startsWith("/aws/lambda/") &&
-    !handlers.some(({ name }) => resource.Properties.LogGroupName === `/aws/lambda/${name}`)
+    !handlers.some(({ name }) => Naming.getLogGroupLogicalId(name) === resourceName)
   ) {
     return false;
   }

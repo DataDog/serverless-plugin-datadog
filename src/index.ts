@@ -195,7 +195,7 @@ module.exports = class ServerlessPlugin {
    * as well as function level. Automatically create tags for service and env with
    * properties from deployment configurations if needed; does not override any existing values.
    */
-  private addTags(handlers: FunctionInfo[], enableTags: Boolean) {
+  private addTags(handlers: FunctionInfo[], enableTags: boolean) {
     const provider = this.serverless.service.provider as any;
     this.serverless.cli.log(`Adding Plugin Version ${version} tag`);
 
