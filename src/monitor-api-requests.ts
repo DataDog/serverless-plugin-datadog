@@ -64,6 +64,12 @@ export async function deleteMonitor(monitorId: number, monitorsApiKey: string, m
   return response;
 }
 
+/**
+ * TODO - refactor handleMonitorsApiResponse into this module
+ * and use it here instead of throwing an error
+ *
+ * This is done because getExistingMonitors calls searchMonitors
+ */
 export async function searchMonitors(queryTag: string, monitorsApiKey: string, monitorsAppKey: string) {
   const query = `tag:"${queryTag}"`;
   const response: Response = await fetch(`https://api.datadoghq.com/api/v1/monitor/search?query=${query}`, {
@@ -76,7 +82,7 @@ export async function searchMonitors(queryTag: string, monitorsApiKey: string, m
   });
 
   if (response.status !== 200) {
-    console.error(new Error(`${response.status} ${response.statusText}`));
+    throw new Error(`Can't fetch monitors. Status code: ${response.status}. Message: ${response.statusText}`);
   }
 
   const json = await response.json();
