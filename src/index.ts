@@ -139,7 +139,7 @@ module.exports = class ServerlessPlugin {
       }
     }
 
-    this.addTags(handlers, config);
+    this.addTags(handlers, config.enableTags);
 
     redirectHandlers(handlers, config.addLayers);
     if (config.integrationTesting === false) {
@@ -195,17 +195,14 @@ module.exports = class ServerlessPlugin {
    * as well as function level. Automatically create tags for service and env with
    * properties from deployment configurations if needed; does not override any existing values.
    */
-  private addTags(handlers: FunctionInfo[], config: Configuration) {
+  private addTags(handlers: FunctionInfo[], enableTags: Boolean) {
     const provider = this.serverless.service.provider as any;
+    this.serverless.cli.log(`Adding Plugin Version ${version} tag`);
 
-    if (config.enableTags) {
-      this.serverless.cli.log("Adding service and environment tags to functions");
-    }
-    this.serverless.cli.log(`Adding Plugin Version ${version}`);
     handlers.forEach(({ handler }) => {
       handler.tags ??= {};
-
-      if (config.enableTags) {
+      if (enableTags) {
+        this.serverless.cli.log(`Adding service and environment tags to function ${handler.name}`);
         if (!provider.tags?.[TagKeys.Service] && !provider.stackTags?.[TagKeys.Service]) {
           handler.tags[TagKeys.Service] ??= this.serverless.service.getServiceName();
         }
