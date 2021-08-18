@@ -880,12 +880,12 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     `);
   });
 
-  it("can map a function name with a dash in it's name", async () => {
+  it("can add a subscription to a log group with a normalised logical id when the function name contains a dash", async () => {
     const service = serviceWithResources({
       FirstDashtestLogGroup: {
         Type: "AWS::Logs::LogGroup",
         Properties: {
-          LogGroupName: "/aws/lambda/first",
+          LogGroupName: "/aws/lambda/first-test",
         },
       },
     });
@@ -916,7 +916,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       Object {
         "FirstDashtestLogGroup": Object {
           "Properties": Object {
-            "LogGroupName": "/aws/lambda/first",
+            "LogGroupName": "/aws/lambda/first-test",
           },
           "Type": "AWS::Logs::LogGroup",
         },
