@@ -102,7 +102,7 @@ describe("findHandlers", () => {
       },
       {
         name: "python39-function",
-        handler: { handler: "myfile.handler", runtime: "python3.8" },
+        handler: { handler: "myfile.handler", runtime: "python3.9" },
         type: RuntimeType.PYTHON,
         runtime: "python3.9",
       },
