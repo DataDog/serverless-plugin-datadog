@@ -205,6 +205,9 @@ module.exports = class ServerlessPlugin {
 
     handlers.forEach(({ handler }) => {
       handler.tags ??= {};
+
+      handler.tags[TagKeys.Plugin] = `v${version}`;
+
       if (enableTags) {
         if (!provider.tags?.[TagKeys.Service] && !provider.stackTags?.[TagKeys.Service]) {
           handler.tags[TagKeys.Service] ??= this.serverless.service.getServiceName();
@@ -214,8 +217,6 @@ module.exports = class ServerlessPlugin {
           handler.tags[TagKeys.Env] ??= this.serverless.getProvider("aws").getStage();
         }
       }
-
-      handler.tags[TagKeys.Plugin] = `v${version}`;
     });
   }
 };
