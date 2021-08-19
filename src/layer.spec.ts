@@ -53,46 +53,55 @@ describe("findHandlers", () => {
     const result = findHandlers(mockService, []);
     expect(result).toEqual([
       {
+        name: "go-function",
         handler: { handler: "myfile.handler", runtime: "go1.10" },
         type: RuntimeType.UNSUPPORTED,
         runtime: "go1.10",
       },
       {
+        name: "node10-function",
         handler: { handler: "myfile.handler", runtime: "nodejs10.x" },
         type: RuntimeType.NODE,
         runtime: "nodejs10.x",
       },
       {
+        name: "node12-function",
         handler: { handler: "myfile.handler", runtime: "nodejs12.x" },
         type: RuntimeType.NODE,
         runtime: "nodejs12.x",
       },
       {
+        name: "node14-function",
         handler: { handler: "myfile.handler", runtime: "nodejs14.x" },
         type: RuntimeType.NODE,
         runtime: "nodejs14.x",
       },
       {
+        name: "python27-function",
         handler: { handler: "myfile.handler", runtime: "python2.7" },
         type: RuntimeType.PYTHON,
         runtime: "python2.7",
       },
       {
+        name: "python36-function",
         handler: { handler: "myfile.handler", runtime: "python3.6" },
         type: RuntimeType.PYTHON,
         runtime: "python3.6",
       },
       {
+        name: "python37-function",
         handler: { handler: "myfile.handler", runtime: "python3.7" },
         type: RuntimeType.PYTHON,
         runtime: "python3.7",
       },
       {
+        name: "python38-function",
         handler: { handler: "myfile.handler", runtime: "python3.8" },
         type: RuntimeType.PYTHON,
         runtime: "python3.8",
       },
       {
+        name: "python39-function",
         handler: { handler: "myfile.handler", runtime: "python3.8" },
         type: RuntimeType.PYTHON,
         runtime: "python3.9",
