@@ -95,6 +95,12 @@
         "LogGroupName": "/aws/lambda/dd-sls-plugin-integration-test-dev-PythonHello38"
       }
     },
+    "PythonHello39LogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/dd-sls-plugin-integration-test-dev-PythonHello39"
+      }
+    },
     "JavascriptHello10DashxLogGroup": {
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
@@ -406,6 +412,60 @@
         "PythonHello38LogGroup"
       ]
     },
+    "PythonHello39LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/dd-sls-plugin-integration-test.zip"
+        },
+        "Handler": "datadog_lambda.handler.handler",
+        "Runtime": "python3.9",
+        "FunctionName": "dd-sls-plugin-integration-test-dev-PythonHello39",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Tags": [
+          {
+            "Key": "dd_sls_plugin",
+            "Value": "vX.XX.X"
+          },
+          {
+            "Key": "service",
+            "Value": "dd-sls-plugin-integration-test"
+          },
+          {
+            "Key": "env",
+            "Value": "dev"
+          }
+        ],
+        "Environment": {
+          "Variables": {
+            "DD_API_KEY": 1234,
+            "DD_SITE": "datadoghq.com",
+            "DD_TRACE_ENABLED": true,
+            "DD_LOGS_INJECTION": true,
+            "DD_SERVERLESS_LOGS_ENABLED": true,
+            "DD_MERGE_XRAY_TRACES": false,
+            "DD_LAMBDA_HANDLER": "py_handler.hello"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Layers": [
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python39:45",
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
+        ]
+      },
+      "DependsOn": [
+        "PythonHello39LogGroup"
+      ]
+    },
     "JavascriptHello10DashxLambdaFunction": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
@@ -608,6 +668,16 @@
         "CodeSha256": "XXXX"
       }
     },
+    "PythonHello39LambdaVersionXXXX": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "PythonHello39LambdaFunction"
+        },
+        "CodeSha256": "XXXX"
+      }
+    },
     "JavascriptHello10DashxLambdaVersionXXXX": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
@@ -682,6 +752,15 @@
       },
       "Export": {
         "Name": "sls-dd-sls-plugin-integration-test-dev-PythonHello38LambdaFunctionQualifiedArn"
+      }
+    },
+    "PythonHello39LambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "PythonHello39LambdaVersionXXXX"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-PythonHello39LambdaFunctionQualifiedArn"
       }
     },
     "JavascriptHello10DashxLambdaFunctionQualifiedArn": {
