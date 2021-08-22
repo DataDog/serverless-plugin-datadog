@@ -43,6 +43,9 @@ functions:
   PythonHello38:
     handler: py_handler.hello
     runtime: python3.8
+  PythonHello39:
+    handler: py_handler.hello
+    runtime: python3.9
   JavascriptHello10-x:
     handler: js_handler.hello
     runtime: nodejs10.x

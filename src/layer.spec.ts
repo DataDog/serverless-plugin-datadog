@@ -39,77 +39,72 @@ function createMockService(
 describe("findHandlers", () => {
   it("finds all node and python layers with matching layers", () => {
     const mockService = createMockService("us-east-1", {
-      "func-a": { handler: "myfile.handler", runtime: "nodejs8.10" },
-      "func-b": { handler: "myfile.handler", runtime: "go1.10" },
-      "func-c": { handler: "myfile.handler", runtime: "nodejs10.x" },
-      "func-d": { handler: "myfile.handler", runtime: "python2.7" },
-      "func-e": { handler: "myfile.handler", runtime: "python3.6" },
-      "func-f": { handler: "myfile.handler", runtime: "python3.7" },
-      "func-g": { handler: "myfile.handler", runtime: "python3.8" },
-      "func-h": { handler: "myfile.handler", runtime: "nodejs12.x" },
-      "func-i": { handler: "myfile.handler", runtime: "nodejs14.x" },
+      "go-function": { handler: "myfile.handler", runtime: "go1.10" },
+      "node10-function": { handler: "myfile.handler", runtime: "nodejs10.x" },
+      "node12-function": { handler: "myfile.handler", runtime: "nodejs12.x" },
+      "node14-function": { handler: "myfile.handler", runtime: "nodejs14.x" },
+      "python27-function": { handler: "myfile.handler", runtime: "python2.7" },
+      "python36-function": { handler: "myfile.handler", runtime: "python3.6" },
+      "python37-function": { handler: "myfile.handler", runtime: "python3.7" },
+      "python38-function": { handler: "myfile.handler", runtime: "python3.8" },
+      "python39-function": { handler: "myfile.handler", runtime: "python3.9" },
     });
 
     const result = findHandlers(mockService, []);
-    expect(result).toMatchObject([
+    expect(result).toEqual([
       {
-        handler: { handler: "myfile.handler", runtime: "nodejs8.10" },
-        type: RuntimeType.NODE,
-        runtime: "nodejs8.10",
-      },
-      {
+        name: "go-function",
         handler: { handler: "myfile.handler", runtime: "go1.10" },
         type: RuntimeType.UNSUPPORTED,
         runtime: "go1.10",
       },
       {
+        name: "node10-function",
         handler: { handler: "myfile.handler", runtime: "nodejs10.x" },
         type: RuntimeType.NODE,
         runtime: "nodejs10.x",
       },
       {
+        name: "node12-function",
+        handler: { handler: "myfile.handler", runtime: "nodejs12.x" },
+        type: RuntimeType.NODE,
+        runtime: "nodejs12.x",
+      },
+      {
+        name: "node14-function",
+        handler: { handler: "myfile.handler", runtime: "nodejs14.x" },
+        type: RuntimeType.NODE,
+        runtime: "nodejs14.x",
+      },
+      {
+        name: "python27-function",
         handler: { handler: "myfile.handler", runtime: "python2.7" },
         type: RuntimeType.PYTHON,
         runtime: "python2.7",
       },
       {
+        name: "python36-function",
         handler: { handler: "myfile.handler", runtime: "python3.6" },
         type: RuntimeType.PYTHON,
         runtime: "python3.6",
       },
       {
+        name: "python37-function",
         handler: { handler: "myfile.handler", runtime: "python3.7" },
         type: RuntimeType.PYTHON,
         runtime: "python3.7",
       },
       {
+        name: "python38-function",
         handler: { handler: "myfile.handler", runtime: "python3.8" },
         type: RuntimeType.PYTHON,
         runtime: "python3.8",
       },
       {
-        handler: { runtime: "nodejs12.x" },
-        type: RuntimeType.NODE,
-        runtime: "nodejs12.x",
-      },
-      {
-        handler: { runtime: "nodejs14.x" },
-        type: RuntimeType.NODE,
-        runtime: "nodejs14.x",
-      },
-    ]);
-  });
-
-  it("uses regular node runtime", () => {
-    const mockService = createMockService("us-east-1", {
-      "func-a": { handler: "myfile.handler" },
-    });
-    const result = findHandlers(mockService, [], "nodejs8.10");
-    expect(result).toMatchObject([
-      {
-        handler: {},
-        type: RuntimeType.NODE,
-        runtime: "nodejs8.10",
+        name: "python39-function",
+        handler: { handler: "myfile.handler", runtime: "python3.9" },
+        type: RuntimeType.PYTHON,
+        runtime: "python3.9",
       },
     ]);
   });
