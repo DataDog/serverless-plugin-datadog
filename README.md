@@ -190,7 +190,7 @@ custom:
    monitors:
      - high_error_rate:
         name: "High Error Rate with Modified Warning Threshold"
-        message: "More than 10% of the function’s invocations were errors in the selected time range. Notify @data.dog@datadoghq.com @slack-serverless-                 monitors"
+        message: "More than 10% of the function’s invocations were errors in the selected time range. Notify @data.dog@datadoghq.com @slack-serverless-monitors"
         tags: ["modified_error_rate", "serverless", "error_rate"]
         require_full_window: true
         priority: 2
