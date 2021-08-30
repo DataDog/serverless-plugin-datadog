@@ -1,3 +1,4 @@
+import { FunctionInfo } from "layer";
 import * as Serverless from "serverless";
 
 const yellowFont = "\x1b[33m";
@@ -9,7 +10,7 @@ const outputPrefix = "DatadogMonitor";
  * Builds the CloudFormation Outputs containing the alphanumeric key, description,
  * and value (URL) to the function in Datadog
  */
-export async function addOutputLinks(serverless: Serverless, site: string) {
+export async function addOutputLinks(serverless: Serverless, site: string, handlers: FunctionInfo[]) {
   const awsAccount = await serverless.getProvider("aws").getAccountId();
   const region = serverless.service.provider.region;
   const outputs = serverless.service.provider.compiledCloudFormationTemplate?.Outputs;
@@ -17,11 +18,11 @@ export async function addOutputLinks(serverless: Serverless, site: string) {
     return;
   }
 
-  serverless.service.getAllFunctions().forEach((functionKey) => {
-    const functionName = serverless.service.getFunction(functionKey).name;
-    const key = `${outputPrefix}${functionKey}`.replace(/[^a-z0-9]/gi, "");
+  handlers.forEach(({ name, handler }) => {
+    const functionName = handler.name;
+    const key = `${outputPrefix}${name}`.replace(/[^a-z0-9]/gi, "");
     outputs[key] = {
-      Description: `See ${functionKey} in Datadog`,
+      Description: `See ${name} in Datadog`,
       Value: `https://app.${site}/functions/${functionName}:${region}:${awsAccount}:aws?source=sls-plugin`,
     };
   });

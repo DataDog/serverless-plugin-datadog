@@ -6,6 +6,7 @@
  * Copyright 2021 Datadog, Inc.
  */
 
+import { FunctionInfo } from "layer";
 import Service from "serverless/classes/Service";
 
 export interface Configuration {
@@ -88,37 +89,35 @@ export const defaultConfiguration: Configuration = {
   enableDDLogs: true,
 };
 
-export function setEnvConfiguration(config: Configuration, service: Service) {
-  const provider = service.provider as any;
-
-  if (provider.environment === undefined) {
-    provider.environment = {};
-  }
-  const environment = provider.environment as any;
-  if (config.apiKey !== undefined && environment[apiKeyEnvVar] === undefined) {
-    environment[apiKeyEnvVar] = config.apiKey;
-  }
-  if (config.apiKMSKey !== undefined && environment[apiKeyKMSEnvVar] === undefined) {
-    environment[apiKeyKMSEnvVar] = config.apiKMSKey;
-  }
-  if (environment[siteURLEnvVar] === undefined) {
-    environment[siteURLEnvVar] = config.site;
-  }
-  if (environment[logLevelEnvVar] === undefined) {
-    environment[logLevelEnvVar] = config.logLevel;
-  }
-  if (environment[logForwardingEnvVar] === undefined && config.addExtension === false) {
-    environment[logForwardingEnvVar] = config.flushMetricsToLogs;
-  }
-  if (config.enableDDTracing !== undefined && environment[ddTracingEnabledEnvVar] === undefined) {
-    environment[ddTracingEnabledEnvVar] = config.enableDDTracing;
-  }
-  if (config.injectLogContext !== undefined && environment[logInjectionEnvVar] === undefined) {
-    environment[logInjectionEnvVar] = config.injectLogContext;
-  }
-  if (config.enableDDLogs !== undefined && environment[ddLogsEnabledEnvVar] === undefined) {
-    environment[ddLogsEnabledEnvVar] = config.enableDDLogs;
-  }
+export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]) {
+  handlers.forEach(({ handler }) => {
+    handler.environment ??= {};
+    const environment = handler.environment as any;
+    if (config.apiKey !== undefined && environment[apiKeyEnvVar] === undefined) {
+      environment[apiKeyEnvVar] = config.apiKey;
+    }
+    if (config.apiKMSKey !== undefined && environment[apiKeyKMSEnvVar] === undefined) {
+      environment[apiKeyKMSEnvVar] = config.apiKMSKey;
+    }
+    if (environment[siteURLEnvVar] === undefined) {
+      environment[siteURLEnvVar] = config.site;
+    }
+    if (environment[logLevelEnvVar] === undefined) {
+      environment[logLevelEnvVar] = config.logLevel;
+    }
+    if (environment[logForwardingEnvVar] === undefined && config.addExtension === false) {
+      environment[logForwardingEnvVar] = config.flushMetricsToLogs;
+    }
+    if (config.enableDDTracing !== undefined && environment[ddTracingEnabledEnvVar] === undefined) {
+      environment[ddTracingEnabledEnvVar] = config.enableDDTracing;
+    }
+    if (config.injectLogContext !== undefined && environment[logInjectionEnvVar] === undefined) {
+      environment[logInjectionEnvVar] = config.injectLogContext;
+    }
+    if (config.enableDDLogs !== undefined && environment[ddLogsEnabledEnvVar] === undefined) {
+      environment[ddLogsEnabledEnvVar] = config.enableDDLogs;
+    }
+  });
 }
 
 export function getConfig(service: Service): Configuration {

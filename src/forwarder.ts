@@ -1,4 +1,6 @@
+import { FunctionInfo } from "layer";
 import Service from "serverless/classes/Service";
+import { getLogGroupLogicalId } from "serverless/lib/plugins/aws/lib/naming";
 import Aws = require("serverless/plugins/aws/provider/awsProvider");
 
 const logGroupKey = "AWS::Logs::LogGroup";
@@ -67,6 +69,7 @@ export async function addCloudWatchForwarderSubscriptions(
   aws: Aws,
   functionArn: CloudFormationObjectArn | string,
   forwarderConfigs: ForwarderConfigs,
+  handlers: FunctionInfo[],
 ) {
   const resources = service.provider.compiledCloudFormationTemplate?.Resources;
   if (resources === undefined) {
@@ -81,7 +84,7 @@ export async function addCloudWatchForwarderSubscriptions(
     await validateForwarderArn(aws, functionArn);
   }
   for (const [name, resource] of Object.entries(resources)) {
-    if (!shouldSubscribe(resource, forwarderConfigs)) {
+    if (!shouldSubscribe(name, resource, forwarderConfigs, handlers)) {
       continue;
     }
     const logGroupName = resource.Properties.LogGroupName;
@@ -163,10 +166,16 @@ function validateWebsocketSubscription(resource: any, subscribe: boolean) {
   return resource.Properties.LogGroupName.startsWith("/aws/websocket/") && subscribe;
 }
 
-function shouldSubscribe(resource: any, forwarderConfigs: ForwarderConfigs) {
+function shouldSubscribe(
+  resourceName: string,
+  resource: any,
+  forwarderConfigs: ForwarderConfigs,
+  handlers: FunctionInfo[],
+) {
   if (!isLogGroup(resource)) {
     return false;
   }
+
   // if the extension is enabled, we don't want to subscribe to lambda log groups
   if (
     forwarderConfigs.AddExtension &&
@@ -189,6 +198,15 @@ function shouldSubscribe(resource: any, forwarderConfigs: ForwarderConfigs) {
   ) {
     return false;
   }
+
+  // If the log group does not belong to our list of handlers, we don't want to subscribe to it
+  if (
+    resource.Properties.LogGroupName.startsWith("/aws/lambda/") &&
+    !handlers.some(({ name }) => getLogGroupLogicalId(name) === resourceName)
+  ) {
+    return false;
+  }
+
   return true;
 }
 

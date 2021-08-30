@@ -662,12 +662,12 @@
     "@types/lodash" "^4.14.123"
     lodash "^4.17.11"
 
-"@serverless/platform-client-china@^2.1.9":
-  version "2.1.12"
-  resolved "https://registry.npmjs.org/@serverless/platform-client-china/-/platform-client-china-2.1.12.tgz"
-  integrity sha512-jJQCUYbA7GgVUJCHhrrBwlmUXPm/Qpy4LGVqH74Vq9Y9vsxJXuaj6VKZjezaULoqb8ISP5buH7i2nGNbJXoOoA==
+"@serverless/platform-client-china@^2.2.0":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/@serverless/platform-client-china/-/platform-client-china-2.2.2.tgz#89bf422ef4fbfc9eef0c533105fa52662a860aa9"
+  integrity sha512-58B0UOueZIZiR8btPgSav53Jvzz8ce0LMVp2bPnWUyu4oKrmlCSgO/vYCeklyCd4kBDGZQ3aefHNxLMusE/XRQ==
   dependencies:
-    "@serverless/utils-china" "^1.0.14"
+    "@serverless/utils-china" "^1.1.4"
     adm-zip "^0.5.1"
     archiver "^5.0.2"
     axios "^0.21.1"
@@ -715,16 +715,17 @@
     ramda "^0.26.1"
     traverse "^0.6.6"
 
-"@serverless/utils-china@^1.0.14":
-  version "1.0.15"
-  resolved "https://registry.npmjs.org/@serverless/utils-china/-/utils-china-1.0.15.tgz"
-  integrity sha512-+fSVqyhiITJZ/9wz7fNA6QsJ0XLq3k+UQi8iX7TQNmXdWEtjfslKv2cbnW3A19jbuG2rQ0jzwNShnuLeMuqnSw==
+"@serverless/utils-china@^1.1.4":
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/@serverless/utils-china/-/utils-china-1.1.4.tgz#5a76c90d5d0f33c144fe0e82c799251a46415adb"
+  integrity sha512-8s73M1k+mST7Z/Rp8wgmZh50tjpwX+fqsbYYRuFGgyuWTvgqAlUflDOWAeQuDx4pEndWEqjbG09ZrZNqlHuZqQ==
   dependencies:
-    "@tencent-sdk/capi" "^1.1.2"
+    "@tencent-sdk/capi" "^1.1.8"
     dijkstrajs "^1.0.1"
     dot-qs "0.2.0"
     duplexify "^4.1.1"
     end-of-stream "^1.4.4"
+    got "^11.8.2"
     https-proxy-agent "^5.0.0"
     kafka-node "^5.0.0"
     protobufjs "^6.9.0"
@@ -803,9 +804,9 @@
   dependencies:
     defer-to-connect "^2.0.0"
 
-"@tencent-sdk/capi@^1.1.2":
+"@tencent-sdk/capi@^1.1.8":
   version "1.1.8"
-  resolved "https://registry.npmjs.org/@tencent-sdk/capi/-/capi-1.1.8.tgz"
+  resolved "https://registry.yarnpkg.com/@tencent-sdk/capi/-/capi-1.1.8.tgz#955130f9c7da88a599c05b3eae01b2f0e15a9beb"
   integrity sha512-AmyMQndtxMsM59eDeA0gGiw8T2LzNvDhx/xl+ygFXXrsw+yb/mit73ndHkiHKcRA1EpNHTyD1PN9ATxghzplfg==
   dependencies:
     "@types/request" "^2.48.3"
@@ -971,10 +972,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/serverless@1.78.19":
-  version "1.78.19"
-  resolved "https://registry.npmjs.org/@types/serverless/-/serverless-1.78.19.tgz"
-  integrity sha512-vaeJhOzq6fEJlaFDO3oq5nk9ZllIIYQi3JgMTf4bbIF0olFHTd7KLrkHm5T9NM6lmb0lf2li9pn83rZiPTyTJQ==
+"@types/serverless@1.78.34":
+  version "1.78.34"
+  resolved "https://registry.yarnpkg.com/@types/serverless/-/serverless-1.78.34.tgz#a164f3e5ed05e1c525e5718a1864dde1fc9786d2"
+  integrity sha512-i5e86m5bbNlkqQTS7yZJZppzgpi5+tfPB61ra+b63cFvDmpWH+O06V53TdBMYdMvxwmGUQb5GfwWmHoptbOAMg==
 
 "@types/stack-utils@^2.0.0":
   version "2.0.0"
