@@ -7,15 +7,19 @@
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](https://github.com/DataDog/serverless-plugin-datadog/blob/master/LICENSE)
 
 Datadog recommends the Serverless Framework Plugin for developers using the Serverless Framework to deploy their serverless applications.
-The plugin automatically configures ingestion of metrics, traces, and logs from your serverless applications by:
+The plugin automatically enables instrumentation for your Python and Node.js applications to collect metrics, traces, and logs by:
 
-- Installing and configuring the Datadog Lambda library for your Python and Node.js Lambda functions.
-- Enabling the collection of enhanced Lambda metrics and custom metrics from your Lambda functions.
-- Managing subscriptions from the Datadog Forwarder to your Lambda function log groups.
+- Installing the Datadog Lambda library to your Lambda functions as a Lambda layer.
+- Installing the Datadog Lambda Extension to your Lambda functions as a Lambda layer (`addExtension`) or subscribing the Datadog Forwarder to your Lambda functions' log groups (`forwarderArn`).
+- Making the required configuration changes, such as adding environment variables, to your Lambda functions.
 
 ## Getting started
 
 To quickly get started, follow the installation instructions for [Python][1] or [Node.js][2], and view your function's enhanced metrics, traces, and logs in Datadog. These instructions will get you a basic working setup.
+
+## Upgrade
+
+Each version of the plugin is published with a [specific set of versions of the Datadog Lambda layers](`/src/layers.json`). To pick up new features and bug fixes provided by the latest versions of Datadog Lambda layers, upgrade the serverless framework plugin. Test the new version before applying it on your production applications.
 
 ## More configuration options
 
