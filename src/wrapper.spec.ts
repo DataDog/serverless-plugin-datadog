@@ -144,7 +144,7 @@ describe("redirectHandlers", () => {
 
   it("sets custom handlers correctly for nodejs", async () => {
     mock({});
-    const customHandler = "/src/custom-handler.handler"
+    const customHandler = "/src/custom-handler.handler";
     const handler = {
       name: "my-lambda",
       package: {} as any,
@@ -167,7 +167,7 @@ describe("redirectHandlers", () => {
 
   it("sets custom handlers correctly for python", async () => {
     mock({});
-    const customHandler = "/src/custom-handler.handler"
+    const customHandler = "/src/custom-handler.handler";
     const handler = {
       name: "my-lambda",
       package: {} as any,
