@@ -62,7 +62,7 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              runtime: "nodejs8.10",
+              runtime: "nodejs14.x",
             },
           },
         },
@@ -76,7 +76,7 @@ describe("ServerlessPlugin", () => {
             node1: {
               handler: "my-func.ev",
               layers: [expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:.*/)],
-              runtime: "nodejs8.10",
+              runtime: "nodejs14.x",
             },
           },
           provider: {
@@ -99,7 +99,7 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              runtime: "nodejs8.10",
+              runtime: "nodejs14.x",
             },
           },
           custom: {
@@ -121,7 +121,7 @@ describe("ServerlessPlugin", () => {
             node1: {
               handler: "my-func.ev",
               layers: [expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:Datadog-Extension\:.*/)],
-              runtime: "nodejs8.10",
+              runtime: "nodejs14.x",
             },
           },
           provider: {
@@ -144,7 +144,7 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              runtime: "nodejs8.10",
+              runtime: "nodejs14.x",
             },
           },
           custom: {
@@ -169,7 +169,7 @@ describe("ServerlessPlugin", () => {
                 expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:.*/),
                 expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:Datadog-Extension\:.*/),
               ],
-              runtime: "nodejs8.10",
+              runtime: "nodejs14.x",
             },
           },
           provider: {
@@ -193,7 +193,7 @@ describe("ServerlessPlugin", () => {
             node1: {
               handler: "my-func.ev",
               layers: [],
-              runtime: "nodejs8.10",
+              runtime: "nodejs14.x",
             },
           },
           custom: {
@@ -212,7 +212,7 @@ describe("ServerlessPlugin", () => {
             node1: {
               handler: "my-func.ev",
               layers: [],
-              runtime: "nodejs8.10",
+              runtime: "nodejs14.x",
             },
           },
           provider: {
@@ -236,7 +236,7 @@ describe("ServerlessPlugin", () => {
             node1: {
               handler: "my-func.ev",
               layers: [],
-              runtime: "nodejs8.10",
+              runtime: "nodejs14.x",
             },
           },
           custom: {
@@ -256,7 +256,7 @@ describe("ServerlessPlugin", () => {
             node1: {
               handler: "my-func.ev",
               layers: [],
-              runtime: "nodejs8.10",
+              runtime: "nodejs14.x",
             },
           },
           provider: {
@@ -280,7 +280,7 @@ describe("ServerlessPlugin", () => {
             node1: {
               handler: "my-func.ev",
               layers: [],
-              runtime: "nodejs8.10",
+              runtime: "nodejs14.x",
             },
           },
           custom: {
@@ -299,7 +299,7 @@ describe("ServerlessPlugin", () => {
             node1: {
               handler: "my-func.ev",
               layers: [expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:.*/)],
-              runtime: "nodejs8.10",
+              runtime: "nodejs14.x",
             },
           },
           provider: {
@@ -332,7 +332,7 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              runtime: "nodejs8.10",
+              runtime: "nodejs14.x",
             },
           },
           custom: {
@@ -370,7 +370,7 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              runtime: "nodejs8.10",
+              runtime: "nodejs14.x",
             },
           },
           custom: {
@@ -409,7 +409,7 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              runtime: "nodejs8.10",
+              runtime: "nodejs14.x",
             },
           },
           custom: {
@@ -449,16 +449,18 @@ describe("ServerlessPlugin", () => {
           provider: {
             compiledCloudFormationTemplate: {
               Resources: {
-                FirstGroup: {
+                FirstLogGroup: {
                   Type: "AWS::Logs::LogGroup",
                   Properties: {
-                    LogGroupName: "/aws/lambda/first-group",
+                    LogGroupName: "/aws/lambda/first",
                   },
                 },
               },
             },
           },
-          functions: {},
+          functions: {
+            first: {},
+          },
           custom: {
             datadog: {
               forwarderArn: "some-arn",
@@ -469,7 +471,7 @@ describe("ServerlessPlugin", () => {
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
       expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).toHaveProperty(
-        "FirstGroupSubscription",
+        "FirstLogGroupSubscription",
       );
     });
 
@@ -483,16 +485,18 @@ describe("ServerlessPlugin", () => {
           provider: {
             compiledCloudFormationTemplate: {
               Resources: {
-                FirstGroup: {
+                FirstLogGroup: {
                   Type: "AWS::Logs::LogGroup",
                   Properties: {
-                    LogGroupName: "/aws/lambda/first-group",
+                    LogGroupName: "/aws/lambda/first",
                   },
                 },
               },
             },
           },
-          functions: {},
+          functions: {
+            first: {},
+          },
           custom: {
             datadog: {
               forwarder: "some-arn",
@@ -503,7 +507,7 @@ describe("ServerlessPlugin", () => {
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
       expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).toHaveProperty(
-        "FirstGroupSubscription",
+        "FirstLogGroupSubscription",
       );
     });
 
@@ -517,16 +521,18 @@ describe("ServerlessPlugin", () => {
           provider: {
             compiledCloudFormationTemplate: {
               Resources: {
-                FirstGroup: {
+                FirstLogGroup: {
                   Type: "AWS::Logs::LogGroup",
                   Properties: {
-                    LogGroupName: "/aws/lambda/first-group",
+                    LogGroupName: "/aws/lambda/first",
                   },
                 },
               },
             },
           },
-          functions: {},
+          functions: {
+            first: {},
+          },
           custom: {
             datadog: {
               forwarder: "some-arn",
@@ -538,7 +544,7 @@ describe("ServerlessPlugin", () => {
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
       expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).not.toHaveProperty(
-        "FirstGroupSubscription",
+        "FirstLogGroupSubscription",
       );
     });
     it("does subscribe to non-lambda log groups when the extension is enabled", async () => {
@@ -600,7 +606,7 @@ describe("ServerlessPlugin", () => {
           provider: {
             compiledCloudFormationTemplate: {
               Resources: {
-                FirstGroup: {
+                FirstLogGroup: {
                   Type: "AWS::Logs::LogGroup",
                   Properties: {
                     LogGroupName: "/aws/lambda/first-group",
@@ -638,7 +644,7 @@ describe("ServerlessPlugin", () => {
           provider: {
             compiledCloudFormationTemplate: {
               Resources: {
-                FirstGroup: {
+                FirstLogGroup: {
                   Type: "AWS::Logs::LogGroup",
                   Properties: {
                     LogGroupName: "/aws/lambda/first-group",
@@ -656,13 +662,12 @@ describe("ServerlessPlugin", () => {
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
       expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).not.toHaveProperty(
-        "FirstGroupSubscription",
+        "FirstLogGroupSubscription",
       );
     });
 
     it("only adds dd_sls_plugin tag when enabledTags is false", async () => {
       const function_ = functionMock({ env: "test" });
-      const functionWithTags: ExtendedFunctionDefinition = function_;
       const serverless = {
         cli: { log: () => {} },
         getProvider: awsMock,
@@ -671,14 +676,7 @@ describe("ServerlessPlugin", () => {
             region: "us-east-1",
           },
           functions: {
-            node1: {
-              handler: "my-func.ev",
-              layers: [],
-              runtime: "nodejs8.10",
-              tags: {
-                env: "test",
-              },
-            },
+            node1: function_,
           },
           getServiceName: () => "dev",
           getAllFunctions: () => [function_],
@@ -692,7 +690,7 @@ describe("ServerlessPlugin", () => {
       };
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
-      expect(functionWithTags).toHaveProperty("tags", {
+      expect(function_).toHaveProperty("tags", {
         env: "test",
         dd_sls_plugin: expect.stringMatching(SEM_VER_REGEX),
       });
@@ -700,7 +698,6 @@ describe("ServerlessPlugin", () => {
 
     it("adds tags by default with service name and stage values", async () => {
       const function_ = functionMock({});
-      const functionWithTags: ExtendedFunctionDefinition = function_;
       const serverless = {
         cli: { log: () => {} },
         getProvider: awsMock,
@@ -712,17 +709,13 @@ describe("ServerlessPlugin", () => {
             region: "us-east-1",
           },
           functions: {
-            node1: {
-              handler: "my-func.ev",
-              layers: [],
-              runtime: "nodejs8.10",
-            },
+            node1: function_,
           },
         },
       };
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
-      expect(functionWithTags).toHaveProperty("tags", {
+      expect(function_).toHaveProperty("tags", {
         env: "dev",
         service: "dev",
         dd_sls_plugin: expect.stringMatching(SEM_VER_REGEX),
@@ -731,7 +724,6 @@ describe("ServerlessPlugin", () => {
 
     it("does not override existing tags on function", async () => {
       const function_ = functionMock({ service: "test" });
-      const functionWithTags: ExtendedFunctionDefinition = function_;
       const serverless = {
         cli: { log: () => {} },
         getProvider: awsMock,
@@ -743,20 +735,13 @@ describe("ServerlessPlugin", () => {
             region: "us-east-1",
           },
           functions: {
-            node1: {
-              handler: "my-func.ev",
-              layers: [],
-              runtime: "nodejs8.10",
-              tags: {
-                service: "test",
-              },
-            },
+            node1: function_,
           },
         },
       };
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
-      expect(functionWithTags).toHaveProperty("tags", {
+      expect(function_).toHaveProperty("tags", {
         env: "dev",
         service: "test",
         dd_sls_plugin: expect.stringMatching(SEM_VER_REGEX),
@@ -765,7 +750,6 @@ describe("ServerlessPlugin", () => {
 
     it("does not override tags set on provider level", async () => {
       const function_ = functionMock({});
-      const functionWithTags: ExtendedFunctionDefinition = function_;
       const serverless = {
         cli: { log: () => {} },
         getProvider: awsMock,
@@ -783,13 +767,48 @@ describe("ServerlessPlugin", () => {
             },
           },
           functions: {
+            node1: function_,
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+
+      // The service and env tags will be set with the values given in the provider instead
+      expect(function_).toHaveProperty("tags", { dd_sls_plugin: expect.stringMatching(SEM_VER_REGEX) });
+    });
+
+    it("does not override tags on an excluded function", async () => {
+      const function_ = functionMock({});
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: awsMock,
+        service: {
+          getServiceName: () => "my-service",
+          getAllFunctions: () => ["node1"],
+          getFunction: () => function_,
+          provider: {
+            region: "us-east-1",
+            tags: {
+              service: "service-name",
+            },
+            stackTags: {
+              env: "dev",
+            },
+          },
+          functions: {
             node1: {
               handler: "my-func.ev",
               layers: [],
-              runtime: "nodejs8.10",
+              runtime: "nodejs14.x",
               tags: {
                 service: "test",
               },
+            },
+          },
+          custom: {
+            datadog: {
+              exclude: ["node1"],
             },
           },
         },
@@ -798,7 +817,7 @@ describe("ServerlessPlugin", () => {
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
 
       // The service and env tags will be set with the values given in the provider instead
-      expect(functionWithTags).toHaveProperty("tags", { dd_sls_plugin: expect.stringMatching(SEM_VER_REGEX) });
+      expect(function_).toHaveProperty("tags", {});
     });
   });
 });

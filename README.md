@@ -7,15 +7,19 @@
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](https://github.com/DataDog/serverless-plugin-datadog/blob/master/LICENSE)
 
 Datadog recommends the Serverless Framework Plugin for developers using the Serverless Framework to deploy their serverless applications.
-The plugin automatically configures ingestion of metrics, traces, and logs from your serverless applications by:
+The plugin automatically enables instrumentation for your Python and Node.js applications to collect metrics, traces, and logs by:
 
-- Installing and configuring the Datadog Lambda library for your Python and Node.js Lambda functions.
-- Enabling the collection of enhanced Lambda metrics and custom metrics from your Lambda functions.
-- Managing subscriptions from the Datadog Forwarder to your Lambda function log groups.
+- Installing the Datadog Lambda library to your Lambda functions as a Lambda layer.
+- Installing the Datadog Lambda Extension to your Lambda functions as a Lambda layer (`addExtension`) or subscribing the Datadog Forwarder to your Lambda functions' log groups (`forwarderArn`).
+- Making the required configuration changes, such as adding environment variables, to your Lambda functions.
 
 ## Getting started
 
 To quickly get started, follow the installation instructions for [Python][1] or [Node.js][2], and view your function's enhanced metrics, traces, and logs in Datadog. These instructions will get you a basic working setup.
+
+## Upgrade
+
+Each version of the plugin is published with a [specific set of versions of the Datadog Lambda layers](`/src/layers.json`). To pick up new features and bug fixes provided by the latest versions of Datadog Lambda layers, upgrade the serverless framework plugin. Test the new version before applying it on your production applications.
 
 ## More configuration options
 
@@ -30,7 +34,7 @@ To further configure your plugin, use the following custom parameters in your `s
 | `monitorsApiKey`            | Datadog API Key. Only needed when using plugin to create monitors for your functions and when `monitors` is defined. Separate from `apiKey` with your function, `monitorsApiKey` is only used to create monitors through the Datadog Monitors API. You may use the same API key for both `apiKey` and `monitorsApiKey`.                                                                                              |
 | `monitorsAppKey`            | Datadog Application Key. Only needed when using plugin to create monitors for your function and when `monitors` is defined.                                                                                                                                                                                                                                                                                          |
 | `addLayers`                 | Whether to install the Datadog Lambda library as a layer. Defaults to `true`. Set to `false` when you plan to package the Datadog Lambda library to your function's deployment package on your own so that you can install a specific version of the Datadog Lambda library ([Python][4] or [Node.js][5]).                                                                                                           |
-| `addExtension`              | Whether to install the Datadog Lambda Extension as a layer. Defaults to `false`. When enabled, it's required to set the `apiKey` (or `apiKMSKey`) parameter. The Datadog Lambda Extension Layer is in public preview. Learn more about the Lambda Extension Layer [here][8].                                                                                                                                         |
+| `addExtension`              | Whether to install the Datadog Lambda Extension as a layer. Defaults to `false`. When enabled, it's required to set the `apiKey` (or `apiKMSKey`) parameter. Learn more about the Lambda Extension Layer [here][8]. Note: AWS only supports Lambda Extensions for [certain runtimes][9].                                                                                                                             |
 | `logLevel`                  | The log level, set to `DEBUG` for extended logging.                                                                                                                                                                                                                                                                                                                                                                  |
 | `enableXrayTracing`         | Set `true` to enable X-Ray tracing on the Lambda functions and API Gateway integrations. Defaults to `false`.                                                                                                                                                                                                                                                                                                        |
 | `enableDDTracing`           | Enable Datadog tracing on the Lambda function. Note: This applies only to integrations using the Datadog Extension. Defaults to `true`.                                                                                                                                                                                                                                                                              |
@@ -191,7 +195,7 @@ custom:
    monitors:
      - high_error_rate:
         name: "High Error Rate with Modified Warning Threshold"
-        message: "More than 10% of the function’s invocations were errors in the selected time range. Notify @data.dog@datadoghq.com @slack-serverless-                 monitors"
+        message: "More than 10% of the function’s invocations were errors in the selected time range. Notify @data.dog@datadoghq.com @slack-serverless-monitors"
         tags: ["modified_error_rate", "serverless", "error_rate"]
         require_full_window: true
         priority: 2
@@ -269,3 +273,4 @@ This product includes software developed at Datadog (https://www.datadoghq.com/)
 [6]: https://webpack.js.org/configuration/externals/
 [7]: https://docs.datadoghq.com/serverless/forwarder/
 [8]: https://docs.datadoghq.com/serverless/datadog_lambda_library/extension/
+[9]: https://docs.aws.amazon.com/lambda/latest/dg/using-extensions.html

@@ -6,6 +6,7 @@
  * Copyright 2021 Datadog, Inc.
  */
 
+import { FunctionInfo } from "layer";
 import Service from "serverless/classes/Service";
 
 const ddTraceEnabledEnvVar = "DD_TRACE_ENABLED";
@@ -18,7 +19,7 @@ export enum TracingMode {
   NONE,
 }
 
-export function enableTracing(service: Service, tracingMode: TracingMode) {
+export function enableTracing(service: Service, tracingMode: TracingMode, handlers: FunctionInfo[]) {
   const provider = service.provider as any;
   if (tracingMode === TracingMode.XRAY || tracingMode === TracingMode.HYBRID) {
     provider.tracing = {
@@ -27,9 +28,11 @@ export function enableTracing(service: Service, tracingMode: TracingMode) {
     };
   }
   if (tracingMode === TracingMode.HYBRID || tracingMode === TracingMode.DD_TRACE) {
-    const environment: Record<string, boolean> = provider.environment ?? {};
-    environment[ddTraceEnabledEnvVar] = true;
-    environment[ddMergeXrayTracesEnvVar] = tracingMode === TracingMode.HYBRID;
-    provider.environment = environment;
+    handlers.forEach(({ handler }) => {
+      handler.environment ??= {};
+      const environment = handler.environment as any;
+      environment[ddTraceEnabledEnvVar] = true;
+      environment[ddMergeXrayTracesEnvVar] = tracingMode === TracingMode.HYBRID;
+    });
   }
 }

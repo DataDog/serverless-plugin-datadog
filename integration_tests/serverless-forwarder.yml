@@ -18,6 +18,9 @@ custom:
     forwarderArn: arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder
     integrationTesting: true
     logLevel: "info"
+    exclude:
+      - ExcludeThis
+      - Exclude-This
 
 functions:
   PythonHello27:
@@ -40,6 +43,9 @@ functions:
   PythonHello38:
     handler: py_handler.hello
     runtime: python3.8
+  PythonHello39:
+    handler: py_handler.hello
+    runtime: python3.9
   JavascriptHello10-x:
     handler: js_handler.hello
     runtime: nodejs10.x
@@ -55,5 +61,11 @@ functions:
     handler: js_handler.hello
     runtime: nodejs12.x
   JavascriptHello14-x:
+    handler: js_handler.hello
+    runtime: nodejs14.x
+  ExcludeThis:
+    handler: js_handler.hello
+    runtime: nodejs14.x
+  Exclude-This:
     handler: js_handler.hello
     runtime: nodejs14.x
