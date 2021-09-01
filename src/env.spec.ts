@@ -134,7 +134,7 @@ describe("getConfig", () => {
         datadog: {
           apiKey: "1234",
           logLevel: "debug",
-          customHandler: '/src/custom-handler.handler',
+          customHandler: "/src/custom-handler.handler",
         },
       },
     } as any);
@@ -155,7 +155,7 @@ describe("getConfig", () => {
       subscribeToApiGatewayLogs: true,
       subscribeToHttpApiLogs: true,
       subscribeToWebsocketLogs: true,
-      customHandler: '/src/custom-handler.handler',
+      customHandler: "/src/custom-handler.handler",
     });
   });
 });
