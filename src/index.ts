@@ -141,7 +141,7 @@ module.exports = class ServerlessPlugin {
 
     this.addTags(handlers, config.enableTags);
 
-    redirectHandlers(handlers, config.addLayers);
+    redirectHandlers(handlers, config.addLayers, config.customHandler);
     if (config.integrationTesting === false) {
       await addOutputLinks(this.serverless, config.site, handlers);
     } else {

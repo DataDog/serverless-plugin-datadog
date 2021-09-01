@@ -127,6 +127,37 @@ describe("getConfig", () => {
       subscribeToWebsocketLogs: true,
     });
   });
+
+  it("sets custom handler", () => {
+    const result = getConfig({
+      custom: {
+        datadog: {
+          apiKey: "1234",
+          logLevel: "debug",
+          customHandler: "/src/custom-handler.handler",
+        },
+      },
+    } as any);
+    expect(result).toEqual({
+      addLayers: true,
+      apiKey: "1234",
+      flushMetricsToLogs: true,
+      logLevel: "debug",
+      site: "datadoghq.com",
+      enableXrayTracing: false,
+      enableDDTracing: true,
+      enableDDLogs: true,
+      addExtension: false,
+      enableTags: true,
+      injectLogContext: true,
+      exclude: [],
+      integrationTesting: false,
+      subscribeToApiGatewayLogs: true,
+      subscribeToHttpApiLogs: true,
+      subscribeToWebsocketLogs: true,
+      customHandler: "/src/custom-handler.handler",
+    });
+  });
 });
 
 describe("forceExcludeDepsFromWebpack", () => {
