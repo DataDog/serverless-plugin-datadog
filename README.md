@@ -19,7 +19,7 @@ To quickly get started, follow the installation instructions for [Python][1] or 
 
 ## Upgrade
 
-Each version of the plugin is published with a [specific set of versions of the Datadog Lambda layers](`/src/layers.json`). To pick up new features and bug fixes provided by the latest versions of Datadog Lambda layers, upgrade the serverless framework plugin. Test the new version before applying it on your production applications.
+Each version of the plugin is published with a [specific set of versions of the Datadog Lambda layers][11]. To pick up new features and bug fixes provided by the latest versions of Datadog Lambda layers, upgrade the serverless framework plugin. Test the new version before applying it on your production applications.
 
 ## More configuration options
 
@@ -253,7 +253,7 @@ You can also open an issue for a feature request.
 
 ## Contributing
 
-If you find an issue with this package and have a fix, please feel free to open a pull request following the [procedures](CONTRIBUTING.md).
+If you find an issue with this package and have a fix, please feel free to open a pull request following the [procedures][10].
 
 ## Community
 
@@ -274,3 +274,5 @@ This product includes software developed at Datadog (https://www.datadoghq.com/)
 [7]: https://docs.datadoghq.com/serverless/forwarder/
 [8]: https://docs.datadoghq.com/serverless/datadog_lambda_library/extension/
 [9]: https://docs.aws.amazon.com/lambda/latest/dg/using-extensions.html
+[10]: https://github.com/DataDog/serverless-plugin-datadog/blob/master/CONTRIBUTING.md
+[11]: https://github.com/DataDog/serverless-plugin-datadog/blob/master/src/layers.json
