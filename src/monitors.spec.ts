@@ -190,15 +190,16 @@ describe("buildMonitorParams", () => {
 
 describe("setMonitors", () => {
   afterEach(() => {
-    ((createMonitor as unknown) as jest.Mock).mockRestore();
-    ((updateMonitor as unknown) as jest.Mock).mockRestore();
-    ((deleteMonitor as unknown) as jest.Mock).mockRestore();
-    ((getExistingMonitors as unknown) as jest.Mock).mockRestore();
+    (createMonitor as unknown as jest.Mock).mockRestore();
+    (updateMonitor as unknown as jest.Mock).mockRestore();
+    (deleteMonitor as unknown as jest.Mock).mockRestore();
+    (getExistingMonitors as unknown as jest.Mock).mockRestore();
   });
   it("returns 'Successfully created custom_monitor_1'", async () => {
-    ((getExistingMonitors as unknown) as jest.Mock).mockReturnValue({});
-    ((createMonitor as unknown) as jest.Mock).mockReturnValue({ status: 200 });
+    (getExistingMonitors as unknown as jest.Mock).mockReturnValue({});
+    (createMonitor as unknown as jest.Mock).mockReturnValue({ status: 200 });
     const logStatements = await setMonitors(
+      "datadoghq.com",
       [CUSTOM_MONITOR_1],
       "apikey",
       "appkey",
@@ -207,78 +208,122 @@ describe("setMonitors", () => {
       "env",
     );
     expect(logStatements).toEqual(["Successfully created custom_monitor_1"]);
-    expect((createMonitor as unknown) as jest.Mock).toHaveBeenCalledWith(CUSTOM_MONITOR_1_PARAMS, "apikey", "appkey");
+    expect(createMonitor as unknown as jest.Mock).toHaveBeenCalledWith(
+      "datadoghq.com",
+      CUSTOM_MONITOR_1_PARAMS,
+      "apikey",
+      "appkey",
+    );
   });
   it("returns 'Successfully updated custom_monitor_1', 'Successfully created custom_monitor_2, increased_cost'", async () => {
-    ((getExistingMonitors as unknown) as jest.Mock).mockReturnValue({ custom_monitor_1: 123456 });
-    ((createMonitor as unknown) as jest.Mock).mockReturnValue({ status: 200 });
-    ((updateMonitor as unknown) as jest.Mock).mockReturnValue({ status: 200 });
-    const logStatements = await setMonitors(MONITOR_SET_1, "apikey", "appkey", "cloud_formation_id", "service", "env");
+    (getExistingMonitors as unknown as jest.Mock).mockReturnValue({ custom_monitor_1: 123456 });
+    (createMonitor as unknown as jest.Mock).mockReturnValue({ status: 200 });
+    (updateMonitor as unknown as jest.Mock).mockReturnValue({ status: 200 });
+    const logStatements = await setMonitors(
+      "datadoghq.com",
+      MONITOR_SET_1,
+      "apikey",
+      "appkey",
+      "cloud_formation_id",
+      "service",
+      "env",
+    );
     expect(logStatements).toEqual([
       "Successfully updated custom_monitor_1",
       "Successfully created custom_monitor_2, increased_cost",
     ]);
-    expect((createMonitor as unknown) as jest.Mock).toHaveBeenCalledWith(
+    expect(createMonitor as unknown as jest.Mock).toHaveBeenCalledWith(
+      "datadoghq.com",
       INCREASED_COST_MONITOR_PARAMS,
       "apikey",
       "appkey",
     );
-    expect((createMonitor as unknown) as jest.Mock).toHaveBeenCalledWith(CUSTOM_MONITOR_2_PARAMS, "apikey", "appkey");
+    expect(createMonitor as unknown as jest.Mock).toHaveBeenCalledWith(
+      "datadoghq.com",
+      CUSTOM_MONITOR_2_PARAMS,
+      "apikey",
+      "appkey",
+    );
   });
   it("returns 'Successfully updated custom_monitor_1, custom_monitor_2', 'Successfully created timeout', 'Successfully deleted increased_cost'", async () => {
-    ((getExistingMonitors as unknown) as jest.Mock).mockReturnValue({
+    (getExistingMonitors as unknown as jest.Mock).mockReturnValue({
       custom_monitor_1: 123456,
       custom_monitor_2: 123456,
       increased_cost: 123456,
     });
-    ((createMonitor as unknown) as jest.Mock).mockReturnValue({ status: 200 });
-    ((updateMonitor as unknown) as jest.Mock).mockReturnValue({ status: 200 });
-    ((deleteMonitor as unknown) as jest.Mock).mockReturnValue({ status: 200 });
-    const logStatements = await setMonitors(MONITOR_SET_2, "apikey", "appkey", "cloud_formation_id", "service", "env");
+    (createMonitor as unknown as jest.Mock).mockReturnValue({ status: 200 });
+    (updateMonitor as unknown as jest.Mock).mockReturnValue({ status: 200 });
+    (deleteMonitor as unknown as jest.Mock).mockReturnValue({ status: 200 });
+    const logStatements = await setMonitors(
+      "datadoghq.com",
+      MONITOR_SET_2,
+      "apikey",
+      "appkey",
+      "cloud_formation_id",
+      "service",
+      "env",
+    );
     expect(logStatements).toEqual([
       "Successfully updated custom_monitor_1, custom_monitor_2",
       "Successfully created timeout",
       "Successfully deleted increased_cost",
     ]);
-    expect((updateMonitor as unknown) as jest.Mock).toHaveBeenCalledWith(
+    expect(updateMonitor as unknown as jest.Mock).toHaveBeenCalledWith(
+      "datadoghq.com",
       123456,
       CUSTOM_MONITOR_1_PARAMS,
       "apikey",
       "appkey",
     );
-    expect((updateMonitor as unknown) as jest.Mock).toHaveBeenCalledWith(
+    expect(updateMonitor as unknown as jest.Mock).toHaveBeenCalledWith(
+      "datadoghq.com",
       123456,
       UPDATED_CUSTOM_MONITOR_2_PARAMS,
       "apikey",
       "appkey",
     ); //make sure to use the UPDATED_Monitors?
-    expect((createMonitor as unknown) as jest.Mock).toHaveBeenCalledWith(TIMEOUT_MONITOR_PARAMS, "apikey", "appkey");
-    expect((deleteMonitor as unknown) as jest.Mock).toHaveBeenCalledWith(123456, "apikey", "appkey");
+    expect(createMonitor as unknown as jest.Mock).toHaveBeenCalledWith(
+      "datadoghq.com",
+      TIMEOUT_MONITOR_PARAMS,
+      "apikey",
+      "appkey",
+    );
+    expect(deleteMonitor as unknown as jest.Mock).toHaveBeenCalledWith("datadoghq.com", 123456, "apikey", "appkey");
   });
   it("returns 'Succcessfully updated custom_monitor_1, 'Successfully created increased_cost', 'Successfully deleted timeout'", async () => {
-    ((getExistingMonitors as unknown) as jest.Mock).mockReturnValue({
+    (getExistingMonitors as unknown as jest.Mock).mockReturnValue({
       timeout: 123456,
       custom_monitor_1: 123456,
       custom_monitor_2: 123456,
     });
-    ((createMonitor as unknown) as jest.Mock).mockReturnValue({ status: 200 });
-    ((updateMonitor as unknown) as jest.Mock).mockReturnValue({ status: 200 });
-    ((deleteMonitor as unknown) as jest.Mock).mockReturnValue({ status: 200 });
-    const logStatements = await setMonitors(MONITOR_SET_3, "apikey", "appkey", "cloud_formation_id", "service", "env");
+    (createMonitor as unknown as jest.Mock).mockReturnValue({ status: 200 });
+    (updateMonitor as unknown as jest.Mock).mockReturnValue({ status: 200 });
+    (deleteMonitor as unknown as jest.Mock).mockReturnValue({ status: 200 });
+    const logStatements = await setMonitors(
+      "datadoghq.com",
+      MONITOR_SET_3,
+      "apikey",
+      "appkey",
+      "cloud_formation_id",
+      "service",
+      "env",
+    );
     expect(logStatements).toEqual([
       "Successfully updated custom_monitor_1",
       "Successfully created increased_cost",
       "Successfully deleted timeout, custom_monitor_2",
     ]);
-    expect((updateMonitor as unknown) as jest.Mock).toHaveBeenCalledWith(
+    expect(updateMonitor as unknown as jest.Mock).toHaveBeenCalledWith(
+      "datadoghq.com",
       123456,
       CUSTOM_MONITOR_1_PARAMS,
       "apikey",
       "appkey",
     );
-    expect((deleteMonitor as unknown) as jest.Mock).toHaveBeenCalledWith(123456, "apikey", "appkey");
-    expect((deleteMonitor as unknown) as jest.Mock).toHaveBeenCalledWith(123456, "apikey", "appkey");
-    expect((createMonitor as unknown) as jest.Mock).toHaveBeenCalledWith(
+    expect(deleteMonitor as unknown as jest.Mock).toHaveBeenCalledWith("datadoghq.com", 123456, "apikey", "appkey");
+    expect(deleteMonitor as unknown as jest.Mock).toHaveBeenCalledWith("datadoghq.com", 123456, "apikey", "appkey");
+    expect(createMonitor as unknown as jest.Mock).toHaveBeenCalledWith(
+      "datadoghq.com",
       INCREASED_COST_MONITOR_PARAMS,
       "apikey",
       "appkey",
