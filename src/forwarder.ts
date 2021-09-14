@@ -73,23 +73,23 @@ export async function addExecutionLogGroupsAndSubscriptions(
 ) {
   const resources = service.provider.compiledCloudFormationTemplate?.Resources;
   if (forwarderConfigs.SubToApiGatewayLogGroup) {
-    //create log group
+    // create log group
     const logGroupName = await createRestExecutionLogGroupName(aws);
     const executionLogGroupKey = "RestExecutionLogGroup";
     const executionLogGroupName = addExecutionLogGroup(logGroupName);
     resources[executionLogGroupKey] = executionLogGroupName;
-    //add subscription
+    // add subscription
     const executionSubscription = subscribeToExecutionLogGroup(functionArn, executionLogGroupKey);
     const executionSubscriptionKey = "RestExecutionLogGroupSubscription";
     resources[executionSubscriptionKey] = executionSubscription;
   }
 
   if (forwarderConfigs.SubToWebsocketLogGroup) {
-    //create log group
+    // create log group
     const logGroupName = await createWebsocketExecutionLogGroupName(aws);
     const executionLogGroupKey = "WebsocketExecutionLogGroup";
     const executionLogGroupName = addExecutionLogGroup(logGroupName);
-    //add subscription
+    // add subscription
     resources[executionLogGroupKey] = executionLogGroupName;
     const executionSubscription = subscribeToExecutionLogGroup(functionArn, executionLogGroupKey);
     const executionSubscriptionKey = "WebsocketExecutionLogGroupSubscription";
@@ -271,13 +271,13 @@ function addExecutionLogGroup(logGroupName: any) {
   return executionLogGroup;
 }
 
-function subscribeToExecutionLogGroup(functionArn: string | CloudFormationObjectArn, logGroupKey: string) {
+function subscribeToExecutionLogGroup(functionArn: string | CloudFormationObjectArn, executionLogGroupKey: string) {
   const executionSubscription = {
     Type: logGroupSubscriptionKey,
     Properties: {
       DestinationArn: functionArn,
       FilterPattern: "",
-      LogGroupName: { Ref: logGroupKey },
+      LogGroupName: { Ref: executionLogGroupKey },
     },
   };
   return executionSubscription;
