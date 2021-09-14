@@ -1,5 +1,10 @@
 import Service from "serverless/classes/Service";
-import { addCloudWatchForwarderSubscriptions, CloudFormationObjectArn, canSubscribeLogGroup } from "./forwarder";
+import {
+  addCloudWatchForwarderSubscriptions,
+  CloudFormationObjectArn,
+  canSubscribeLogGroup,
+  addExecutionLogGroupsAndSubscriptions,
+} from "./forwarder";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
 import { resolveConfigFile } from "prettier";
 import { FunctionInfo, RuntimeType } from "./layer";
@@ -159,6 +164,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       SubToApiGatewayLogGroup: true,
       SubToHttpApiLogGroup: true,
       SubToWebsocketLogGroup: true,
+      SubToExecutionLogGroups: true,
     };
 
     const handlers: FunctionInfo[] = [
@@ -195,34 +201,6 @@ describe("addCloudWatchForwarderSubscriptions", () => {
             "FilterPattern": "",
             "LogGroupName": Object {
               "Ref": "ApiGatewayGroup",
-            },
-          },
-          "Type": "AWS::Logs::SubscriptionFilter",
-        },
-        "ExecutionLogGroup": Object {
-          "Properties": Object {
-            "LogGroupName": Object {
-              "Fn::Join": Array [
-                "",
-                Array [
-                  "API-Gateway-Execution-Logs_",
-                  Object {
-                    "Ref": "ApiGatewayRestApi",
-                  },
-                  "/",
-                  "dev",
-                ],
-              ],
-            },
-          },
-          "Type": "AWS::Logs::LogGroup",
-        },
-        "ExecutionLogGroupSubscription": Object {
-          "Properties": Object {
-            "DestinationArn": "my-func",
-            "FilterPattern": "",
-            "LogGroupName": Object {
-              "Ref": "ExecutionLogGroup",
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
@@ -357,6 +335,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       SubToApiGatewayLogGroup: false,
       SubToHttpApiLogGroup: false,
       SubToWebsocketLogGroup: true,
+      SubToExecutionLogGroups: false,
     };
 
     const handlers: FunctionInfo[] = [
@@ -475,6 +454,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       SubToApiGatewayLogGroup: true,
       SubToHttpApiLogGroup: true,
       SubToWebsocketLogGroup: true,
+      SubToExecutionLogGroups: false,
     };
 
     const handlers: FunctionInfo[] = [
@@ -512,6 +492,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       SubToApiGatewayLogGroup: true,
       SubToHttpApiLogGroup: true,
       SubToWebsocketLogGroup: true,
+      SubToExecutionLogGroups: false,
     };
 
     const handlers: FunctionInfo[] = [
@@ -562,6 +543,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       SubToApiGatewayLogGroup: true,
       SubToHttpApiLogGroup: true,
       SubToWebsocketLogGroup: true,
+      SubToExecutionLogGroups: false,
     };
 
     const handlers: FunctionInfo[] = [
@@ -622,6 +604,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       SubToApiGatewayLogGroup: true,
       SubToHttpApiLogGroup: true,
       SubToWebsocketLogGroup: true,
+      SubToExecutionLogGroups: false,
     };
 
     const handlers: FunctionInfo[] = [
@@ -700,6 +683,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       SubToApiGatewayLogGroup: true,
       SubToHttpApiLogGroup: true,
       SubToWebsocketLogGroup: true,
+      SubToExecutionLogGroups: false,
     };
 
     const handlers: FunctionInfo[] = [
@@ -747,6 +731,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       SubToApiGatewayLogGroup: true,
       SubToHttpApiLogGroup: true,
       SubToWebsocketLogGroup: true,
+      SubToExecutionLogGroups: false,
     };
 
     const handlers: FunctionInfo[] = [
@@ -792,6 +777,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       SubToApiGatewayLogGroup: true,
       SubToHttpApiLogGroup: true,
       SubToWebsocketLogGroup: true,
+      SubToExecutionLogGroups: false,
     };
     const handlers: FunctionInfo[] = [
       {
@@ -838,6 +824,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       SubToApiGatewayLogGroup: true,
       SubToHttpApiLogGroup: true,
       SubToWebsocketLogGroup: true,
+      SubToExecutionLogGroups: false,
     };
 
     const handlers: FunctionInfo[] = [
@@ -898,6 +885,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       SubToApiGatewayLogGroup: true,
       SubToHttpApiLogGroup: true,
       SubToWebsocketLogGroup: true,
+      SubToExecutionLogGroups: false,
     };
 
     const handlers: FunctionInfo[] = [
@@ -926,6 +914,127 @@ describe("addCloudWatchForwarderSubscriptions", () => {
             "FilterPattern": "",
             "LogGroupName": Object {
               "Ref": "FirstDashtestLogGroup",
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
+        },
+      }
+    `);
+  });
+
+  it("Adds execution log groups if the environment variable is set", async () => {
+    const service = serviceWithResources({});
+    const aws = awsMock({});
+
+    const forwarderConfigs = {
+      AddExtension: false,
+      IntegrationTesting: false,
+      SubToApiGatewayLogGroup: true,
+      SubToHttpApiLogGroup: true,
+      SubToWebsocketLogGroup: true,
+      SubToExecutionLogGroups: true,
+    };
+    await addExecutionLogGroupsAndSubscriptions(service as Service, aws, "my-func", forwarderConfigs);
+    expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
+      Object {
+        "RestExecutionLogGroup": Object {
+          "Properties": Object {
+            "LogGroupName": Object {
+              "Fn::Join": Array [
+                "",
+                Array [
+                  "API-Gateway-Execution-Logs_",
+                  Object {
+                    "Ref": "ApiGatewayRestApi",
+                  },
+                  "/",
+                  "dev",
+                ],
+              ],
+            },
+          },
+          "Type": "AWS::Logs::LogGroup",
+        },
+        "RestExecutionLogGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "my-func",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Ref": "RestExecutionLogGroup",
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
+        },
+        "WebsocketExecutionLogGroup": Object {
+          "Properties": Object {
+            "LogGroupName": Object {
+              "Fn::Join": Array [
+                "",
+                Array [
+                  "/aws/apigateway/",
+                  Object {
+                    "Ref": "WebsocketsApi",
+                  },
+                  "/",
+                  "dev",
+                ],
+              ],
+            },
+          },
+          "Type": "AWS::Logs::LogGroup",
+        },
+        "WebsocketExecutionLogGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "my-func",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Ref": "WebsocketExecutionLogGroup",
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
+        },
+      }
+    `);
+  });
+  it("Doesn't add execution log groups if an environment variable is not set", async () => {
+    const service = serviceWithResources({});
+    const aws = awsMock({});
+
+    const forwarderConfigs = {
+      AddExtension: false,
+      IntegrationTesting: false,
+      SubToApiGatewayLogGroup: true,
+      SubToHttpApiLogGroup: true,
+      SubToWebsocketLogGroup: false,
+      SubToExecutionLogGroups: true,
+    };
+    await addExecutionLogGroupsAndSubscriptions(service as Service, aws, "my-func", forwarderConfigs);
+    expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
+      Object {
+        "RestExecutionLogGroup": Object {
+          "Properties": Object {
+            "LogGroupName": Object {
+              "Fn::Join": Array [
+                "",
+                Array [
+                  "API-Gateway-Execution-Logs_",
+                  Object {
+                    "Ref": "ApiGatewayRestApi",
+                  },
+                  "/",
+                  "dev",
+                ],
+              ],
+            },
+          },
+          "Type": "AWS::Logs::LogGroup",
+        },
+        "RestExecutionLogGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "my-func",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Ref": "RestExecutionLogGroup",
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",

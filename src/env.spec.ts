@@ -95,6 +95,7 @@ describe("getConfig", () => {
       subscribeToApiGatewayLogs: true,
       subscribeToHttpApiLogs: true,
       subscribeToWebsocketLogs: true,
+      subscribeToExecutionLogs: false,
     });
   });
 
@@ -125,6 +126,7 @@ describe("getConfig", () => {
       subscribeToApiGatewayLogs: true,
       subscribeToHttpApiLogs: true,
       subscribeToWebsocketLogs: true,
+      subscribeToExecutionLogs: false,
     });
   });
 
@@ -155,6 +157,7 @@ describe("getConfig", () => {
       subscribeToApiGatewayLogs: true,
       subscribeToHttpApiLogs: true,
       subscribeToWebsocketLogs: true,
+      subscribeToExecutionLogs: false,
       customHandler: "/src/custom-handler.handler",
     });
   });
@@ -271,6 +274,7 @@ describe("setEnvConfiguration", () => {
         subscribeToApiGatewayLogs: true,
         subscribeToHttpApiLogs: true,
         subscribeToWebsocketLogs: true,
+        subscribeToExecutionLogs: false,
         exclude: ["dd-excluded-function"],
       },
       handlers,
@@ -358,6 +362,7 @@ describe("setEnvConfiguration", () => {
         subscribeToApiGatewayLogs: true,
         subscribeToHttpApiLogs: true,
         subscribeToWebsocketLogs: true,
+        subscribeToExecutionLogs: false,
         exclude: [],
       },
       handlers,
@@ -425,6 +430,7 @@ describe("setEnvConfiguration", () => {
         subscribeToApiGatewayLogs: true,
         subscribeToHttpApiLogs: true,
         subscribeToWebsocketLogs: true,
+        subscribeToExecutionLogs: false,
         addExtension: true,
         enableTags: true,
         injectLogContext: false,
@@ -477,6 +483,7 @@ describe("setEnvConfiguration", () => {
         subscribeToApiGatewayLogs: true,
         subscribeToHttpApiLogs: true,
         subscribeToWebsocketLogs: true,
+        subscribeToExecutionLogs: false,
         addExtension: true,
         enableTags: true,
         injectLogContext: false,
@@ -528,6 +535,7 @@ describe("setEnvConfiguration", () => {
         subscribeToApiGatewayLogs: true,
         subscribeToHttpApiLogs: true,
         subscribeToWebsocketLogs: true,
+        subscribeToExecutionLogs: false,
         addExtension: true,
         enableTags: true,
         injectLogContext: false,

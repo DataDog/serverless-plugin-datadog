@@ -662,10 +662,10 @@
     "@types/lodash" "^4.14.123"
     lodash "^4.17.11"
 
-"@serverless/platform-client-china@^2.2.0":
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/@serverless/platform-client-china/-/platform-client-china-2.2.2.tgz#89bf422ef4fbfc9eef0c533105fa52662a860aa9"
-  integrity sha512-58B0UOueZIZiR8btPgSav53Jvzz8ce0LMVp2bPnWUyu4oKrmlCSgO/vYCeklyCd4kBDGZQ3aefHNxLMusE/XRQ==
+"@serverless/platform-client-china@^2.1.9":
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/@serverless/platform-client-china/-/platform-client-china-2.2.6.tgz#54bbb413179ab11303a38c7933a2e201703fa840"
+  integrity sha512-CRQi3vi1iqWF8qeMNjU5lq+V7ztdVY3pUf6qNhCwcxM1TAOFncM3lsbIc4yf9gsKkOThHDmltf686u/KqDGgJg==
   dependencies:
     "@serverless/utils-china" "^1.1.4"
     adm-zip "^0.5.1"

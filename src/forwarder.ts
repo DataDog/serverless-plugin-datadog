@@ -28,6 +28,7 @@ interface ForwarderConfigs {
   SubToApiGatewayLogGroup: boolean;
   SubToHttpApiLogGroup: boolean;
   SubToWebsocketLogGroup: boolean;
+  SubToExecutionLogGroups: boolean;
 }
 interface DescribeSubscriptionFiltersResponse {
   subscriptionFilters: {
@@ -61,6 +62,38 @@ async function validateForwarderArn(aws: Aws, functionArn: CloudFormationObjectA
     await aws.request("Lambda", "getFunction", { FunctionName: functionArn });
   } catch (err) {
     throw new DatadogForwarderNotFoundError(`Could not perform GetFunction on ${functionArn}.`);
+  }
+}
+
+export async function addExecutionLogGroupsAndSubscriptions(
+  service: Service,
+  aws: Aws,
+  functionArn: CloudFormationObjectArn | string,
+  forwarderConfigs: ForwarderConfigs,
+) {
+  const resources = service.provider.compiledCloudFormationTemplate?.Resources;
+  if (forwarderConfigs.SubToApiGatewayLogGroup) {
+    //create log group
+    const logGroupName = await createRestExecutionLogGroupName(aws);
+    const executionLogGroupKey = "RestExecutionLogGroup";
+    const executionLogGroupName = addExecutionLogGroup(logGroupName);
+    resources[executionLogGroupKey] = executionLogGroupName;
+    //add subscription
+    const executionSubscription = subscribeToExecutionLogGroup(functionArn, executionLogGroupKey);
+    const executionSubscriptionKey = "RestExecutionLogGroupSubscription";
+    resources[executionSubscriptionKey] = executionSubscription;
+  }
+
+  if (forwarderConfigs.SubToWebsocketLogGroup) {
+    //create log group
+    const logGroupName = await createWebsocketExecutionLogGroupName(aws);
+    const executionLogGroupKey = "WebsocketExecutionLogGroup";
+    const executionLogGroupName = addExecutionLogGroup(logGroupName);
+    //add subscription
+    resources[executionLogGroupKey] = executionLogGroupName;
+    const executionSubscription = subscribeToExecutionLogGroup(functionArn, executionLogGroupKey);
+    const executionSubscriptionKey = "WebsocketExecutionLogGroupSubscription";
+    resources[executionSubscriptionKey] = executionSubscription;
   }
 }
 
@@ -107,18 +140,8 @@ export async function addCloudWatchForwarderSubscriptions(
     // Create subscriptions for each log group
     const subscription = subscribeToLogGroup(functionArn, name);
     resources[scopedSubName] = subscription;
-    // Create the Execution log group for API Gateway logging manually so we can subscribe
-    if (validateApiGatewaySubscription(resource, forwarderConfigs.SubToApiGatewayLogGroup)) {
-      // add api gateway execution log group
-      const executionLogGroup = createExecutionLogGroup(aws);
-      const executionLogGroupKey = "ExecutionLogGroup";
-      resources[executionLogGroupKey] = executionLogGroup;
-      // add subscription to execution log group
-      const executionSubscription = subscribeToExecutionLogGroup(functionArn);
-      const executionSubscriptionKey = "ExecutionLogGroupSubscription";
-      resources[executionSubscriptionKey] = executionSubscription;
-    }
   }
+
   return errors;
 }
 
@@ -175,7 +198,10 @@ function shouldSubscribe(
   if (!isLogGroup(resource)) {
     return false;
   }
-
+  // we don't want to run the shouldSubscribe validation on execution log groups since we manually add those.
+  if (typeof resource.Properties.LogGroupName !== "string") {
+    return false;
+  }
   // if the extension is enabled, we don't want to subscribe to lambda log groups
   if (
     forwarderConfigs.AddExtension &&
@@ -221,27 +247,37 @@ function subscribeToLogGroup(functionArn: string | CloudFormationObjectArn, name
   };
   return subscription;
 }
-function createExecutionLogGroup(aws: Aws) {
-  // Create the Execution log group for API Gateway logging manually
-  const executionLogGroupName = {
+
+async function createRestExecutionLogGroupName(aws: Aws) {
+  return {
     "Fn::Join": ["", ["API-Gateway-Execution-Logs_", { Ref: "ApiGatewayRestApi" }, "/", aws.getStage()]],
   };
+}
 
+async function createWebsocketExecutionLogGroupName(aws: Aws) {
+  return {
+    "Fn::Join": ["", ["/aws/apigateway/", { Ref: "WebsocketsApi" }, "/", aws.getStage()]],
+  };
+}
+
+function addExecutionLogGroup(logGroupName: any) {
+  // Create the Execution log group for API Gateway REST logging manually
   const executionLogGroup = {
     Type: "AWS::Logs::LogGroup",
     Properties: {
-      LogGroupName: executionLogGroupName,
+      LogGroupName: logGroupName,
     },
   };
   return executionLogGroup;
 }
-function subscribeToExecutionLogGroup(functionArn: string | CloudFormationObjectArn) {
+
+function subscribeToExecutionLogGroup(functionArn: string | CloudFormationObjectArn, logGroupKey: string) {
   const executionSubscription = {
     Type: logGroupSubscriptionKey,
     Properties: {
       DestinationArn: functionArn,
       FilterPattern: "",
-      LogGroupName: { Ref: "ExecutionLogGroup" },
+      LogGroupName: { Ref: logGroupKey },
     },
   };
   return executionSubscription;

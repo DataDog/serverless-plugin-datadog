@@ -15,7 +15,7 @@ import { getConfig, setEnvConfiguration, forceExcludeDepsFromWebpack, hasWebpack
 import { applyExtensionLayer, applyLambdaLibraryLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
 import { TracingMode, enableTracing } from "./tracing";
 import { redirectHandlers } from "./wrapper";
-import { addCloudWatchForwarderSubscriptions } from "./forwarder";
+import { addCloudWatchForwarderSubscriptions, addExecutionLogGroupsAndSubscriptions } from "./forwarder";
 import { addOutputLinks, printOutputs } from "./output";
 import { FunctionDefinition } from "serverless";
 import { setMonitors } from "./monitors";
@@ -118,6 +118,7 @@ module.exports = class ServerlessPlugin {
       SubToApiGatewayLogGroup: config.subscribeToApiGatewayLogs,
       SubToHttpApiLogGroup: config.subscribeToHttpApiLogs,
       SubToWebsocketLogGroup: config.subscribeToWebsocketLogs,
+      SubToExecutionLogGroups: config.subscribeToExecutionLogs,
     };
 
     const defaultRuntime = this.serverless.service.provider.runtime;
@@ -125,6 +126,7 @@ module.exports = class ServerlessPlugin {
 
     let datadogForwarderArn;
     datadogForwarderArn = setDatadogForwarder(config);
+    this.serverless.cli.log("Setting Datadog Forwarder");
     if (datadogForwarderArn) {
       const aws = this.serverless.getProvider("aws");
       const errors = await addCloudWatchForwarderSubscriptions(
@@ -134,6 +136,14 @@ module.exports = class ServerlessPlugin {
         forwarderConfigs,
         handlers,
       );
+      if (config.subscribeToExecutionLogs) {
+        await addExecutionLogGroupsAndSubscriptions(
+          this.serverless.service,
+          aws,
+          datadogForwarderArn,
+          forwarderConfigs,
+        );
+      }
       for (const error of errors) {
         this.serverless.cli.log(error);
       }
