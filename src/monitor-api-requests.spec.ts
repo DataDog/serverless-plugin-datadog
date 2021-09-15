@@ -58,7 +58,7 @@ describe("createMonitor", () => {
   });
   it("returns true when syntax is valid", async () => {
     ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 200 });
-    const response = await createMonitor(monitorParams, "apikey", "appkey");
+    const response = await createMonitor("datadoghq.com", monitorParams, "apikey", "appkey");
     expect(response.status).toBe(200);
     expect((fetch as unknown) as jest.Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v1/monitor",
@@ -67,7 +67,7 @@ describe("createMonitor", () => {
   });
   it("returns false and logs a 400 Bad Request when syntax is invalid", async () => {
     ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 400 });
-    const response = await createMonitor(invalidMonitorParams, "apikey", "appkey");
+    const response = await createMonitor("datadoghq.com", invalidMonitorParams, "apikey", "appkey");
     expect(() => handleMonitorsApiResponse(response, "high_error_rate")).toThrowError(
       "400 Bad Request: This could be due to incorrect syntax for high_error_rate",
     );
@@ -79,7 +79,7 @@ describe("createMonitor", () => {
   });
   it("returns an Error", async () => {
     ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 403, statusText: "Unauthorized" });
-    const response = await createMonitor(monitorParams, "apikey", "appkey");
+    const response = await createMonitor("datadoghq.com", monitorParams, "apikey", "appkey");
     expect(() => handleMonitorsApiResponse(response, "high_error_rate")).toThrowError("403 Unauthorized");
     expect(response.status).toBe(403);
     expect((fetch as unknown) as jest.Mock).toHaveBeenCalledWith(
@@ -107,7 +107,7 @@ describe("updateMonitor", () => {
   });
   it("returns true when syntax is valid", async () => {
     ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 200 });
-    const response = await updateMonitor(12345, monitorParams, "apikey", "appkey");
+    const response = await updateMonitor("datadoghq.com", 12345, monitorParams, "apikey", "appkey");
     expect(response.status).toBe(200);
     expect((fetch as unknown) as jest.Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v1/monitor/12345",
@@ -117,7 +117,7 @@ describe("updateMonitor", () => {
   it("returns false and logs 400 Bad Request when syntax is invalid", async () => {
     console.log = jest.fn();
     ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 400 });
-    const response = await updateMonitor(12345, invalidMonitorParams, "apikey", "appkey");
+    const response = await updateMonitor("datadoghq.com", 12345, invalidMonitorParams, "apikey", "appkey");
     expect(() => handleMonitorsApiResponse(response, "high_error_rate")).toThrowError(
       "400 Bad Request: This could be due to incorrect syntax for high_error_rate",
     );
@@ -129,7 +129,7 @@ describe("updateMonitor", () => {
   });
   it("throws an Invalid Authentication Error when authentication is invalid", async () => {
     ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 403, statusText: "Unauthorized" });
-    const response = await updateMonitor(12345, monitorParams, "apikey", "appkey");
+    const response = await updateMonitor("datadoghq.com", 12345, monitorParams, "apikey", "appkey");
     expect(() => handleMonitorsApiResponse(response, "high_error_rate")).toThrowError("403 Unauthorized");
     expect(response.status).toBe(403);
     expect((fetch as unknown) as jest.Mock).toHaveBeenCalledWith(
@@ -149,7 +149,7 @@ describe("deleteMonitor", () => {
   });
   it("returns true when syntax is valid", async () => {
     ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 200 });
-    const response = await deleteMonitor(12345, "apikey", "appkey");
+    const response = await deleteMonitor("datadoghq.com", 12345, "apikey", "appkey");
     expect(response.status).toBe(200);
     expect((fetch as unknown) as jest.Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v1/monitor/12345",
@@ -158,7 +158,7 @@ describe("deleteMonitor", () => {
   });
   it("returns false and throws an Error", async () => {
     ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 403, statusText: "Unauthorized" });
-    const response = await deleteMonitor(12345, "apikey", "appkey");
+    const response = await deleteMonitor("datadoghq.com", 12345, "apikey", "appkey");
     expect(() => handleMonitorsApiResponse(response, "high_error_rate")).toThrowError("403 Unauthorized");
     expect(response.status).toBe(403);
     expect((fetch as unknown) as jest.Mock).toHaveBeenCalledWith(
@@ -206,7 +206,7 @@ describe("searchMonitor", () => {
         },
       }),
     });
-    const response = await searchMonitors("queryTag", "apikey", "appkey");
+    const response = await searchMonitors("datadoghq.com", "queryTag", "apikey", "appkey");
     expect(response).toEqual({
       status: "No Data",
       scopes: ["aws_cloudformation_stack-id:cloudformation_stack_id"],
@@ -241,8 +241,8 @@ describe("searchMonitor", () => {
   });
   it("throws an Invalid Authentication Error when authentication is invalid", async () => {
     ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 403, statusText: "Unauthorized" });
-    await expect(async () => await searchMonitors("queryString", "apikey", "appkey")).rejects.toThrowError(
-      "Can't fetch monitors. Status code: 403. Message: Unauthorized",
-    );
+    await expect(
+      async () => await searchMonitors("datadoghq.com", "queryString", "apikey", "appkey"),
+    ).rejects.toThrowError("Can't fetch monitors. Status code: 403. Message: Unauthorized");
   });
 });

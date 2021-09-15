@@ -19,7 +19,7 @@ To quickly get started, follow the installation instructions for [Python][1] or 
 
 ## Upgrade
 
-Each version of the plugin is published with a [specific set of versions of the Datadog Lambda layers](`/src/layers.json`). To pick up new features and bug fixes provided by the latest versions of Datadog Lambda layers, upgrade the serverless framework plugin. Test the new version before applying it on your production applications.
+Each version of the plugin is published with a [specific set of versions of the Datadog Lambda layers][11]. To pick up new features and bug fixes provided by the latest versions of Datadog Lambda layers, upgrade the serverless framework plugin. Test the new version before applying it on your production applications.
 
 ## More configuration options
 
@@ -49,6 +49,7 @@ To further configure your plugin, use the following custom parameters in your `s
 | `exclude`                   | When set, this plugin will ignore all specified functions. Use this parameter if you have any functions that should not include Datadog functionality. Defaults to `[]`.                                                                                                                                                                                                                                             |
 | `enabled`                   | When set to false, the Datadog plugin will stay inactive. Defaults to `true`. You can control this option using an environment variable, e.g. `enabled: ${strToBool(${env:DD_PLUGIN_ENABLED, true})}`, to activate/deactivate the plugin during deployment. Alternatively, you can also use the value passed in through `--stage` to control this option, [see example.](#disable-plugin-for-particular-environment) |
 | `monitors`                  | When defined, the Datadog plugin will configure monitors for the deployed function. You must also have `monitorsApiKey` and `monitorsAppKey` defined. To learn how to define monitors, see [To Enable and Configure a Recommended Serverless Monitor.](#to-enable-and-configure-a-recommended-serverless-monitor)                                                                                                    |
+| `customHandler`             | When set, the specified handler is set as the handler for all the functions. By deafult, the handler is set to `/opt/nodejs/node_modules/datadog-lambda-js/handler.handler` if `addLayers` is set to `true`, or `node_modules/datadog-lambda-js/dist/handler.handler` if `addLayers` is set to `false`                                                                                                               |
 
 To use any of these parameters, add a `custom` > `datadog` section to your `serverless.yml` similar to this example:
 
@@ -155,7 +156,7 @@ There are seven recommended monitors with default values pre-configured.
 | :------------------: | :--------------------------------------------------------------------------------------: | :--------: | :--------------------: |
 |   High Error Rate    |                       `aws.lambda.errors`/`aws.lambda.invocations`                       |   >= 10%   |   `high_error_rate`    |
 |       Timeout        |                      `aws.lambda.duration.max`/`aws.lambda.timeout`                      |    >= 1    |       `timeout`        |
-|    Out of Memory     |         `aws.lambda.lambda.enhanced.max_memory_used`/<br>`aws.lambda.memorysize`         |    >= 1    |    `out_of_memory`     |
+|    Out of Memory     |                           `aws.lambda.enhanced.out_of_memory`                            |    > 0     |    `out_of_memory`     |
 |  High Iterator Age   |                            `aws.lambda.iterator_age.maximum`                             | >= 24 hrs  |  `high_iterator_age`   |
 | High Cold Start Rate | `aws.lambda.enhanced.invocations(cold_start:true)`/<br>`aws.lambda.enhanced.invocations` |   >= 20%   | `high_cold_start_rate` |
 |    High Throttles    |                     `aws.lambda.throttles`/`aws.lambda.invocations`                      |   >= 20%   |    `high_throttles`    |
@@ -252,7 +253,7 @@ You can also open an issue for a feature request.
 
 ## Contributing
 
-If you find an issue with this package and have a fix, please feel free to open a pull request following the [procedures](CONTRIBUTING.md).
+If you find an issue with this package and have a fix, please feel free to open a pull request following the [procedures][10].
 
 ## Community
 
@@ -273,3 +274,5 @@ This product includes software developed at Datadog (https://www.datadoghq.com/)
 [7]: https://docs.datadoghq.com/serverless/forwarder/
 [8]: https://docs.datadoghq.com/serverless/datadog_lambda_library/extension/
 [9]: https://docs.aws.amazon.com/lambda/latest/dg/using-extensions.html
+[10]: https://github.com/DataDog/serverless-plugin-datadog/blob/master/CONTRIBUTING.md
+[11]: https://github.com/DataDog/serverless-plugin-datadog/blob/master/src/layers.json

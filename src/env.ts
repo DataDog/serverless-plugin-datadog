@@ -62,6 +62,9 @@ export interface Configuration {
   subscribeToApiGatewayLogs: boolean;
   subscribeToHttpApiLogs: boolean;
   subscribeToWebsocketLogs: boolean;
+
+  // When set, this plugin will configure the specified handler for the functions
+  customHandler?: string;
 }
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
