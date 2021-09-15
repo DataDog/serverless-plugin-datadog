@@ -18,6 +18,8 @@ export interface Configuration {
   apiKey?: string;
   // Datadog API Key encrypted using KMS, only necessary when using metrics without log forwarding
   apiKMSKey?: string;
+  // Whether to capture and store the payload and response of a lambda invocation
+  captureLambdaPayload?: boolean;
   // Datadog API Key used for enabling monitor configuration through plugin
   monitorsApiKey?: string;
   // Datadog App Key used for enabling monitor configuration through plugin; separate from the apiKey that is deployed with your function
@@ -70,6 +72,7 @@ const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
 const ddTracingEnabledEnvVar = "DD_TRACE_ENABLED";
 const logInjectionEnvVar = "DD_LOGS_INJECTION";
 const ddLogsEnabledEnvVar = "DD_SERVERLESS_LOGS_ENABLED";
+const ddCaptureLambdaPayloadEnvVar = "DD_CAPTURE_PAYLOAD";
 
 export const defaultConfiguration: Configuration = {
   addLayers: true,
@@ -87,6 +90,7 @@ export const defaultConfiguration: Configuration = {
   subscribeToHttpApiLogs: true,
   subscribeToWebsocketLogs: true,
   enableDDLogs: true,
+  captureLambdaPayload: false,
 };
 
 export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]) {
@@ -116,6 +120,9 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     }
     if (config.enableDDLogs !== undefined && environment[ddLogsEnabledEnvVar] === undefined) {
       environment[ddLogsEnabledEnvVar] = config.enableDDLogs;
+    }
+    if (environment[ddCaptureLambdaPayloadEnvVar] === undefined) {
+      environment[ddCaptureLambdaPayloadEnvVar] = config.captureLambdaPayload;
     }
   });
 }
