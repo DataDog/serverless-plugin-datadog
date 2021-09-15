@@ -1,6 +1,5 @@
 import { FunctionInfo } from "layer";
 import Service from "serverless/classes/Service";
-// import { getLogGroupLogicalId } from "serverless/lib/plugins/aws/lib/naming";
 import Aws = require("serverless/plugins/aws/provider/awsProvider");
 
 const logGroupKey = "AWS::Logs::LogGroup";
