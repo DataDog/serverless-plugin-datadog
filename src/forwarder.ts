@@ -1,6 +1,6 @@
 import { FunctionInfo } from "layer";
 import Service from "serverless/classes/Service";
-import { getLogGroupLogicalId } from "serverless/lib/plugins/aws/lib/naming";
+// import { getLogGroupLogicalId } from "serverless/lib/plugins/aws/lib/naming";
 import Aws = require("serverless/plugins/aws/provider/awsProvider");
 
 const logGroupKey = "AWS::Logs::LogGroup";
@@ -245,4 +245,17 @@ function subscribeToExecutionLogGroup(functionArn: string | CloudFormationObject
     },
   };
   return executionSubscription;
+}
+
+// Created from https://github.com/serverless/serverless/blob/master/lib/plugins/aws/lib/naming.js#L125-L127
+// Skipped lodash because Lambda Function Names can't include unicode chars or symbols
+function getLogGroupLogicalId(functionName: string): string {
+  if (!functionName) {
+    return "";
+  }
+  const uppercasedFirst = functionName[0].toUpperCase();
+  const rest = functionName.slice(1);
+  const upperCasedFunctionName = uppercasedFirst + rest;
+  const normalizedFunctionName = upperCasedFunctionName.replace(/-/g, "Dash").replace(/_/g, "Underscore");
+  return `${normalizedFunctionName}LogGroup`;
 }
