@@ -75,7 +75,7 @@ const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
 const ddTracingEnabledEnvVar = "DD_TRACE_ENABLED";
 const logInjectionEnvVar = "DD_LOGS_INJECTION";
 const ddLogsEnabledEnvVar = "DD_SERVERLESS_LOGS_ENABLED";
-const ddCaptureLambdaPayloadEnvVar = "DD_CAPTURE_PAYLOAD";
+const ddCaptureLambdaPayloadEnvVar = "DD_CAPTURE_LAMBDA_PAYLOAD";
 
 export const defaultConfiguration: Configuration = {
   addLayers: true,
