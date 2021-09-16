@@ -392,6 +392,8 @@ function websocketExecutionLoggingIsEnabled(obj: LogsConfig) {
     return false;
   }
   return obj?.websocket === true || obj?.websocket?.executionLogging === true;
+}
+
 // Created from https://github.com/serverless/serverless/blob/master/lib/plugins/aws/lib/naming.js#L125-L127
 // Skipped lodash because Lambda Function Names can't include unicode chars or symbols
 function getLogGroupLogicalId(functionName: string): string {
