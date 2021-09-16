@@ -115,9 +115,7 @@ module.exports = class ServerlessPlugin {
     const forwarderConfigs = {
       AddExtension: config.addExtension,
       IntegrationTesting: config.integrationTesting,
-      SubToApiGatewayLogGroup: config.subscribeToApiGatewayLogs,
-      SubToHttpApiLogGroup: config.subscribeToHttpApiLogs,
-      SubToWebsocketLogGroup: config.subscribeToWebsocketLogs,
+      SubToAccessLogGroups: config.subscribeToAccessLogs,
       SubToExecutionLogGroups: config.subscribeToExecutionLogs,
     };
 
@@ -137,12 +135,7 @@ module.exports = class ServerlessPlugin {
         handlers,
       );
       if (config.subscribeToExecutionLogs) {
-        await addExecutionLogGroupsAndSubscriptions(
-          this.serverless.service,
-          aws,
-          datadogForwarderArn,
-          forwarderConfigs,
-        );
+        await addExecutionLogGroupsAndSubscriptions(this.serverless.service, aws, datadogForwarderArn);
       }
       for (const error of errors) {
         this.serverless.cli.log(error);

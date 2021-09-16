@@ -1,3 +1,4 @@
+import { ServerResponse } from "http";
 import { FunctionInfo } from "layer";
 import Service from "serverless/classes/Service";
 import { getLogGroupLogicalId } from "serverless/lib/plugins/aws/lib/naming";
@@ -25,9 +26,7 @@ interface LogGroupResource {
 interface ForwarderConfigs {
   AddExtension: boolean;
   IntegrationTesting: boolean | undefined;
-  SubToApiGatewayLogGroup: boolean;
-  SubToHttpApiLogGroup: boolean;
-  SubToWebsocketLogGroup: boolean;
+  SubToAccessLogGroups: boolean;
   SubToExecutionLogGroups: boolean;
 }
 interface DescribeSubscriptionFiltersResponse {
@@ -41,6 +40,22 @@ interface DescribeSubscriptionFiltersResponse {
     roleArn: string;
   }[];
 }
+
+type SubLogsConfig =
+  | boolean
+  | {
+      accessLogging: boolean | undefined;
+      executionLogging: boolean | undefined;
+    }
+  | undefined;
+
+type LogsConfig =
+  | {
+      restApi: SubLogsConfig;
+      httpApi: SubLogsConfig;
+      websocket: SubLogsConfig;
+    }
+  | undefined;
 
 // When users define ARN with CloudFormation functions, the ARN takes this type instead of a string.
 export interface CloudFormationObjectArn {
@@ -69,10 +84,15 @@ export async function addExecutionLogGroupsAndSubscriptions(
   service: Service,
   aws: Aws,
   functionArn: CloudFormationObjectArn | string,
-  forwarderConfigs: ForwarderConfigs,
 ) {
+  const extendedProvider = (service.provider as any)?.logs;
+
+  if (!isLogsConfig(extendedProvider)) {
+    return;
+  }
+
   const resources = service.provider.compiledCloudFormationTemplate?.Resources;
-  if (forwarderConfigs.SubToApiGatewayLogGroup) {
+  if (restExecutionLoggingIsEnabled(extendedProvider)) {
     // create log group
     const logGroupName = await createRestExecutionLogGroupName(aws);
     const executionLogGroupKey = "RestExecutionLogGroup";
@@ -84,15 +104,15 @@ export async function addExecutionLogGroupsAndSubscriptions(
     resources[executionSubscriptionKey] = executionSubscription;
   }
 
-  if (forwarderConfigs.SubToWebsocketLogGroup) {
+  if (websocketExecutionLoggingIsEnabled(extendedProvider)) {
     // create log group
     const logGroupName = await createWebsocketExecutionLogGroupName(aws);
-    const executionLogGroupKey = "WebsocketExecutionLogGroup";
+    const executionLogGroupKey = "WebsocketsExecutionLogGroup";
     const executionLogGroupName = addExecutionLogGroup(logGroupName);
     // add subscription
     resources[executionLogGroupKey] = executionLogGroupName;
     const executionSubscription = subscribeToExecutionLogGroup(functionArn, executionLogGroupKey);
-    const executionSubscriptionKey = "WebsocketExecutionLogGroupSubscription";
+    const executionSubscriptionKey = "WebsocketsExecutionLogGroupSubscription";
     resources[executionSubscriptionKey] = executionSubscription;
   }
 }
@@ -117,7 +137,7 @@ export async function addCloudWatchForwarderSubscriptions(
     await validateForwarderArn(aws, functionArn);
   }
   for (const [name, resource] of Object.entries(resources)) {
-    if (!shouldSubscribe(name, resource, forwarderConfigs, handlers)) {
+    if (!shouldSubscribe(name, resource, forwarderConfigs, handlers, service)) {
       continue;
     }
     const logGroupName = resource.Properties.LogGroupName;
@@ -179,14 +199,26 @@ export async function describeSubscriptionFilters(aws: Aws, logGroupName: string
 }
 
 // Helper functions to validate we have a particular log group and if we should subscribe to it
-function validateApiGatewaySubscription(resource: any, subscribe: boolean) {
-  return resource.Properties.LogGroupName.startsWith("/aws/api-gateway/") && subscribe;
+function validateRestApiSubscription(resource: any, subscribe: boolean, extendedProvider: any) {
+  return (
+    restAccessLoggingIsEnabled(extendedProvider) &&
+    resource.Properties.LogGroupName.startsWith("/aws/api-gateway/") &&
+    subscribe
+  );
 }
-function validateHttpApiSubscription(resource: any, subscribe: boolean) {
-  return resource.Properties.LogGroupName.startsWith("/aws/http-api/") && subscribe;
+function validateHttpApiSubscription(resource: any, subscribe: boolean, extendedProvider: any) {
+  return (
+    httpAccessLoggingIsEnabled(extendedProvider) &&
+    resource.Properties.LogGroupName.startsWith("/aws/http-api/") &&
+    subscribe
+  );
 }
-function validateWebsocketSubscription(resource: any, subscribe: boolean) {
-  return resource.Properties.LogGroupName.startsWith("/aws/websocket/") && subscribe;
+function validateWebsocketSubscription(resource: any, subscribe: boolean, extendedProvider: any) {
+  return (
+    websocketAccessLoggingIsEnabled(extendedProvider) &&
+    resource.Properties.LogGroupName.startsWith("/aws/websocket/") &&
+    subscribe
+  );
 }
 
 function shouldSubscribe(
@@ -194,7 +226,9 @@ function shouldSubscribe(
   resource: any,
   forwarderConfigs: ForwarderConfigs,
   handlers: FunctionInfo[],
+  service: Service,
 ) {
+  const extendedProvider = (service.provider as any)?.logs;
   if (!isLogGroup(resource)) {
     return false;
   }
@@ -206,9 +240,9 @@ function shouldSubscribe(
   if (
     forwarderConfigs.AddExtension &&
     !(
-      validateApiGatewaySubscription(resource, forwarderConfigs.SubToApiGatewayLogGroup) ||
-      validateHttpApiSubscription(resource, forwarderConfigs.SubToHttpApiLogGroup) ||
-      validateWebsocketSubscription(resource, forwarderConfigs.SubToWebsocketLogGroup)
+      validateRestApiSubscription(resource, forwarderConfigs.SubToAccessLogGroups, extendedProvider) ||
+      validateHttpApiSubscription(resource, forwarderConfigs.SubToAccessLogGroups, extendedProvider) ||
+      validateWebsocketSubscription(resource, forwarderConfigs.SubToAccessLogGroups, extendedProvider)
     )
   ) {
     return false;
@@ -217,9 +251,9 @@ function shouldSubscribe(
   if (
     !(
       resource.Properties.LogGroupName.startsWith("/aws/lambda/") ||
-      validateApiGatewaySubscription(resource, forwarderConfigs.SubToApiGatewayLogGroup) ||
-      validateHttpApiSubscription(resource, forwarderConfigs.SubToHttpApiLogGroup) ||
-      validateWebsocketSubscription(resource, forwarderConfigs.SubToWebsocketLogGroup)
+      validateRestApiSubscription(resource, forwarderConfigs.SubToAccessLogGroups, extendedProvider) ||
+      validateHttpApiSubscription(resource, forwarderConfigs.SubToAccessLogGroups, extendedProvider) ||
+      validateWebsocketSubscription(resource, forwarderConfigs.SubToAccessLogGroups, extendedProvider)
     )
   ) {
     return false;
@@ -281,4 +315,82 @@ function subscribeToExecutionLogGroup(functionArn: string | CloudFormationObject
     },
   };
   return executionSubscription;
+}
+
+export function isLogsConfig(obj: any): obj is LogsConfig {
+  if (typeof obj !== "object") {
+    return false;
+  }
+
+  if (obj.hasOwnProperty("restApi")) {
+    if (!isSubLogsConfig(obj.restApi)) {
+      return false;
+    }
+  }
+
+  if (obj.hasOwnProperty("httpApi")) {
+    if (!isSubLogsConfig(obj.httpApi)) {
+      return false;
+    }
+  }
+
+  if (obj.hasOwnProperty("websocket")) {
+    if (!isSubLogsConfig(obj.websocket)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function isSubLogsConfig(obj: any): obj is SubLogsConfig {
+  if (typeof obj === "boolean") {
+    return true;
+  }
+  if (typeof obj !== "object") {
+    return false;
+  }
+  if (obj.hasOwnProperty("accessLogging")) {
+    if (typeof obj.accessLogging !== "boolean" && typeof obj.accessLogging !== undefined) {
+      return false;
+    }
+  }
+  if (obj.hasOwnProperty("executionLogging")) {
+    if (typeof obj.executionLogging !== "boolean" && typeof obj.executionLogging !== undefined) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function restAccessLoggingIsEnabled(obj: LogsConfig) {
+  if (obj?.restApi === false) {
+    return false;
+  }
+  return obj?.restApi === true || obj?.restApi?.accessLogging === true;
+}
+function restExecutionLoggingIsEnabled(obj: LogsConfig) {
+  if (obj?.restApi === false) {
+    return false;
+  }
+  return obj?.restApi === true || obj?.restApi?.executionLogging === true;
+}
+function httpAccessLoggingIsEnabled(obj: LogsConfig) {
+  if (obj?.httpApi === false) {
+    return false;
+  }
+  return obj?.httpApi === true || obj?.httpApi?.accessLogging === true;
+}
+
+function websocketAccessLoggingIsEnabled(obj: LogsConfig) {
+  if (obj?.websocket === false) {
+    return false;
+  }
+  return obj?.websocket === true || obj?.websocket?.accessLogging === true;
+}
+
+function websocketExecutionLoggingIsEnabled(obj: LogsConfig) {
+  if (obj?.websocket === false) {
+    return false;
+  }
+  return obj?.websocket === true || obj?.websocket?.executionLogging === true;
 }

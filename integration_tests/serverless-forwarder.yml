@@ -9,9 +9,13 @@ provider:
   region: sa-east-1
   lambdaHashingVersion: 20201221
   logs:
-    restApi: true
-    httpApi: true
-    websocket: true
+    restApi:
+      accessLogging: true
+      executionLogging: false
+    httpApi: false
+    websocket:
+      accessLogging: true
+      executionLogging: true
 
 custom:
   datadog:

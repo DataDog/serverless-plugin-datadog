@@ -57,9 +57,7 @@ export interface Configuration {
   monitors?: { [id: string]: { [key: string]: any } }[];
 
   // API Gateway Acess logging
-  subscribeToApiGatewayLogs: boolean;
-  subscribeToHttpApiLogs: boolean;
-  subscribeToWebsocketLogs: boolean;
+  subscribeToAccessLogs: boolean;
   // API Gateway Execution loggin - handles rest and websocket. Http not supported as of Sept.21
   subscribeToExecutionLogs: boolean;
 
@@ -88,9 +86,7 @@ export const defaultConfiguration: Configuration = {
   injectLogContext: true,
   exclude: [],
   integrationTesting: false,
-  subscribeToApiGatewayLogs: true,
-  subscribeToHttpApiLogs: true,
-  subscribeToWebsocketLogs: true,
+  subscribeToAccessLogs: true,
   subscribeToExecutionLogs: false,
   enableDDLogs: true,
 };

@@ -819,5 +819,85 @@ describe("ServerlessPlugin", () => {
       // The service and env tags will be set with the values given in the provider instead
       expect(function_).toHaveProperty("tags", {});
     });
+
+    it("Does not attempt add execution log groups if execution logging env variable is false", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: (name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            logs: {
+              restApi: true,
+            },
+            compiledCloudFormationTemplate: {
+              Resources: {
+                FirstLogGroup: {
+                  Type: "AWS::Logs::LogGroup",
+                  Properties: {
+                    LogGroupName: "/aws/api-gateway/first",
+                  },
+                },
+              },
+            },
+          },
+          functions: {
+            first: {},
+          },
+          custom: {
+            datadog: {
+              forwarderArn: "some-arn",
+              subscribeToExecutionLogs: false,
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).not.toHaveProperty(
+        "RestExecutionLogGroup",
+      );
+    });
+
+    it("Does attempt add execution log groups if execution logging env variable is true", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: (name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            logs: {
+              restApi: true,
+            },
+            compiledCloudFormationTemplate: {
+              Resources: {
+                FirstLogGroup: {
+                  Type: "AWS::Logs::LogGroup",
+                  Properties: {
+                    LogGroupName: "/aws/api-gateway/first",
+                  },
+                },
+              },
+            },
+          },
+          functions: {
+            first: {},
+          },
+          custom: {
+            datadog: {
+              forwarderArn: "some-arn",
+              subscribeToExecutionLogs: true,
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).toHaveProperty(
+        "RestExecutionLogGroup",
+      );
+    });
   });
 });
