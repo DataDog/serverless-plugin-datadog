@@ -62,6 +62,6 @@
 
     "resolveJsonModule": true
   },
-  "include": ["src/**/*", "types/**/*.d.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }
