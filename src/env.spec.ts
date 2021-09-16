@@ -143,6 +143,7 @@ describe("getConfig", () => {
     expect(result).toEqual({
       addLayers: true,
       apiKey: "1234",
+      captureLambdaPayload: false,
       flushMetricsToLogs: true,
       logLevel: "debug",
       site: "datadoghq.com",
