@@ -45,7 +45,7 @@ for ((i = 0; i < ${#SERVERLESS_CONFIGS[@]}; i++)); do
     # Normalize SHA256 hashes
     perl -p -i -e 's/("CodeSha256":.*)/"CodeSha256": "XXXX"/g' ${RAW_CFN_TEMPLATE}
     # Normalize dd_sls_plugin version tag value
-    perl -p -i -e 's/(v\d.\d\d.\d)/vX.XX.X/g' ${RAW_CFN_TEMPLATE}
+    perl -p -i -e 's/(v\d+.\d+.\d+)/vX.XX.X/g' ${RAW_CFN_TEMPLATE}
     # Normalize Datadog Layer Arn versions
     perl -p -i -e 's/(arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-(Python27|Python36|Python37|Python38|Python39|Node10-x|Node12-x|Node14-x|Extension):\d+)/arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-\2:XXX/g' ${RAW_CFN_TEMPLATE}
     # Normalize API Gateway timestamps
