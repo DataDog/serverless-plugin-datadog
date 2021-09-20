@@ -299,6 +299,34 @@
         }
       }
     },
+    "WebsocketsExecutionLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
+            "",
+            [
+              "/aws/apigateway/",
+              {
+                "Ref": "WebsocketsApi"
+              },
+              "/",
+              "dev"
+            ]
+          ]
+        }
+      }
+    },
+    "WebsocketsExecutionLogGroupSubscription": {
+      "Type": "AWS::Logs::SubscriptionFilter",
+      "Properties": {
+        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
+        "FilterPattern": "",
+        "LogGroupName": {
+          "Ref": "WebsocketsExecutionLogGroup"
+        }
+      }
+    },
     "PythonHello27LambdaFunction": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
@@ -1397,12 +1425,6 @@
         "ProtocolType": "HTTP"
       }
     },
-    "HttpApiLogGroup": {
-      "Type": "AWS::Logs::LogGroup",
-      "Properties": {
-        "LogGroupName": "/aws/http-api/dd-sls-plugin-integration-test-dev"
-      }
-    },
     "HttpApiStage": {
       "Type": "AWS::ApiGatewayV2::Stage",
       "Properties": {
@@ -1413,18 +1435,8 @@
         "AutoDeploy": true,
         "DefaultRouteSettings": {
           "DetailedMetricsEnabled": false
-        },
-        "AccessLogSettings": {
-          "DestinationArn": {
-            "Fn::GetAtt": [
-              "HttpApiLogGroup",
-              "Arn"
-            ]
-          },
-          "Format": "{\"requestId\":\"$context.requestId\",\"ip\":\"$context.identity.sourceIp\",\"requestTime\":\"$context.requestTime\",\"httpMethod\":\"$context.httpMethod\",\"routeKey\":\"$context.routeKey\",\"status\":\"$context.status\",\"protocol\":\"$context.protocol\",\"responseLength\":\"$context.responseLength\"}"
         }
-      },
-      "DependsOn": "HttpApiLogGroup"
+      }
     },
     "PythonHello27LambdaPermissionHttpApi": {
       "Type": "AWS::Lambda::Permission",
@@ -1586,34 +1598,6 @@
         }
       }
     },
-    "ExecutionLogGroup": {
-      "Type": "AWS::Logs::LogGroup",
-      "Properties": {
-        "LogGroupName": {
-          "Fn::Join": [
-            "",
-            [
-              "API-Gateway-Execution-Logs_",
-              {
-                "Ref": "ApiGatewayRestApi"
-              },
-              "/",
-              "dev"
-            ]
-          ]
-        }
-      }
-    },
-    "ExecutionLogGroupSubscription": {
-      "Type": "AWS::Logs::SubscriptionFilter",
-      "Properties": {
-        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
-        "FilterPattern": "",
-        "LogGroupName": {
-          "Ref": "ExecutionLogGroup"
-        }
-      }
-    },
     "WebsocketsLogGroupSubscription": {
       "Type": "AWS::Logs::SubscriptionFilter",
       "Properties": {
@@ -1621,16 +1605,6 @@
         "FilterPattern": "",
         "LogGroupName": {
           "Ref": "WebsocketsLogGroup"
-        }
-      }
-    },
-    "HttpApiLogGroupSubscription": {
-      "Type": "AWS::Logs::SubscriptionFilter",
-      "Properties": {
-        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
-        "FilterPattern": "",
-        "LogGroupName": {
-          "Ref": "HttpApiLogGroup"
         }
       }
     }

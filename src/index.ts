@@ -15,11 +15,12 @@ import { getConfig, setEnvConfiguration, forceExcludeDepsFromWebpack, hasWebpack
 import { applyExtensionLayer, applyLambdaLibraryLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
 import { TracingMode, enableTracing } from "./tracing";
 import { redirectHandlers } from "./wrapper";
-import { addCloudWatchForwarderSubscriptions } from "./forwarder";
+import { addCloudWatchForwarderSubscriptions, addExecutionLogGroupsAndSubscriptions } from "./forwarder";
 import { addOutputLinks, printOutputs } from "./output";
 import { FunctionDefinition } from "serverless";
 import { setMonitors } from "./monitors";
 import { getCloudFormationStackId } from "./monitor-api-requests";
+import { stringify } from "querystring";
 
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
 export interface ExtendedFunctionDefinition extends FunctionDefinition {
@@ -69,6 +70,7 @@ module.exports = class ServerlessPlugin {
     const config = getConfig(this.serverless.service);
     if (config.enabled === false) return;
     this.serverless.cli.log("Auto instrumenting functions with Datadog");
+    configHasOldProperties(config);
     validateConfiguration(config);
 
     const defaultRuntime = this.serverless.service.provider.runtime;
@@ -115,9 +117,8 @@ module.exports = class ServerlessPlugin {
     const forwarderConfigs = {
       AddExtension: config.addExtension,
       IntegrationTesting: config.integrationTesting,
-      SubToApiGatewayLogGroup: config.subscribeToApiGatewayLogs,
-      SubToHttpApiLogGroup: config.subscribeToHttpApiLogs,
-      SubToWebsocketLogGroup: config.subscribeToWebsocketLogs,
+      SubToAccessLogGroups: config.subscribeToAccessLogs,
+      SubToExecutionLogGroups: config.subscribeToExecutionLogs,
     };
 
     const defaultRuntime = this.serverless.service.provider.runtime;
@@ -125,6 +126,7 @@ module.exports = class ServerlessPlugin {
 
     let datadogForwarderArn;
     datadogForwarderArn = setDatadogForwarder(config);
+    this.serverless.cli.log("Setting Datadog Forwarder");
     if (datadogForwarderArn) {
       const aws = this.serverless.getProvider("aws");
       const errors = await addCloudWatchForwarderSubscriptions(
@@ -134,6 +136,9 @@ module.exports = class ServerlessPlugin {
         forwarderConfigs,
         handlers,
       );
+      if (config.subscribeToExecutionLogs) {
+        await addExecutionLogGroupsAndSubscriptions(this.serverless.service, aws, datadogForwarderArn);
+      }
       for (const error of errors) {
         this.serverless.cli.log(error);
       }
@@ -222,8 +227,32 @@ module.exports = class ServerlessPlugin {
   }
 };
 
+function configHasOldProperties(obj: any) {
+  let hasOldProperties = false;
+  let message = "The following configuration options have been removed:";
+
+  if (obj.subscribeToApiGatewayLogs) {
+    message += " subscribeToApiGatewayLogs";
+    hasOldProperties = true;
+  }
+  if (obj.subscribeToHttpApiLogs) {
+    message += " subscribeToHttpApiLogs";
+    hasOldProperties = true;
+  }
+
+  if (obj.subscribeToWebsocketLogs) {
+    message += " subscribeToWebsocketLogs";
+    hasOldProperties = true;
+  }
+
+  if (hasOldProperties) {
+    throw new Error(message + ". Please use the subscribeToAccessLogs or subscribeToExecutionLogs options instead.");
+  }
+}
+
 function validateConfiguration(config: Configuration) {
   const siteList: string[] = ["datadoghq.com", "datadoghq.eu", "us3.datadoghq.com", "ddog-gov.com"];
+
   if (config.apiKey !== undefined && config.apiKMSKey !== undefined) {
     throw new Error("`apiKey` and `apiKMSKey` should not be set at the same time.");
   }
