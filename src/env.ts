@@ -56,9 +56,9 @@ export interface Configuration {
   // When set, this plugin will configure the specified monitors for the function
   monitors?: { [id: string]: { [key: string]: any } }[];
 
-  // API Gateway Acess logging
+  // API Gateway Access logging
   subscribeToAccessLogs: boolean;
-  // API Gateway Execution loggin - handles rest and websocket. Http not supported as of Sept.21
+  // API Gateway Execution logging - handles rest and websocket. Http not supported as of Sept.21
   subscribeToExecutionLogs: boolean;
 
   // When set, this plugin will configure the specified handler for the functions

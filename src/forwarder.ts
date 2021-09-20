@@ -56,6 +56,11 @@ type LogsConfig =
     }
   | undefined;
 
+const REST_EXECUTION_LOG_GROUP_KEY = "RestExecutionLogGroup";
+const REST_EXECUTION_SUBSCRIPTION_KEY = "RestExecutionLogGroupSubscription";
+const WEBSOCKETS_EXECUTION_LOG_GROUP_KEY = "WebsocketsExecutionLogGroup";
+const WEBSOCKETS_EXECUTION_SUBCRIPTION_KEY = "WebsocketsExecutionLogGroupSubscription";
+
 // When users define ARN with CloudFormation functions, the ARN takes this type instead of a string.
 export interface CloudFormationObjectArn {
   "Fn::Sub"?: string;
@@ -94,25 +99,21 @@ export async function addExecutionLogGroupsAndSubscriptions(
   if (restExecutionLoggingIsEnabled(extendedProvider)) {
     // create log group
     const logGroupName = await createRestExecutionLogGroupName(aws);
-    const executionLogGroupKey = "RestExecutionLogGroup";
     const executionLogGroupName = addExecutionLogGroup(logGroupName);
-    resources[executionLogGroupKey] = executionLogGroupName;
+    resources[REST_EXECUTION_LOG_GROUP_KEY] = executionLogGroupName;
     // add subscription
-    const executionSubscription = subscribeToExecutionLogGroup(functionArn, executionLogGroupKey);
-    const executionSubscriptionKey = "RestExecutionLogGroupSubscription";
-    resources[executionSubscriptionKey] = executionSubscription;
+    const executionSubscription = subscribeToExecutionLogGroup(functionArn, REST_EXECUTION_LOG_GROUP_KEY);
+    resources[REST_EXECUTION_SUBSCRIPTION_KEY] = executionSubscription;
   }
 
   if (websocketExecutionLoggingIsEnabled(extendedProvider)) {
     // create log group
     const logGroupName = await createWebsocketExecutionLogGroupName(aws);
-    const executionLogGroupKey = "WebsocketsExecutionLogGroup";
     const executionLogGroupName = addExecutionLogGroup(logGroupName);
     // add subscription
-    resources[executionLogGroupKey] = executionLogGroupName;
-    const executionSubscription = subscribeToExecutionLogGroup(functionArn, executionLogGroupKey);
-    const executionSubscriptionKey = "WebsocketsExecutionLogGroupSubscription";
-    resources[executionSubscriptionKey] = executionSubscription;
+    resources[WEBSOCKETS_EXECUTION_LOG_GROUP_KEY] = executionLogGroupName;
+    const executionSubscription = subscribeToExecutionLogGroup(functionArn, WEBSOCKETS_EXECUTION_LOG_GROUP_KEY);
+    resources[WEBSOCKETS_EXECUTION_SUBCRIPTION_KEY] = executionSubscription;
   }
 }
 

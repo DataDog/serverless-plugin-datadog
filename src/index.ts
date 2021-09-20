@@ -20,6 +20,7 @@ import { addOutputLinks, printOutputs } from "./output";
 import { FunctionDefinition } from "serverless";
 import { setMonitors } from "./monitors";
 import { getCloudFormationStackId } from "./monitor-api-requests";
+import { stringify } from "querystring";
 
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
 export interface ExtendedFunctionDefinition extends FunctionDefinition {
@@ -69,6 +70,7 @@ module.exports = class ServerlessPlugin {
     const config = getConfig(this.serverless.service);
     if (config.enabled === false) return;
     this.serverless.cli.log("Auto instrumenting functions with Datadog");
+    configHasOldProperties(config);
     validateConfiguration(config);
 
     const defaultRuntime = this.serverless.service.provider.runtime;
@@ -225,8 +227,32 @@ module.exports = class ServerlessPlugin {
   }
 };
 
+function configHasOldProperties(obj: any) {
+  let hasOldProperties = false;
+  let message = "The following configuration options have been removed:";
+
+  if (obj.subscribeToApiGatewayLogs) {
+    message += " subscribeToApiGatewayLogs";
+    hasOldProperties = true;
+  }
+  if (obj.subscribeToHttpApiLogs) {
+    message += " subscribeToHttpApiLogs";
+    hasOldProperties = true;
+  }
+
+  if (obj.subscribeToWebsocketLogs) {
+    message += " subscribeToWebsocketLogs";
+    hasOldProperties = true;
+  }
+
+  if (hasOldProperties) {
+    throw new Error(message + ". Please use the subscribeToAccessLogs or subscribeToExecutionLogs options instead.");
+  }
+}
+
 function validateConfiguration(config: Configuration) {
   const siteList: string[] = ["datadoghq.com", "datadoghq.eu", "us3.datadoghq.com", "ddog-gov.com"];
+
   if (config.apiKey !== undefined && config.apiKMSKey !== undefined) {
     throw new Error("`apiKey` and `apiKMSKey` should not be set at the same time.");
   }
