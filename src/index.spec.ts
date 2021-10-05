@@ -9,10 +9,8 @@
 const ServerlessPlugin = require("./index");
 
 import mock from "mock-fs";
-import Aws from "serverless/plugins/aws/provider/awsProvider";
 import { FunctionDefinition } from "serverless";
-import { ExtendedFunctionDefinition } from "./index";
-import { Configuration, defaultConfiguration } from "./env";
+import Aws from "serverless/plugins/aws/provider/awsProvider";
 
 const SEM_VER_REGEX = /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$/;
 
@@ -53,7 +51,7 @@ describe("ServerlessPlugin", () => {
       mock({});
       const serverless = {
         cli: {
-          log: () => {},
+          log: () => { },
         },
         service: {
           provider: {
@@ -90,7 +88,7 @@ describe("ServerlessPlugin", () => {
       mock({});
       const serverless = {
         cli: {
-          log: () => {},
+          log: () => { },
         },
         service: {
           provider: {
@@ -135,7 +133,7 @@ describe("ServerlessPlugin", () => {
       mock({});
       const serverless = {
         cli: {
-          log: () => {},
+          log: () => { },
         },
         service: {
           provider: {
@@ -183,7 +181,7 @@ describe("ServerlessPlugin", () => {
       mock({});
       const serverless = {
         cli: {
-          log: () => {},
+          log: () => { },
         },
         service: {
           provider: {
@@ -226,7 +224,7 @@ describe("ServerlessPlugin", () => {
       mock({});
       const serverless = {
         cli: {
-          log: () => {},
+          log: () => { },
         },
         service: {
           provider: {
@@ -270,7 +268,7 @@ describe("ServerlessPlugin", () => {
       mock({});
       const serverless = {
         cli: {
-          log: () => {},
+          log: () => { },
         },
         service: {
           provider: {
@@ -323,7 +321,7 @@ describe("ServerlessPlugin", () => {
       mock({});
       const serverless = {
         cli: {
-          log: () => {},
+          log: () => { },
         },
         service: {
           provider: {
@@ -351,7 +349,9 @@ describe("ServerlessPlugin", () => {
         await plugin.hooks["after:package:initialize"]();
       } catch (e) {
         threwError = true;
-        thrownErrorMessage = e.message;
+        if (e instanceof Error) {
+          thrownErrorMessage = e.message;
+        }
       }
       expect(threwError).toBe(true);
       expect(thrownErrorMessage).toEqual("`apiKey` and `apiKMSKey` should not be set at the same time.");
@@ -361,7 +361,7 @@ describe("ServerlessPlugin", () => {
       mock({});
       const serverless = {
         cli: {
-          log: () => {},
+          log: () => { },
         },
         service: {
           provider: {
@@ -388,7 +388,9 @@ describe("ServerlessPlugin", () => {
         await plugin.hooks["after:package:initialize"]();
       } catch (e) {
         threwError = true;
-        thrownErrorMessage = e.message;
+        if (e instanceof Error) {
+          thrownErrorMessage = e.message;
+        }
       }
       expect(threwError).toBe(true);
       expect(thrownErrorMessage).toEqual(
@@ -400,7 +402,7 @@ describe("ServerlessPlugin", () => {
       mock({});
       const serverless = {
         cli: {
-          log: () => {},
+          log: () => { },
         },
         service: {
           provider: {
@@ -428,7 +430,9 @@ describe("ServerlessPlugin", () => {
         await plugin.hooks["after:package:initialize"]();
       } catch (e) {
         threwError = true;
-        thrownErrorMessage = e.message;
+        if (e instanceof Error) {
+          thrownErrorMessage = e.message;
+        }
       }
       expect(threwError).toBe(true);
       expect(thrownErrorMessage).toEqual("When `addExtension` is true, `apiKey` or `apiKMSKey` must also be set.");
@@ -441,7 +445,7 @@ describe("ServerlessPlugin", () => {
     });
     it("adds subscription filters when forwarderArn is set", async () => {
       const serverless = {
-        cli: { log: () => {} },
+        cli: { log: () => { } },
         getProvider: (name: string) => awsMock(),
         service: {
           getServiceName: () => "dev",
@@ -477,7 +481,7 @@ describe("ServerlessPlugin", () => {
 
     it("adds subscription filters when forwarder is set", async () => {
       const serverless = {
-        cli: { log: () => {} },
+        cli: { log: () => { } },
         getProvider: awsMock,
         service: {
           getServiceName: () => "dev",
@@ -513,7 +517,7 @@ describe("ServerlessPlugin", () => {
 
     it("does not subscribe to lambda log groups when the extension is enabled", async () => {
       const serverless = {
-        cli: { log: () => {} },
+        cli: { log: () => { } },
         getProvider: awsMock,
         service: {
           getServiceName: () => "dev",
@@ -549,7 +553,7 @@ describe("ServerlessPlugin", () => {
     });
     it("does subscribe to non-lambda log groups when the extension is enabled", async () => {
       const serverless = {
-        cli: { log: () => {} },
+        cli: { log: () => { } },
         getProvider: awsMock,
         service: {
           getServiceName: () => "dev",
@@ -597,7 +601,7 @@ describe("ServerlessPlugin", () => {
     });
     it("throws an error when forwarderArn and forwarder are set", async () => {
       const serverless = {
-        cli: { log: () => {} },
+        cli: { log: () => { } },
         getProvider: awsMock,
         service: {
           getServiceName: () => "dev",
@@ -635,7 +639,7 @@ describe("ServerlessPlugin", () => {
 
     it("does not add subscription filters when neither the forwarderArn nor the forwarder are set", async () => {
       const serverless = {
-        cli: { log: () => {} },
+        cli: { log: () => { } },
         getProvider: awsMock,
         service: {
           getServiceName: () => "dev",
@@ -668,7 +672,7 @@ describe("ServerlessPlugin", () => {
     it("only adds dd_sls_plugin tag when enabledTags is false", async () => {
       const function_ = functionMock({ env: "test" });
       const serverless = {
-        cli: { log: () => {} },
+        cli: { log: () => { } },
         getProvider: awsMock,
         service: {
           provider: {
@@ -698,7 +702,7 @@ describe("ServerlessPlugin", () => {
     it("adds tags by default with service name and stage values", async () => {
       const function_ = functionMock({});
       const serverless = {
-        cli: { log: () => {} },
+        cli: { log: () => { } },
         getProvider: awsMock,
         service: {
           getServiceName: () => "dev",
@@ -724,7 +728,7 @@ describe("ServerlessPlugin", () => {
     it("does not override existing tags on function", async () => {
       const function_ = functionMock({ service: "test" });
       const serverless = {
-        cli: { log: () => {} },
+        cli: { log: () => { } },
         getProvider: awsMock,
         service: {
           getServiceName: () => "dev",
@@ -750,7 +754,7 @@ describe("ServerlessPlugin", () => {
     it("does not override tags set on provider level", async () => {
       const function_ = functionMock({});
       const serverless = {
-        cli: { log: () => {} },
+        cli: { log: () => { } },
         getProvider: awsMock,
         service: {
           getServiceName: () => "my-service",
@@ -780,7 +784,7 @@ describe("ServerlessPlugin", () => {
     it("does not override tags on an excluded function", async () => {
       const function_ = functionMock({});
       const serverless = {
-        cli: { log: () => {} },
+        cli: { log: () => { } },
         getProvider: awsMock,
         service: {
           getServiceName: () => "my-service",
@@ -821,7 +825,7 @@ describe("ServerlessPlugin", () => {
 
     it("Does not attempt add execution log groups if subscribeToExecutionLogs is false", async () => {
       const serverless = {
-        cli: { log: () => {} },
+        cli: { log: () => { } },
         getProvider: (name: string) => awsMock(),
         service: {
           getServiceName: () => "dev",
@@ -861,7 +865,7 @@ describe("ServerlessPlugin", () => {
 
     it("Does attempt to add execution log groups if subscribeToExecutionLogs is true", async () => {
       const serverless = {
-        cli: { log: () => {} },
+        cli: { log: () => { } },
         getProvider: (name: string) => awsMock(),
         service: {
           getServiceName: () => "dev",
@@ -901,7 +905,7 @@ describe("ServerlessPlugin", () => {
 
     it("Throws an error if the config has old properties", async () => {
       const serverless = {
-        cli: { log: () => {} },
+        cli: { log: () => { } },
         getProvider: (name: string) => awsMock(),
         service: {
           getServiceName: () => "dev",
@@ -943,7 +947,7 @@ describe("ServerlessPlugin", () => {
 
     it("Throws the correct error if the config has multiple old properties", async () => {
       const serverless = {
-        cli: { log: () => {} },
+        cli: { log: () => { } },
         getProvider: (name: string) => awsMock(),
         service: {
           getServiceName: () => "dev",
