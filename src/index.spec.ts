@@ -9,12 +9,11 @@
 const ServerlessPlugin = require("./index");
 
 import mock from "mock-fs";
-import Aws from "serverless/plugins/aws/provider/awsProvider";
 import { FunctionDefinition } from "serverless";
-import { ExtendedFunctionDefinition } from "./index";
-import { Configuration, defaultConfiguration } from "./env";
+import Aws from "serverless/plugins/aws/provider/awsProvider";
 
-const SEM_VER_REGEX = /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$/;
+const SEM_VER_REGEX =
+  /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$/;
 
 function awsMock(): Aws {
   return {
@@ -351,7 +350,9 @@ describe("ServerlessPlugin", () => {
         await plugin.hooks["after:package:initialize"]();
       } catch (e) {
         threwError = true;
-        thrownErrorMessage = e.message;
+        if (e instanceof Error) {
+          thrownErrorMessage = e.message;
+        }
       }
       expect(threwError).toBe(true);
       expect(thrownErrorMessage).toEqual("`apiKey` and `apiKMSKey` should not be set at the same time.");
@@ -388,7 +389,9 @@ describe("ServerlessPlugin", () => {
         await plugin.hooks["after:package:initialize"]();
       } catch (e) {
         threwError = true;
-        thrownErrorMessage = e.message;
+        if (e instanceof Error) {
+          thrownErrorMessage = e.message;
+        }
       }
       expect(threwError).toBe(true);
       expect(thrownErrorMessage).toEqual(
@@ -428,7 +431,9 @@ describe("ServerlessPlugin", () => {
         await plugin.hooks["after:package:initialize"]();
       } catch (e) {
         threwError = true;
-        thrownErrorMessage = e.message;
+        if (e instanceof Error) {
+          thrownErrorMessage = e.message;
+        }
       }
       expect(threwError).toBe(true);
       expect(thrownErrorMessage).toEqual("When `addExtension` is true, `apiKey` or `apiKMSKey` must also be set.");

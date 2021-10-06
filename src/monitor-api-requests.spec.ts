@@ -42,47 +42,45 @@ const invalidMonitorParams: MonitorParams = {
 
 describe("createMonitor", () => {
   const validRequestBody = {
-    body:
-      '{"tags":["serverless_monitor_type:single_function","serverless_monitor_id:high_error_rate","aws_cloudformation_stack-id:cloudformation_stack_id","created_by:dd_sls_plugin","env:dev","service:plugin-demo-ts"],"options":{},"type":"metric alert","query":"avg(last_15m):sum:aws.lambda.errors{aws_cloudformation_stack-id:cloudformation_stack_id} by {functionname,region,aws_account}.as_count() / sum:aws.lambda.invocations{aws_cloudformation_stack-id:cloudformation_stack_id} by {functionname,region,aws_account}.as_count() >= 0.1","message":"More than 10% of the function’s invocations were errors in the selected time range. {{#is_alert}} Resolution: Examine the function’s logs, check for recent code or configuration changes with [Deployment Tracking](https://docs.datadoghq.com/serverless/deployment_tracking), or look for failures across microservices with [distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing).{{/is_alert}}","name":"High Error Rate on {{functionname.name}} in {{region.name}} for {{aws_account.name}}"}',
+    body: '{"tags":["serverless_monitor_type:single_function","serverless_monitor_id:high_error_rate","aws_cloudformation_stack-id:cloudformation_stack_id","created_by:dd_sls_plugin","env:dev","service:plugin-demo-ts"],"options":{},"type":"metric alert","query":"avg(last_15m):sum:aws.lambda.errors{aws_cloudformation_stack-id:cloudformation_stack_id} by {functionname,region,aws_account}.as_count() / sum:aws.lambda.invocations{aws_cloudformation_stack-id:cloudformation_stack_id} by {functionname,region,aws_account}.as_count() >= 0.1","message":"More than 10% of the function’s invocations were errors in the selected time range. {{#is_alert}} Resolution: Examine the function’s logs, check for recent code or configuration changes with [Deployment Tracking](https://docs.datadoghq.com/serverless/deployment_tracking), or look for failures across microservices with [distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing).{{/is_alert}}","name":"High Error Rate on {{functionname.name}} in {{region.name}} for {{aws_account.name}}"}',
     headers: { "Content-Type": "application/json", "DD-API-KEY": "apikey", "DD-APPLICATION-KEY": "appkey" },
     method: "POST",
   };
   const invalidRequestBody = {
-    body:
-      '{"tags":["serverless_monitor_type:single_function","serverless_monitor_id:high_error_rate","aws_cloudformation_stack-id:cloudformation_stack_id","created_by:dd_sls_plugin","env:dev","service:plugin-demo-ts"],"type":"metric alert","query":"avg(last_15m):sum:aws.lambda.errors{aws_cloudformation_stack-id:cloudformation_stack_id} by {functionname,region,aws_account}.as_count() / sum:aws.lambda.invocations{aws_cloudformation_stack-id:cloudformation_stack_id} by {functionname,region,aws_account}.as_count() >= 0.1","message":"More than 10% of the function’s invocations were errors in the selected time range. {{#is_alert}} Resolution: Examine the function’s logs, check for recent code or configuration changes with [Deployment Tracking](https://docs.datadoghq.com/serverless/deployment_tracking), or look for failures across microservices with [distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing).{{/is_alert}}","name":"High Error Rate on {{functionname.name}} in {{region.name}} for {{aws_account.name}}"}',
+    body: '{"tags":["serverless_monitor_type:single_function","serverless_monitor_id:high_error_rate","aws_cloudformation_stack-id:cloudformation_stack_id","created_by:dd_sls_plugin","env:dev","service:plugin-demo-ts"],"type":"metric alert","query":"avg(last_15m):sum:aws.lambda.errors{aws_cloudformation_stack-id:cloudformation_stack_id} by {functionname,region,aws_account}.as_count() / sum:aws.lambda.invocations{aws_cloudformation_stack-id:cloudformation_stack_id} by {functionname,region,aws_account}.as_count() >= 0.1","message":"More than 10% of the function’s invocations were errors in the selected time range. {{#is_alert}} Resolution: Examine the function’s logs, check for recent code or configuration changes with [Deployment Tracking](https://docs.datadoghq.com/serverless/deployment_tracking), or look for failures across microservices with [distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing).{{/is_alert}}","name":"High Error Rate on {{functionname.name}} in {{region.name}} for {{aws_account.name}}"}',
     headers: { "Content-Type": "application/json", "DD-API-KEY": "apikey", "DD-APPLICATION-KEY": "appkey" },
     method: "POST",
   };
   afterEach(() => {
-    ((fetch as unknown) as jest.Mock).mockClear();
+    (fetch as unknown as jest.Mock).mockClear();
   });
   it("returns true when syntax is valid", async () => {
-    ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 200 });
+    (fetch as unknown as jest.Mock).mockReturnValue({ status: 200 });
     const response = await createMonitor("datadoghq.com", monitorParams, "apikey", "appkey");
     expect(response.status).toBe(200);
-    expect((fetch as unknown) as jest.Mock).toHaveBeenCalledWith(
+    expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v1/monitor",
       validRequestBody,
     );
   });
   it("returns false and logs a 400 Bad Request when syntax is invalid", async () => {
-    ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 400 });
+    (fetch as unknown as jest.Mock).mockReturnValue({ status: 400 });
     const response = await createMonitor("datadoghq.com", invalidMonitorParams, "apikey", "appkey");
     expect(() => handleMonitorsApiResponse(response, "high_error_rate")).toThrowError(
       "400 Bad Request: This could be due to incorrect syntax for high_error_rate",
     );
     expect(response.status).toBe(400);
-    expect((fetch as unknown) as jest.Mock).toHaveBeenCalledWith(
+    expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v1/monitor",
       invalidRequestBody,
     );
   });
   it("returns an Error", async () => {
-    ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 403, statusText: "Unauthorized" });
+    (fetch as unknown as jest.Mock).mockReturnValue({ status: 403, statusText: "Unauthorized" });
     const response = await createMonitor("datadoghq.com", monitorParams, "apikey", "appkey");
     expect(() => handleMonitorsApiResponse(response, "high_error_rate")).toThrowError("403 Unauthorized");
     expect(response.status).toBe(403);
-    expect((fetch as unknown) as jest.Mock).toHaveBeenCalledWith(
+    expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v1/monitor",
       validRequestBody,
     );
@@ -91,48 +89,46 @@ describe("createMonitor", () => {
 
 describe("updateMonitor", () => {
   const validRequestBody = {
-    body:
-      '{"tags":["serverless_monitor_type:single_function","serverless_monitor_id:high_error_rate","aws_cloudformation_stack-id:cloudformation_stack_id","created_by:dd_sls_plugin","env:dev","service:plugin-demo-ts"],"options":{},"type":"metric alert","query":"avg(last_15m):sum:aws.lambda.errors{aws_cloudformation_stack-id:cloudformation_stack_id} by {functionname,region,aws_account}.as_count() / sum:aws.lambda.invocations{aws_cloudformation_stack-id:cloudformation_stack_id} by {functionname,region,aws_account}.as_count() >= 0.1","message":"More than 10% of the function’s invocations were errors in the selected time range. {{#is_alert}} Resolution: Examine the function’s logs, check for recent code or configuration changes with [Deployment Tracking](https://docs.datadoghq.com/serverless/deployment_tracking), or look for failures across microservices with [distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing).{{/is_alert}}","name":"High Error Rate on {{functionname.name}} in {{region.name}} for {{aws_account.name}}"}',
+    body: '{"tags":["serverless_monitor_type:single_function","serverless_monitor_id:high_error_rate","aws_cloudformation_stack-id:cloudformation_stack_id","created_by:dd_sls_plugin","env:dev","service:plugin-demo-ts"],"options":{},"type":"metric alert","query":"avg(last_15m):sum:aws.lambda.errors{aws_cloudformation_stack-id:cloudformation_stack_id} by {functionname,region,aws_account}.as_count() / sum:aws.lambda.invocations{aws_cloudformation_stack-id:cloudformation_stack_id} by {functionname,region,aws_account}.as_count() >= 0.1","message":"More than 10% of the function’s invocations were errors in the selected time range. {{#is_alert}} Resolution: Examine the function’s logs, check for recent code or configuration changes with [Deployment Tracking](https://docs.datadoghq.com/serverless/deployment_tracking), or look for failures across microservices with [distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing).{{/is_alert}}","name":"High Error Rate on {{functionname.name}} in {{region.name}} for {{aws_account.name}}"}',
     headers: { "Content-Type": "application/json", "DD-API-KEY": "apikey", "DD-APPLICATION-KEY": "appkey" },
     method: "PUT",
   };
   const invalidRequestBody = {
-    body:
-      '{"tags":["serverless_monitor_type:single_function","serverless_monitor_id:high_error_rate","aws_cloudformation_stack-id:cloudformation_stack_id","created_by:dd_sls_plugin","env:dev","service:plugin-demo-ts"],"type":"metric alert","query":"avg(last_15m):sum:aws.lambda.errors{aws_cloudformation_stack-id:cloudformation_stack_id} by {functionname,region,aws_account}.as_count() / sum:aws.lambda.invocations{aws_cloudformation_stack-id:cloudformation_stack_id} by {functionname,region,aws_account}.as_count() >= 0.1","message":"More than 10% of the function’s invocations were errors in the selected time range. {{#is_alert}} Resolution: Examine the function’s logs, check for recent code or configuration changes with [Deployment Tracking](https://docs.datadoghq.com/serverless/deployment_tracking), or look for failures across microservices with [distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing).{{/is_alert}}","name":"High Error Rate on {{functionname.name}} in {{region.name}} for {{aws_account.name}}"}',
+    body: '{"tags":["serverless_monitor_type:single_function","serverless_monitor_id:high_error_rate","aws_cloudformation_stack-id:cloudformation_stack_id","created_by:dd_sls_plugin","env:dev","service:plugin-demo-ts"],"type":"metric alert","query":"avg(last_15m):sum:aws.lambda.errors{aws_cloudformation_stack-id:cloudformation_stack_id} by {functionname,region,aws_account}.as_count() / sum:aws.lambda.invocations{aws_cloudformation_stack-id:cloudformation_stack_id} by {functionname,region,aws_account}.as_count() >= 0.1","message":"More than 10% of the function’s invocations were errors in the selected time range. {{#is_alert}} Resolution: Examine the function’s logs, check for recent code or configuration changes with [Deployment Tracking](https://docs.datadoghq.com/serverless/deployment_tracking), or look for failures across microservices with [distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing).{{/is_alert}}","name":"High Error Rate on {{functionname.name}} in {{region.name}} for {{aws_account.name}}"}',
     headers: { "Content-Type": "application/json", "DD-API-KEY": "apikey", "DD-APPLICATION-KEY": "appkey" },
     method: "PUT",
   };
   afterEach(() => {
-    ((fetch as unknown) as jest.Mock).mockClear();
+    (fetch as unknown as jest.Mock).mockClear();
   });
   it("returns true when syntax is valid", async () => {
-    ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 200 });
+    (fetch as unknown as jest.Mock).mockReturnValue({ status: 200 });
     const response = await updateMonitor("datadoghq.com", 12345, monitorParams, "apikey", "appkey");
     expect(response.status).toBe(200);
-    expect((fetch as unknown) as jest.Mock).toHaveBeenCalledWith(
+    expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v1/monitor/12345",
       validRequestBody,
     );
   });
   it("returns false and logs 400 Bad Request when syntax is invalid", async () => {
     console.log = jest.fn();
-    ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 400 });
+    (fetch as unknown as jest.Mock).mockReturnValue({ status: 400 });
     const response = await updateMonitor("datadoghq.com", 12345, invalidMonitorParams, "apikey", "appkey");
     expect(() => handleMonitorsApiResponse(response, "high_error_rate")).toThrowError(
       "400 Bad Request: This could be due to incorrect syntax for high_error_rate",
     );
     expect(response.status).toBe(400);
-    expect((fetch as unknown) as jest.Mock).toHaveBeenCalledWith(
+    expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v1/monitor/12345",
       invalidRequestBody,
     );
   });
   it("throws an Invalid Authentication Error when authentication is invalid", async () => {
-    ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 403, statusText: "Unauthorized" });
+    (fetch as unknown as jest.Mock).mockReturnValue({ status: 403, statusText: "Unauthorized" });
     const response = await updateMonitor("datadoghq.com", 12345, monitorParams, "apikey", "appkey");
     expect(() => handleMonitorsApiResponse(response, "high_error_rate")).toThrowError("403 Unauthorized");
     expect(response.status).toBe(403);
-    expect((fetch as unknown) as jest.Mock).toHaveBeenCalledWith(
+    expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v1/monitor/12345",
       validRequestBody,
     );
@@ -145,23 +141,23 @@ describe("deleteMonitor", () => {
     method: "DELETE",
   };
   afterEach(() => {
-    ((fetch as unknown) as jest.Mock).mockClear();
+    (fetch as unknown as jest.Mock).mockClear();
   });
   it("returns true when syntax is valid", async () => {
-    ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 200 });
+    (fetch as unknown as jest.Mock).mockReturnValue({ status: 200 });
     const response = await deleteMonitor("datadoghq.com", 12345, "apikey", "appkey");
     expect(response.status).toBe(200);
-    expect((fetch as unknown) as jest.Mock).toHaveBeenCalledWith(
+    expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v1/monitor/12345",
       validRequestBody,
     );
   });
   it("returns false and throws an Error", async () => {
-    ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 403, statusText: "Unauthorized" });
+    (fetch as unknown as jest.Mock).mockReturnValue({ status: 403, statusText: "Unauthorized" });
     const response = await deleteMonitor("datadoghq.com", 12345, "apikey", "appkey");
     expect(() => handleMonitorsApiResponse(response, "high_error_rate")).toThrowError("403 Unauthorized");
     expect(response.status).toBe(403);
-    expect((fetch as unknown) as jest.Mock).toHaveBeenCalledWith(
+    expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v1/monitor/12345",
       validRequestBody,
     );
@@ -170,7 +166,7 @@ describe("deleteMonitor", () => {
 
 describe("searchMonitor", () => {
   it("returns monitor data", async () => {
-    ((fetch as unknown) as jest.Mock).mockReturnValue({
+    (fetch as unknown as jest.Mock).mockReturnValue({
       status: 200,
       json: () => ({
         monitors: {
@@ -240,7 +236,7 @@ describe("searchMonitor", () => {
     });
   });
   it("throws an Invalid Authentication Error when authentication is invalid", async () => {
-    ((fetch as unknown) as jest.Mock).mockReturnValue({ status: 403, statusText: "Unauthorized" });
+    (fetch as unknown as jest.Mock).mockReturnValue({ status: 403, statusText: "Unauthorized" });
     await expect(
       async () => await searchMonitors("datadoghq.com", "queryString", "apikey", "appkey"),
     ).rejects.toThrowError("Can't fetch monitors. Status code: 403. Message: Unauthorized");
