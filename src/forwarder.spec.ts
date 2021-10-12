@@ -1,11 +1,15 @@
 import Service from "serverless/classes/Service";
-import { addCloudWatchForwarderSubscriptions, CloudFormationObjectArn, canSubscribeLogGroup } from "./forwarder";
+import {
+  addCloudWatchForwarderSubscriptions,
+  CloudFormationObjectArn,
+  canSubscribeLogGroup,
+  isLogsConfig,
+} from "./forwarder";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
 import { resolveConfigFile } from "prettier";
 import { FunctionInfo, RuntimeType } from "./layer";
-
 function serviceWithResources(resources?: Record<string, any>, serviceName = "my-service"): Service {
-  const service: Partial<Service> = {
+  const service = {
     getServiceName: () => serviceName,
     provider: {
       name: "",
@@ -16,9 +20,36 @@ function serviceWithResources(resources?: Record<string, any>, serviceName = "my
         Resources: resources as any,
         Outputs: {},
       },
+      logs: {
+        restApi: true,
+        httpApi: true,
+        websocket: true,
+      },
     },
   };
-  return service as Service;
+  return service as any;
+}
+
+function serviceWithOnlyWebsocketLogs(resources?: Record<string, any>, serviceName = "my-service"): Service {
+  const service = {
+    getServiceName: () => serviceName,
+    provider: {
+      name: "",
+      stage: "",
+      region: "",
+      versionFunctions: true,
+      compiledCloudFormationTemplate: {
+        Resources: resources as any,
+        Outputs: {},
+      },
+      logs: {
+        restApi: false,
+        httpApi: false,
+        websocket: true,
+      },
+    },
+  };
+  return service as any;
 }
 
 function awsMock(existingSubs: { [key: string]: any }, stackName?: string, doesAlwaysReject?: boolean): Aws {
@@ -156,9 +187,8 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       IntegrationTesting: false,
-      SubToApiGatewayLogGroup: true,
-      SubToHttpApiLogGroup: true,
-      SubToWebsocketLogGroup: true,
+      SubToAccessLogGroups: true,
+      SubToExecutionLogGroups: true,
     };
 
     const handlers: FunctionInfo[] = [
@@ -195,34 +225,6 @@ describe("addCloudWatchForwarderSubscriptions", () => {
             "FilterPattern": "",
             "LogGroupName": Object {
               "Ref": "ApiGatewayGroup",
-            },
-          },
-          "Type": "AWS::Logs::SubscriptionFilter",
-        },
-        "ExecutionLogGroup": Object {
-          "Properties": Object {
-            "LogGroupName": Object {
-              "Fn::Join": Array [
-                "",
-                Array [
-                  "API-Gateway-Execution-Logs_",
-                  Object {
-                    "Ref": "ApiGatewayRestApi",
-                  },
-                  "/",
-                  "dev",
-                ],
-              ],
-            },
-          },
-          "Type": "AWS::Logs::LogGroup",
-        },
-        "ExecutionLogGroupSubscription": Object {
-          "Properties": Object {
-            "DestinationArn": "my-func",
-            "FilterPattern": "",
-            "LogGroupName": Object {
-              "Ref": "ExecutionLogGroup",
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
@@ -306,7 +308,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
   });
 
   it("does not add subscriptions for log groups that have their subscriptions disabled", async () => {
-    const service = serviceWithResources({
+    const service = serviceWithOnlyWebsocketLogs({
       FirstLogGroup: {
         Type: "AWS::Logs::LogGroup",
         Properties: {
@@ -354,9 +356,8 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       IntegrationTesting: false,
-      SubToApiGatewayLogGroup: false,
-      SubToHttpApiLogGroup: false,
-      SubToWebsocketLogGroup: true,
+      SubToAccessLogGroups: true,
+      SubToExecutionLogGroups: false,
     };
 
     const handlers: FunctionInfo[] = [
@@ -377,7 +378,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
         type: RuntimeType.NODE,
       },
     ];
-
+    service.provider;
     await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs, handlers);
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
       Object {
@@ -472,9 +473,8 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       IntegrationTesting: false,
-      SubToApiGatewayLogGroup: true,
-      SubToHttpApiLogGroup: true,
-      SubToWebsocketLogGroup: true,
+      SubToAccessLogGroups: true,
+      SubToExecutionLogGroups: false,
     };
 
     const handlers: FunctionInfo[] = [
@@ -509,9 +509,8 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       IntegrationTesting: false,
-      SubToApiGatewayLogGroup: true,
-      SubToHttpApiLogGroup: true,
-      SubToWebsocketLogGroup: true,
+      SubToAccessLogGroups: true,
+      SubToExecutionLogGroups: false,
     };
 
     const handlers: FunctionInfo[] = [
@@ -559,9 +558,9 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       IntegrationTesting: false,
-      SubToApiGatewayLogGroup: true,
-      SubToHttpApiLogGroup: true,
-      SubToWebsocketLogGroup: true,
+      SubToAccessLogGroups: true,
+
+      SubToExecutionLogGroups: false,
     };
 
     const handlers: FunctionInfo[] = [
@@ -619,9 +618,9 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       IntegrationTesting: false,
-      SubToApiGatewayLogGroup: true,
-      SubToHttpApiLogGroup: true,
-      SubToWebsocketLogGroup: true,
+      SubToAccessLogGroups: true,
+
+      SubToExecutionLogGroups: false,
     };
 
     const handlers: FunctionInfo[] = [
@@ -697,9 +696,9 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       IntegrationTesting: false,
-      SubToApiGatewayLogGroup: true,
-      SubToHttpApiLogGroup: true,
-      SubToWebsocketLogGroup: true,
+      SubToAccessLogGroups: true,
+
+      SubToExecutionLogGroups: false,
     };
 
     const handlers: FunctionInfo[] = [
@@ -744,9 +743,9 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       IntegrationTesting: false,
-      SubToApiGatewayLogGroup: true,
-      SubToHttpApiLogGroup: true,
-      SubToWebsocketLogGroup: true,
+      SubToAccessLogGroups: true,
+
+      SubToExecutionLogGroups: false,
     };
 
     const handlers: FunctionInfo[] = [
@@ -789,9 +788,9 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       IntegrationTesting: true,
-      SubToApiGatewayLogGroup: true,
-      SubToHttpApiLogGroup: true,
-      SubToWebsocketLogGroup: true,
+      SubToAccessLogGroups: true,
+
+      SubToExecutionLogGroups: false,
     };
     const handlers: FunctionInfo[] = [
       {
@@ -835,9 +834,9 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       IntegrationTesting: false,
-      SubToApiGatewayLogGroup: true,
-      SubToHttpApiLogGroup: true,
-      SubToWebsocketLogGroup: true,
+      SubToAccessLogGroups: true,
+
+      SubToExecutionLogGroups: false,
     };
 
     const handlers: FunctionInfo[] = [
@@ -895,9 +894,9 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       IntegrationTesting: false,
-      SubToApiGatewayLogGroup: true,
-      SubToHttpApiLogGroup: true,
-      SubToWebsocketLogGroup: true,
+      SubToAccessLogGroups: true,
+
+      SubToExecutionLogGroups: false,
     };
 
     const handlers: FunctionInfo[] = [
@@ -932,5 +931,29 @@ describe("addCloudWatchForwarderSubscriptions", () => {
         },
       }
     `);
+  });
+
+  it("Passes log group validation with one setting", async () => {
+    const provider = { restApi: false };
+    const val = isLogsConfig(provider);
+    expect(val).toEqual(true);
+  });
+
+  it("Passes log group validation with multiple settings", async () => {
+    const provider = { restApi: false, httpApi: true };
+    const val = isLogsConfig(provider);
+    expect(val).toEqual(true);
+  });
+
+  it("Passes log group validation with nested settings", async () => {
+    const provider = { restApi: { accessLogging: true }, httpApi: true };
+    const val = isLogsConfig(provider);
+    expect(val).toEqual(true);
+  });
+
+  it("Fails log group validation with invalid setting", async () => {
+    const provider = "some string";
+    const val = isLogsConfig(provider);
+    expect(val).toEqual(false);
   });
 });

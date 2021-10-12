@@ -67,7 +67,7 @@ custom:
     enableXrayTracing: false
     enableDDTracing: true
     enableDDLogs: true
-    subscribeToApiGatewayLogs: true
+    subscribeToAccessLogs: true
     forwarderArn: arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder
     enableTags: true
     injectLogContext: true
@@ -264,7 +264,7 @@ For product feedback and questions, join the `#serverless` channel in the [Datad
 
 Unless explicitly stated otherwise, all files in this repository are licensed under the Apache License Version 2.0.
 
-This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2021 Datadog, Inc.
+This product includes software developed at Datadog (<https://www.datadoghq.com/>). Copyright 2021 Datadog, Inc.
 
 [1]: https://docs.datadoghq.com/serverless/installation/python/?tab=serverlessframework
 [2]: https://docs.datadoghq.com/serverless/installation/nodejs/?tab=serverlessframework

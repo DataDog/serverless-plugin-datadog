@@ -24,8 +24,18 @@ else
 fi
 
 # Ensure no uncommitted changes
-if [ -n "$(git status --porcelain)" ]; then 
+if [ -n "$(git status --porcelain)" ]; then
     echo "Detected uncommitted changes, aborting"
+    exit 1
+fi
+
+# Check we have merged our changes
+echo "Checking changes have been merged to master"
+LAST_MERGED_COMMIT="$(git log --oneline -1)"
+read -p "The most recent commit to master was ${LAST_MERGED_COMMIT}. Was this your most recent change? (y/n): " CONT
+if [ "$CONT" != "y" ]; then
+    echo "Please merge your changes before finishing the release!"
+    echo "Exiting"
     exit 1
 fi
 

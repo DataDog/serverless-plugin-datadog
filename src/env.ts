@@ -58,10 +58,10 @@ export interface Configuration {
   // When set, this plugin will configure the specified monitors for the function
   monitors?: { [id: string]: { [key: string]: any } }[];
 
-  // API Gateway logging
-  subscribeToApiGatewayLogs: boolean;
-  subscribeToHttpApiLogs: boolean;
-  subscribeToWebsocketLogs: boolean;
+  // API Gateway Access logging
+  subscribeToAccessLogs: boolean;
+  // API Gateway Execution logging - handles rest and websocket. Http not supported as of Sept.21
+  subscribeToExecutionLogs: boolean;
 
   // When set, this plugin will configure the specified handler for the functions
   customHandler?: string;
@@ -89,9 +89,8 @@ export const defaultConfiguration: Configuration = {
   injectLogContext: true,
   exclude: [],
   integrationTesting: false,
-  subscribeToApiGatewayLogs: true,
-  subscribeToHttpApiLogs: true,
-  subscribeToWebsocketLogs: true,
+  subscribeToAccessLogs: true,
+  subscribeToExecutionLogs: false,
   enableDDLogs: true,
   captureLambdaPayload: false,
 };
