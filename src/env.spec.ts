@@ -83,6 +83,7 @@ describe("getConfig", () => {
       apiKey: "1234",
       flushMetricsToLogs: true,
       logLevel: "debug",
+      captureLambdaPayload: false,
       site: "datadoghq.com",
       enableXrayTracing: false,
       enableDDTracing: true,
@@ -112,6 +113,7 @@ describe("getConfig", () => {
       apiKey: "1234",
       flushMetricsToLogs: true,
       logLevel: "debug",
+      captureLambdaPayload: false,
       site: "datadoghq.com",
       enableXrayTracing: false,
       enableDDTracing: true,
@@ -139,6 +141,7 @@ describe("getConfig", () => {
     expect(result).toEqual({
       addLayers: true,
       apiKey: "1234",
+      captureLambdaPayload: false,
       flushMetricsToLogs: true,
       logLevel: "debug",
       site: "datadoghq.com",
