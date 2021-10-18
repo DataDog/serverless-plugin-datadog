@@ -7,7 +7,6 @@
  */
 import { FunctionDefinition, FunctionDefinitionHandler } from "serverless";
 import Service from "serverless/classes/Service";
-const extensionLayerKey: string = "extension";
 export enum RuntimeType {
   NODE,
   PYTHON,
@@ -19,6 +18,7 @@ export interface FunctionInfo {
   type: RuntimeType;
   handler: FunctionDefinition;
   runtime?: string;
+  architecture?: string;
 }
 
 export interface LayerJSON {
@@ -41,6 +41,12 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
   "python3.8": RuntimeType.PYTHON,
   "python3.9": RuntimeType.PYTHON,
 };
+
+export const armKeys: { [key: string]: string } = {
+  "python3.8": "python3.8-arm",
+  "python3.9": "python3.9-arm",
+  "extension": "extension-arm",
+}
 
 export function findHandlers(service: Service, exclude: string[], defaultRuntime?: string): FunctionInfo[] {
   return Object.entries(service.functions)
@@ -71,8 +77,12 @@ export function applyLambdaLibraryLayers(region: string, handlers: FunctionInfo[
       continue;
     }
 
-    const { runtime } = handler;
-    const lambdaLayerARN = runtime !== undefined ? regionRuntimes[runtime] : undefined;
+    const { runtime, architecture } = handler;
+    let runtimeKey: string | undefined = runtime;
+    if (architecture === 'arm64' && runtime && runtime in armKeys) {
+      runtimeKey = armKeys[runtime]
+    }
+    const lambdaLayerARN = runtimeKey !== undefined ? regionRuntimes[runtimeKey] : undefined;
     let currentLayers = getLayers(handler);
 
     if (lambdaLayerARN) {
@@ -92,7 +102,12 @@ export function applyExtensionLayer(region: string, handlers: FunctionInfo[], la
     if (handler.type === RuntimeType.UNSUPPORTED) {
       continue;
     }
+    const { architecture, runtime } = handler;
     let extensionLayerARN: string | undefined;
+    let extensionLayerKey: string = 'extension';
+    if (architecture === 'arm64' && runtime && runtime in armKeys) {
+      extensionLayerKey = armKeys[extensionLayerKey]
+    }
     extensionLayerARN = regionRuntimes[extensionLayerKey];
     let currentLayers = getLayers(handler);
     if (extensionLayerARN) {
