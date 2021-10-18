@@ -275,12 +275,14 @@ describe("applyLambdaLibraryLayers", () => {
       architecture: "arm64",
     } as FunctionInfo;
     const layers: LayerJSON = {
-      regions: { "us-east-1": { 
-        "python3.9": "python:3.9",
-        "python3.9-arm": "python-arm:3.9", 
-        "extension": "extension:11",
-        "extension-arm": "extension-arm:11"
-      }},
+      regions: {
+        "us-east-1": {
+          "python3.9": "python:3.9",
+          "python3.9-arm": "python-arm:3.9",
+          extension: "extension:11",
+          "extension-arm": "extension-arm:11",
+        },
+      },
     };
     applyLambdaLibraryLayers("us-east-1", [handler], layers);
     applyExtensionLayer("us-east-1", [handler], layers);
@@ -297,17 +299,45 @@ describe("applyLambdaLibraryLayers", () => {
       architecture: "arm64",
     } as FunctionInfo;
     const layers: LayerJSON = {
-      regions: { "us-east-1": { 
-        "python3.7": "python:3.7",
-        "extension": "extension:11",
-        "extension-arm": "extension-arm:11"
-      }},
+      regions: {
+        "us-east-1": {
+          "python3.7": "python:3.7",
+          extension: "extension:11",
+          "extension-arm": "extension-arm:11",
+        },
+      },
     };
     applyLambdaLibraryLayers("us-east-1", [handler], layers);
     applyExtensionLayer("us-east-1", [handler], layers);
     expect(handler.handler).toEqual({
       runtime: "python3.7",
       layers: ["python:3.7", "extension:11"],
+    });
+  });
+
+  it("swaps previous layer when specifying arm architecture", () => {
+    let handler = {
+      handler: { runtime: "python3.9" },
+      type: RuntimeType.PYTHON,
+      runtime: "python3.9",
+      architecture: "arm64",
+    } as FunctionInfo;
+    (handler.handler as any).layers = ["python:3.9", "extension:11"];
+    const layers: LayerJSON = {
+      regions: {
+        "us-east-1": {
+          "python3.9": "python:3.9",
+          "python3.9-arm": "python-arm:3.9",
+          extension: "extension:11",
+          "extension-arm": "extension-arm:11",
+        },
+      },
+    };
+    applyLambdaLibraryLayers("us-east-1", [handler], layers);
+    applyExtensionLayer("us-east-1", [handler], layers);
+    expect(handler.handler).toEqual({
+      runtime: "python3.9",
+      layers: ["python-arm:3.9", "extension-arm:11"],
     });
   });
 });

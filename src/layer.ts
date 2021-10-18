@@ -45,8 +45,8 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
 export const armKeys: { [key: string]: string } = {
   "python3.8": "python3.8-arm",
   "python3.9": "python3.9-arm",
-  "extension": "extension-arm",
-}
+  extension: "extension-arm",
+};
 
 export function findHandlers(service: Service, exclude: string[], defaultRuntime?: string): FunctionInfo[] {
   return Object.entries(service.functions)
@@ -79,11 +79,15 @@ export function applyLambdaLibraryLayers(region: string, handlers: FunctionInfo[
 
     const { runtime, architecture } = handler;
     let runtimeKey: string | undefined = runtime;
-    if (architecture === 'arm64' && runtime && runtime in armKeys) {
-      runtimeKey = armKeys[runtime]
+    let currentLayers = getLayers(handler);
+    if (architecture === "arm64" && runtime && runtime in armKeys) {
+      runtimeKey = armKeys[runtime];
+      const possibleDuplicate = regionRuntimes[runtime];
+      if (new Set(currentLayers).has(possibleDuplicate!)) {
+        currentLayers = currentLayers.filter((layer) => layer !== possibleDuplicate);
+      }
     }
     const lambdaLayerARN = runtimeKey !== undefined ? regionRuntimes[runtimeKey] : undefined;
-    let currentLayers = getLayers(handler);
 
     if (lambdaLayerARN) {
       currentLayers = pushLayerARN([lambdaLayerARN], currentLayers);
@@ -104,12 +108,18 @@ export function applyExtensionLayer(region: string, handlers: FunctionInfo[], la
     }
     const { architecture, runtime } = handler;
     let extensionLayerARN: string | undefined;
-    let extensionLayerKey: string = 'extension';
-    if (architecture === 'arm64' && runtime && runtime in armKeys) {
-      extensionLayerKey = armKeys[extensionLayerKey]
+    let extensionLayerKey: string = "extension";
+    let currentLayers = getLayers(handler);
+    if (architecture === "arm64" && runtime && runtime in armKeys) {
+      const possibleDuplicate = regionRuntimes[extensionLayerKey];
+
+      if (new Set(currentLayers).has(possibleDuplicate!)) {
+        currentLayers = currentLayers.filter((layer) => layer !== possibleDuplicate);
+      }
+      extensionLayerKey = armKeys[extensionLayerKey];
     }
     extensionLayerARN = regionRuntimes[extensionLayerKey];
-    let currentLayers = getLayers(handler);
+
     if (extensionLayerARN) {
       currentLayers = pushLayerARN([extensionLayerARN], currentLayers);
       setLayers(handler, currentLayers);
