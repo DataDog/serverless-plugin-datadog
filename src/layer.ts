@@ -79,16 +79,13 @@ export function applyLambdaLibraryLayers(region: string, handlers: FunctionInfo[
 
     const { runtime, architecture } = handler;
     let runtimeKey: string | undefined = runtime;
-    let currentLayers = getLayers(handler);
     if (architecture === "arm64" && runtime && runtime in armKeys) {
       runtimeKey = armKeys[runtime];
-      const possibleDuplicate = regionRuntimes[runtime];
-      if (new Set(currentLayers).has(possibleDuplicate!)) {
-        currentLayers = currentLayers.filter((layer) => layer !== possibleDuplicate);
-      }
+      removePreviousLayer(handler, regionRuntimes[runtime]);
     }
-    const lambdaLayerARN = runtimeKey !== undefined ? regionRuntimes[runtimeKey] : undefined;
 
+    const lambdaLayerARN = runtimeKey !== undefined ? regionRuntimes[runtimeKey] : undefined;
+    let currentLayers = getLayers(handler);
     if (lambdaLayerARN) {
       currentLayers = pushLayerARN([lambdaLayerARN], currentLayers);
       setLayers(handler, currentLayers);
@@ -109,17 +106,14 @@ export function applyExtensionLayer(region: string, handlers: FunctionInfo[], la
     const { architecture, runtime } = handler;
     let extensionLayerARN: string | undefined;
     let extensionLayerKey: string = "extension";
-    let currentLayers = getLayers(handler);
-    if (architecture === "arm64" && runtime && runtime in armKeys) {
-      const possibleDuplicate = regionRuntimes[extensionLayerKey];
 
-      if (new Set(currentLayers).has(possibleDuplicate!)) {
-        currentLayers = currentLayers.filter((layer) => layer !== possibleDuplicate);
-      }
+    if (architecture === "arm64" && runtime && runtime in armKeys) {
+      removePreviousLayer(handler, regionRuntimes[extensionLayerKey]);
       extensionLayerKey = armKeys[extensionLayerKey];
     }
-    extensionLayerARN = regionRuntimes[extensionLayerKey];
 
+    extensionLayerARN = regionRuntimes[extensionLayerKey];
+    let currentLayers = getLayers(handler);
     if (extensionLayerARN) {
       currentLayers = pushLayerARN([extensionLayerARN], currentLayers);
       setLayers(handler, currentLayers);
@@ -146,6 +140,14 @@ function getLayers(handler: FunctionInfo) {
     return [];
   }
   return layersList;
+}
+
+function removePreviousLayer(handler: FunctionInfo, previousLayer: string | undefined) {
+  let layersList = getLayers(handler);
+  if (new Set(layersList).has(previousLayer!)) {
+    layersList = layersList?.filter((layer) => layer !== previousLayer);
+  }
+  setLayers(handler, layersList);
 }
 
 function setLayers(handler: FunctionInfo, layers: string[]) {
