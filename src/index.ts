@@ -12,7 +12,14 @@ import * as govLayers from "./layers-gov.json";
 import { version } from "../package.json";
 
 import { getConfig, setEnvConfiguration, forceExcludeDepsFromWebpack, hasWebpackPlugin, Configuration } from "./env";
-import { applyExtensionLayer, applyLambdaLibraryLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
+import {
+  applyExtensionLayer,
+  applyLambdaLibraryLayers,
+  DEFAULT_ARCHITECTURE,
+  findHandlers,
+  FunctionInfo,
+  RuntimeType,
+} from "./layer";
 import { TracingMode, enableTracing } from "./tracing";
 import { redirectHandlers } from "./wrapper";
 import { addCloudWatchForwarderSubscriptions, addExecutionLogGroupsAndSubscriptions } from "./forwarder";
@@ -21,12 +28,6 @@ import { FunctionDefinition } from "serverless";
 import { setMonitors } from "./monitors";
 import { getCloudFormationStackId } from "./monitor-api-requests";
 import { stringify } from "querystring";
-
-// Separate interface since DefinitelyTyped currently doesn't include tags or env
-export interface ExtendedFunctionDefinition extends FunctionDefinition {
-  tags?: { [key: string]: string };
-  environment?: { [key: string]: string };
-}
 
 enum TagKeys {
   Service = "service",
@@ -74,6 +75,10 @@ module.exports = class ServerlessPlugin {
     validateConfiguration(config);
 
     const defaultRuntime = this.serverless.service.provider.runtime;
+    // Since the current types don't have the architecture,
+    // we have to convert it to any type.
+    const defaultArchitecture = (this.serverless.service.provider as any).architecture ?? DEFAULT_ARCHITECTURE;
+    const defaultRegion = this.serverless.service.provider.region;
     const handlers = findHandlers(this.serverless.service, config.exclude, defaultRuntime);
 
     setEnvConfiguration(config, handlers);
@@ -82,7 +87,7 @@ module.exports = class ServerlessPlugin {
     if (config.addLayers) {
       this.serverless.cli.log("Adding Lambda Library Layers to functions");
       this.debugLogHandlers(handlers);
-      applyLambdaLibraryLayers(this.serverless.service.provider.region, handlers, allLayers);
+      applyLambdaLibraryLayers(defaultRegion, defaultArchitecture, handlers, allLayers);
       if (hasWebpackPlugin(this.serverless.service)) {
         forceExcludeDepsFromWebpack(this.serverless.service);
       }
@@ -93,7 +98,7 @@ module.exports = class ServerlessPlugin {
     if (config.addExtension) {
       this.serverless.cli.log("Adding Datadog Lambda Extension Layer to functions");
       this.debugLogHandlers(handlers);
-      applyExtensionLayer(this.serverless.service.provider.region, handlers, allLayers);
+      applyExtensionLayer(defaultRegion, defaultArchitecture, handlers, allLayers);
     } else {
       this.serverless.cli.log("Skipping adding Lambda Extension Layer");
     }

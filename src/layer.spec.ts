@@ -120,7 +120,7 @@ describe("applyLambdaLibraryLayers", () => {
     const layers: LayerJSON = {
       regions: { "us-east-1": { "nodejs10.x": "node:2" } },
     };
-    applyLambdaLibraryLayers("us-east-1", [handler], layers);
+    applyLambdaLibraryLayers("us-east-1", "x86_64", [handler], layers);
     expect(handler.handler).toEqual({
       runtime: "nodejs10.x",
       layers: ["node:2"],
@@ -136,7 +136,7 @@ describe("applyLambdaLibraryLayers", () => {
     const layers: LayerJSON = {
       regions: { "us-east-1": { "nodejs10.x": "node:2" } },
     };
-    applyLambdaLibraryLayers("us-east-1", [handler], layers);
+    applyLambdaLibraryLayers("us-east-1", "x86_64", [handler], layers);
     expect(handler.handler).toEqual({
       runtime: "nodejs10.x",
       layers: ["node:1", "node:2"],
@@ -152,7 +152,7 @@ describe("applyLambdaLibraryLayers", () => {
     const layers: LayerJSON = {
       regions: { "us-east-1": { "nodejs10.x": "node:1" } },
     };
-    applyLambdaLibraryLayers("us-east-1", [handler], layers);
+    applyLambdaLibraryLayers("us-east-1", "x86_64", [handler], layers);
     expect(handler.handler).toEqual({
       runtime: "nodejs10.x",
       layers: ["node:1"],
@@ -168,7 +168,7 @@ describe("applyLambdaLibraryLayers", () => {
     const layers: LayerJSON = {
       regions: { "us-east-1": { "nodejs10.x": "node:1" } },
     };
-    applyLambdaLibraryLayers("us-east-2", [handler], layers);
+    applyLambdaLibraryLayers("us-east-2", "x86_64", [handler], layers);
     expect(handler.handler).toEqual({
       runtime: "nodejs10.x",
     });
@@ -183,7 +183,7 @@ describe("applyLambdaLibraryLayers", () => {
     const layers: LayerJSON = {
       regions: { "us-east-1": { "python2.7": "python:2" } },
     };
-    applyLambdaLibraryLayers("us-east-1", [handler], layers);
+    applyLambdaLibraryLayers("us-east-1", "x86_64", [handler], layers);
     expect(handler.handler).toEqual({
       runtime: "nodejs10.x",
     });
@@ -198,7 +198,7 @@ describe("applyLambdaLibraryLayers", () => {
     const layers: LayerJSON = {
       regions: { "us-east-1": { "python2.7": "python:2" } },
     };
-    applyLambdaLibraryLayers("us-east-1", [handler], layers);
+    applyLambdaLibraryLayers("us-east-1", "x86_64", [handler], layers);
     expect(handler.handler).toEqual({});
   });
 
@@ -210,7 +210,7 @@ describe("applyLambdaLibraryLayers", () => {
     const layers: LayerJSON = {
       regions: { "us-east-1": { "python2.7": "python:2" } },
     };
-    applyLambdaLibraryLayers("us-east-1", [handler], layers);
+    applyLambdaLibraryLayers("us-east-1", "x86_64", [handler], layers);
     expect(handler.handler).toEqual({});
   });
 
@@ -227,7 +227,7 @@ describe("applyLambdaLibraryLayers", () => {
         },
       },
     };
-    applyLambdaLibraryLayers("us-gov-east-1", [handler], layers);
+    applyLambdaLibraryLayers("us-gov-east-1", "x86_64", [handler], layers);
     expect(handler.handler).toEqual({
       runtime: "nodejs10.x",
       layers: ["arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node10-x:30"],
@@ -243,7 +243,7 @@ describe("applyLambdaLibraryLayers", () => {
     const layers: LayerJSON = {
       regions: { "us-east-1": { extension: "extension:5" } },
     };
-    applyExtensionLayer("us-east-1", [handler], layers);
+    applyExtensionLayer("us-east-1", "x86_64", [handler], layers);
     expect(handler.handler).toEqual({
       runtime: "nodejs10.x",
       layers: ["extension:5"],
@@ -259,20 +259,19 @@ describe("applyLambdaLibraryLayers", () => {
     const layers: LayerJSON = {
       regions: { "us-east-1": { "nodejs10.x": "node:2", extension: "extension:5" } },
     };
-    applyLambdaLibraryLayers("us-east-1", [handler], layers);
-    applyExtensionLayer("us-east-1", [handler], layers);
+    applyLambdaLibraryLayers("us-east-1", "x86_64", [handler], layers);
+    applyExtensionLayer("us-east-1", "x86_64", [handler], layers);
     expect(handler.handler).toEqual({
       runtime: "nodejs10.x",
       layers: ["node:2", "extension:5"],
     });
   });
 
-  it("adds correct lambda layer given architecture", () => {
+  it("adds correct lambda layer given architecture in function level", () => {
     const handler = {
-      handler: { runtime: "python3.9" },
+      handler: { runtime: "python3.9", architecture: "arm64" },
       type: RuntimeType.PYTHON,
       runtime: "python3.9",
-      architecture: "arm64",
     } as FunctionInfo;
     const layers: LayerJSON = {
       regions: {
@@ -284,19 +283,45 @@ describe("applyLambdaLibraryLayers", () => {
         },
       },
     };
-    applyLambdaLibraryLayers("us-east-1", [handler], layers);
-    applyExtensionLayer("us-east-1", [handler], layers);
+    applyLambdaLibraryLayers("us-east-1", "", [handler], layers);
+    applyExtensionLayer("us-east-1", "", [handler], layers);
+    expect(handler.handler).toEqual({
+      architecture: "arm64",
+      runtime: "python3.9",
+      layers: ["python-arm:3.9", "extension-arm:11"],
+    });
+  });
+
+  it("adds correct lambda layer given architecture in provider level", () => {
+    const handler = {
+      handler: { runtime: "python3.9" },
+      type: RuntimeType.PYTHON,
+      runtime: "python3.9",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: {
+        "us-east-1": {
+          "python3.9": "python:3.9",
+          "python3.9-arm": "python-arm:3.9",
+          extension: "extension:11",
+          "extension-arm": "extension-arm:11",
+        },
+      },
+    };
+    const architecture = "arm64";
+    applyLambdaLibraryLayers("us-east-1", architecture, [handler], layers);
+    applyExtensionLayer("us-east-1", architecture, [handler], layers);
     expect(handler.handler).toEqual({
       runtime: "python3.9",
       layers: ["python-arm:3.9", "extension-arm:11"],
     });
   });
-  it("uses default runtime layer if runtime not in armKeys", () => {
+
+  it("uses default runtime layer if architecture not available for specified runtime", () => {
     const handler = {
-      handler: { runtime: "python3.7" },
+      handler: { runtime: "python3.7", architecture: "arm64" },
       type: RuntimeType.PYTHON,
       runtime: "python3.7",
-      architecture: "arm64",
     } as FunctionInfo;
     const layers: LayerJSON = {
       regions: {
@@ -307,20 +332,20 @@ describe("applyLambdaLibraryLayers", () => {
         },
       },
     };
-    applyLambdaLibraryLayers("us-east-1", [handler], layers);
-    applyExtensionLayer("us-east-1", [handler], layers);
+    applyLambdaLibraryLayers("us-east-1", "", [handler], layers);
+    applyExtensionLayer("us-east-1", "", [handler], layers);
     expect(handler.handler).toEqual({
+      architecture: "arm64",
       runtime: "python3.7",
       layers: ["python:3.7", "extension:11"],
     });
   });
 
-  it("swaps previous layer when specifying arm architecture", () => {
+  it("swaps previous layer when specifying arm architecture in functions", () => {
     let handler = {
-      handler: { runtime: "python3.9" },
+      handler: { runtime: "python3.9", architecture: "arm64" },
       type: RuntimeType.PYTHON,
       runtime: "python3.9",
-      architecture: "arm64",
     } as FunctionInfo;
     (handler.handler as any).layers = ["python:3.9", "extension:11"];
     const layers: LayerJSON = {
@@ -333,8 +358,35 @@ describe("applyLambdaLibraryLayers", () => {
         },
       },
     };
-    applyLambdaLibraryLayers("us-east-1", [handler], layers);
-    applyExtensionLayer("us-east-1", [handler], layers);
+    applyLambdaLibraryLayers("us-east-1", "", [handler], layers);
+    applyExtensionLayer("us-east-1", "", [handler], layers);
+    expect(handler.handler).toEqual({
+      architecture: "arm64",
+      runtime: "python3.9",
+      layers: ["python-arm:3.9", "extension-arm:11"],
+    });
+  });
+
+  it("swaps previous layer when specifying arm architecture in provider level", () => {
+    let handler = {
+      handler: { runtime: "python3.9" },
+      type: RuntimeType.PYTHON,
+      runtime: "python3.9",
+    } as FunctionInfo;
+    (handler.handler as any).layers = ["python:3.9", "extension:11"];
+    const layers: LayerJSON = {
+      regions: {
+        "us-east-1": {
+          "python3.9": "python:3.9",
+          "python3.9-arm": "python-arm:3.9",
+          extension: "extension:11",
+          "extension-arm": "extension-arm:11",
+        },
+      },
+    };
+    const architecture = "arm64";
+    applyLambdaLibraryLayers("us-east-1", architecture, [handler], layers);
+    applyExtensionLayer("us-east-1", architecture, [handler], layers);
     expect(handler.handler).toEqual({
       runtime: "python3.9",
       layers: ["python-arm:3.9", "extension-arm:11"],

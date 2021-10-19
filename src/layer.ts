@@ -16,8 +16,16 @@ export enum RuntimeType {
 export interface FunctionInfo {
   name: string;
   type: RuntimeType;
-  handler: FunctionDefinition;
+  handler: ExtendedFunctionDefinition;
   runtime?: string;
+}
+
+export const X86_64_ARCHITECTURE = "x86_64";
+export const ARM64_ARCHITECTURE = "arm64";
+export const DEFAULT_ARCHITECTURE = X86_64_ARCHITECTURE;
+
+// Separate interface since DefinitelyTyped currently doesn't include tags or env
+export interface ExtendedFunctionDefinition extends FunctionDefinition {
   architecture?: string;
 }
 
@@ -66,7 +74,12 @@ export function findHandlers(service: Service, exclude: string[], defaultRuntime
     ) as FunctionInfo[];
 }
 
-export function applyLambdaLibraryLayers(region: string, handlers: FunctionInfo[], layers: LayerJSON) {
+export function applyLambdaLibraryLayers(
+  region: string,
+  architecture: string,
+  handlers: FunctionInfo[],
+  layers: LayerJSON,
+) {
   const regionRuntimes = layers.regions[region];
   if (regionRuntimes === undefined) {
     return;
@@ -77,9 +90,10 @@ export function applyLambdaLibraryLayers(region: string, handlers: FunctionInfo[
       continue;
     }
 
-    const { runtime, architecture } = handler;
+    const { runtime } = handler;
+    architecture = (handler.handler as any).architecture ?? architecture;
     let runtimeKey: string | undefined = runtime;
-    if (architecture === "arm64" && runtime && runtime in armKeys) {
+    if (architecture === ARM64_ARCHITECTURE && runtime && runtime in armKeys) {
       runtimeKey = armKeys[runtime];
       removePreviousLayer(handler, regionRuntimes[runtime]);
     }
@@ -93,7 +107,7 @@ export function applyLambdaLibraryLayers(region: string, handlers: FunctionInfo[
   }
 }
 
-export function applyExtensionLayer(region: string, handlers: FunctionInfo[], layers: LayerJSON) {
+export function applyExtensionLayer(region: string, architecture: string, handlers: FunctionInfo[], layers: LayerJSON) {
   const regionRuntimes = layers.regions[region];
   if (regionRuntimes === undefined) {
     return;
@@ -103,11 +117,12 @@ export function applyExtensionLayer(region: string, handlers: FunctionInfo[], la
     if (handler.type === RuntimeType.UNSUPPORTED) {
       continue;
     }
-    const { architecture, runtime } = handler;
+    const { runtime } = handler;
+    architecture = (handler.handler as any).architecture ?? architecture;
     let extensionLayerARN: string | undefined;
     let extensionLayerKey: string = "extension";
 
-    if (architecture === "arm64" && runtime && runtime in armKeys) {
+    if (architecture === ARM64_ARCHITECTURE && runtime && runtime in armKeys) {
       removePreviousLayer(handler, regionRuntimes[extensionLayerKey]);
       extensionLayerKey = armKeys[extensionLayerKey];
     }
