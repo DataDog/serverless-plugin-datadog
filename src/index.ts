@@ -82,7 +82,7 @@ module.exports = class ServerlessPlugin {
     if (config.addLayers) {
       this.serverless.cli.log("Adding Lambda Library Layers to functions");
       this.debugLogHandlers(handlers);
-      applyLambdaLibraryLayers(this.serverless.service.provider.region, handlers, allLayers);
+      applyLambdaLibraryLayers(this.serverless.service, handlers, allLayers);
       if (hasWebpackPlugin(this.serverless.service)) {
         forceExcludeDepsFromWebpack(this.serverless.service);
       }
@@ -93,7 +93,7 @@ module.exports = class ServerlessPlugin {
     if (config.addExtension) {
       this.serverless.cli.log("Adding Datadog Lambda Extension Layer to functions");
       this.debugLogHandlers(handlers);
-      applyExtensionLayer(this.serverless.service.provider.region, handlers, allLayers);
+      applyExtensionLayer(this.serverless.service, handlers, allLayers);
     } else {
       this.serverless.cli.log("Skipping adding Lambda Extension Layer");
     }
