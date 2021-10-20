@@ -75,10 +75,6 @@ module.exports = class ServerlessPlugin {
     validateConfiguration(config);
 
     const defaultRuntime = this.serverless.service.provider.runtime;
-    // Since the current types don't have the architecture,
-    // we have to convert it to any type.
-    const defaultArchitecture = (this.serverless.service.provider as any).architecture ?? DEFAULT_ARCHITECTURE;
-    const defaultRegion = this.serverless.service.provider.region;
     const handlers = findHandlers(this.serverless.service, config.exclude, defaultRuntime);
 
     setEnvConfiguration(config, handlers);
@@ -87,7 +83,7 @@ module.exports = class ServerlessPlugin {
     if (config.addLayers) {
       this.serverless.cli.log("Adding Lambda Library Layers to functions");
       this.debugLogHandlers(handlers);
-      applyLambdaLibraryLayers(defaultRegion, defaultArchitecture, handlers, allLayers);
+      applyLambdaLibraryLayers(this.serverless.service, handlers, allLayers);
       if (hasWebpackPlugin(this.serverless.service)) {
         forceExcludeDepsFromWebpack(this.serverless.service);
       }
@@ -98,7 +94,7 @@ module.exports = class ServerlessPlugin {
     if (config.addExtension) {
       this.serverless.cli.log("Adding Datadog Lambda Extension Layer to functions");
       this.debugLogHandlers(handlers);
-      applyExtensionLayer(defaultRegion, defaultArchitecture, handlers, allLayers);
+      applyExtensionLayer(this.serverless.service, handlers, allLayers);
     } else {
       this.serverless.cli.log("Skipping adding Lambda Extension Layer");
     }

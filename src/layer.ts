@@ -74,12 +74,8 @@ export function findHandlers(service: Service, exclude: string[], defaultRuntime
     ) as FunctionInfo[];
 }
 
-export function applyLambdaLibraryLayers(
-  region: string,
-  architecture: string,
-  handlers: FunctionInfo[],
-  layers: LayerJSON,
-) {
+export function applyLambdaLibraryLayers(service: Service, handlers: FunctionInfo[], layers: LayerJSON) {
+  const { region } = service.provider;
   const regionRuntimes = layers.regions[region];
   if (regionRuntimes === undefined) {
     return;
@@ -91,15 +87,16 @@ export function applyLambdaLibraryLayers(
     }
 
     const { runtime } = handler;
-    architecture = (handler.handler as any).architecture ?? architecture;
+    const architecture =
+      (handler.handler as any).architecture ?? (service.provider as any).architecture ?? DEFAULT_ARCHITECTURE;
     let runtimeKey: string | undefined = runtime;
     if (architecture === ARM64_ARCHITECTURE && runtime && runtime in armKeys) {
       runtimeKey = armKeys[runtime];
-      removePreviousLayer(handler, regionRuntimes[runtime]);
+      removePreviousLayer(service, handler, regionRuntimes[runtime]);
     }
 
     const lambdaLayerARN = runtimeKey !== undefined ? regionRuntimes[runtimeKey] : undefined;
-    let currentLayers = getLayers(handler);
+    let currentLayers = getLayers(service, handler);
     if (lambdaLayerARN) {
       currentLayers = pushLayerARN([lambdaLayerARN], currentLayers);
       setLayers(handler, currentLayers);
@@ -107,7 +104,8 @@ export function applyLambdaLibraryLayers(
   }
 }
 
-export function applyExtensionLayer(region: string, architecture: string, handlers: FunctionInfo[], layers: LayerJSON) {
+export function applyExtensionLayer(service: Service, handlers: FunctionInfo[], layers: LayerJSON) {
+  const { region } = service.provider;
   const regionRuntimes = layers.regions[region];
   if (regionRuntimes === undefined) {
     return;
@@ -118,17 +116,18 @@ export function applyExtensionLayer(region: string, architecture: string, handle
       continue;
     }
     const { runtime } = handler;
-    architecture = (handler.handler as any).architecture ?? architecture;
+    const architecture =
+      (handler.handler as any).architecture ?? (service.provider as any).architecture ?? DEFAULT_ARCHITECTURE;
     let extensionLayerARN: string | undefined;
     let extensionLayerKey: string = "extension";
 
     if (architecture === ARM64_ARCHITECTURE && runtime && runtime in armKeys) {
-      removePreviousLayer(handler, regionRuntimes[extensionLayerKey]);
+      removePreviousLayer(service, handler, regionRuntimes[extensionLayerKey]);
       extensionLayerKey = armKeys[extensionLayerKey];
     }
 
     extensionLayerARN = regionRuntimes[extensionLayerKey];
-    let currentLayers = getLayers(handler);
+    let currentLayers = getLayers(service, handler);
     if (extensionLayerARN) {
       currentLayers = pushLayerARN([extensionLayerARN], currentLayers);
       setLayers(handler, currentLayers);
@@ -149,16 +148,16 @@ export function isFunctionDefinitionHandler(funcDef: FunctionDefinition): funcDe
   return typeof (funcDef as any).handler === "string";
 }
 
-function getLayers(handler: FunctionInfo) {
-  const layersList = (handler.handler as any).layers as string[] | undefined;
-  if (layersList === undefined) {
-    return [];
-  }
-  return layersList;
+function getLayers(service: Service, handler: FunctionInfo): string[] {
+  const functionLayersList = ((handler.handler as any).layers as string[] | string[]) || [];
+  const serviceLayerList = ((service.provider as any).layers as string[] | string[]) || [];
+  const layerList = serviceLayerList?.concat(functionLayersList);
+
+  return layerList;
 }
 
-function removePreviousLayer(handler: FunctionInfo, previousLayer: string | undefined) {
-  let layersList = getLayers(handler);
+function removePreviousLayer(service: Service, handler: FunctionInfo, previousLayer: string | undefined) {
+  let layersList = getLayers(service, handler);
   if (new Set(layersList).has(previousLayer!)) {
     layersList = layersList?.filter((layer) => layer !== previousLayer);
   }
