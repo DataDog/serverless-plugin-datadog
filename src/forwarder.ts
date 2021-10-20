@@ -1,4 +1,3 @@
-import { ServerResponse } from "http";
 import { FunctionInfo } from "layer";
 import Service from "serverless/classes/Service";
 import Aws = require("serverless/plugins/aws/provider/awsProvider");

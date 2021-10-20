@@ -101,7 +101,7 @@ export async function getCloudFormationStackId(serverless: Serverless) {
       { StackName: stackName },
       { region: serverless.getProvider("aws").getRegion() },
     )
-    .catch((err) => {
+    .catch(() => {
       // Ignore any request exceptions, fail silently and skip output logging
     });
   const cloudFormationStackId: string = describeStackOutput ? describeStackOutput.Stacks[0].StackId : "";
