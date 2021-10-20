@@ -258,7 +258,7 @@ describe("setEnvConfiguration", () => {
       {
         addLayers: false,
         apiKey: "1234",
-        apiKeySecretARN: "5678",
+        apiKeySecretArn: "5678",
         apiKMSKey: "0912",
         site: "datadoghq.eu",
         logLevel: "debug",

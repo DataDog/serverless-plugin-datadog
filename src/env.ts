@@ -17,7 +17,7 @@ export interface Configuration {
   // Datadog API Key, only necessary when using metrics without log forwarding
   apiKey?: string;
   // The ARN of the secret storing the Datadog API key.
-  apiKeySecretARN?: string;
+  apiKeySecretArn?: string;
   // Datadog API Key encrypted using KMS, only necessary when using metrics without log forwarding
   apiKMSKey?: string;
   // Whether to capture and store the payload and response of a lambda invocation
@@ -71,7 +71,7 @@ export interface Configuration {
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
 const apiKeyKMSEnvVar = "DD_KMS_API_KEY";
-const apiKeySecretARNEnvVar = "DD_API_KEY_SECRET_ARN";
+const apiKeySecretArnEnvVar = "DD_API_KEY_SECRET_ARN";
 const siteURLEnvVar = "DD_SITE";
 const logLevelEnvVar = "DD_LOG_LEVEL";
 const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
@@ -108,8 +108,8 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     if (config.apiKMSKey !== undefined && environment[apiKeyKMSEnvVar] === undefined) {
       environment[apiKeyKMSEnvVar] = config.apiKMSKey;
     }
-    if (config.apiKeySecretARN !== undefined && environment[apiKeySecretARNEnvVar] === undefined) {
-      environment[apiKeySecretARNEnvVar] = config.apiKeySecretARN;
+    if (config.apiKeySecretArn !== undefined && environment[apiKeySecretArnEnvVar] === undefined) {
+      environment[apiKeySecretArnEnvVar] = config.apiKeySecretArn;
     }
     if (environment[siteURLEnvVar] === undefined) {
       environment[siteURLEnvVar] = config.site;
