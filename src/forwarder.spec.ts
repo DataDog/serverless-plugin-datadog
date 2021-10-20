@@ -6,7 +6,6 @@ import {
   isLogsConfig,
 } from "./forwarder";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
-import { resolveConfigFile } from "prettier";
 import { FunctionInfo, RuntimeType } from "./layer";
 function serviceWithResources(resources?: Record<string, any>, serviceName = "my-service"): Service {
   const service = {
@@ -55,7 +54,7 @@ function serviceWithOnlyWebsocketLogs(resources?: Record<string, any>, serviceNa
 function awsMock(existingSubs: { [key: string]: any }, stackName?: string, doesAlwaysReject?: boolean): Aws {
   return {
     getStage: () => "dev",
-    request: (service, method, params: any) => {
+    request: (_service, method, params: any) => {
       if (doesAlwaysReject) {
         return Promise.reject("Not found.");
       }
