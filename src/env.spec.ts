@@ -258,7 +258,8 @@ describe("setEnvConfiguration", () => {
       {
         addLayers: false,
         apiKey: "1234",
-        apiKMSKey: "5678",
+        apiKeySecretARN: "5678",
+        apiKMSKey: "0912",
         site: "datadoghq.eu",
         logLevel: "debug",
         flushMetricsToLogs: true,
@@ -279,8 +280,9 @@ describe("setEnvConfiguration", () => {
         handler: {
           environment: {
             DD_API_KEY: "1234",
+            DD_API_KEY_SECRET_ARN: "5678",
             DD_FLUSH_TO_LOG: true,
-            DD_KMS_API_KEY: "5678",
+            DD_KMS_API_KEY: "0912",
             DD_LOG_LEVEL: "debug",
             DD_SITE: "datadoghq.eu",
             DD_TRACE_ENABLED: true,
@@ -296,8 +298,9 @@ describe("setEnvConfiguration", () => {
         handler: {
           environment: {
             DD_API_KEY: "1234",
+            DD_API_KEY_SECRET_ARN: "5678",
             DD_FLUSH_TO_LOG: true,
-            DD_KMS_API_KEY: "5678",
+            DD_KMS_API_KEY: "0912",
             DD_LOG_LEVEL: "debug",
             DD_SITE: "datadoghq.eu",
             DD_TRACE_ENABLED: true,
