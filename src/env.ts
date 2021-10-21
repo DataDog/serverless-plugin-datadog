@@ -6,7 +6,7 @@
  * Copyright 2021 Datadog, Inc.
  */
 
-import { FunctionInfo } from "layer";
+import { FunctionInfo, runtimeLookup, RuntimeType } from "layer";
 import Service from "serverless/classes/Service";
 
 export interface Configuration {
@@ -108,7 +108,8 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     if (config.apiKMSKey !== undefined && environment[apiKeyKMSEnvVar] === undefined) {
       environment[apiKeyKMSEnvVar] = config.apiKMSKey;
     }
-    if (config.apiKeySecretArn !== undefined && environment[apiKeySecretArnEnvVar] === undefined) {
+    const isNode = runtimeLookup[handler.runtime!] === RuntimeType.NODE;
+    if (config.apiKeySecretArn !== undefined && environment[apiKeySecretArnEnvVar] === undefined && !isNode) {
       environment[apiKeySecretArnEnvVar] = config.apiKeySecretArn;
     }
     if (environment[siteURLEnvVar] === undefined) {
