@@ -6,7 +6,7 @@
  * Copyright 2021 Datadog, Inc.
  */
 
-import { FunctionInfo, runtimeLookup, RuntimeType } from "layer";
+import { FunctionInfo, runtimeLookup, RuntimeType } from "./layer";
 import Service from "serverless/classes/Service";
 
 export interface Configuration {
