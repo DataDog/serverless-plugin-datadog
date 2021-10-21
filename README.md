@@ -1,4 +1,10 @@
-# Datadog Serverless Plugin
+---
+title: Datadog Serverless Plugin
+kind: documentation
+aliases:
+  - /serverless/serverless_integrations/plugin/
+dependencies: ["https://github.com/DataDog/serverless-plugin-datadog/blob/master/README.md"]
+---
 
 ![build](https://github.com/DataDog/serverless-plugin-datadog/workflows/build/badge.svg)
 [![Code Coverage](https://img.shields.io/codecov/c/github/DataDog/serverless-plugin-datadog)](https://codecov.io/gh/DataDog/serverless-plugin-datadog)

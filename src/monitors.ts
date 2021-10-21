@@ -1,11 +1,5 @@
 import { SERVERLESS_MONITORS } from "./serverless_monitors";
-import {
-  updateMonitor,
-  createMonitor,
-  deleteMonitor,
-  getExistingMonitors,
-  InvalidAuthenticationError,
-} from "./monitor-api-requests";
+import { updateMonitor, createMonitor, deleteMonitor, getExistingMonitors } from "./monitor-api-requests";
 import { Response } from "node-fetch";
 
 export interface MonitorParams {
