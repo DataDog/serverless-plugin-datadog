@@ -12,13 +12,7 @@ import * as govLayers from "./layers-gov.json";
 import { version } from "../package.json";
 
 import { getConfig, setEnvConfiguration, forceExcludeDepsFromWebpack, hasWebpackPlugin, Configuration } from "./env";
-import {
-  applyExtensionLayer,
-  applyLambdaLibraryLayers,
-  findHandlers,
-  FunctionInfo,
-  RuntimeType,
-} from "./layer";
+import { applyExtensionLayer, applyLambdaLibraryLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
 import { TracingMode, enableTracing } from "./tracing";
 import { redirectHandlers } from "./wrapper";
 import { addCloudWatchForwarderSubscriptions, addExecutionLogGroupsAndSubscriptions } from "./forwarder";
