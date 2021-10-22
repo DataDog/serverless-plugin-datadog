@@ -285,6 +285,36 @@ describe("applyLambdaLibraryLayers", () => {
     });
   });
 
+  it("detects when to use the GovCloud layers with arm architecture", () => {
+    const handler = {
+      handler: { runtime: "python3.9" },
+      type: RuntimeType.PYTHON,
+      runtime: "python3.9",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: {
+        "us-gov-east-1": {
+          "python3.9": "python:3.9",
+          "python3.9-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python39-ARM:49",
+          extension: "extension:11",
+          "extension-arm": "extension-arm:11",
+        },
+      },
+    };
+    const mockService = createMockService(
+      "us-gov-east-1",
+      {
+        "python-function": { handler: "myfile.handler", runtime: "python3.9" },
+      },
+      "arm64",
+    );
+    applyLambdaLibraryLayers(mockService, [handler], layers);
+    expect(handler.handler).toEqual({
+      runtime: "python3.9",
+      layers: ["arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python39-ARM:49"],
+    });
+  });
+
   it("adds extension layer", () => {
     const handler = {
       handler: { runtime: "nodejs10.x" },
