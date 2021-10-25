@@ -18,9 +18,9 @@ export const jsHandler = "node_modules/datadog-lambda-js/dist/handler.handler";
  * For each lambda function, redirects handler to the Datadog handler for the given runtime,
  * and sets Datadog environment variable `DD_LAMBDA_HANDLER` to the original handler.
  */
-export function redirectHandlers(funcs: FunctionInfo[], addLayers: boolean) {
+export function redirectHandlers(funcs: FunctionInfo[], addLayers: boolean, customHandler?: string) {
   funcs.forEach((func) => {
-    const handler = getDDHandler(func.type, addLayers);
+    const handler = getDDHandler(func.type, addLayers, customHandler);
     if (handler === undefined) {
       return;
     }
@@ -43,9 +43,12 @@ export function redirectHandlers(funcs: FunctionInfo[], addLayers: boolean) {
   });
 }
 
-function getDDHandler(lambdaRuntime: RuntimeType | undefined, addLayers: boolean) {
+function getDDHandler(lambdaRuntime: RuntimeType | undefined, addLayers: boolean, customHandler?: string) {
   if (lambdaRuntime === undefined) {
     return;
+  }
+  if (customHandler) {
+    return customHandler;
   }
   switch (lambdaRuntime) {
     case RuntimeType.NODE:

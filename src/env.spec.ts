@@ -13,6 +13,7 @@ import {
   forceExcludeDepsFromWebpack,
   hasWebpackPlugin,
 } from "./env";
+import { FunctionInfo, RuntimeType } from "./layer";
 
 describe("hasWebpackPlugin", () => {
   it("returns false when the serverless.yml plugins object is not defined", () => {
@@ -82,6 +83,7 @@ describe("getConfig", () => {
       apiKey: "1234",
       flushMetricsToLogs: true,
       logLevel: "debug",
+      captureLambdaPayload: false,
       site: "datadoghq.com",
       enableXrayTracing: false,
       enableDDTracing: true,
@@ -91,9 +93,8 @@ describe("getConfig", () => {
       injectLogContext: true,
       exclude: [],
       integrationTesting: false,
-      subscribeToApiGatewayLogs: true,
-      subscribeToHttpApiLogs: true,
-      subscribeToWebsocketLogs: true,
+      subscribeToAccessLogs: true,
+      subscribeToExecutionLogs: false,
     });
   });
 
@@ -112,6 +113,7 @@ describe("getConfig", () => {
       apiKey: "1234",
       flushMetricsToLogs: true,
       logLevel: "debug",
+      captureLambdaPayload: false,
       site: "datadoghq.com",
       enableXrayTracing: false,
       enableDDTracing: true,
@@ -121,9 +123,39 @@ describe("getConfig", () => {
       injectLogContext: true,
       exclude: [],
       integrationTesting: false,
-      subscribeToApiGatewayLogs: true,
-      subscribeToHttpApiLogs: true,
-      subscribeToWebsocketLogs: true,
+      subscribeToAccessLogs: true,
+      subscribeToExecutionLogs: false,
+    });
+  });
+
+  it("sets custom handler", () => {
+    const result = getConfig({
+      custom: {
+        datadog: {
+          apiKey: "1234",
+          logLevel: "debug",
+          customHandler: "/src/custom-handler.handler",
+        },
+      },
+    } as any);
+    expect(result).toEqual({
+      addLayers: true,
+      apiKey: "1234",
+      captureLambdaPayload: false,
+      flushMetricsToLogs: true,
+      logLevel: "debug",
+      site: "datadoghq.com",
+      enableXrayTracing: false,
+      enableDDTracing: true,
+      enableDDLogs: true,
+      addExtension: false,
+      enableTags: true,
+      injectLogContext: true,
+      exclude: [],
+      integrationTesting: false,
+      subscribeToAccessLogs: true,
+      subscribeToExecutionLogs: false,
+      customHandler: "/src/custom-handler.handler",
     });
   });
 });
@@ -202,10 +234,25 @@ describe("forceExcludeDepsFromWebpack", () => {
 });
 
 describe("setEnvConfiguration", () => {
-  it("sets env vars", () => {
-    const service = {
-      provider: {},
-    } as any;
+  it("sets env vars for all handlers", () => {
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function2",
+        type: RuntimeType.NODE,
+      },
+    ];
 
     setEnvConfiguration(
       {
@@ -221,44 +268,78 @@ describe("setEnvConfiguration", () => {
         addExtension: false,
         enableTags: true,
         injectLogContext: false,
-        subscribeToApiGatewayLogs: true,
-        subscribeToHttpApiLogs: true,
-        subscribeToWebsocketLogs: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
         exclude: ["dd-excluded-function"],
       },
-      service,
+      handlers,
     );
-    expect(service).toEqual({
-      provider: {
-        environment: {
-          DD_API_KEY: "1234",
-          DD_FLUSH_TO_LOG: true,
-          DD_KMS_API_KEY: "5678",
-          DD_LOG_LEVEL: "debug",
-          DD_SITE: "datadoghq.eu",
-          DD_TRACE_ENABLED: true,
-          DD_LOGS_INJECTION: false,
-          DD_SERVERLESS_LOGS_ENABLED: true,
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_FLUSH_TO_LOG: true,
+            DD_KMS_API_KEY: "5678",
+            DD_LOG_LEVEL: "debug",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_LOGS_INJECTION: false,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+          },
+          events: [],
         },
+        name: "function",
+        type: RuntimeType.NODE,
       },
-    });
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_FLUSH_TO_LOG: true,
+            DD_KMS_API_KEY: "5678",
+            DD_LOG_LEVEL: "debug",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_LOGS_INJECTION: false,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+          },
+          events: [],
+        },
+        name: "function2",
+        type: RuntimeType.NODE,
+      },
+    ]);
   });
 
   it("doesn't overwrite already present env vars", () => {
-    const service = {
-      provider: {
-        environment: {
-          DD_API_KEY: "1234",
-          DD_FLUSH_TO_LOG: true,
-          DD_KMS_API_KEY: "5678",
-          DD_LOG_LEVEL: "debug",
-          DD_SITE: "datadoghq.eu",
-          DD_TRACE_ENABLED: false,
-          DD_SERVERLESS_LOGS_ENABLED: false,
-          DD_LOGS_INJECTION: false,
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_FLUSH_TO_LOG: "true",
+            DD_KMS_API_KEY: "5678",
+            DD_LOG_LEVEL: "debug",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: "false",
+            DD_LOGS_INJECTION: "false",
+          },
+          events: [],
         },
+        name: "function",
+        type: RuntimeType.NODE,
       },
-    } as any;
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function2",
+        type: RuntimeType.NODE,
+      },
+    ];
+
     setEnvConfiguration(
       {
         addLayers: false,
@@ -273,33 +354,61 @@ describe("setEnvConfiguration", () => {
         addExtension: false,
         enableTags: true,
         injectLogContext: true,
-        subscribeToApiGatewayLogs: true,
-        subscribeToHttpApiLogs: true,
-        subscribeToWebsocketLogs: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
         exclude: [],
       },
-      service,
+      handlers,
     );
-    expect(service).toEqual({
-      provider: {
-        environment: {
-          DD_API_KEY: "1234",
-          DD_FLUSH_TO_LOG: true,
-          DD_KMS_API_KEY: "5678",
-          DD_LOG_LEVEL: "debug",
-          DD_SITE: "datadoghq.eu",
-          DD_TRACE_ENABLED: false,
-          DD_LOGS_INJECTION: false,
-          DD_SERVERLESS_LOGS_ENABLED: false,
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_FLUSH_TO_LOG: "true",
+            DD_KMS_API_KEY: "5678",
+            DD_LOG_LEVEL: "debug",
+            DD_SITE: "datadoghq.eu",
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_TRACE_ENABLED: "false",
+            DD_LOGS_INJECTION: "false",
+          },
+          events: [],
         },
+        name: "function",
+        type: RuntimeType.NODE,
       },
-    });
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "aaaa",
+            DD_FLUSH_TO_LOG: false,
+            DD_KMS_API_KEY: "bbbb",
+            DD_LOGS_INJECTION: true,
+            DD_LOG_LEVEL: "info",
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_SITE: "datadoghq.com",
+            DD_TRACE_ENABLED: true,
+          },
+          events: [],
+        },
+        name: "function2",
+        type: RuntimeType.NODE,
+      },
+    ]);
   });
 
   it("does not define `DD_FLUSH_TO_LOG` when `addExtension` is true", () => {
-    const service = {
-      provider: {},
-    } as any;
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
     setEnvConfiguration(
       {
         addLayers: false,
@@ -311,35 +420,46 @@ describe("setEnvConfiguration", () => {
         enableXrayTracing: true,
         enableDDTracing: true,
         enableDDLogs: true,
-        subscribeToApiGatewayLogs: true,
-        subscribeToHttpApiLogs: true,
-        subscribeToWebsocketLogs: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
         addExtension: true,
         enableTags: true,
         injectLogContext: false,
         exclude: ["dd-excluded-function"],
       },
-      service,
+      handlers,
     );
-    expect(service).toEqual({
-      provider: {
-        environment: {
-          DD_API_KEY: "1234",
-          DD_KMS_API_KEY: "5678",
-          DD_LOG_LEVEL: "debug",
-          DD_SITE: "datadoghq.eu",
-          DD_TRACE_ENABLED: true,
-          DD_SERVERLESS_LOGS_ENABLED: true,
-          DD_LOGS_INJECTION: false,
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_KMS_API_KEY: "5678",
+            DD_LOGS_INJECTION: false,
+            DD_LOG_LEVEL: "debug",
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+          },
+          events: [],
         },
+        name: "function",
+        type: RuntimeType.NODE,
       },
-    });
+    ]);
   });
 
   it("does not define `DD_LOG_LEVEL` by default when logLevel is undefined", () => {
-    const service = {
-      provider: {},
-    } as any;
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
     setEnvConfiguration(
       {
         addLayers: false,
@@ -351,34 +471,45 @@ describe("setEnvConfiguration", () => {
         enableXrayTracing: true,
         enableDDTracing: true,
         enableDDLogs: true,
-        subscribeToApiGatewayLogs: true,
-        subscribeToHttpApiLogs: true,
-        subscribeToWebsocketLogs: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
         addExtension: true,
         enableTags: true,
         injectLogContext: false,
         exclude: ["dd-excluded-function"],
       },
-      service,
+      handlers,
     );
-    expect(service).toEqual({
-      provider: {
-        environment: {
-          DD_API_KEY: "1234",
-          DD_KMS_API_KEY: "5678",
-          DD_SITE: "datadoghq.eu",
-          DD_TRACE_ENABLED: true,
-          DD_SERVERLESS_LOGS_ENABLED: true,
-          DD_LOGS_INJECTION: false,
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_KMS_API_KEY: "5678",
+            DD_LOGS_INJECTION: false,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+          },
+          events: [],
         },
+        name: "function",
+        type: RuntimeType.NODE,
       },
-    });
+    ]);
   });
 
   it("defines `DD_LOG_LEVEL` when logLevel is defined", () => {
-    const service = {
-      provider: {},
-    } as any;
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
     setEnvConfiguration(
       {
         addLayers: false,
@@ -390,28 +521,32 @@ describe("setEnvConfiguration", () => {
         enableXrayTracing: true,
         enableDDTracing: true,
         enableDDLogs: true,
-        subscribeToApiGatewayLogs: true,
-        subscribeToHttpApiLogs: true,
-        subscribeToWebsocketLogs: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
         addExtension: true,
         enableTags: true,
         injectLogContext: false,
         exclude: ["dd-excluded-function"],
       },
-      service,
+      handlers,
     );
-    expect(service).toEqual({
-      provider: {
-        environment: {
-          DD_API_KEY: "1234",
-          DD_KMS_API_KEY: "5678",
-          DD_SITE: "datadoghq.eu",
-          DD_TRACE_ENABLED: true,
-          DD_SERVERLESS_LOGS_ENABLED: true,
-          DD_LOGS_INJECTION: false,
-          DD_LOG_LEVEL: "info",
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_KMS_API_KEY: "5678",
+            DD_LOGS_INJECTION: false,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_LOG_LEVEL: "info",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+          },
+          events: [],
         },
+        name: "function",
+        type: RuntimeType.NODE,
       },
-    });
+    ]);
   });
 });

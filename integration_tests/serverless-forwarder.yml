@@ -9,15 +9,23 @@ provider:
   region: sa-east-1
   lambdaHashingVersion: 20201221
   logs:
-    restApi: true
-    httpApi: true
-    websocket: true
+    restApi:
+      accessLogging: true
+      executionLogging: false
+    httpApi: false
+    websocket:
+      accessLogging: true
+      executionLogging: true
 
 custom:
   datadog:
     forwarderArn: arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder
     integrationTesting: true
     logLevel: "info"
+    subscribeToExecutionLogs: true
+    exclude:
+      - ExcludeThis
+      - Exclude-This
 
 functions:
   PythonHello27:
@@ -58,5 +66,11 @@ functions:
     handler: js_handler.hello
     runtime: nodejs12.x
   JavascriptHello14-x:
+    handler: js_handler.hello
+    runtime: nodejs14.x
+  ExcludeThis:
+    handler: js_handler.hello
+    runtime: nodejs14.x
+  Exclude-This:
     handler: js_handler.hello
     runtime: nodejs14.x

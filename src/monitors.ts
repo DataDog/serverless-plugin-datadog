@@ -1,11 +1,5 @@
 import { SERVERLESS_MONITORS } from "./serverless_monitors";
-import {
-  updateMonitor,
-  createMonitor,
-  deleteMonitor,
-  getExistingMonitors,
-  InvalidAuthenticationError,
-} from "./monitor-api-requests";
+import { updateMonitor, createMonitor, deleteMonitor, getExistingMonitors } from "./monitor-api-requests";
 import { Response } from "node-fetch";
 
 export interface MonitorParams {
@@ -102,6 +96,7 @@ function doesMonitorExist(serverlessMonitorId: string, existingMonitors: { [key:
  * @returns an array of successfully deleted monitors
  */
 async function deleteRemovedMonitors(
+  site: string,
   pluginMonitors: Monitor[],
   existingMonitors: { [key: string]: number },
   monitorsApiKey: string,
@@ -112,7 +107,7 @@ async function deleteRemovedMonitors(
   pluginMonitors.forEach((currentMonitor) => currentMonitorIds.push(Object.keys(currentMonitor)[0]));
   for (const pluginMonitorId of Object.keys(existingMonitors)) {
     if (!currentMonitorIds.includes(pluginMonitorId)) {
-      const response = await deleteMonitor(existingMonitors[pluginMonitorId], monitorsApiKey, monitorsAppKey);
+      const response = await deleteMonitor(site, existingMonitors[pluginMonitorId], monitorsApiKey, monitorsAppKey);
       const successfullyDeleted = handleMonitorsApiResponse(response, pluginMonitorId);
       if (successfullyDeleted) {
         successfullyDeletedMonitors.push(` ${pluginMonitorId}`);
@@ -147,6 +142,7 @@ export function handleMonitorsApiResponse(response: Response, serverlessMonitorI
  * @returns monitors that have been successfully created, updated, and deleted according to the configuration defined in the plugin
  */
 export async function setMonitors(
+  site: string,
   monitors: Monitor[],
   monitorsApiKey: string,
   monitorsAppKey: string,
@@ -155,6 +151,7 @@ export async function setMonitors(
   env: string,
 ) {
   const serverlessMonitorIdByMonitorId = await getExistingMonitors(
+    site,
     cloudFormationStackId,
     monitorsApiKey,
     monitorsAppKey,
@@ -169,13 +166,13 @@ export async function setMonitors(
     const monitorExists = await doesMonitorExist(serverlessMonitorId, serverlessMonitorIdByMonitorId);
 
     if (monitorExists) {
-      const response = await updateMonitor(monitorIdNumber, monitorParams, monitorsApiKey, monitorsAppKey);
+      const response = await updateMonitor(site, monitorIdNumber, monitorParams, monitorsApiKey, monitorsAppKey);
       const successfullyCreated = handleMonitorsApiResponse(response, serverlessMonitorId);
       if (successfullyCreated) {
         successfullyUpdatedMonitors.push(` ${serverlessMonitorId}`);
       }
     } else {
-      const response = await createMonitor(monitorParams, monitorsApiKey, monitorsAppKey);
+      const response = await createMonitor(site, monitorParams, monitorsApiKey, monitorsAppKey);
       const successfullyUpdated = handleMonitorsApiResponse(response, serverlessMonitorId);
       if (successfullyUpdated) {
         successfullyCreatedMonitors.push(` ${serverlessMonitorId}`);
@@ -183,6 +180,7 @@ export async function setMonitors(
     }
   }
   const successfullyDeletedMonitors = await deleteRemovedMonitors(
+    site,
     monitors,
     serverlessMonitorIdByMonitorId,
     monitorsApiKey,

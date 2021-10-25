@@ -1,9 +1,8 @@
 service: dd-sls-plugin-integration-test
-frameworkVersion: '2'
+frameworkVersion: "2"
 
 plugins:
   - ../dist/src
-
 
 provider:
   name: aws
@@ -15,6 +14,8 @@ custom:
     addExtension: true
     apiKey: 1234
     integrationTesting: true
+    exclude:
+      - ExcludeThis
 
 functions:
   PythonHello27:
@@ -39,5 +40,8 @@ functions:
     handler: js_handler.hello
     runtime: nodejs12.x
   JavascriptHello14-x:
+    handler: js_handler.hello
+    runtime: nodejs14.x
+  ExcludeThis:
     handler: js_handler.hello
     runtime: nodejs14.x

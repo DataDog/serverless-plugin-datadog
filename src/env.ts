@@ -6,6 +6,7 @@
  * Copyright 2021 Datadog, Inc.
  */
 
+import { FunctionInfo } from "layer";
 import Service from "serverless/classes/Service";
 
 export interface Configuration {
@@ -17,6 +18,8 @@ export interface Configuration {
   apiKey?: string;
   // Datadog API Key encrypted using KMS, only necessary when using metrics without log forwarding
   apiKMSKey?: string;
+  // Whether to capture and store the payload and response of a lambda invocation
+  captureLambdaPayload?: boolean;
   // Datadog API Key used for enabling monitor configuration through plugin
   monitorsApiKey?: string;
   // Datadog App Key used for enabling monitor configuration through plugin; separate from the apiKey that is deployed with your function
@@ -55,10 +58,13 @@ export interface Configuration {
   // When set, this plugin will configure the specified monitors for the function
   monitors?: { [id: string]: { [key: string]: any } }[];
 
-  // API Gateway logging
-  subscribeToApiGatewayLogs: boolean;
-  subscribeToHttpApiLogs: boolean;
-  subscribeToWebsocketLogs: boolean;
+  // API Gateway Access logging
+  subscribeToAccessLogs: boolean;
+  // API Gateway Execution logging - handles rest and websocket. Http not supported as of Sept.21
+  subscribeToExecutionLogs: boolean;
+
+  // When set, this plugin will configure the specified handler for the functions
+  customHandler?: string;
 }
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
@@ -69,6 +75,7 @@ const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
 const ddTracingEnabledEnvVar = "DD_TRACE_ENABLED";
 const logInjectionEnvVar = "DD_LOGS_INJECTION";
 const ddLogsEnabledEnvVar = "DD_SERVERLESS_LOGS_ENABLED";
+const ddCaptureLambdaPayloadEnvVar = "DD_CAPTURE_LAMBDA_PAYLOAD";
 
 export const defaultConfiguration: Configuration = {
   addLayers: true,
@@ -82,43 +89,44 @@ export const defaultConfiguration: Configuration = {
   injectLogContext: true,
   exclude: [],
   integrationTesting: false,
-  subscribeToApiGatewayLogs: true,
-  subscribeToHttpApiLogs: true,
-  subscribeToWebsocketLogs: true,
+  subscribeToAccessLogs: true,
+  subscribeToExecutionLogs: false,
   enableDDLogs: true,
+  captureLambdaPayload: false,
 };
 
-export function setEnvConfiguration(config: Configuration, service: Service) {
-  const provider = service.provider as any;
-
-  if (provider.environment === undefined) {
-    provider.environment = {};
-  }
-  const environment = provider.environment as any;
-  if (config.apiKey !== undefined && environment[apiKeyEnvVar] === undefined) {
-    environment[apiKeyEnvVar] = config.apiKey;
-  }
-  if (config.apiKMSKey !== undefined && environment[apiKeyKMSEnvVar] === undefined) {
-    environment[apiKeyKMSEnvVar] = config.apiKMSKey;
-  }
-  if (environment[siteURLEnvVar] === undefined) {
-    environment[siteURLEnvVar] = config.site;
-  }
-  if (environment[logLevelEnvVar] === undefined) {
-    environment[logLevelEnvVar] = config.logLevel;
-  }
-  if (environment[logForwardingEnvVar] === undefined && config.addExtension === false) {
-    environment[logForwardingEnvVar] = config.flushMetricsToLogs;
-  }
-  if (config.enableDDTracing !== undefined && environment[ddTracingEnabledEnvVar] === undefined) {
-    environment[ddTracingEnabledEnvVar] = config.enableDDTracing;
-  }
-  if (config.injectLogContext !== undefined && environment[logInjectionEnvVar] === undefined) {
-    environment[logInjectionEnvVar] = config.injectLogContext;
-  }
-  if (config.enableDDLogs !== undefined && environment[ddLogsEnabledEnvVar] === undefined) {
-    environment[ddLogsEnabledEnvVar] = config.enableDDLogs;
-  }
+export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]) {
+  handlers.forEach(({ handler }) => {
+    handler.environment ??= {};
+    const environment = handler.environment as any;
+    if (config.apiKey !== undefined && environment[apiKeyEnvVar] === undefined) {
+      environment[apiKeyEnvVar] = config.apiKey;
+    }
+    if (config.apiKMSKey !== undefined && environment[apiKeyKMSEnvVar] === undefined) {
+      environment[apiKeyKMSEnvVar] = config.apiKMSKey;
+    }
+    if (environment[siteURLEnvVar] === undefined) {
+      environment[siteURLEnvVar] = config.site;
+    }
+    if (environment[logLevelEnvVar] === undefined) {
+      environment[logLevelEnvVar] = config.logLevel;
+    }
+    if (environment[logForwardingEnvVar] === undefined && config.addExtension === false) {
+      environment[logForwardingEnvVar] = config.flushMetricsToLogs;
+    }
+    if (config.enableDDTracing !== undefined && environment[ddTracingEnabledEnvVar] === undefined) {
+      environment[ddTracingEnabledEnvVar] = config.enableDDTracing;
+    }
+    if (config.injectLogContext !== undefined && environment[logInjectionEnvVar] === undefined) {
+      environment[logInjectionEnvVar] = config.injectLogContext;
+    }
+    if (config.enableDDLogs !== undefined && environment[ddLogsEnabledEnvVar] === undefined) {
+      environment[ddLogsEnabledEnvVar] = config.enableDDLogs;
+    }
+    if (environment[ddCaptureLambdaPayloadEnvVar] === undefined) {
+      environment[ddCaptureLambdaPayloadEnvVar] = config.captureLambdaPayload;
+    }
+  });
 }
 
 export function getConfig(service: Service): Configuration {

@@ -28,9 +28,9 @@ export const TIMEOUT: ServerlessMonitor = {
 
 export const OUT_OF_MEMORY: ServerlessMonitor = {
   name: "Out of Memory on {{functionname.name}} in {{region.name}} for {{aws_account.name}}",
-  threshold: 1,
+  threshold: 0,
   query: (cloudFormationStackId: string, criticalThreshold: number) => {
-    return `avg(last_15m):sum:aws.lambda.enhanced.max_memory_used{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() / sum:aws.lambda.memorysize{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() >= ${criticalThreshold}`;
+    return `avg(last_15m):sum:aws.lambda.enhanced.out_of_memory{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,functionname,region} > ${criticalThreshold}`;
   },
   message:
     "At least one invocation in the selected time range ran out of memory. Resolution: Lambda functions that use more than their allotted amount of memory can be killed by the Lambda runtime. To users, this may look like failed requests to your application. [Distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing) can help you pinpoint parts of your application using excessive amounts of memory. Consider increasing the amount of memory your Lambda function is allowed to use.",

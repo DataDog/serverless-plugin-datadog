@@ -18,8 +18,13 @@ interface QueriedMonitor {
   tags: string[];
 }
 
-export async function createMonitor(monitorParams: MonitorParams, monitorsApiKey: string, monitorsAppKey: string) {
-  const response: Response = await fetch("https://api.datadoghq.com/api/v1/monitor", {
+export async function createMonitor(
+  site: string,
+  monitorParams: MonitorParams,
+  monitorsApiKey: string,
+  monitorsAppKey: string,
+) {
+  const response: Response = await fetch(`https://api.${site}/api/v1/monitor`, {
     method: "POST",
     headers: {
       "DD-API-KEY": monitorsApiKey,
@@ -33,12 +38,13 @@ export async function createMonitor(monitorParams: MonitorParams, monitorsApiKey
 }
 
 export async function updateMonitor(
+  site: string,
   monitorId: number,
   monitorParams: MonitorParams,
   monitorsApiKey: string,
   monitorsAppKey: string,
 ) {
-  const response: Response = await fetch(`https://api.datadoghq.com/api/v1/monitor/${monitorId}`, {
+  const response: Response = await fetch(`https://api.${site}/api/v1/monitor/${monitorId}`, {
     method: "PUT",
     headers: {
       "DD-API-KEY": monitorsApiKey,
@@ -51,8 +57,8 @@ export async function updateMonitor(
   return response;
 }
 
-export async function deleteMonitor(monitorId: number, monitorsApiKey: string, monitorsAppKey: string) {
-  const response: Response = await fetch(`https://api.datadoghq.com/api/v1/monitor/${monitorId}`, {
+export async function deleteMonitor(site: string, monitorId: number, monitorsApiKey: string, monitorsAppKey: string) {
+  const response: Response = await fetch(`https://api.${site}/api/v1/monitor/${monitorId}`, {
     method: "DELETE",
     headers: {
       "DD-API-KEY": monitorsApiKey,
@@ -64,9 +70,9 @@ export async function deleteMonitor(monitorId: number, monitorsApiKey: string, m
   return response;
 }
 
-export async function searchMonitors(queryTag: string, monitorsApiKey: string, monitorsAppKey: string) {
+export async function searchMonitors(site: string, queryTag: string, monitorsApiKey: string, monitorsAppKey: string) {
   const query = `tag:"${queryTag}"`;
-  const response: Response = await fetch(`https://api.datadoghq.com/api/v1/monitor/search?query=${query}`, {
+  const response: Response = await fetch(`https://api.${site}/api/v1/monitor/search?query=${query}`, {
     method: "GET",
     headers: {
       "DD-API-KEY": monitorsApiKey,
@@ -95,7 +101,7 @@ export async function getCloudFormationStackId(serverless: Serverless) {
       { StackName: stackName },
       { region: serverless.getProvider("aws").getRegion() },
     )
-    .catch((err) => {
+    .catch(() => {
       // Ignore any request exceptions, fail silently and skip output logging
     });
   const cloudFormationStackId: string = describeStackOutput ? describeStackOutput.Stacks[0].StackId : "";
@@ -103,11 +109,13 @@ export async function getCloudFormationStackId(serverless: Serverless) {
 }
 
 export async function getExistingMonitors(
+  site: string,
   cloudFormationStackId: string,
   monitorsApiKey: string,
   monitorsAppKey: string,
 ) {
   const existingMonitors = await searchMonitors(
+    site,
     `aws_cloudformation_stack-id:${cloudFormationStackId}`,
     monitorsApiKey,
     monitorsAppKey,

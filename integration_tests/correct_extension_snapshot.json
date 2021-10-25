@@ -119,6 +119,12 @@
         "LogGroupName": "/aws/lambda/dd-sls-plugin-integration-test-dev-JavascriptHello14-x"
       }
     },
+    "ExcludeThisLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/dd-sls-plugin-integration-test-dev-ExcludeThis"
+      }
+    },
     "IamRoleLambdaExecution": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -231,6 +237,7 @@
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LAMBDA_HANDLER": "py_handler.hello"
           }
@@ -285,6 +292,7 @@
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LAMBDA_HANDLER": "py_handler.hello"
           }
@@ -339,6 +347,7 @@
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LAMBDA_HANDLER": "py_handler.hello"
           }
@@ -393,6 +402,7 @@
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LAMBDA_HANDLER": "py_handler.hello"
           }
@@ -447,6 +457,7 @@
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LAMBDA_HANDLER": "py_handler.hello"
           }
@@ -501,6 +512,7 @@
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LAMBDA_HANDLER": "js_handler.hello"
           }
@@ -555,6 +567,7 @@
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LAMBDA_HANDLER": "js_handler.hello"
           }
@@ -609,6 +622,7 @@
             "DD_TRACE_ENABLED": true,
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LAMBDA_HANDLER": "js_handler.hello"
           }
@@ -626,6 +640,31 @@
       },
       "DependsOn": [
         "JavascriptHello14DashxLogGroup"
+      ]
+    },
+    "ExcludeThisLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/dd-sls-plugin-integration-test.zip"
+        },
+        "Handler": "js_handler.hello",
+        "Runtime": "nodejs14.x",
+        "FunctionName": "dd-sls-plugin-integration-test-dev-ExcludeThis",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "ExcludeThisLogGroup"
       ]
     },
     "PythonHello27LambdaVersionXXXX": {
@@ -704,6 +743,16 @@
       "Properties": {
         "FunctionName": {
           "Ref": "JavascriptHello14DashxLambdaFunction"
+        },
+        "CodeSha256": "XXXX"
+      }
+    },
+    "ExcludeThisLambdaVersionXXXX": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "ExcludeThisLambdaFunction"
         },
         "CodeSha256": "XXXX"
       }
@@ -788,6 +837,15 @@
       },
       "Export": {
         "Name": "sls-dd-sls-plugin-integration-test-dev-JavascriptHello14DashxLambdaFunctionQualifiedArn"
+      }
+    },
+    "ExcludeThisLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "ExcludeThisLambdaVersionXXXX"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-ExcludeThisLambdaFunctionQualifiedArn"
       }
     }
   }
