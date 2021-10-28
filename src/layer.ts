@@ -75,11 +75,9 @@ export function applyLambdaLibraryLayers(service: Service, handlers: FunctionInf
 
     const { runtime } = handler;
     const lambdaLayerARN = runtime !== undefined ? regionRuntimes[runtime] : undefined;
-    let currentLayers = getLayers(service, handler);
 
     if (lambdaLayerARN) {
-      currentLayers = pushLayerARN([lambdaLayerARN], currentLayers);
-      setLayers(handler, currentLayers);
+      addLayer(service, handler, lambdaLayerARN);
     }
   }
 }
@@ -97,10 +95,8 @@ export function applyExtensionLayer(service: Service, handlers: FunctionInfo[], 
     }
     let extensionLayerARN: string | undefined;
     extensionLayerARN = regionRuntimes[extensionLayerKey];
-    let currentLayers = getLayers(service, handler);
     if (extensionLayerARN) {
-      currentLayers = pushLayerARN([extensionLayerARN], currentLayers);
-      setLayers(handler, currentLayers);
+      addLayer(service, handler, extensionLayerARN);
     }
   }
 }
@@ -118,14 +114,15 @@ export function isFunctionDefinitionHandler(funcDef: FunctionDefinition): funcDe
   return typeof (funcDef as any).handler === "string";
 }
 
-function getLayers(service: Service, handler: FunctionInfo): string[] {
+function addLayer(service: Service, handler: FunctionInfo, layerArn: string) {
   const functionLayersList = ((handler.handler as any).layers as string[] | string[]) || [];
   const serviceLayerList = ((service.provider as any).layers as string[] | string[]) || [];
-  const layerList = serviceLayerList?.concat(functionLayersList);
-
-  return layerList;
-}
-
-function setLayers(handler: FunctionInfo, layers: string[]) {
-  (handler.handler as any).layers = [...new Set(layers)];
+  // Function-level layers override service-level layers
+  // Append to the function-level layers only if other function-level layers are present
+  // or if no service-level layers are present
+  if (functionLayersList.length > 0 || serviceLayerList.length === 0) {
+    (handler.handler as any).layers = pushLayerARN([layerArn], functionLayersList);
+  } else {
+    (service.provider as any).layers = pushLayerARN([layerArn], serviceLayerList);
+  }
 }

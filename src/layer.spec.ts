@@ -112,7 +112,7 @@ describe("findHandlers", () => {
 });
 
 describe("applyLambdaLibraryLayers", () => {
-  it("adds a layer array if none are present", () => {
+  it("adds a layer array if none are present at the function array or service.provider array", () => {
     const handler = {
       handler: { runtime: "nodejs10.x" },
       type: RuntimeType.NODE,
@@ -150,9 +150,9 @@ describe("applyLambdaLibraryLayers", () => {
     });
   });
 
-  it("appends to the layer array if already present at provider level", () => {
+  it("appends to the provider layer array if the function layer array is empty", () => {
     const handler = {
-      handler: { runtime: "nodejs10.x", layers: ["node:1"] } as any,
+      handler: { runtime: "nodejs10.x" } as any,
       type: RuntimeType.NODE,
       runtime: "nodejs10.x",
     } as FunctionInfo;
@@ -170,7 +170,65 @@ describe("applyLambdaLibraryLayers", () => {
     applyLambdaLibraryLayers(mockService, [handler], layers);
     expect(handler.handler).toEqual({
       runtime: "nodejs10.x",
-      layers: ["my-layer-1", "my-layer-2", "node:1", "node:2"],
+    });
+    expect(mockService.provider).toEqual({
+      layers: ["my-layer-1", "my-layer-2", "node:2"],
+      region: "us-east-1",
+    });
+  });
+
+  it("appends to the function layer array if the function layer array and service.provider layer array each have items", () => {
+    const handler = {
+      handler: { runtime: "nodejs10.x", layers: ["my-layer-1"] } as any,
+      type: RuntimeType.NODE,
+      runtime: "nodejs10.x",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: { "us-east-1": { "nodejs10.x": "node:2" } },
+    };
+    const mockService = createMockService(
+      "us-east-1",
+      {
+        "node-function": { handler: "myfile.handler", runtime: "nodejs10.x" },
+      },
+      [],
+      ["ignored-service-layer"], // Eventually this is ignored by Serverless
+    );
+    applyLambdaLibraryLayers(mockService, [handler], layers);
+    expect(handler.handler).toEqual({
+      runtime: "nodejs10.x",
+      layers: ["my-layer-1", "node:2"],
+    });
+    expect(mockService.provider).toEqual({
+      layers: ["ignored-service-layer"],
+      region: "us-east-1",
+    });
+  });
+
+  it("appends to the service array only if the functions array is empty and the service array has items", () => {
+    const handler = {
+      handler: { runtime: "nodejs10.x" } as any,
+      type: RuntimeType.NODE,
+      runtime: "nodejs10.x",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: { "us-east-1": { "nodejs10.x": "node:2" } },
+    };
+    const mockService = createMockService(
+      "us-east-1",
+      {
+        "node-function": { handler: "myfile.handler", runtime: "nodejs10.x" },
+      },
+      [],
+      ["used-service-layer"],
+    );
+    applyLambdaLibraryLayers(mockService, [handler], layers);
+    expect(handler.handler).toEqual({
+      runtime: "nodejs10.x",
+    });
+    expect(mockService.provider).toEqual({
+      layers: ["used-service-layer", "node:2"],
+      region: "us-east-1",
     });
   });
 
@@ -323,7 +381,10 @@ describe("applyLambdaLibraryLayers", () => {
     applyExtensionLayer(mockService, [handler], layers);
     expect(handler.handler).toEqual({
       runtime: "nodejs10.x",
+    });
+    expect(mockService.provider).toEqual({
       layers: ["my-layer-1", "my-layer-2", "node:2", "extension:5"],
+      region: "us-east-1",
     });
   });
 });
