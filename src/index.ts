@@ -250,7 +250,7 @@ function configHasOldProperties(obj: any) {
 }
 
 function validateConfiguration(config: Configuration) {
-  checkForMultipleApiKeys(config)
+  checkForMultipleApiKeys(config);
 
   const siteList: string[] = [
     "datadoghq.com",
