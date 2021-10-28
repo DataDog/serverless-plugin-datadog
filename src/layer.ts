@@ -127,5 +127,5 @@ function getLayers(service: Service, handler: FunctionInfo): string[] {
 }
 
 function setLayers(handler: FunctionInfo, layers: string[]) {
-  (handler.handler as any).layers = layers;
+  (handler.handler as any).layers = [...new Set(layers)];
 }

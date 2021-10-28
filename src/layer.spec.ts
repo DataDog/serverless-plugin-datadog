@@ -311,14 +311,19 @@ describe("applyLambdaLibraryLayers", () => {
     const layers: LayerJSON = {
       regions: { "us-east-1": { "nodejs10.x": "node:2", extension: "extension:5" } },
     };
-    const mockService = createMockService("us-east-1", {
-      "node-function": { handler: "myfile.handler", runtime: "nodejs10.x" },
-    });
+    const mockService = createMockService(
+      "us-east-1",
+      {
+        "node-function": { handler: "myfile.handler", runtime: "nodejs10.x" },
+      },
+      [],
+      ["my-layer-1", "my-layer-2"],
+    );
     applyLambdaLibraryLayers(mockService, [handler], layers);
     applyExtensionLayer(mockService, [handler], layers);
     expect(handler.handler).toEqual({
       runtime: "nodejs10.x",
-      layers: ["node:2", "extension:5"],
+      layers: ["my-layer-1", "my-layer-2", "node:2", "extension:5"],
     });
   });
 });
