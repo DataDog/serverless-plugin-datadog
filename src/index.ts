@@ -265,10 +265,16 @@ function validateConfiguration(config: Configuration) {
     throw new Error(`${multipleApiKeysMessage} should not be set at the same time.`);
   }
 
-  const siteList: string[] = ["datadoghq.com", "datadoghq.eu", "us3.datadoghq.com", "ddog-gov.com"];
+  const siteList: string[] = [
+    "datadoghq.com",
+    "datadoghq.eu",
+    "us3.datadoghq.com",
+    "us5.datadoghq.com",
+    "ddog-gov.com",
+  ];
   if (config.site !== undefined && !siteList.includes(config.site.toLowerCase())) {
     throw new Error(
-      "Warning: Invalid site URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, or ddog-gov.com.",
+      "Warning: Invalid site URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, us5.datadoghq.com, or ddog-gov.com.",
     );
   }
   if (config.addExtension) {
