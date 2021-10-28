@@ -16,7 +16,7 @@ export interface Configuration {
   addLayers: boolean;
   // Datadog API Key, only necessary when using metrics without log forwarding
   apiKey?: string;
-  // The ARN of the secret storing the Datadog API key.
+  // The ARN of the secret in AWS Secrets Manager containing the Datadog API key.
   apiKeySecretArn?: string;
   // Datadog API Key encrypted using KMS, only necessary when using metrics without log forwarding
   apiKMSKey?: string;

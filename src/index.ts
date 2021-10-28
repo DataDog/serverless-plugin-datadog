@@ -250,20 +250,7 @@ function configHasOldProperties(obj: any) {
 }
 
 function validateConfiguration(config: Configuration) {
-  let multipleApiKeysMessage;
-  if (config.apiKey !== undefined && config.apiKMSKey !== undefined && config.apiKeySecretArn !== undefined) {
-    multipleApiKeysMessage = "`apiKey`, `apiKMSKey`, and `apiKeySecretArn`";
-  } else if (config.apiKey !== undefined && config.apiKMSKey !== undefined) {
-    multipleApiKeysMessage = "`apiKey` and `apiKMSKey`";
-  } else if (config.apiKey !== undefined && config.apiKeySecretArn !== undefined) {
-    multipleApiKeysMessage = "`apiKey` and `apiKeySecretArn`";
-  } else if (config.apiKMSKey !== undefined && config.apiKeySecretArn !== undefined) {
-    multipleApiKeysMessage = "`apiKMSKey` and `apiKeySecretArn`";
-  }
-
-  if (multipleApiKeysMessage) {
-    throw new Error(`${multipleApiKeysMessage} should not be set at the same time.`);
-  }
+  checkForMultipleApiKeys(config)
 
   const siteList: string[] = [
     "datadoghq.com",
@@ -286,6 +273,23 @@ function validateConfiguration(config: Configuration) {
     if (config.monitorsApiKey === undefined || config.monitorsAppKey === undefined) {
       throw new Error("When `monitors` is defined, `monitorsApiKey` and `monitorsAppKey` must also be defined");
     }
+  }
+}
+
+function checkForMultipleApiKeys(config: Configuration) {
+  let multipleApiKeysMessage;
+  if (config.apiKey !== undefined && config.apiKMSKey !== undefined && config.apiKeySecretArn !== undefined) {
+    multipleApiKeysMessage = "`apiKey`, `apiKMSKey`, and `apiKeySecretArn`";
+  } else if (config.apiKey !== undefined && config.apiKMSKey !== undefined) {
+    multipleApiKeysMessage = "`apiKey` and `apiKMSKey`";
+  } else if (config.apiKey !== undefined && config.apiKeySecretArn !== undefined) {
+    multipleApiKeysMessage = "`apiKey` and `apiKeySecretArn`";
+  } else if (config.apiKMSKey !== undefined && config.apiKeySecretArn !== undefined) {
+    multipleApiKeysMessage = "`apiKMSKey` and `apiKeySecretArn`";
+  }
+
+  if (multipleApiKeysMessage) {
+    throw new Error(`${multipleApiKeysMessage} should not be set at the same time.`);
   }
 }
 

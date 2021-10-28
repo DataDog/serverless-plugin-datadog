@@ -258,7 +258,7 @@ describe("setEnvConfiguration", () => {
       {
         addLayers: false,
         apiKey: "1234",
-        apiKeySecretArn: "5678",
+        apiKeySecretArn: "some-resource:from:aws:secrets-manager:arn",
         apiKMSKey: "0912",
         site: "datadoghq.eu",
         logLevel: "debug",
@@ -280,7 +280,7 @@ describe("setEnvConfiguration", () => {
         handler: {
           environment: {
             DD_API_KEY: "1234",
-            DD_API_KEY_SECRET_ARN: "5678",
+            DD_API_KEY_SECRET_ARN: "some-resource:from:aws:secrets-manager:arn",
             DD_FLUSH_TO_LOG: true,
             DD_KMS_API_KEY: "0912",
             DD_LOG_LEVEL: "debug",
@@ -298,7 +298,7 @@ describe("setEnvConfiguration", () => {
         handler: {
           environment: {
             DD_API_KEY: "1234",
-            DD_API_KEY_SECRET_ARN: "5678",
+            DD_API_KEY_SECRET_ARN: "some-resource:from:aws:secrets-manager:arn",
             DD_FLUSH_TO_LOG: true,
             DD_KMS_API_KEY: "0912",
             DD_LOG_LEVEL: "debug",
