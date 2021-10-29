@@ -150,7 +150,7 @@ describe("applyLambdaLibraryLayers", () => {
     });
   });
 
-  it("appends to the provider layer array if the function layer array is empty", () => {
+  it("appends to the function layer array if the function layer array is empty and the provider array has items", () => {
     const handler = {
       handler: { runtime: "nodejs10.x" } as any,
       type: RuntimeType.NODE,
@@ -167,12 +167,17 @@ describe("applyLambdaLibraryLayers", () => {
       [],
       ["my-layer-1", "my-layer-2"],
     );
+    expect(mockService.provider).toEqual({
+      layers: ["my-layer-1", "my-layer-2"],
+      region: "us-east-1",
+    });
     applyLambdaLibraryLayers(mockService, [handler], layers);
     expect(handler.handler).toEqual({
       runtime: "nodejs10.x",
+      layers: ["my-layer-1", "my-layer-2", "node:2"],
     });
     expect(mockService.provider).toEqual({
-      layers: ["my-layer-1", "my-layer-2", "node:2"],
+      layers: ["my-layer-1", "my-layer-2"],
       region: "us-east-1",
     });
   });
@@ -201,33 +206,6 @@ describe("applyLambdaLibraryLayers", () => {
     });
     expect(mockService.provider).toEqual({
       layers: ["ignored-service-layer"],
-      region: "us-east-1",
-    });
-  });
-
-  it("appends to the service array only if the functions array is empty and the service array has items", () => {
-    const handler = {
-      handler: { runtime: "nodejs10.x" } as any,
-      type: RuntimeType.NODE,
-      runtime: "nodejs10.x",
-    } as FunctionInfo;
-    const layers: LayerJSON = {
-      regions: { "us-east-1": { "nodejs10.x": "node:2" } },
-    };
-    const mockService = createMockService(
-      "us-east-1",
-      {
-        "node-function": { handler: "myfile.handler", runtime: "nodejs10.x" },
-      },
-      [],
-      ["used-service-layer"],
-    );
-    applyLambdaLibraryLayers(mockService, [handler], layers);
-    expect(handler.handler).toEqual({
-      runtime: "nodejs10.x",
-    });
-    expect(mockService.provider).toEqual({
-      layers: ["used-service-layer", "node:2"],
       region: "us-east-1",
     });
   });
@@ -380,34 +358,28 @@ describe("applyLambdaLibraryLayers", () => {
     applyLambdaLibraryLayers(mockService, [handler], layers);
     applyExtensionLayer(mockService, [handler], layers);
     expect(handler.handler).toEqual({
+      layers: ["my-layer-1", "my-layer-2", "node:2", "extension:5"],
       runtime: "nodejs10.x",
     });
     expect(mockService.provider).toEqual({
-      layers: ["my-layer-1", "my-layer-2", "node:2", "extension:5"],
+      layers: ["my-layer-1", "my-layer-2"],
       region: "us-east-1",
     });
   });
 });
 
 describe("pushLayerARN", () => {
-  it("pushes two layers", () => {
-    const layerARNs: string[] = ["node:2", "extension:5"];
-    let currentLayers: string[] = [];
-    currentLayers = pushLayerARN(layerARNs, currentLayers);
-    expect(currentLayers).toEqual(["node:2", "extension:5"]);
-  });
-
   it("appends a layer", () => {
-    const layerARNs: string[] = ["extension:5"];
-    let currentLayers: string[] = ["node:2"];
-    currentLayers = pushLayerARN(layerARNs, currentLayers);
+    const layerARN = "extension:5";
+    let currentLayers = ["node:2"];
+    currentLayers = pushLayerARN(layerARN, currentLayers);
     expect(currentLayers).toEqual(["node:2", "extension:5"]);
   });
 
   it("does not re-append an existing layer", () => {
-    const layerARNs: string[] = ["extension:5"];
-    let currentLayers: string[] = ["extension:5"];
-    currentLayers = pushLayerARN(layerARNs, currentLayers);
+    const layerARN = "extension:5";
+    let currentLayers = ["extension:5"];
+    currentLayers = pushLayerARN(layerARN, currentLayers);
     expect(currentLayers).toEqual(["extension:5"]);
   });
 });

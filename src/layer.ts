@@ -101,13 +101,10 @@ export function applyExtensionLayer(service: Service, handlers: FunctionInfo[], 
   }
 }
 
-export function pushLayerARN(layerARNs: string[], currentLayers: string[]) {
-  for (const layerARN of layerARNs) {
-    if (!new Set(currentLayers).has(layerARN)) {
-      currentLayers.push(layerARN);
-    }
-  }
-  return currentLayers;
+export function pushLayerARN(layerARN: string, currentLayers: string[]): string[] {
+  const layerSet = new Set(currentLayers);
+  layerSet.add(layerARN);
+  return Array.from(layerSet);
 }
 
 export function isFunctionDefinitionHandler(funcDef: FunctionDefinition): funcDef is FunctionDefinitionHandler {
@@ -118,11 +115,13 @@ function addLayer(service: Service, handler: FunctionInfo, layerArn: string) {
   const functionLayersList = ((handler.handler as any).layers as string[] | string[]) || [];
   const serviceLayerList = ((service.provider as any).layers as string[] | string[]) || [];
   // Function-level layers override service-level layers
-  // Append to the function-level layers only if other function-level layers are present
-  // or if no service-level layers are present
+  // Append to the function-level layers if other function-level layers are present
+  // If service-level layers are present
+  // Set them at the function level, as our layers are runtime-dependent and could vary
+  // between functions in the same project
   if (functionLayersList.length > 0 || serviceLayerList.length === 0) {
-    (handler.handler as any).layers = pushLayerARN([layerArn], functionLayersList);
+    (handler.handler as any).layers = pushLayerARN(layerArn, functionLayersList);
   } else {
-    (service.provider as any).layers = pushLayerARN([layerArn], serviceLayerList);
+    (handler.handler as any).layers = pushLayerARN(layerArn, serviceLayerList);
   }
 }
