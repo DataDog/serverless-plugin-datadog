@@ -843,7 +843,7 @@
     },
     "ProviderLevelLayerLambdaLayerS3Key": {
       "Description": "Current Lambda layer S3Key",
-      "Value": "serverless/dd-sls-plugin-integration-test/dev/1635525038103-2021-10-29T16:30:38.103Z/ProviderLevelLayer.zip",
+      "Value": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/ProviderLevelLayer.zip",
       "Export": {
         "Name": "sls-dd-sls-plugin-integration-test-dev-ProviderLevelLayerLambdaLayerS3Key"
       }
@@ -866,7 +866,7 @@
     },
     "FunctionLevelLayerLambdaLayerS3Key": {
       "Description": "Current Lambda layer S3Key",
-      "Value": "serverless/dd-sls-plugin-integration-test/dev/1635525038103-2021-10-29T16:30:38.103Z/FunctionLevelLayer.zip",
+      "Value": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/FunctionLevelLayer.zip",
       "Export": {
         "Name": "sls-dd-sls-plugin-integration-test-dev-FunctionLevelLayerLambdaLayerS3Key"
       }
