@@ -8,6 +8,8 @@ provider:
   name: aws
   region: sa-east-1
   lambdaHashingVersion: 20201221
+  layers:
+    - { Ref: ProviderLevelLayerLambdaLayer }
 
 custom:
   datadog:
@@ -39,9 +41,22 @@ functions:
   JavascriptHello12-x:
     handler: js_handler.hello
     runtime: nodejs12.x
+    layers:
+      - { Ref: FunctionLevelLayerLambdaLayer }
   JavascriptHello14-x:
     handler: js_handler.hello
     runtime: nodejs14.x
   ExcludeThis:
     handler: js_handler.hello
     runtime: nodejs14.x
+layers:
+  ProviderLevelLayer:
+    path: ProviderLevelLayer # required, path to layer contents on disk
+    name: ${self:service}-${sls:stage}-ProviderLevelLayer # optional, Deployed Lambda layer name
+    description: It's a text file # optional, Description to publish to AWS
+    compatibleRuntimes: # optional, a list of runtimes this layer is compatible with
+      - nodejs12.x
+  FunctionLevelLayer:
+    path: FunctionLevelLayer
+    name: ${self:service}-${sls:stage}-FunctionLevelLayer # optional, Deployed Lambda layer name
+    description: It's also a text file # optional, Description to publish to AWS
