@@ -39,7 +39,8 @@ for ((i = 0; i < ${#SERVERLESS_CONFIGS[@]}; i++)); do
     echo "Running 'sls package' with ${SERVERLESS_CONFIGS[i]}"
     serverless package --config ${SERVERLESS_CONFIGS[i]}
     # Normalize S3Key timestamps
-    perl -p -i -e 's/("S3Key".*)/"S3Key": "serverless\/dd-sls-plugin-integration-test\/dev\/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX\/dd-sls-plugin-integration-test.zip"/g' ${RAW_CFN_TEMPLATE}
+    perl -p -i -e 's/("serverless\/dd-sls-plugin-integration-test\/dev\/.*\/dd-sls-plugin-integration-test.zip")/"serverless\/dd-sls-plugin-integration-test\/dev\/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX\/dd-sls-plugin-integration-test.zip"/g' ${RAW_CFN_TEMPLATE}
+    perl -p -i -e 's/("serverless\/dd-sls-plugin-integration-test\/dev\/.*\/custom-resources.zip")/"serverless\/dd-sls-plugin-integration-test\/dev\/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX\/custom-resources.zip"/g' ${RAW_CFN_TEMPLATE}
     # Normalize LambdaVersion ID's
     perl -p -i -e 's/(LambdaVersion.*")/LambdaVersionXXXX"/g' ${RAW_CFN_TEMPLATE}
     # Normalize SHA256 hashes

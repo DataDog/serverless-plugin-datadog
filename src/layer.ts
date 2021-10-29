@@ -113,15 +113,15 @@ export function isFunctionDefinitionHandler(funcDef: FunctionDefinition): funcDe
 
 function addLayer(service: Service, handler: FunctionInfo, layerArn: string) {
   const functionLayersList = ((handler.handler as any).layers as string[] | string[]) || [];
-  const serviceLayerList = ((service.provider as any).layers as string[] | string[]) || [];
+  const serviceLayersList = ((service.provider as any).layers as string[] | string[]) || [];
   // Function-level layers override service-level layers
   // Append to the function-level layers if other function-level layers are present
   // If service-level layers are present
   // Set them at the function level, as our layers are runtime-dependent and could vary
   // between functions in the same project
-  if (functionLayersList.length > 0 || serviceLayerList.length === 0) {
+  if (functionLayersList.length > 0 || serviceLayersList.length === 0) {
     (handler.handler as any).layers = pushLayerARN(layerArn, functionLayersList);
   } else {
-    (handler.handler as any).layers = pushLayerARN(layerArn, serviceLayerList);
+    (handler.handler as any).layers = pushLayerARN(layerArn, serviceLayersList);
   }
 }
