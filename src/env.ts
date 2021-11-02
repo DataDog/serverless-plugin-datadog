@@ -109,7 +109,12 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
       environment[apiKeyKMSEnvVar] = config.apiKMSKey;
     }
     const isNode = runtimeLookup[handler.runtime!] === RuntimeType.NODE;
-    if (config.apiKeySecretArn !== undefined && environment[apiKeySecretArnEnvVar] === undefined && !isNode) {
+    const isSendingSynchronousMetrics = !config.addExtension && !config.flushMetricsToLogs;
+    if (
+      config.apiKeySecretArn !== undefined &&
+      environment[apiKeySecretArnEnvVar] === undefined &&
+      !(isSendingSynchronousMetrics && isNode)
+    ) {
       environment[apiKeySecretArnEnvVar] = config.apiKeySecretArn;
     }
     if (environment[siteURLEnvVar] === undefined) {
