@@ -552,4 +552,42 @@ describe("setEnvConfiguration", () => {
       },
     ]);
   });
+
+  it("throws error when trying to add `DD_API_KEY_SECRET_ARN` while using sync metrics in a node runtime", () => {
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+          runtime: "nodejs12.x",
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
+
+    expect(() => {
+      setEnvConfiguration(
+        {
+          addLayers: false,
+          apiKeySecretArn: "some-resource:from:aws:secrets-manager:arn",
+          site: "datadoghq.eu",
+          logLevel: "debug",
+          flushMetricsToLogs: false,
+          enableXrayTracing: true,
+          enableDDTracing: true,
+          enableDDLogs: true,
+          subscribeToAccessLogs: true,
+          subscribeToExecutionLogs: false,
+          addExtension: false,
+          enableTags: true,
+          injectLogContext: false,
+          exclude: ["dd-excluded-function"],
+        },
+        handlers,
+      );
+    }).toThrowError(
+      `\`apiKeySecretArn\` is not supported for Node runtimes when using Synchronous Metrics. Use either \`apiKey\` or \`apiKmsKey\`.`,
+    );
+  });
 });
