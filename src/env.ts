@@ -108,9 +108,9 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     if (config.apiKMSKey !== undefined && environment[apiKeyKMSEnvVar] === undefined) {
       environment[apiKeyKMSEnvVar] = config.apiKMSKey;
     }
-    const isNode = runtimeLookup[handler.runtime!] === RuntimeType.NODE;
-    const isSendingSynchronousMetrics = !config.addExtension && !config.flushMetricsToLogs;
     if (config.apiKeySecretArn !== undefined && environment[apiKeySecretArnEnvVar] === undefined) {
+      const isNode = runtimeLookup[handler.runtime!] === RuntimeType.NODE;
+      const isSendingSynchronousMetrics = !config.addExtension && !config.flushMetricsToLogs;
       if (isSendingSynchronousMetrics && isNode) {
         throw new Error(
           `\`apiKeySecretArn\` is not supported for Node runtimes when using Synchronous Metrics. Use either \`apiKey\` or \`apiKmsKey\`.`,
