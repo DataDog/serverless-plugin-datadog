@@ -39,7 +39,8 @@ for ((i = 0; i < ${#SERVERLESS_CONFIGS[@]}; i++)); do
     echo "Running 'sls package' with ${SERVERLESS_CONFIGS[i]}"
     serverless package --config ${SERVERLESS_CONFIGS[i]}
     # Normalize S3Key timestamps
-    perl -p -i -e 's/("S3Key".*)/"S3Key": "serverless\/dd-sls-plugin-integration-test\/dev\/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX\/dd-sls-plugin-integration-test.zip"/g' ${RAW_CFN_TEMPLATE}
+    perl -p -i -e 's/("serverless\/dd-sls-plugin-integration-test\/dev\/.*\/dd-sls-plugin-integration-test.zip")/"serverless\/dd-sls-plugin-integration-test\/dev\/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX\/dd-sls-plugin-integration-test.zip"/g' ${RAW_CFN_TEMPLATE}
+    perl -p -i -e 's/("serverless\/dd-sls-plugin-integration-test\/dev\/.*\/custom-resources.zip")/"serverless\/dd-sls-plugin-integration-test\/dev\/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX\/custom-resources.zip"/g' ${RAW_CFN_TEMPLATE}
     # Normalize LambdaVersion ID's
     perl -p -i -e 's/(LambdaVersion.*")/LambdaVersionXXXX"/g' ${RAW_CFN_TEMPLATE}
     # Normalize SHA256 hashes
@@ -50,6 +51,9 @@ for ((i = 0; i < ${#SERVERLESS_CONFIGS[@]}; i++)); do
     perl -p -i -e 's/(arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-(Python27|Python36|Python37|Python38|Python39|Node10-x|Node12-x|Node14-x|Extension):\d+)/arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-\2:XXX/g' ${RAW_CFN_TEMPLATE}
     # Normalize API Gateway timestamps
     perl -p -i -e 's/("ApiGatewayDeployment.*")/"ApiGatewayDeploymentxxxx"/g' ${RAW_CFN_TEMPLATE}
+    # Normalize layer timestamps
+    perl -p -i -e 's/("serverless\/dd-sls-plugin-integration-test\/dev\/.*\/ProviderLevelLayer.zip")/"serverless\/dd-sls-plugin-integration-test\/dev\/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX\/ProviderLevelLayer.zip"/g' ${RAW_CFN_TEMPLATE}
+    perl -p -i -e 's/("serverless\/dd-sls-plugin-integration-test\/dev\/.*\/FunctionLevelLayer.zip")/"serverless\/dd-sls-plugin-integration-test\/dev\/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX\/FunctionLevelLayer.zip"/g' ${RAW_CFN_TEMPLATE}
     cp ${RAW_CFN_TEMPLATE} ${TEST_SNAPSHOTS[i]}
     echo "===================================="
     if [ "$UPDATE_SNAPSHOTS" = "true" ]; then

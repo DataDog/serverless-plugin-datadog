@@ -96,10 +96,8 @@ export function applyLambdaLibraryLayers(service: Service, handlers: FunctionInf
     }
 
     const lambdaLayerARN = runtimeKey !== undefined ? regionRuntimes[runtimeKey] : undefined;
-    let currentLayers = getLayers(service, handler);
     if (lambdaLayerARN) {
-      currentLayers = pushLayerARN([lambdaLayerARN], currentLayers);
-      setLayers(handler, currentLayers);
+      addLayer(service, handler, lambdaLayerARN);
     }
   }
 }
@@ -127,33 +125,39 @@ export function applyExtensionLayer(service: Service, handlers: FunctionInfo[], 
     }
 
     extensionLayerARN = regionRuntimes[extensionLayerKey];
-    let currentLayers = getLayers(service, handler);
     if (extensionLayerARN) {
-      currentLayers = pushLayerARN([extensionLayerARN], currentLayers);
-      setLayers(handler, currentLayers);
+      addLayer(service, handler, extensionLayerARN);
     }
   }
 }
 
-export function pushLayerARN(layerARNs: string[], currentLayers: string[]) {
-  for (const layerARN of layerARNs) {
-    if (!new Set(currentLayers).has(layerARN)) {
-      currentLayers.push(layerARN);
-    }
-  }
-  return currentLayers;
+export function pushLayerARN(layerARN: string, currentLayers: string[]): string[] {
+  const layerSet = new Set(currentLayers);
+  layerSet.add(layerARN);
+  return Array.from(layerSet);
 }
 
 export function isFunctionDefinitionHandler(funcDef: FunctionDefinition): funcDef is FunctionDefinitionHandler {
   return typeof (funcDef as any).handler === "string";
 }
 
-function getLayers(service: Service, handler: FunctionInfo): string[] {
-  const functionLayersList = ((handler.handler as any).layers as string[] | string[]) || [];
-  const serviceLayerList = ((service.provider as any).layers as string[] | string[]) || [];
-  const layerList = serviceLayerList?.concat(functionLayersList);
+function addLayer(service: Service, handler: FunctionInfo, layerArn: string) {
+  setLayers(handler, pushLayerARN(layerArn, getLayers(service, handler)));
+}
 
-  return layerList;
+function getLayers(service: Service, handler: FunctionInfo) {
+  const functionLayersList = ((handler.handler as any).layers as string[] | string[]) || [];
+  const serviceLayersList = ((service.provider as any).layers as string[] | string[]) || [];
+  // Function-level layers override service-level layers
+  // Append to the function-level layers if other function-level layers are present
+  // If service-level layers are present
+  // Set them at the function level, as our layers are runtime-dependent and could vary
+  // between functions in the same project
+  if (functionLayersList.length > 0 || serviceLayersList.length === 0) {
+    return functionLayersList;
+  } else {
+    return serviceLayersList;
+  }
 }
 
 function removePreviousLayer(service: Service, handler: FunctionInfo, previousLayer: string | undefined) {

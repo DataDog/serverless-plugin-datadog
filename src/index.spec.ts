@@ -19,7 +19,7 @@ function awsMock(): Aws {
   return {
     getAccountId: () => Promise.resolve("111111111111"),
     getStage: () => "dev",
-    request: (service, method, params: any) => {
+    request: (_service, method, _params: any) => {
       if (method == "describeSubscriptionFilters") {
         return Promise.reject("Log group doesn't exist");
       }
@@ -395,7 +395,7 @@ describe("ServerlessPlugin", () => {
       }
       expect(threwError).toBe(true);
       expect(thrownErrorMessage).toEqual(
-        "Warning: Invalid site URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, or ddog-gov.com.",
+        "Warning: Invalid site URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, us5.datadoghq.com, or ddog-gov.com.",
       );
     });
 
@@ -447,7 +447,7 @@ describe("ServerlessPlugin", () => {
     it("adds subscription filters when forwarderArn is set", async () => {
       const serverless = {
         cli: { log: () => {} },
-        getProvider: (name: string) => awsMock(),
+        getProvider: (_name: string) => awsMock(),
         service: {
           getServiceName: () => "dev",
           getAllFunctions: () => [],
@@ -827,7 +827,7 @@ describe("ServerlessPlugin", () => {
     it("Does not attempt add execution log groups if subscribeToExecutionLogs is false", async () => {
       const serverless = {
         cli: { log: () => {} },
-        getProvider: (name: string) => awsMock(),
+        getProvider: (_name: string) => awsMock(),
         service: {
           getServiceName: () => "dev",
           getAllFunctions: () => [],
@@ -867,7 +867,7 @@ describe("ServerlessPlugin", () => {
     it("Does attempt to add execution log groups if subscribeToExecutionLogs is true", async () => {
       const serverless = {
         cli: { log: () => {} },
-        getProvider: (name: string) => awsMock(),
+        getProvider: (_name: string) => awsMock(),
         service: {
           getServiceName: () => "dev",
           getAllFunctions: () => [],
@@ -907,7 +907,7 @@ describe("ServerlessPlugin", () => {
     it("Throws an error if the config has old properties", async () => {
       const serverless = {
         cli: { log: () => {} },
-        getProvider: (name: string) => awsMock(),
+        getProvider: (_name: string) => awsMock(),
         service: {
           getServiceName: () => "dev",
           getAllFunctions: () => [],
@@ -949,7 +949,7 @@ describe("ServerlessPlugin", () => {
     it("Throws the correct error if the config has multiple old properties", async () => {
       const serverless = {
         cli: { log: () => {} },
-        getProvider: (name: string) => awsMock(),
+        getProvider: (_name: string) => awsMock(),
         service: {
           getServiceName: () => "dev",
           getAllFunctions: () => [],

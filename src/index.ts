@@ -243,7 +243,13 @@ function configHasOldProperties(obj: any) {
 }
 
 function validateConfiguration(config: Configuration) {
-  const siteList: string[] = ["datadoghq.com", "datadoghq.eu", "us3.datadoghq.com", "ddog-gov.com"];
+  const siteList: string[] = [
+    "datadoghq.com",
+    "datadoghq.eu",
+    "us3.datadoghq.com",
+    "us5.datadoghq.com",
+    "ddog-gov.com",
+  ];
 
   if (config.apiKey !== undefined && config.apiKMSKey !== undefined) {
     throw new Error("`apiKey` and `apiKMSKey` should not be set at the same time.");
@@ -251,7 +257,7 @@ function validateConfiguration(config: Configuration) {
 
   if (config.site !== undefined && !siteList.includes(config.site.toLowerCase())) {
     throw new Error(
-      "Warning: Invalid site URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, or ddog-gov.com.",
+      "Warning: Invalid site URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, us5.datadoghq.com, or ddog-gov.com.",
     );
   }
   if (config.addExtension) {

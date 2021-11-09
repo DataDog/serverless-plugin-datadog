@@ -202,6 +202,35 @@
         }
       }
     },
+    "ProviderLevelLayerLambdaLayer": {
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "Content": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/ProviderLevelLayer.zip"
+        },
+        "LayerName": "dd-sls-plugin-integration-test-dev-ProviderLevelLayer",
+        "Description": "It's a text file",
+        "CompatibleRuntimes": [
+          "nodejs12.x"
+        ]
+      }
+    },
+    "FunctionLevelLayerLambdaLayer": {
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "Content": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/FunctionLevelLayer.zip"
+        },
+        "LayerName": "dd-sls-plugin-integration-test-dev-FunctionLevelLayer",
+        "Description": "It's also a text file"
+      }
+    },
     "PythonHello27LambdaFunction": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
@@ -249,6 +278,9 @@
           ]
         },
         "Layers": [
+          {
+            "Ref": "ProviderLevelLayerLambdaLayer"
+          },
           "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python27:XXX",
           "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
@@ -304,6 +336,9 @@
           ]
         },
         "Layers": [
+          {
+            "Ref": "ProviderLevelLayerLambdaLayer"
+          },
           "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python36:XXX",
           "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
@@ -359,6 +394,9 @@
           ]
         },
         "Layers": [
+          {
+            "Ref": "ProviderLevelLayerLambdaLayer"
+          },
           "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python37:XXX",
           "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
@@ -414,6 +452,9 @@
           ]
         },
         "Layers": [
+          {
+            "Ref": "ProviderLevelLayerLambdaLayer"
+          },
           "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python38:XXX",
           "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
@@ -469,6 +510,9 @@
           ]
         },
         "Layers": [
+          {
+            "Ref": "ProviderLevelLayerLambdaLayer"
+          },
           "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python39:XXX",
           "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
@@ -524,6 +568,9 @@
           ]
         },
         "Layers": [
+          {
+            "Ref": "ProviderLevelLayerLambdaLayer"
+          },
           "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node10-x:XXX",
           "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
@@ -579,6 +626,9 @@
           ]
         },
         "Layers": [
+          {
+            "Ref": "FunctionLevelLayerLambdaLayer"
+          },
           "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node12-x:XXX",
           "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
@@ -634,6 +684,9 @@
           ]
         },
         "Layers": [
+          {
+            "Ref": "ProviderLevelLayerLambdaLayer"
+          },
           "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node14-x:XXX",
           "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
@@ -661,7 +714,12 @@
             "IamRoleLambdaExecution",
             "Arn"
           ]
-        }
+        },
+        "Layers": [
+          {
+            "Ref": "ProviderLevelLayerLambdaLayer"
+          }
+        ]
       },
       "DependsOn": [
         "ExcludeThisLogGroup"
@@ -727,16 +785,6 @@
         "CodeSha256": "XXXX"
       }
     },
-    "JavascriptHello12DashxLambdaVersionXXXX": {
-      "Type": "AWS::Lambda::Version",
-      "DeletionPolicy": "Retain",
-      "Properties": {
-        "FunctionName": {
-          "Ref": "JavascriptHello12DashxLambdaFunction"
-        },
-        "CodeSha256": "XXXX"
-      }
-    },
     "JavascriptHello14DashxLambdaVersionXXXX": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
@@ -756,6 +804,16 @@
         },
         "CodeSha256": "XXXX"
       }
+    },
+    "JavascriptHello12DashxLambdaVersionXXXX": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "JavascriptHello12DashxLambdaFunction"
+        },
+        "CodeSha256": "XXXX"
+      }
     }
   },
   "Outputs": {
@@ -765,6 +823,52 @@
       },
       "Export": {
         "Name": "sls-dd-sls-plugin-integration-test-dev-ServerlessDeploymentBucketName"
+      }
+    },
+    "ProviderLevelLayerLambdaLayerQualifiedArn": {
+      "Description": "Current Lambda layer version",
+      "Value": {
+        "Ref": "ProviderLevelLayerLambdaLayer"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-ProviderLevelLayerLambdaLayerQualifiedArn"
+      }
+    },
+    "ProviderLevelLayerLambdaLayerHash": {
+      "Description": "Current Lambda layer hash",
+      "Value": "ca99f65eb22bc573edd4f9ac2a087d0dd5acc751",
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-ProviderLevelLayerLambdaLayerHash"
+      }
+    },
+    "ProviderLevelLayerLambdaLayerS3Key": {
+      "Description": "Current Lambda layer S3Key",
+      "Value": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/ProviderLevelLayer.zip",
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-ProviderLevelLayerLambdaLayerS3Key"
+      }
+    },
+    "FunctionLevelLayerLambdaLayerQualifiedArn": {
+      "Description": "Current Lambda layer version",
+      "Value": {
+        "Ref": "FunctionLevelLayerLambdaLayer"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-FunctionLevelLayerLambdaLayerQualifiedArn"
+      }
+    },
+    "FunctionLevelLayerLambdaLayerHash": {
+      "Description": "Current Lambda layer hash",
+      "Value": "0f01889b95d76f2e1385d132d4a12c58ca99d568",
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-FunctionLevelLayerLambdaLayerHash"
+      }
+    },
+    "FunctionLevelLayerLambdaLayerS3Key": {
+      "Description": "Current Lambda layer S3Key",
+      "Value": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/FunctionLevelLayer.zip",
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-FunctionLevelLayerLambdaLayerS3Key"
       }
     },
     "PythonHello27LambdaFunctionQualifiedArn": {
@@ -821,15 +925,6 @@
         "Name": "sls-dd-sls-plugin-integration-test-dev-JavascriptHello10DashxLambdaFunctionQualifiedArn"
       }
     },
-    "JavascriptHello12DashxLambdaFunctionQualifiedArn": {
-      "Description": "Current Lambda function version",
-      "Value": {
-        "Ref": "JavascriptHello12DashxLambdaVersionXXXX"
-      },
-      "Export": {
-        "Name": "sls-dd-sls-plugin-integration-test-dev-JavascriptHello12DashxLambdaFunctionQualifiedArn"
-      }
-    },
     "JavascriptHello14DashxLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
@@ -846,6 +941,15 @@
       },
       "Export": {
         "Name": "sls-dd-sls-plugin-integration-test-dev-ExcludeThisLambdaFunctionQualifiedArn"
+      }
+    },
+    "JavascriptHello12DashxLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "JavascriptHello12DashxLambdaVersionXXXX"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-JavascriptHello12DashxLambdaFunctionQualifiedArn"
       }
     }
   }

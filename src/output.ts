@@ -40,7 +40,7 @@ export async function printOutputs(serverless: Serverless, site: string) {
       { StackName: stackName },
       { region: serverless.getProvider("aws").getRegion() },
     )
-    .catch((err) => {
+    .catch(() => {
       // Ignore any request exceptions, fail silently and skip output logging
     });
   if (describeStackOutput === undefined) {
