@@ -58,7 +58,7 @@ export const HIGH_COLD_START_RATE: ServerlessMonitor = {
 
 export const HIGH_THROTTLES: ServerlessMonitor = {
   name: "High Throttles on {{functionname.name}} in {{region.name}} for {{aws_account.name}}",
-  threshold: 0.2,
+  threshold: 0.1,
   query: (cloudFormationStackId: string, criticalThreshold: number) => {
     return `avg(last_15m):sum:aws.lambda.throttles {aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,region,functionname}.as_count() / ( sum:aws.lambda.throttles {aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,region,functionname}.as_count() + sum:aws.lambda.invocations{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,region,functionname}.as_count() ) >= ${criticalThreshold}`;
   },
