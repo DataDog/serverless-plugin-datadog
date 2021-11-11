@@ -48,7 +48,7 @@ export const HIGH_ITERATOR_AGE: ServerlessMonitor = {
 
 export const HIGH_COLD_START_RATE: ServerlessMonitor = {
   name: "High Cold Start Rate on {{functionname.name}} in {{region.name}} for {{aws_account.name}}",
-  threshold: 0.2,
+  threshold: 0.01,
   query: (cloudFormationStackId: string, criticalThreshold: number) => {
     return `avg(last_15m):sum:aws.lambda.enhanced.invocations{cold_start:true AND aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() / sum:aws.lambda.enhanced.invocations{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() >= ${criticalThreshold}`;
   },
