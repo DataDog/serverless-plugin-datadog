@@ -52,6 +52,9 @@ export interface Configuration {
   enableTags: boolean;
   // When set, the lambda layer will automatically patch console.log with Datadog's tracing ids.
   injectLogContext: boolean;
+  // When set, the plugin will automatically upload git commit data to Datadog and tag the function with
+  // git.commit.sha.
+  enableSourceCodeIntegration: boolean;
 
   // When set, this plugin will not try to redirect the handlers of these specified functions;
   exclude: string[];
@@ -74,6 +77,7 @@ const logLevelEnvVar = "DD_LOG_LEVEL";
 const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
 const ddTracingEnabledEnvVar = "DD_TRACE_ENABLED";
 const logInjectionEnvVar = "DD_LOGS_INJECTION";
+const ddTagsEnvVar = "DD_TAGS";
 const ddLogsEnabledEnvVar = "DD_SERVERLESS_LOGS_ENABLED";
 const ddCaptureLambdaPayloadEnvVar = "DD_CAPTURE_LAMBDA_PAYLOAD";
 
@@ -87,6 +91,7 @@ export const defaultConfiguration: Configuration = {
   addExtension: false,
   enableTags: true,
   injectLogContext: true,
+  enableSourceCodeIntegration: true,
   exclude: [],
   integrationTesting: false,
   subscribeToAccessLogs: true,

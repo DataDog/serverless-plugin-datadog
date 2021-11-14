@@ -7,19 +7,18 @@
  */
 
 import * as Serverless from "serverless";
-import * as layers from "./layers.json";
-import * as govLayers from "./layers-gov.json";
-import { version } from "../package.json";
-
-import { getConfig, setEnvConfiguration, forceExcludeDepsFromWebpack, hasWebpackPlugin, Configuration } from "./env";
-import { applyExtensionLayer, applyLambdaLibraryLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
-import { TracingMode, enableTracing } from "./tracing";
-import { redirectHandlers } from "./wrapper";
-import { addCloudWatchForwarderSubscriptions, addExecutionLogGroupsAndSubscriptions } from "./forwarder";
-import { addOutputLinks, printOutputs } from "./output";
 import { FunctionDefinition } from "serverless";
-import { setMonitors } from "./monitors";
+import { version } from "../package.json";
+import { Configuration, forceExcludeDepsFromWebpack, getConfig, hasWebpackPlugin, setEnvConfiguration } from "./env";
+import { addCloudWatchForwarderSubscriptions, addExecutionLogGroupsAndSubscriptions } from "./forwarder";
+import { applyExtensionLayer, applyLambdaLibraryLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
+import * as govLayers from "./layers-gov.json";
+import * as layers from "./layers.json";
 import { getCloudFormationStackId } from "./monitor-api-requests";
+import { setMonitors } from "./monitors";
+import { addOutputLinks, printOutputs } from "./output";
+import { enableTracing, TracingMode } from "./tracing";
+import { redirectHandlers } from "./wrapper";
 
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
 export interface ExtendedFunctionDefinition extends FunctionDefinition {
@@ -145,6 +144,10 @@ module.exports = class ServerlessPlugin {
 
     this.addTags(handlers, config.enableTags);
 
+    if (config.enableSourceCodeIntegration) {
+      this.addSourceCodeIntegrationTag(handlers);
+    }
+
     redirectHandlers(handlers, config.addLayers, config.customHandler);
     if (config.integrationTesting === false) {
       await addOutputLinks(this.serverless, config.site, handlers);
@@ -223,6 +226,26 @@ module.exports = class ServerlessPlugin {
         }
       }
     });
+  }
+
+  /**
+   * Uploads git metadata for the current directory to Datadog and goes through
+   * each function defined in serverless and attaches the git.commit.sha to DD_TAGS.
+   */
+  private addSourceCodeIntegrationTag(handlers: FunctionInfo[]) {
+    // init simpleGit client
+
+    // get the current git repo
+
+    // if not a git repo, return
+
+    // if a git repo, check if clean, ahead of master, etc.
+    // if, then error
+    // else, upload to datadog
+
+    // get the latest git commit and attach it
+
+    return;
   }
 };
 
