@@ -56,6 +56,12 @@
     ]
   },
   "dependencies": {
-    "node-fetch": "^2.6.1"
+    "@datadog/datadog-ci": "^0.17.9",
+    "@types/async-retry": "^1.4.3",
+    "@types/datadog-metrics": "^0.6.2",
+    "@types/deep-extend": "^0.4.32",
+    "datadog-metrics": "^0.9.3",
+    "node-fetch": "^2.6.1",
+    "proxy": "^1.0.2"
   }
 }

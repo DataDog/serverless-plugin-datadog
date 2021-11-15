@@ -1,8 +1,6 @@
 import * as simpleGit from "simple-git";
-import { Writable } from "stream";
 import { URL } from "url";
-import { CommitInfo } from "./interfaces";
-import { renderGitError } from "./renderer";
+import { CommitInfo } from "./git-metadata/interfaces";
 
 // Returns a configured SimpleGit.
 export const newSimpleGit = async (): Promise<simpleGit.SimpleGit> => {
@@ -68,7 +66,6 @@ export const gitTrackedFiles = async (git: simpleGit.SimpleGit): Promise<string[
 // Returns the current hash, remote URL and tracked files paths.
 export const getCommitInfo = async (
   git: simpleGit.SimpleGit,
-  stdout: Writable,
   repositoryURL?: string,
 ): Promise<CommitInfo | undefined> => {
   // Invoke git commands to retrieve the remote, hash and tracked files.
@@ -85,9 +82,7 @@ export const getCommitInfo = async (
       [remote, hash, trackedFiles] = await Promise.all([gitRemote(git), gitHash(git), gitTrackedFiles(git)]);
     }
   } catch (e) {
-    stdout.write(renderGitError(e));
-
-    return;
+    throw e;
   }
 
   return new CommitInfo(hash, remote, trackedFiles);
