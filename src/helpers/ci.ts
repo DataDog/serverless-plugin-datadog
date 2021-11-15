@@ -1,6 +1,6 @@
-import {URL} from 'url'
+import { URL } from "url";
 
-import {Metadata, SpanTags} from './interfaces'
+import { Metadata, SpanTags } from "./interfaces";
 import {
   CI_JOB_NAME,
   CI_JOB_URL,
@@ -19,78 +19,78 @@ import {
   GIT_REPOSITORY_URL,
   GIT_SHA,
   GIT_TAG,
-} from './tags'
-import {removeEmptyValues} from './utils'
+} from "./tags";
+import { removeEmptyValues } from "./utils";
 
 export const CI_ENGINES = {
-  APPVEYOR: 'appveyor',
-  AZURE: 'azurepipelines',
-  BITBUCKET: 'bitbucket',
-  BITRISE: 'bitrise',
-  BUILDKITE: 'buildkite',
-  CIRCLECI: 'circleci',
-  GITHUB: 'github',
-  GITLAB: 'gitlab',
-  JENKINS: 'jenkins',
-  TRAVIS: 'travisci',
-}
+  APPVEYOR: "appveyor",
+  AZURE: "azurepipelines",
+  BITBUCKET: "bitbucket",
+  BITRISE: "bitrise",
+  BUILDKITE: "buildkite",
+  CIRCLECI: "circleci",
+  GITHUB: "github",
+  GITLAB: "gitlab",
+  JENKINS: "jenkins",
+  TRAVIS: "travisci",
+};
 
 // Receives a string with the form 'John Doe <john.doe@gmail.com>'
 // and returns { name: 'John Doe', email: 'john.doe@gmail.com' }
 const parseEmailAndName = (emailAndName: string | undefined) => {
   if (!emailAndName) {
-    return {name: '', email: ''}
+    return { name: "", email: "" };
   }
-  let name = ''
-  let email = ''
-  const matchNameAndEmail = emailAndName.match(/(?:"?([^"]*)"?\s)?(?:<?(.+@[^>]+)>?)/)
+  let name = "";
+  let email = "";
+  const matchNameAndEmail = emailAndName.match(/(?:"?([^"]*)"?\s)?(?:<?(.+@[^>]+)>?)/);
   if (matchNameAndEmail) {
-    name = matchNameAndEmail[1]
-    email = matchNameAndEmail[2]
+    name = matchNameAndEmail[1];
+    email = matchNameAndEmail[2];
   }
 
-  return {name, email}
-}
+  return { name, email };
+};
 
 const resolveTilde = (filePath: string | undefined) => {
-  if (!filePath || typeof filePath !== 'string') {
-    return ''
+  if (!filePath || typeof filePath !== "string") {
+    return "";
   }
   // '~/folder/path' or '~'
-  if (filePath[0] === '~' && (filePath[1] === '/' || filePath.length === 1)) {
-    return filePath.replace('~', process.env.HOME ?? '')
+  if (filePath[0] === "~" && (filePath[1] === "/" || filePath.length === 1)) {
+    return filePath.replace("~", process.env.HOME ?? "");
   }
 
-  return filePath
-}
+  return filePath;
+};
 
 const filterSensitiveInfoFromRepository = (repositoryUrl: string) => {
-  if (repositoryUrl.startsWith('git@')) {
-    return repositoryUrl
+  if (repositoryUrl.startsWith("git@")) {
+    return repositoryUrl;
   }
   try {
-    const {protocol, hostname, pathname} = new URL(repositoryUrl)
+    const { protocol, hostname, pathname } = new URL(repositoryUrl);
     if (!protocol || !hostname) {
-      return repositoryUrl
+      return repositoryUrl;
     }
 
-    return `${protocol}//${hostname}${pathname}`
+    return `${protocol}//${hostname}${pathname}`;
   } catch (e) {
-    return repositoryUrl
+    return repositoryUrl;
   }
-}
+};
 
 const normalizeRef = (ref: string | undefined) => {
   if (!ref) {
-    return ref
+    return ref;
   }
 
-  return ref.replace(/origin\/|refs\/heads\/|tags\//gm, '')
-}
+  return ref.replace(/origin\/|refs\/heads\/|tags\//gm, "");
+};
 
 export const getCISpanTags = (): SpanTags | undefined => {
-  const env = process.env
-  let tags: SpanTags = {}
+  const env = process.env;
+  let tags: SpanTags = {};
 
   if (env.CIRCLECI) {
     const {
@@ -103,9 +103,9 @@ export const getCISpanTags = (): SpanTags | undefined => {
       CIRCLE_SHA1,
       CIRCLE_REPOSITORY_URL,
       CIRCLE_JOB,
-    } = env
+    } = env;
 
-    const pipelineUrl = `https://app.circleci.com/pipelines/workflows/${CIRCLE_WORKFLOW_ID}`
+    const pipelineUrl = `https://app.circleci.com/pipelines/workflows/${CIRCLE_WORKFLOW_ID}`;
 
     tags = {
       [CI_JOB_URL]: CIRCLE_BUILD_URL,
@@ -118,7 +118,7 @@ export const getCISpanTags = (): SpanTags | undefined => {
       [GIT_SHA]: CIRCLE_SHA1,
       [GIT_REPOSITORY_URL]: CIRCLE_REPOSITORY_URL,
       [CIRCLE_TAG ? GIT_TAG : GIT_BRANCH]: CIRCLE_TAG || CIRCLE_BRANCH,
-    }
+    };
   }
 
   if (env.TRAVIS) {
@@ -134,7 +134,7 @@ export const getCISpanTags = (): SpanTags | undefined => {
       TRAVIS_BUILD_WEB_URL,
       TRAVIS_BUILD_DIR,
       TRAVIS_COMMIT_MESSAGE,
-    } = env
+    } = env;
     tags = {
       [CI_JOB_URL]: TRAVIS_JOB_WEB_URL,
       [CI_PIPELINE_ID]: TRAVIS_BUILD_ID,
@@ -146,11 +146,11 @@ export const getCISpanTags = (): SpanTags | undefined => {
       [GIT_SHA]: TRAVIS_COMMIT,
       [GIT_REPOSITORY_URL]: `https://github.com/${TRAVIS_REPO_SLUG}.git`,
       [GIT_COMMIT_MESSAGE]: TRAVIS_COMMIT_MESSAGE,
-    }
-    const isTag = !!TRAVIS_TAG
-    const ref = TRAVIS_TAG || TRAVIS_PULL_REQUEST_BRANCH || TRAVIS_BRANCH
-    const refKey = isTag ? GIT_TAG : GIT_BRANCH
-    tags[refKey] = ref
+    };
+    const isTag = !!TRAVIS_TAG;
+    const ref = TRAVIS_TAG || TRAVIS_PULL_REQUEST_BRANCH || TRAVIS_BRANCH;
+    const refKey = isTag ? GIT_TAG : GIT_BRANCH;
+    tags[refKey] = ref;
   }
 
   if (env.GITLAB_CI) {
@@ -170,9 +170,9 @@ export const getCISpanTags = (): SpanTags | undefined => {
       CI_COMMIT_MESSAGE,
       CI_COMMIT_TIMESTAMP,
       CI_COMMIT_AUTHOR,
-    } = env
+    } = env;
 
-    const {name, email} = parseEmailAndName(CI_COMMIT_AUTHOR)
+    const { name, email } = parseEmailAndName(CI_COMMIT_AUTHOR);
 
     tags = {
       [CI_JOB_NAME]: GITLAB_CI_JOB_NAME,
@@ -180,7 +180,7 @@ export const getCISpanTags = (): SpanTags | undefined => {
       [CI_PIPELINE_ID]: GITLAB_CI_PIPELINE_ID,
       [CI_PIPELINE_NAME]: CI_PROJECT_PATH,
       [CI_PIPELINE_NUMBER]: CI_PIPELINE_IID,
-      [CI_PIPELINE_URL]: GITLAB_CI_PIPELINE_URL && GITLAB_CI_PIPELINE_URL.replace('/-/pipelines/', '/pipelines/'),
+      [CI_PIPELINE_URL]: GITLAB_CI_PIPELINE_URL && GITLAB_CI_PIPELINE_URL.replace("/-/pipelines/", "/pipelines/"),
       [CI_PROVIDER_NAME]: CI_ENGINES.GITLAB,
       [CI_WORKSPACE_PATH]: CI_PROJECT_DIR,
       [CI_STAGE_NAME]: CI_JOB_STAGE,
@@ -192,7 +192,7 @@ export const getCISpanTags = (): SpanTags | undefined => {
       [GIT_COMMIT_AUTHOR_NAME]: name,
       [GIT_COMMIT_AUTHOR_EMAIL]: email,
       [GIT_COMMIT_AUTHOR_DATE]: CI_COMMIT_TIMESTAMP,
-    }
+    };
   }
 
   if (env.GITHUB_ACTIONS || env.GITHUB_ACTION) {
@@ -205,12 +205,12 @@ export const getCISpanTags = (): SpanTags | undefined => {
       GITHUB_REF,
       GITHUB_SHA,
       GITHUB_REPOSITORY,
-    } = env
-    const repositoryUrl = `https://github.com/${GITHUB_REPOSITORY}.git`
-    const pipelineURL = `https://github.com/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}/checks`
+    } = env;
+    const repositoryUrl = `https://github.com/${GITHUB_REPOSITORY}.git`;
+    const pipelineURL = `https://github.com/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}/checks`;
 
-    const ref = GITHUB_HEAD_REF || GITHUB_REF || ''
-    const refKey = ref.includes('tags') ? GIT_TAG : GIT_BRANCH
+    const ref = GITHUB_HEAD_REF || GITHUB_REF || "";
+    const refKey = ref.includes("tags") ? GIT_TAG : GIT_BRANCH;
 
     tags = {
       [CI_JOB_URL]: pipelineURL,
@@ -223,7 +223,7 @@ export const getCISpanTags = (): SpanTags | undefined => {
       [GIT_SHA]: GITHUB_SHA,
       [GIT_REPOSITORY_URL]: repositoryUrl,
       [refKey]: ref,
-    }
+    };
   }
 
   if (env.JENKINS_URL) {
@@ -237,7 +237,7 @@ export const getCISpanTags = (): SpanTags | undefined => {
       GIT_COMMIT,
       GIT_URL,
       GIT_URL_1,
-    } = env
+    } = env;
 
     tags = {
       [CI_PIPELINE_ID]: BUILD_TAG,
@@ -247,23 +247,23 @@ export const getCISpanTags = (): SpanTags | undefined => {
       [CI_WORKSPACE_PATH]: WORKSPACE,
       [GIT_SHA]: GIT_COMMIT,
       [GIT_REPOSITORY_URL]: GIT_URL || GIT_URL_1,
-    }
-    const isTag = JENKINS_GIT_BRANCH && JENKINS_GIT_BRANCH.includes('tags')
-    const refKey = isTag ? GIT_TAG : GIT_BRANCH
-    const ref = normalizeRef(JENKINS_GIT_BRANCH)
+    };
+    const isTag = JENKINS_GIT_BRANCH && JENKINS_GIT_BRANCH.includes("tags");
+    const refKey = isTag ? GIT_TAG : GIT_BRANCH;
+    const ref = normalizeRef(JENKINS_GIT_BRANCH);
 
-    tags[refKey] = ref
+    tags[refKey] = ref;
 
-    let finalPipelineName = ''
+    let finalPipelineName = "";
     if (JOB_NAME) {
       // Job names can contain parameters, e.g. jobName/KEY1=VALUE1,KEY2=VALUE2/branchName
-      const jobNameAndParams = JOB_NAME.split('/')
-      if (jobNameAndParams.length > 1 && jobNameAndParams[1].includes('=')) {
-        finalPipelineName = jobNameAndParams[0]
+      const jobNameAndParams = JOB_NAME.split("/");
+      if (jobNameAndParams.length > 1 && jobNameAndParams[1].includes("=")) {
+        finalPipelineName = jobNameAndParams[0];
       } else {
-        finalPipelineName = JOB_NAME.replace(`/${ref}`, '')
+        finalPipelineName = JOB_NAME.replace(`/${ref}`, "");
       }
-      tags[CI_PIPELINE_NAME] = finalPipelineName
+      tags[CI_PIPELINE_NAME] = finalPipelineName;
     }
   }
 
@@ -282,10 +282,10 @@ export const getCISpanTags = (): SpanTags | undefined => {
       BUILDKITE_BUILD_AUTHOR,
       BUILDKITE_BUILD_AUTHOR_EMAIL,
       BUILDKITE_MESSAGE,
-    } = env
+    } = env;
 
-    const ref = BUILDKITE_TAG || BUILDKITE_BRANCH
-    const refKey = BUILDKITE_TAG ? GIT_TAG : GIT_BRANCH
+    const ref = BUILDKITE_TAG || BUILDKITE_BRANCH;
+    const refKey = BUILDKITE_TAG ? GIT_TAG : GIT_BRANCH;
 
     tags = {
       [CI_PROVIDER_NAME]: CI_ENGINES.BUILDKITE,
@@ -301,7 +301,7 @@ export const getCISpanTags = (): SpanTags | undefined => {
       [GIT_COMMIT_AUTHOR_NAME]: BUILDKITE_BUILD_AUTHOR,
       [GIT_COMMIT_AUTHOR_EMAIL]: BUILDKITE_BUILD_AUTHOR_EMAIL,
       [GIT_COMMIT_MESSAGE]: BUILDKITE_MESSAGE,
-    }
+    };
   }
 
   if (env.BITRISE_BUILD_SLUG) {
@@ -318,11 +318,11 @@ export const getCISpanTags = (): SpanTags | undefined => {
       GIT_REPOSITORY_URL: BITRISE_GIT_REPOSITORY_URL,
       BITRISE_GIT_TAG,
       BITRISE_GIT_MESSAGE,
-    } = env
+    } = env;
 
-    const isTag = !!BITRISE_GIT_TAG
-    const refKey = isTag ? GIT_TAG : GIT_BRANCH
-    const ref = BITRISE_GIT_TAG || BITRISEIO_GIT_BRANCH_DEST || BITRISE_GIT_BRANCH
+    const isTag = !!BITRISE_GIT_TAG;
+    const refKey = isTag ? GIT_TAG : GIT_BRANCH;
+    const ref = BITRISE_GIT_TAG || BITRISEIO_GIT_BRANCH_DEST || BITRISE_GIT_BRANCH;
 
     tags = {
       [CI_PROVIDER_NAME]: CI_ENGINES.BITRISE,
@@ -335,7 +335,7 @@ export const getCISpanTags = (): SpanTags | undefined => {
       [CI_WORKSPACE_PATH]: BITRISE_SOURCE_DIR,
       [refKey]: ref,
       [GIT_COMMIT_MESSAGE]: BITRISE_GIT_MESSAGE,
-    }
+    };
   }
 
   if (env.BITBUCKET_COMMIT) {
@@ -348,9 +348,9 @@ export const getCISpanTags = (): SpanTags | undefined => {
       BITBUCKET_TAG,
       BITBUCKET_PIPELINE_UUID,
       BITBUCKET_CLONE_DIR,
-    } = env
+    } = env;
 
-    const url = `https://bitbucket.org/${BITBUCKET_REPO_FULL_NAME}/addon/pipelines/home#!/results/${BITBUCKET_BUILD_NUMBER}`
+    const url = `https://bitbucket.org/${BITBUCKET_REPO_FULL_NAME}/addon/pipelines/home#!/results/${BITBUCKET_BUILD_NUMBER}`;
 
     tags = {
       [CI_PROVIDER_NAME]: CI_ENGINES.BITBUCKET,
@@ -363,8 +363,8 @@ export const getCISpanTags = (): SpanTags | undefined => {
       [GIT_TAG]: BITBUCKET_TAG,
       [GIT_REPOSITORY_URL]: BITBUCKET_GIT_SSH_ORIGIN,
       [CI_WORKSPACE_PATH]: BITBUCKET_CLONE_DIR,
-      [CI_PIPELINE_ID]: BITBUCKET_PIPELINE_UUID && BITBUCKET_PIPELINE_UUID.replace(/{|}/gm, ''),
-    }
+      [CI_PIPELINE_ID]: BITBUCKET_PIPELINE_UUID && BITBUCKET_PIPELINE_UUID.replace(/{|}/gm, ""),
+    };
   }
 
   if (env.TF_BUILD) {
@@ -388,10 +388,10 @@ export const getCISpanTags = (): SpanTags | undefined => {
       BUILD_SOURCEVERSIONMESSAGE,
       SYSTEM_STAGEDISPLAYNAME,
       SYSTEM_JOBDISPLAYNAME,
-    } = env
+    } = env;
 
-    const ref = SYSTEM_PULLREQUEST_SOURCEBRANCH || BUILD_SOURCEBRANCH || BUILD_SOURCEBRANCHNAME
-    const refKey = (ref || '').includes('tags') ? GIT_TAG : GIT_BRANCH
+    const ref = SYSTEM_PULLREQUEST_SOURCEBRANCH || BUILD_SOURCEBRANCH || BUILD_SOURCEBRANCHNAME;
+    const refKey = (ref || "").includes("tags") ? GIT_TAG : GIT_BRANCH;
 
     tags = {
       [CI_PROVIDER_NAME]: CI_ENGINES.AZURE,
@@ -407,18 +407,18 @@ export const getCISpanTags = (): SpanTags | undefined => {
       [GIT_COMMIT_MESSAGE]: BUILD_SOURCEVERSIONMESSAGE,
       [CI_STAGE_NAME]: SYSTEM_STAGEDISPLAYNAME,
       [CI_JOB_NAME]: SYSTEM_JOBDISPLAYNAME,
-    }
+    };
 
     if (SYSTEM_TEAMFOUNDATIONSERVERURI && SYSTEM_TEAMPROJECTID && BUILD_BUILDID) {
-      const baseUrl = `${SYSTEM_TEAMFOUNDATIONSERVERURI}${SYSTEM_TEAMPROJECTID}/_build/results?buildId=${BUILD_BUILDID}`
-      const pipelineUrl = baseUrl
-      const jobUrl = `${baseUrl}&view=logs&j=${SYSTEM_JOBID}&t=${SYSTEM_TASKINSTANCEID}`
+      const baseUrl = `${SYSTEM_TEAMFOUNDATIONSERVERURI}${SYSTEM_TEAMPROJECTID}/_build/results?buildId=${BUILD_BUILDID}`;
+      const pipelineUrl = baseUrl;
+      const jobUrl = `${baseUrl}&view=logs&j=${SYSTEM_JOBID}&t=${SYSTEM_TASKINSTANCEID}`;
 
       tags = {
         ...tags,
         [CI_PIPELINE_URL]: pipelineUrl,
         [CI_JOB_URL]: jobUrl,
-      }
+      };
     }
   }
 
@@ -436,9 +436,9 @@ export const getCISpanTags = (): SpanTags | undefined => {
       APPVEYOR_REPO_COMMIT_AUTHOR,
       APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL,
       APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED,
-    } = env
+    } = env;
 
-    const pipelineUrl = `https://ci.appveyor.com/project/${APPVEYOR_REPO_NAME}/builds/${APPVEYOR_BUILD_ID}`
+    const pipelineUrl = `https://ci.appveyor.com/project/${APPVEYOR_REPO_NAME}/builds/${APPVEYOR_BUILD_ID}`;
 
     tags = {
       [CI_PROVIDER_NAME]: CI_ENGINES.APPVEYOR,
@@ -451,38 +451,38 @@ export const getCISpanTags = (): SpanTags | undefined => {
       [GIT_COMMIT_AUTHOR_NAME]: APPVEYOR_REPO_COMMIT_AUTHOR,
       [GIT_COMMIT_AUTHOR_EMAIL]: APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL,
       [GIT_COMMIT_MESSAGE]: APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED,
-    }
+    };
 
-    if (APPVEYOR_REPO_PROVIDER === 'github') {
-      const refKey = APPVEYOR_REPO_TAG_NAME ? GIT_TAG : GIT_BRANCH
-      const ref = APPVEYOR_REPO_TAG_NAME || APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH || APPVEYOR_REPO_BRANCH
+    if (APPVEYOR_REPO_PROVIDER === "github") {
+      const refKey = APPVEYOR_REPO_TAG_NAME ? GIT_TAG : GIT_BRANCH;
+      const ref = APPVEYOR_REPO_TAG_NAME || APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH || APPVEYOR_REPO_BRANCH;
       tags = {
         ...tags,
         [GIT_REPOSITORY_URL]: `https://github.com/${APPVEYOR_REPO_NAME}.git`,
         [GIT_SHA]: APPVEYOR_REPO_COMMIT,
         [refKey]: ref,
-      }
+      };
     }
   }
 
   if (tags[CI_WORKSPACE_PATH]) {
-    tags[CI_WORKSPACE_PATH] = resolveTilde(tags[CI_WORKSPACE_PATH]!)
+    tags[CI_WORKSPACE_PATH] = resolveTilde(tags[CI_WORKSPACE_PATH]!);
   }
   if (tags[GIT_REPOSITORY_URL]) {
-    tags[GIT_REPOSITORY_URL] = filterSensitiveInfoFromRepository(tags[GIT_REPOSITORY_URL]!)
+    tags[GIT_REPOSITORY_URL] = filterSensitiveInfoFromRepository(tags[GIT_REPOSITORY_URL]!);
   }
   if (tags[GIT_BRANCH]) {
-    tags[GIT_BRANCH] = normalizeRef(tags[GIT_BRANCH]!)
+    tags[GIT_BRANCH] = normalizeRef(tags[GIT_BRANCH]!);
   }
   if (tags[GIT_TAG]) {
-    tags[GIT_TAG] = normalizeRef(tags[GIT_TAG]!)
+    tags[GIT_TAG] = normalizeRef(tags[GIT_TAG]!);
   }
 
-  return removeEmptyValues(tags)
-}
+  return removeEmptyValues(tags);
+};
 
 export const getCIMetadata = (): Metadata | undefined => {
-  const env = process.env
+  const env = process.env;
 
   if (env.CIRCLECI) {
     return {
@@ -498,7 +498,7 @@ export const getCIMetadata = (): Metadata | undefined => {
         branch: env.CIRCLE_BRANCH,
         commitSha: env.CIRCLE_SHA1,
       },
-    }
+    };
   }
 
   if (env.TRAVIS) {
@@ -515,7 +515,7 @@ export const getCIMetadata = (): Metadata | undefined => {
         branch: env.TRAVIS_BRANCH,
         commitSha: env.TRAVIS_COMMIT,
       },
-    }
+    };
   }
 
   if (env.GITLAB_CI) {
@@ -532,13 +532,13 @@ export const getCIMetadata = (): Metadata | undefined => {
         branch: env.CI_COMMIT_REF_NAME,
         commitSha: env.CI_COMMIT_SHA,
       },
-    }
+    };
   }
 
   if (env.GITHUB_ACTIONS) {
-    const {GITHUB_REF, GITHUB_SHA, GITHUB_REPOSITORY, GITHUB_RUN_ID} = env
+    const { GITHUB_REF, GITHUB_SHA, GITHUB_REPOSITORY, GITHUB_RUN_ID } = env;
 
-    const pipelineURL = `https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}`
+    const pipelineURL = `https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}`;
 
     return {
       ci: {
@@ -553,11 +553,11 @@ export const getCIMetadata = (): Metadata | undefined => {
         branch: GITHUB_REF,
         commitSha: GITHUB_SHA,
       },
-    }
+    };
   }
 
   if (env.JENKINS_URL) {
-    const {BUILD_URL, GIT_COMMIT, GIT_BRANCH: JENKINS_GIT_BRANCH} = env
+    const { BUILD_URL, GIT_COMMIT, GIT_BRANCH: JENKINS_GIT_BRANCH } = env;
 
     return {
       ci: {
@@ -572,6 +572,6 @@ export const getCIMetadata = (): Metadata | undefined => {
         branch: JENKINS_GIT_BRANCH,
         commitSha: GIT_COMMIT,
       },
-    }
+    };
   }
-}
+};

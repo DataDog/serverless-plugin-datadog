@@ -1,4 +1,4 @@
-import {AxiosPromise, AxiosRequestConfig, AxiosResponse} from 'axios'
+import { AxiosPromise, AxiosRequestConfig, AxiosResponse } from "axios";
 
 import {
   CI_JOB_NAME,
@@ -21,21 +21,21 @@ import {
   GIT_REPOSITORY_URL,
   GIT_SHA,
   GIT_TAG,
-} from './tags'
+} from "./tags";
 
 export interface Metadata {
   ci: {
     pipeline: {
-      url?: string
-    }
+      url?: string;
+    };
     provider: {
-      name: string
-    }
-  }
+      name: string;
+    };
+  };
   git: {
-    branch?: string
-    commitSha?: string
-  }
+    branch?: string;
+    commitSha?: string;
+  };
 }
 
 export type SpanTag =
@@ -58,8 +58,8 @@ export type SpanTag =
   | typeof GIT_COMMIT_MESSAGE
   | typeof GIT_COMMIT_COMMITTER_DATE
   | typeof GIT_COMMIT_COMMITTER_EMAIL
-  | typeof GIT_COMMIT_COMMITTER_NAME
+  | typeof GIT_COMMIT_COMMITTER_NAME;
 
-export type SpanTags = Partial<Record<SpanTag, string>>
+export type SpanTags = Partial<Record<SpanTag, string>>;
 
-export type RequestBuilder = (args: AxiosRequestConfig) => AxiosPromise<AxiosResponse>
+export type RequestBuilder = (args: AxiosRequestConfig) => AxiosPromise<AxiosResponse>;

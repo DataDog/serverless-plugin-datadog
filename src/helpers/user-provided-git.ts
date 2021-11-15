@@ -10,8 +10,8 @@ import {
   GIT_REPOSITORY_URL,
   GIT_SHA,
   GIT_TAG,
-} from './tags'
-import {removeEmptyValues} from './utils'
+} from "./tags";
+import { removeEmptyValues } from "./utils";
 
 export const getUserGitMetadata = () => {
   const {
@@ -26,7 +26,7 @@ export const getUserGitMetadata = () => {
     DD_GIT_COMMIT_COMMITTER_NAME,
     DD_GIT_COMMIT_COMMITTER_EMAIL,
     DD_GIT_COMMIT_COMMITTER_DATE,
-  } = process.env
+  } = process.env;
 
   return removeEmptyValues({
     [GIT_REPOSITORY_URL]: DD_GIT_REPOSITORY_URL,
@@ -40,5 +40,5 @@ export const getUserGitMetadata = () => {
     [GIT_COMMIT_AUTHOR_DATE]: DD_GIT_COMMIT_AUTHOR_DATE,
     [GIT_COMMIT_AUTHOR_EMAIL]: DD_GIT_COMMIT_AUTHOR_EMAIL,
     [GIT_COMMIT_AUTHOR_NAME]: DD_GIT_COMMIT_AUTHOR_NAME,
-  })
-}
+  });
+};
