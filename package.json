@@ -51,6 +51,8 @@
       "\\.snap$",
       "<rootDir>/node_modules/"
     ],
+    "testEnvironment": "<rootDir>/testEnvironment.js",
+    "clearMocks": true,
     "collectCoverageFrom": [
       "src/**/*.ts"
     ]
