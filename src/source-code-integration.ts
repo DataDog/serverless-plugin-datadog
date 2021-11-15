@@ -37,6 +37,7 @@ export class SourceCodeIntegration {
         onError: (e: Error) => {
           throw e;
         },
+        onRetry: (e: Error) => {},
         onUpload: () => {
           return;
         },
