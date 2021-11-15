@@ -1,5 +1,5 @@
 import { AxiosPromise } from "axios";
-import { retryRequest } from "../retry";
+import { retryRequest } from "./retry";
 
 describe("retry", () => {
   const retryCallback = jest.fn();

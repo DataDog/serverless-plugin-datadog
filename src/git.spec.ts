@@ -1,4 +1,4 @@
-import { getCommitInfo, gitRemote, stripCredentials } from "../../git";
+import { getCommitInfo, gitRemote, stripCredentials } from "./git";
 
 interface MockConfig {
   hash?: string;

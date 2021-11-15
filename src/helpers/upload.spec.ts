@@ -1,6 +1,6 @@
 import { default as axios } from "axios";
-import { upload, UploadStatus } from "../upload";
-import * as ciUtils from "../utils";
+import { upload, UploadStatus } from "./upload";
+import * as ciUtils from "./utils";
 
 describe("upload", () => {
   describe("upload", () => {

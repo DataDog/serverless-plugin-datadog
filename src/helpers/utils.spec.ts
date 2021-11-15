@@ -5,7 +5,7 @@ import { AddressInfo } from "net";
 // @ts-ignore
 import proxy from "proxy";
 import ProxyAgent from "proxy-agent";
-import * as ciUtils from "../utils";
+import * as ciUtils from "./utils";
 
 jest.useFakeTimers();
 
