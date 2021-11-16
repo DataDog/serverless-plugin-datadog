@@ -159,6 +159,7 @@ module.exports = class ServerlessPlugin {
         await this.addSourceCodeIntegration(handlers, simpleGit, config.apiKey!, config.site);
       } catch (err) {
         this.serverless.cli.log(`Error occurred when adding source code integration: ${err}`);
+        return;
       }
     }
 
