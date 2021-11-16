@@ -997,7 +997,10 @@
           }
         },
         "MethodResponses": []
-      }
+      },
+      "DependsOn": [
+        "PythonHello27LambdaPermissionApiGateway"
+      ]
     },
     "ApiGatewayMethodUsersCreatePost": {
       "Type": "AWS::ApiGateway::Method",
@@ -1040,7 +1043,10 @@
           }
         },
         "MethodResponses": []
-      }
+      },
+      "DependsOn": [
+        "JavascriptHello10DashxLambdaPermissionApiGateway"
+      ]
     },
     "ApiGatewayDeploymentxxxx": {
       "Type": "AWS::ApiGateway::Deployment",

@@ -17,15 +17,8 @@ import { TracingMode, enableTracing } from "./tracing";
 import { redirectHandlers } from "./wrapper";
 import { addCloudWatchForwarderSubscriptions, addExecutionLogGroupsAndSubscriptions } from "./forwarder";
 import { addOutputLinks, printOutputs } from "./output";
-import { FunctionDefinition } from "serverless";
 import { setMonitors } from "./monitors";
 import { getCloudFormationStackId } from "./monitor-api-requests";
-
-// Separate interface since DefinitelyTyped currently doesn't include tags or env
-export interface ExtendedFunctionDefinition extends FunctionDefinition {
-  tags?: { [key: string]: string };
-  environment?: { [key: string]: string };
-}
 
 enum TagKeys {
   Service = "service",

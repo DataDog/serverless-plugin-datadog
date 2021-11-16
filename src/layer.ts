@@ -7,7 +7,6 @@
  */
 import { FunctionDefinition, FunctionDefinitionHandler } from "serverless";
 import Service from "serverless/classes/Service";
-const extensionLayerKey: string = "extension";
 export enum RuntimeType {
   NODE,
   PYTHON,
@@ -17,8 +16,17 @@ export enum RuntimeType {
 export interface FunctionInfo {
   name: string;
   type: RuntimeType;
-  handler: FunctionDefinition;
+  handler: ExtendedFunctionDefinition;
   runtime?: string;
+}
+
+export const X86_64_ARCHITECTURE = "x86_64";
+export const ARM64_ARCHITECTURE = "arm64";
+export const DEFAULT_ARCHITECTURE = X86_64_ARCHITECTURE;
+
+// Separate interface since DefinitelyTyped currently doesn't include tags or env
+export interface ExtendedFunctionDefinition extends FunctionDefinition {
+  architecture?: string;
 }
 
 export interface LayerJSON {
@@ -42,6 +50,12 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
   "python3.9": RuntimeType.PYTHON,
 };
 
+export const armRuntimeKeys: { [key: string]: string } = {
+  "python3.8": "python3.8-arm",
+  "python3.9": "python3.9-arm",
+  extension: "extension-arm",
+};
+
 export function findHandlers(service: Service, exclude: string[], defaultRuntime?: string): FunctionInfo[] {
   return Object.entries(service.functions)
     .map(([name, handler]) => {
@@ -62,7 +76,6 @@ export function findHandlers(service: Service, exclude: string[], defaultRuntime
 
 export function applyLambdaLibraryLayers(service: Service, handlers: FunctionInfo[], layers: LayerJSON) {
   const { region } = service.provider;
-
   const regionRuntimes = layers.regions[region];
   if (regionRuntimes === undefined) {
     return;
@@ -74,8 +87,15 @@ export function applyLambdaLibraryLayers(service: Service, handlers: FunctionInf
     }
 
     const { runtime } = handler;
-    const lambdaLayerARN = runtime !== undefined ? regionRuntimes[runtime] : undefined;
+    const architecture =
+      (handler.handler as any).architecture ?? (service.provider as any).architecture ?? DEFAULT_ARCHITECTURE;
+    let runtimeKey: string | undefined = runtime;
+    if (architecture === ARM64_ARCHITECTURE && runtime && runtime in armRuntimeKeys) {
+      runtimeKey = armRuntimeKeys[runtime];
+      removePreviousLayer(service, handler, regionRuntimes[runtime]);
+    }
 
+    const lambdaLayerARN = runtimeKey !== undefined ? regionRuntimes[runtimeKey] : undefined;
     if (lambdaLayerARN) {
       addLayer(service, handler, lambdaLayerARN);
     }
@@ -93,7 +113,17 @@ export function applyExtensionLayer(service: Service, handlers: FunctionInfo[], 
     if (handler.type === RuntimeType.UNSUPPORTED) {
       continue;
     }
+    const { runtime } = handler;
+    const architecture =
+      (handler.handler as any).architecture ?? (service.provider as any).architecture ?? DEFAULT_ARCHITECTURE;
     let extensionLayerARN: string | undefined;
+    let extensionLayerKey: string = "extension";
+
+    if (architecture === ARM64_ARCHITECTURE && runtime && runtime in armRuntimeKeys) {
+      removePreviousLayer(service, handler, regionRuntimes[extensionLayerKey]);
+      extensionLayerKey = armRuntimeKeys[extensionLayerKey];
+    }
+
     extensionLayerARN = regionRuntimes[extensionLayerKey];
     if (extensionLayerARN) {
       addLayer(service, handler, extensionLayerARN);
@@ -112,6 +142,10 @@ export function isFunctionDefinitionHandler(funcDef: FunctionDefinition): funcDe
 }
 
 function addLayer(service: Service, handler: FunctionInfo, layerArn: string) {
+  setLayers(handler, pushLayerARN(layerArn, getLayers(service, handler)));
+}
+
+function getLayers(service: Service, handler: FunctionInfo) {
   const functionLayersList = ((handler.handler as any).layers as string[] | string[]) || [];
   const serviceLayersList = ((service.provider as any).layers as string[] | string[]) || [];
   // Function-level layers override service-level layers
@@ -120,8 +154,20 @@ function addLayer(service: Service, handler: FunctionInfo, layerArn: string) {
   // Set them at the function level, as our layers are runtime-dependent and could vary
   // between functions in the same project
   if (functionLayersList.length > 0 || serviceLayersList.length === 0) {
-    (handler.handler as any).layers = pushLayerARN(layerArn, functionLayersList);
+    return functionLayersList;
   } else {
-    (handler.handler as any).layers = pushLayerARN(layerArn, serviceLayersList);
+    return serviceLayersList;
   }
+}
+
+function removePreviousLayer(service: Service, handler: FunctionInfo, previousLayer: string | undefined) {
+  let layersList = getLayers(service, handler);
+  if (new Set(layersList).has(previousLayer!)) {
+    layersList = layersList?.filter((layer) => layer !== previousLayer);
+  }
+  setLayers(handler, layersList);
+}
+
+function setLayers(handler: FunctionInfo, layers: string[]) {
+  (handler.handler as any).layers = layers;
 }

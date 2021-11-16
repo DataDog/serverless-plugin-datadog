@@ -24,11 +24,12 @@ type FunctionDefinitionAll = FunctionDefinitionHandler | FunctionDefinitionImage
 function createMockService(
   region: string,
   funcs: { [funcName: string]: Partial<FunctionDefinitionAll> },
+  architecture?: string,
   plugins?: string[],
   layers?: string[],
 ): Service {
   const service: Partial<Service> & { functions: any; plugins: any } = {
-    provider: { region, layers } as any,
+    provider: { region, layers, architecture } as any,
     getAllFunctionsNames: () => Object.keys(funcs),
     getFunction: (name) => funcs[name] as FunctionDefinitionAll,
     functions: funcs as any,
@@ -164,10 +165,12 @@ describe("applyLambdaLibraryLayers", () => {
       {
         "node-function": { handler: "myfile.handler", runtime: "nodejs10.x" },
       },
+      "x86_64",
       [],
       ["my-layer-1", "my-layer-2"],
     );
     expect(mockService.provider).toEqual({
+      architecture: "x86_64",
       layers: ["my-layer-1", "my-layer-2"],
       region: "us-east-1",
     });
@@ -177,6 +180,7 @@ describe("applyLambdaLibraryLayers", () => {
       layers: ["my-layer-1", "my-layer-2", "node:2"],
     });
     expect(mockService.provider).toEqual({
+      architecture: "x86_64",
       layers: ["my-layer-1", "my-layer-2"],
       region: "us-east-1",
     });
@@ -196,6 +200,7 @@ describe("applyLambdaLibraryLayers", () => {
       {
         "node-function": { handler: "myfile.handler", runtime: "nodejs10.x" },
       },
+      "x86_64",
       [],
       ["ignored-service-layer"], // Eventually this is ignored by Serverless
     );
@@ -205,6 +210,7 @@ describe("applyLambdaLibraryLayers", () => {
       layers: ["my-layer-1", "node:2"],
     });
     expect(mockService.provider).toEqual({
+      architecture: "x86_64",
       layers: ["ignored-service-layer"],
       region: "us-east-1",
     });
@@ -319,6 +325,36 @@ describe("applyLambdaLibraryLayers", () => {
     });
   });
 
+  it("detects when to use the GovCloud layers with arm architecture", () => {
+    const handler = {
+      handler: { runtime: "python3.9" },
+      type: RuntimeType.PYTHON,
+      runtime: "python3.9",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: {
+        "us-gov-east-1": {
+          "python3.9": "python:3.9",
+          "python3.9-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python39-ARM:49",
+          extension: "extension:11",
+          "extension-arm": "extension-arm:11",
+        },
+      },
+    };
+    const mockService = createMockService(
+      "us-gov-east-1",
+      {
+        "python-function": { handler: "myfile.handler", runtime: "python3.9" },
+      },
+      "arm64",
+    );
+    applyLambdaLibraryLayers(mockService, [handler], layers);
+    expect(handler.handler).toEqual({
+      runtime: "python3.9",
+      layers: ["arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python39-ARM:49"],
+    });
+  });
+
   it("adds extension layer", () => {
     const handler = {
       handler: { runtime: "nodejs10.x" },
@@ -352,6 +388,7 @@ describe("applyLambdaLibraryLayers", () => {
       {
         "node-function": { handler: "myfile.handler", runtime: "nodejs10.x" },
       },
+      "x86_64",
       [],
       ["my-layer-1", "my-layer-2"],
     );
@@ -362,8 +399,164 @@ describe("applyLambdaLibraryLayers", () => {
       runtime: "nodejs10.x",
     });
     expect(mockService.provider).toEqual({
+      architecture: "x86_64",
       layers: ["my-layer-1", "my-layer-2"],
       region: "us-east-1",
+    });
+  });
+
+  it("adds correct lambda layer given architecture in function level", () => {
+    const handler = {
+      handler: { runtime: "python3.9", architecture: "arm64" },
+      type: RuntimeType.PYTHON,
+      runtime: "python3.9",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: {
+        "us-east-1": {
+          "python3.9": "python:3.9",
+          "python3.9-arm": "python-arm:3.9",
+          extension: "extension:11",
+          "extension-arm": "extension-arm:11",
+        },
+      },
+    };
+    const mockService = createMockService(
+      "us-east-1",
+      {
+        "python-function": { handler: "myfile.handler", runtime: "python3.9" },
+      },
+      "arm64",
+    );
+    applyLambdaLibraryLayers(mockService, [handler], layers);
+    applyExtensionLayer(mockService, [handler], layers);
+    expect(handler.handler).toEqual({
+      architecture: "arm64",
+      runtime: "python3.9",
+      layers: ["python-arm:3.9", "extension-arm:11"],
+    });
+  });
+
+  it("adds correct lambda layer given architecture in provider level", () => {
+    const handler = {
+      handler: { runtime: "python3.9" },
+      type: RuntimeType.PYTHON,
+      runtime: "python3.9",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: {
+        "us-east-1": {
+          "python3.9": "python:3.9",
+          "python3.9-arm": "python-arm:3.9",
+          extension: "extension:11",
+          "extension-arm": "extension-arm:11",
+        },
+      },
+    };
+    const mockService = createMockService(
+      "us-east-1",
+      {
+        "python-function": { handler: "myfile.handler", runtime: "python3.9" },
+      },
+      "arm64",
+    );
+    applyLambdaLibraryLayers(mockService, [handler], layers);
+    applyExtensionLayer(mockService, [handler], layers);
+    expect(handler.handler).toEqual({
+      runtime: "python3.9",
+      layers: ["python-arm:3.9", "extension-arm:11"],
+    });
+  });
+
+  it("uses default runtime layer if architecture not available for specified runtime", () => {
+    const handler = {
+      handler: { runtime: "python3.7", architecture: "arm64" },
+      type: RuntimeType.PYTHON,
+      runtime: "python3.7",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: {
+        "us-east-1": {
+          "python3.7": "python:3.7",
+          extension: "extension:11",
+          "extension-arm": "extension-arm:11",
+        },
+      },
+    };
+    const mockService = createMockService(
+      "us-east-1",
+      {
+        "python-function": { handler: "myfile.handler", runtime: "python3.7" },
+      },
+      "arm64",
+    );
+    applyLambdaLibraryLayers(mockService, [handler], layers);
+    applyExtensionLayer(mockService, [handler], layers);
+    expect(handler.handler).toEqual({
+      architecture: "arm64",
+      runtime: "python3.7",
+      layers: ["python:3.7", "extension:11"],
+    });
+  });
+
+  it("swaps previous layer when specifying arm architecture in functions", () => {
+    let handler = {
+      handler: { runtime: "python3.9", architecture: "arm64" },
+      type: RuntimeType.PYTHON,
+      runtime: "python3.9",
+    } as FunctionInfo;
+    (handler.handler as any).layers = ["python:3.9", "extension:11"];
+    const layers: LayerJSON = {
+      regions: {
+        "us-east-1": {
+          "python3.9": "python:3.9",
+          "python3.9-arm": "python-arm:3.9",
+          extension: "extension:11",
+          "extension-arm": "extension-arm:11",
+        },
+      },
+    };
+    const mockService = createMockService("us-east-1", {
+      "python-function": { handler: "myfile.handler", runtime: "python3.9" },
+    });
+    applyLambdaLibraryLayers(mockService, [handler], layers);
+    applyExtensionLayer(mockService, [handler], layers);
+    expect(handler.handler).toEqual({
+      architecture: "arm64",
+      runtime: "python3.9",
+      layers: ["python-arm:3.9", "extension-arm:11"],
+    });
+  });
+
+  it("swaps previous layer when specifying arm architecture in provider level", () => {
+    let handler = {
+      handler: { runtime: "python3.9" },
+      type: RuntimeType.PYTHON,
+      runtime: "python3.9",
+    } as FunctionInfo;
+    (handler.handler as any).layers = ["python:3.9", "extension:11"];
+    const layers: LayerJSON = {
+      regions: {
+        "us-east-1": {
+          "python3.9": "python:3.9",
+          "python3.9-arm": "python-arm:3.9",
+          extension: "extension:11",
+          "extension-arm": "extension-arm:11",
+        },
+      },
+    };
+    const mockService = createMockService(
+      "us-east-1",
+      {
+        "python-function": { handler: "myfile.handler", runtime: "python3.9" },
+      },
+      "arm64",
+    );
+    applyLambdaLibraryLayers(mockService, [handler], layers);
+    applyExtensionLayer(mockService, [handler], layers);
+    expect(handler.handler).toEqual({
+      runtime: "python3.9",
+      layers: ["python-arm:3.9", "extension-arm:11"],
     });
   });
 });
