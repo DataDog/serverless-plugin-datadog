@@ -1,4 +1,5 @@
 import { SimpleGit } from "simple-git";
+import { version } from "../package.json";
 import { getCommitInfo } from "./git";
 import { getBaseIntakeUrl } from "./git-metadata/api";
 import { CommitInfo } from "./git-metadata/interfaces";
@@ -69,7 +70,7 @@ export class SourceCodeIntegration {
     requestBuilder: RequestBuilder,
   ): (commitInfo: CommitInfo, opts: UploadOptions) => Promise<UploadStatus> {
     return async (commitInfo: CommitInfo, opts: UploadOptions) => {
-      const payload = commitInfo.asMultipartPayload("0.0.0");
+      const payload = commitInfo.asMultipartPayload(`serverless-plugin-datadog-${version}`);
 
       return upload(requestBuilder)(payload, opts);
     };
