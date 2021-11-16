@@ -50,7 +50,7 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
   "python3.9": RuntimeType.PYTHON,
 };
 
-export const armKeys: { [key: string]: string } = {
+export const armRuntimeKeys: { [key: string]: string } = {
   "python3.8": "python3.8-arm",
   "python3.9": "python3.9-arm",
   extension: "extension-arm",
@@ -90,8 +90,8 @@ export function applyLambdaLibraryLayers(service: Service, handlers: FunctionInf
     const architecture =
       (handler.handler as any).architecture ?? (service.provider as any).architecture ?? DEFAULT_ARCHITECTURE;
     let runtimeKey: string | undefined = runtime;
-    if (architecture === ARM64_ARCHITECTURE && runtime && runtime in armKeys) {
-      runtimeKey = armKeys[runtime];
+    if (architecture === ARM64_ARCHITECTURE && runtime && runtime in armRuntimeKeys) {
+      runtimeKey = armRuntimeKeys[runtime];
       removePreviousLayer(service, handler, regionRuntimes[runtime]);
     }
 
@@ -119,9 +119,9 @@ export function applyExtensionLayer(service: Service, handlers: FunctionInfo[], 
     let extensionLayerARN: string | undefined;
     let extensionLayerKey: string = "extension";
 
-    if (architecture === ARM64_ARCHITECTURE && runtime && runtime in armKeys) {
+    if (architecture === ARM64_ARCHITECTURE && runtime && runtime in armRuntimeKeys) {
       removePreviousLayer(service, handler, regionRuntimes[extensionLayerKey]);
-      extensionLayerKey = armKeys[extensionLayerKey];
+      extensionLayerKey = armRuntimeKeys[extensionLayerKey];
     }
 
     extensionLayerARN = regionRuntimes[extensionLayerKey];
