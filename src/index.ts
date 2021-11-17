@@ -7,18 +7,17 @@
  */
 
 import * as Serverless from "serverless";
-import * as layers from "./layers.json";
-import * as govLayers from "./layers-gov.json";
 import { version } from "../package.json";
-
-import { getConfig, setEnvConfiguration, forceExcludeDepsFromWebpack, hasWebpackPlugin, Configuration } from "./env";
-import { applyExtensionLayer, applyLambdaLibraryLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
-import { TracingMode, enableTracing } from "./tracing";
-import { redirectHandlers } from "./wrapper";
+import { Configuration, forceExcludeDepsFromWebpack, getConfig, hasWebpackPlugin, setEnvConfiguration } from "./env";
 import { addCloudWatchForwarderSubscriptions, addExecutionLogGroupsAndSubscriptions } from "./forwarder";
-import { addOutputLinks, printOutputs } from "./output";
-import { setMonitors } from "./monitors";
+import { applyExtensionLayer, applyLambdaLibraryLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
+import * as govLayers from "./layers-gov.json";
+import * as layers from "./layers.json";
 import { getCloudFormationStackId } from "./monitor-api-requests";
+import { setMonitors } from "./monitors";
+import { addOutputLinks, printOutputs } from "./output";
+import { enableTracing, TracingMode } from "./tracing";
+import { redirectHandlers } from "./wrapper";
 
 enum TagKeys {
   Service = "service",
@@ -152,14 +151,14 @@ module.exports = class ServerlessPlugin {
     const env = this.serverless.getProvider("aws").getStage();
 
     if (config.enabled === false) return;
-    if (config.monitors && config.monitorsApiKey && config.monitorsAppKey) {
+    if (config.monitors && config.datadogApiKey && config.datadogAppKey) {
       const cloudFormationStackId = await getCloudFormationStackId(this.serverless);
       try {
         const logStatements = await setMonitors(
           config.site,
           config.monitors,
-          config.monitorsApiKey,
-          config.monitorsAppKey,
+          config.datadogApiKey,
+          config.datadogAppKey,
           cloudFormationStackId,
           service,
           env,
@@ -266,8 +265,8 @@ function validateConfiguration(config: Configuration) {
     }
   }
   if (config.monitors) {
-    if (config.monitorsApiKey === undefined || config.monitorsAppKey === undefined) {
-      throw new Error("When `monitors` is defined, `monitorsApiKey` and `monitorsAppKey` must also be defined");
+    if (config.datadogApiKey === undefined || config.datadogAppKey === undefined) {
+      throw new Error("When `monitors` is defined, `datadogApiKey` and `datadogAppKey` must also be defined");
     }
   }
 }

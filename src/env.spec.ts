@@ -7,11 +7,11 @@
  */
 
 import {
-  getConfig,
   defaultConfiguration,
-  setEnvConfiguration,
   forceExcludeDepsFromWebpack,
+  getConfig,
   hasWebpackPlugin,
+  setEnvConfiguration,
 } from "./env";
 import { FunctionInfo, RuntimeType } from "./layer";
 
@@ -64,9 +64,70 @@ describe("hasWebpackPlugin", () => {
 });
 
 describe("getConfig", () => {
+  beforeEach(() => {
+    jest.resetModules();
+    process.env = {};
+  });
   it("get a default configuration when none is present", () => {
     const result = getConfig({ custom: {} } as any);
     expect(result).toEqual(defaultConfiguration);
+  });
+
+  it("correctly gets datadog api and app keys from the environment", () => {
+    process.env.DATADOG_API_KEY = "api-key";
+    process.env.DATADOG_APP_KEY = "app-key";
+
+    const result = getConfig({ custom: {} } as any);
+
+    expect(result).toEqual({
+      datadogApiKey: "api-key",
+      datadogAppKey: "app-key",
+      ...defaultConfiguration,
+    });
+  });
+
+  it("uses configuration api and app keys over environment variables", () => {
+    process.env.DATADOG_API_KEY = "api-key";
+    process.env.DATADOG_APP_KEY = "app-key";
+
+    const result = getConfig({
+      custom: {
+        datadog: {
+          datadogApiKey: "use-this-api-key",
+          datadogAppKey: "use-this-app-key",
+        },
+      },
+    } as any);
+
+    expect(result).toEqual({
+      datadogApiKey: "use-this-api-key",
+      datadogAppKey: "use-this-app-key",
+      ...defaultConfiguration,
+    });
+  });
+
+  it("uses monitor api and app keys over everything else", () => {
+    process.env.DATADOG_API_KEY = "api-key";
+    process.env.DATADOG_APP_KEY = "app-key";
+
+    const result = getConfig({
+      custom: {
+        datadog: {
+          monitorsApiKey: "monitors-api-key",
+          monitorsAppKey: "monitors-app-key",
+          datadogApiKey: "use-this-api-key",
+          datadogAppKey: "use-this-app-key",
+        },
+      },
+    } as any);
+
+    expect(result).toEqual({
+      datadogApiKey: "monitors-api-key",
+      datadogAppKey: "monitors-app-key",
+      monitorsApiKey: "monitors-api-key",
+      monitorsAppKey: "monitors-app-key",
+      ...defaultConfiguration,
+    });
   });
 
   it("gets a mixed configuration when some values are present", () => {

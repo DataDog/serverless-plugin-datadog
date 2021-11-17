@@ -20,10 +20,10 @@ export interface Configuration {
   apiKMSKey?: string;
   // Whether to capture and store the payload and response of a lambda invocation
   captureLambdaPayload?: boolean;
-  // Datadog API Key used for enabling monitor configuration through plugin
-  monitorsApiKey?: string;
+  // Datadog API Key used for enabling monitor and source code integration configuration through plugin
+  datadogApiKey?: string;
   // Datadog App Key used for enabling monitor configuration through plugin; separate from the apiKey that is deployed with your function
-  monitorsAppKey?: string;
+  datadogAppKey?: string;
   // Which Site to send to, (should be datadoghq.com or datadoghq.eu)
   site: string;
   // The log level, (set to DEBUG for extended logging)
@@ -76,6 +76,8 @@ const ddTracingEnabledEnvVar = "DD_TRACE_ENABLED";
 const logInjectionEnvVar = "DD_LOGS_INJECTION";
 const ddLogsEnabledEnvVar = "DD_SERVERLESS_LOGS_ENABLED";
 const ddCaptureLambdaPayloadEnvVar = "DD_CAPTURE_LAMBDA_PAYLOAD";
+const ddApiKeyEnvVar = "DATADOG_API_KEY";
+const ddAppKeyEnvVar = "DATADOG_APP_KEY";
 
 export const defaultConfiguration: Configuration = {
   addLayers: true,
@@ -139,10 +141,30 @@ export function getConfig(service: Service): Configuration {
   if (datadog === undefined) {
     datadog = {};
   }
-  return {
+
+  if (process.env[ddApiKeyEnvVar]) {
+    datadog.datadogApiKey ??= process.env[ddApiKeyEnvVar];
+  }
+
+  if (process.env[ddAppKeyEnvVar]) {
+    datadog.datadogAppKey ??= process.env[ddAppKeyEnvVar];
+  }
+
+  // These values are deprecated but will supersede everything if set
+  if (custom?.datadog?.monitorsApiKey) {
+    datadog.datadogApiKey = custom?.datadog?.monitorsApiKey ?? datadog.datadogApiKey;
+  }
+
+  if (custom?.datadog?.monitorsAppKey) {
+    datadog.datadogAppKey = custom?.datadog?.monitorsAppKey ?? datadog.datadogAppKey;
+  }
+
+  const config: Configuration = {
     ...defaultConfiguration,
     ...datadog,
   };
+
+  return config;
 }
 
 export function forceExcludeDepsFromWebpack(service: Service) {
