@@ -18,6 +18,10 @@ export interface Configuration {
   apiKey?: string;
   // Datadog App Key used for enabling monitor configuration through plugin; separate from the apiKey that is deployed with your function
   appKey?: string;
+  // Deprecated
+  monitorsApiKey?: string;
+  // Deprecated
+  monitorsAppKey?: string;
   // Datadog API Key encrypted using KMS, only necessary when using metrics without log forwarding
   apiKMSKey?: string;
   // Whether to capture and store the payload and response of a lambda invocation
@@ -99,6 +103,10 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
   handlers.forEach(({ handler }) => {
     handler.environment ??= {};
     const environment = handler.environment as any;
+    if (process.env.DATADOG_API_KEY !== undefined && environment[apiKeyEnvVar] === undefined) {
+      environment[apiKeyEnvVar] = process.env.DATADOG_API_KEY;
+    }
+    // Overwrite API key with the environment variable
     if (config.apiKey !== undefined && environment[apiKeyEnvVar] === undefined) {
       environment[apiKeyEnvVar] = config.apiKey;
     }

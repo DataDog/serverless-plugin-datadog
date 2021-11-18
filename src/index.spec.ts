@@ -436,7 +436,9 @@ describe("ServerlessPlugin", () => {
         }
       }
       expect(threwError).toBe(true);
-      expect(thrownErrorMessage).toEqual("When `addExtension` is true, `apiKey` or `apiKMSKey` must also be set.");
+      expect(thrownErrorMessage).toEqual(
+        "When `addExtension` is true, the environment variable `DATADOG_API_KEY` or configuration variable `apiKMSKey` must be set.",
+      );
     });
   });
 

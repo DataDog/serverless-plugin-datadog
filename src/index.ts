@@ -260,13 +260,19 @@ function validateConfiguration(config: Configuration) {
     );
   }
   if (config.addExtension) {
-    if (config.apiKey === undefined && config.apiKMSKey === undefined) {
-      throw new Error("When `addExtension` is true, `apiKey` or `apiKMSKey` must also be set.");
+    if (config.apiKey === undefined && process.env.DATADOG_API_KEY === undefined && config.apiKMSKey === undefined) {
+      throw new Error(
+        "When `addExtension` is true, the environment variable `DATADOG_API_KEY` or configuration variable `apiKMSKey` must be set.",
+      );
     }
   }
   if (config.monitors) {
-    if (config.apiKey === undefined || config.appKey === undefined) {
-      throw new Error("When `monitors` is enabled, `apiKey` and `DATADOG_APP_KEY` must be set.");
+    if (
+      (process.env.DATADOG_API_KEY === undefined || process.env.DATADOG_API_KEY === undefined) &&
+      // Support deprecated monitorsApiKey and monitorsAppKey
+      (config.monitorsApiKey === undefined || config.monitorsAppKey === undefined)
+    ) {
+      throw new Error("When `monitors` is enabled, `DATADOG_API_KEY` and `DATADOG_APP_KEY` must be set.");
     }
   }
 }
