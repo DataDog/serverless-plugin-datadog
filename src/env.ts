@@ -16,14 +16,12 @@ export interface Configuration {
   addLayers: boolean;
   // Datadog API Key, only necessary when using metrics without log forwarding
   apiKey?: string;
+  // Datadog App Key used for enabling monitor configuration through plugin; separate from the apiKey that is deployed with your function
+  appKey?: string;
   // Datadog API Key encrypted using KMS, only necessary when using metrics without log forwarding
   apiKMSKey?: string;
   // Whether to capture and store the payload and response of a lambda invocation
   captureLambdaPayload?: boolean;
-  // Datadog API Key used for enabling monitor and source code integration configuration through plugin
-  datadogApiKey?: string;
-  // Datadog App Key used for enabling monitor configuration through plugin; separate from the apiKey that is deployed with your function
-  datadogAppKey?: string;
   // Which Site to send to, (should be datadoghq.com or datadoghq.eu)
   site: string;
   // The log level, (set to DEBUG for extended logging)
@@ -143,20 +141,20 @@ export function getConfig(service: Service): Configuration {
   }
 
   if (process.env[ddApiKeyEnvVar]) {
-    datadog.datadogApiKey ??= process.env[ddApiKeyEnvVar];
+    datadog.apiKey ??= process.env[ddApiKeyEnvVar];
   }
 
   if (process.env[ddAppKeyEnvVar]) {
-    datadog.datadogAppKey ??= process.env[ddAppKeyEnvVar];
+    datadog.appKey ??= process.env[ddAppKeyEnvVar];
   }
 
   // These values are deprecated but will supersede everything if set
   if (custom?.datadog?.monitorsApiKey) {
-    datadog.datadogApiKey = custom?.datadog?.monitorsApiKey ?? datadog.datadogApiKey;
+    datadog.apiKey = custom?.datadog?.monitorsApiKey ?? datadog.apiKey;
   }
 
   if (custom?.datadog?.monitorsAppKey) {
-    datadog.datadogAppKey = custom?.datadog?.monitorsAppKey ?? datadog.datadogAppKey;
+    datadog.appKey = custom?.datadog?.monitorsAppKey ?? datadog.appKey;
   }
 
   const config: Configuration = {

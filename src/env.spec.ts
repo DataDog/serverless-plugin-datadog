@@ -80,8 +80,8 @@ describe("getConfig", () => {
     const result = getConfig({ custom: {} } as any);
 
     expect(result).toEqual({
-      datadogApiKey: "api-key",
-      datadogAppKey: "app-key",
+      apiKey: "api-key",
+      appKey: "app-key",
       ...defaultConfiguration,
     });
   });
@@ -93,15 +93,15 @@ describe("getConfig", () => {
     const result = getConfig({
       custom: {
         datadog: {
-          datadogApiKey: "use-this-api-key",
-          datadogAppKey: "use-this-app-key",
+          apiKey: "use-this-api-key",
+          appKey: "use-this-app-key",
         },
       },
     } as any);
 
     expect(result).toEqual({
-      datadogApiKey: "use-this-api-key",
-      datadogAppKey: "use-this-app-key",
+      apiKey: "use-this-api-key",
+      appKey: "use-this-app-key",
       ...defaultConfiguration,
     });
   });
@@ -115,15 +115,15 @@ describe("getConfig", () => {
         datadog: {
           monitorsApiKey: "monitors-api-key",
           monitorsAppKey: "monitors-app-key",
-          datadogApiKey: "use-this-api-key",
-          datadogAppKey: "use-this-app-key",
+          apiKey: "use-this-api-key",
+          appKey: "use-this-app-key",
         },
       },
     } as any);
 
     expect(result).toEqual({
-      datadogApiKey: "monitors-api-key",
-      datadogAppKey: "monitors-app-key",
+      apiKey: "monitors-api-key",
+      appKey: "monitors-app-key",
       monitorsApiKey: "monitors-api-key",
       monitorsAppKey: "monitors-app-key",
       ...defaultConfiguration,

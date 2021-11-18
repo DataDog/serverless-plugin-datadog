@@ -151,14 +151,14 @@ module.exports = class ServerlessPlugin {
     const env = this.serverless.getProvider("aws").getStage();
 
     if (config.enabled === false) return;
-    if (config.monitors && config.datadogApiKey && config.datadogAppKey) {
+    if (config.monitors && config.apiKey && config.appKey) {
       const cloudFormationStackId = await getCloudFormationStackId(this.serverless);
       try {
         const logStatements = await setMonitors(
           config.site,
           config.monitors,
-          config.datadogApiKey,
-          config.datadogAppKey,
+          config.apiKey,
+          config.appKey,
           cloudFormationStackId,
           service,
           env,
@@ -265,8 +265,8 @@ function validateConfiguration(config: Configuration) {
     }
   }
   if (config.monitors) {
-    if (config.datadogApiKey === undefined || config.datadogAppKey === undefined) {
-      throw new Error("When `monitors` is defined, `datadogApiKey` and `datadogAppKey` must also be defined");
+    if (config.apiKey === undefined || config.appKey === undefined) {
+      throw new Error("When `monitors` is enabled, `apiKey` and `DATADOG_APP_KEY` must be set.");
     }
   }
 }
