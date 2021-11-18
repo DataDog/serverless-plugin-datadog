@@ -106,7 +106,8 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     if (process.env.DATADOG_API_KEY !== undefined && environment[apiKeyEnvVar] === undefined) {
       environment[apiKeyEnvVar] = process.env.DATADOG_API_KEY;
     }
-    // Overwrite API key with the environment variable
+    // Overwrite the environment variable with the value in the config if
+    // they've set it explicitly
     if (config.apiKey !== undefined && environment[apiKeyEnvVar] === undefined) {
       environment[apiKeyEnvVar] = config.apiKey;
     }
