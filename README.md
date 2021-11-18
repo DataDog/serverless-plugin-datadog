@@ -206,14 +206,12 @@ custom:
         tags: ["modified_error_rate", "serverless", "error_rate"]
         require_full_window: true
         priority: 2
-        options: {
+        options:
           include_tags: true
-          notify_audit:true
-          thresholds: {
+          notify_audit: true
+          thresholds:
             ok: 0.025
             warning: 0.05
-          }
-        }
 ```
 
 ##### To delete a monitor
@@ -237,17 +235,15 @@ custom:
           message: "Custom message for custom monitor. Notify @data.dog@datadoghq.com @slack-serverless-monitors"
           tags: ["custom_monitor", "serverless"]
           priority: 3
-          options: {
+          options:
             enable_logs_sample: true
             require_full_window: true
             include_tags: false
-            notify_audit:true
+            notify_audit: true
             notify_no_data: false
-            thresholds: {
+            thresholds:
               ok: 1
               warning: 2
-            }
-          }
 ```
 
 ## Opening Issues
