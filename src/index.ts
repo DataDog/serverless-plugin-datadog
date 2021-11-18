@@ -243,6 +243,8 @@ function configHasOldProperties(obj: any) {
 }
 
 function validateConfiguration(config: Configuration) {
+  checkForMultipleApiKeys(config);
+
   const siteList: string[] = [
     "datadoghq.com",
     "datadoghq.eu",
@@ -250,25 +252,37 @@ function validateConfiguration(config: Configuration) {
     "us5.datadoghq.com",
     "ddog-gov.com",
   ];
-
-  if (config.apiKey !== undefined && config.apiKMSKey !== undefined) {
-    throw new Error("`apiKey` and `apiKMSKey` should not be set at the same time.");
-  }
-
   if (config.site !== undefined && !siteList.includes(config.site.toLowerCase())) {
     throw new Error(
       "Warning: Invalid site URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, us5.datadoghq.com, or ddog-gov.com.",
     );
   }
   if (config.addExtension) {
-    if (config.apiKey === undefined && config.apiKMSKey === undefined) {
-      throw new Error("When `addExtension` is true, `apiKey` or `apiKMSKey` must also be set.");
+    if (config.apiKey === undefined && config.apiKMSKey === undefined && config.apiKeySecretArn === undefined) {
+      throw new Error("When `addExtension` is true, `apiKey`, `apiKMSKey`, or `apiKeySecretArn` must also be set.");
     }
   }
   if (config.monitors) {
     if (config.monitorsApiKey === undefined || config.monitorsAppKey === undefined) {
       throw new Error("When `monitors` is defined, `monitorsApiKey` and `monitorsAppKey` must also be defined");
     }
+  }
+}
+
+function checkForMultipleApiKeys(config: Configuration) {
+  let multipleApiKeysMessage;
+  if (config.apiKey !== undefined && config.apiKMSKey !== undefined && config.apiKeySecretArn !== undefined) {
+    multipleApiKeysMessage = "`apiKey`, `apiKMSKey`, and `apiKeySecretArn`";
+  } else if (config.apiKey !== undefined && config.apiKMSKey !== undefined) {
+    multipleApiKeysMessage = "`apiKey` and `apiKMSKey`";
+  } else if (config.apiKey !== undefined && config.apiKeySecretArn !== undefined) {
+    multipleApiKeysMessage = "`apiKey` and `apiKeySecretArn`";
+  } else if (config.apiKMSKey !== undefined && config.apiKeySecretArn !== undefined) {
+    multipleApiKeysMessage = "`apiKMSKey` and `apiKeySecretArn`";
+  }
+
+  if (multipleApiKeysMessage) {
+    throw new Error(`${multipleApiKeysMessage} should not be set at the same time.`);
   }
 }
 

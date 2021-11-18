@@ -6,7 +6,7 @@
  * Copyright 2021 Datadog, Inc.
  */
 
-import { FunctionInfo } from "layer";
+import { FunctionInfo, runtimeLookup, RuntimeType } from "./layer";
 import Service from "serverless/classes/Service";
 
 export interface Configuration {
@@ -16,6 +16,8 @@ export interface Configuration {
   addLayers: boolean;
   // Datadog API Key, only necessary when using metrics without log forwarding
   apiKey?: string;
+  // The ARN of the secret in AWS Secrets Manager containing the Datadog API key.
+  apiKeySecretArn?: string;
   // Datadog API Key encrypted using KMS, only necessary when using metrics without log forwarding
   apiKMSKey?: string;
   // Whether to capture and store the payload and response of a lambda invocation
@@ -69,6 +71,7 @@ export interface Configuration {
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
 const apiKeyKMSEnvVar = "DD_KMS_API_KEY";
+const apiKeySecretArnEnvVar = "DD_API_KEY_SECRET_ARN";
 const siteURLEnvVar = "DD_SITE";
 const logLevelEnvVar = "DD_LOG_LEVEL";
 const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
@@ -104,6 +107,16 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     }
     if (config.apiKMSKey !== undefined && environment[apiKeyKMSEnvVar] === undefined) {
       environment[apiKeyKMSEnvVar] = config.apiKMSKey;
+    }
+    if (config.apiKeySecretArn !== undefined && environment[apiKeySecretArnEnvVar] === undefined) {
+      const isNode = runtimeLookup[handler.runtime!] === RuntimeType.NODE;
+      const isSendingSynchronousMetrics = !config.addExtension && !config.flushMetricsToLogs;
+      if (isSendingSynchronousMetrics && isNode) {
+        throw new Error(
+          `\`apiKeySecretArn\` is not supported for Node runtimes when using Synchronous Metrics. Use either \`apiKey\` or \`apiKmsKey\`.`,
+        );
+      }
+      environment[apiKeySecretArnEnvVar] = config.apiKeySecretArn;
     }
     if (environment[siteURLEnvVar] === undefined) {
       environment[siteURLEnvVar] = config.site;
