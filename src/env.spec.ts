@@ -341,7 +341,8 @@ describe("setEnvConfiguration", () => {
       {
         addLayers: false,
         apiKey: "1234",
-        apiKMSKey: "5678",
+        apiKeySecretArn: "some-resource:from:aws:secrets-manager:arn",
+        apiKMSKey: "0912",
         site: "datadoghq.eu",
         logLevel: "debug",
         flushMetricsToLogs: true,
@@ -362,8 +363,9 @@ describe("setEnvConfiguration", () => {
         handler: {
           environment: {
             DD_API_KEY: "1234",
+            DD_API_KEY_SECRET_ARN: "some-resource:from:aws:secrets-manager:arn",
             DD_FLUSH_TO_LOG: true,
-            DD_KMS_API_KEY: "5678",
+            DD_KMS_API_KEY: "0912",
             DD_LOG_LEVEL: "debug",
             DD_SITE: "datadoghq.eu",
             DD_TRACE_ENABLED: true,
@@ -379,8 +381,9 @@ describe("setEnvConfiguration", () => {
         handler: {
           environment: {
             DD_API_KEY: "1234",
+            DD_API_KEY_SECRET_ARN: "some-resource:from:aws:secrets-manager:arn",
             DD_FLUSH_TO_LOG: true,
-            DD_KMS_API_KEY: "5678",
+            DD_KMS_API_KEY: "0912",
             DD_LOG_LEVEL: "debug",
             DD_SITE: "datadoghq.eu",
             DD_TRACE_ENABLED: true,
@@ -690,5 +693,43 @@ describe("setEnvConfiguration", () => {
         type: RuntimeType.NODE,
       },
     ]);
+  });
+
+  it("throws error when trying to add `DD_API_KEY_SECRET_ARN` while using sync metrics in a node runtime", () => {
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+          runtime: "nodejs12.x",
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
+
+    expect(() => {
+      setEnvConfiguration(
+        {
+          addLayers: false,
+          apiKeySecretArn: "some-resource:from:aws:secrets-manager:arn",
+          site: "datadoghq.eu",
+          logLevel: "debug",
+          flushMetricsToLogs: false,
+          enableXrayTracing: true,
+          enableDDTracing: true,
+          enableDDLogs: true,
+          subscribeToAccessLogs: true,
+          subscribeToExecutionLogs: false,
+          addExtension: false,
+          enableTags: true,
+          injectLogContext: false,
+          exclude: ["dd-excluded-function"],
+        },
+        handlers,
+      );
+    }).toThrowError(
+      `\`apiKeySecretArn\` is not supported for Node runtimes when using Synchronous Metrics. Use either \`apiKey\` or \`apiKmsKey\`.`,
+    );
   });
 });
