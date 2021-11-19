@@ -103,7 +103,11 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
   handlers.forEach(({ handler }) => {
     handler.environment ??= {};
     const environment = handler.environment as any;
-    if (process.env.DATADOG_API_KEY !== undefined && environment[apiKeyEnvVar] === undefined) {
+    if (
+      process.env.DATADOG_API_KEY !== undefined &&
+      environment[apiKeyEnvVar] === undefined &&
+      config.apiKMSKey === undefined
+    ) {
       environment[apiKeyEnvVar] = process.env.DATADOG_API_KEY;
     }
     // Overwrite the environment variable with the value in the config if

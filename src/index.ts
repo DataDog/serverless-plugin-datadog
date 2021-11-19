@@ -62,6 +62,11 @@ module.exports = class ServerlessPlugin {
     if (config.enabled === false) return;
     this.serverless.cli.log("Auto instrumenting functions with Datadog");
     configHasOldProperties(config);
+    if (config.monitorsApiKey !== undefined || config.monitorsAppKey !== undefined) {
+      this.serverless.cli.log(
+        "Warning: `monitorsApiKey` and `monitorsAppKey` have been deprecated. Please set DATADOG_API_KEY and DATADOG_APP_KEY in your environment instead.",
+      );
+    }
     validateConfiguration(config);
 
     const defaultRuntime = this.serverless.service.provider.runtime;
@@ -268,7 +273,7 @@ function validateConfiguration(config: Configuration) {
   }
   if (config.monitors) {
     if (
-      (process.env.DATADOG_API_KEY === undefined || process.env.DATADOG_API_KEY === undefined) &&
+      (process.env.DATADOG_API_KEY === undefined || process.env.DATADOG_APP_KEY === undefined) &&
       // Support deprecated monitorsApiKey and monitorsAppKey
       (config.monitorsApiKey === undefined || config.monitorsAppKey === undefined)
     ) {

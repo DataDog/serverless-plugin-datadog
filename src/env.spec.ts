@@ -130,6 +130,23 @@ describe("getConfig", () => {
     });
   });
 
+  it("uses apiKey instead of DATADOG_API_KEY", () => {
+    process.env.DATADOG_API_KEY = "api-key";
+
+    const result = getConfig({
+      custom: {
+        datadog: {
+          apiKey: "use-this-api-key",
+        },
+      },
+    } as any);
+
+    expect(result).toEqual({
+      apiKey: "use-this-api-key",
+      ...defaultConfiguration,
+    });
+  });
+
   it("gets a mixed configuration when some values are present", () => {
     const result = getConfig({
       custom: {
@@ -295,6 +312,11 @@ describe("forceExcludeDepsFromWebpack", () => {
 });
 
 describe("setEnvConfiguration", () => {
+  beforeEach(() => {
+    jest.resetModules();
+    process.env = {};
+  });
+
   it("sets env vars for all handlers", () => {
     const handlers: FunctionInfo[] = [
       {
@@ -454,6 +476,65 @@ describe("setEnvConfiguration", () => {
           events: [],
         },
         name: "function2",
+        type: RuntimeType.NODE,
+      },
+    ]);
+  });
+
+  it("doesn't set DD_API_KEY if apiKMSKey and DATADOG_API_KEY in the environment are defined", () => {
+    process.env = {};
+    process.env.DATADOG_API_KEY = "dd-api-key";
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {
+            DD_FLUSH_TO_LOG: "true",
+            DD_LOG_LEVEL: "debug",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: "false",
+            DD_LOGS_INJECTION: "false",
+          },
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
+
+    setEnvConfiguration(
+      {
+        addLayers: false,
+        apiKMSKey: "bbbb",
+        site: "datadoghq.com",
+        logLevel: "info",
+        flushMetricsToLogs: false,
+        enableXrayTracing: true,
+        enableDDTracing: true,
+        enableDDLogs: true,
+        addExtension: false,
+        enableTags: true,
+        injectLogContext: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
+        exclude: [],
+      },
+      handlers,
+    );
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_FLUSH_TO_LOG: "true",
+            DD_KMS_API_KEY: "bbbb",
+            DD_LOG_LEVEL: "debug",
+            DD_SITE: "datadoghq.eu",
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_TRACE_ENABLED: "false",
+            DD_LOGS_INJECTION: "false",
+          },
+          events: [],
+        },
+        name: "function",
         type: RuntimeType.NODE,
       },
     ]);
