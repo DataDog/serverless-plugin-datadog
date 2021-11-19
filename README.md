@@ -79,7 +79,7 @@ custom:
 
 **Note**: If you use webpack, Datadog recommends using the prebuilt layers by setting `addLayers` to `true`, which is the default, and add `datadog-lambda-js` and `dd-trace` to the [externals][6] section of your webpack config.
 
-**Note**: Many of the above configuration values require setting `DATADOG_API_KEY` in your environment. If you store these values in AWS Secrets Manager or AWS KMS, please refer to the above options `apiKeySecretArn` and `apiKMSKey` to pull your Datadog API key from the correct location.
+**Note**: Many of the above configuration values require setting `DATADOG_API_KEY` in your environment. If you store these values in AWS Secrets Manager or AWS KMS, refer to the above options `apiKeySecretArn` and `apiKMSKey` to pull your Datadog API key from the correct location.
 
 ### TypeScript
 
