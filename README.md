@@ -214,7 +214,7 @@ Removing the serverless monitor ID and its parameters will delete the monitor.
 
 #### To Enable and Configure a Custom Monitor
 
-To define a custom monitor, you must define a unique serverless monitor ID string in addition to passing in the API key and Application key via `DATADOG_API_KEY` and `DATADOG_APP_KEY` in your environment. The `query` parameter is required but every other parameter is optional. Define a unique serverless monitor ID string and specify the necessary parameters below. For further documentation on monitor parameters, see the [Datadog Monitors API](https://docs.datadoghq.com/api/latest/monitors/#create-a-monitor).
+To define a custom monitor, you must define a unique serverless monitor ID string in addition to passing in the API key and Application key, `DATADOG_API_KEY` and `DATADOG_APP_KEY`, in your environment. The `query` parameter is required but every other parameter is optional. Define a unique serverless monitor ID string and specify the necessary parameters below. For further documentation on monitor parameters, see the [Datadog Monitors API](https://docs.datadoghq.com/api/latest/monitors/#create-a-monitor).
 
 ```yaml
 custom:
