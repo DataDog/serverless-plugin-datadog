@@ -81,8 +81,6 @@ const ddTracingEnabledEnvVar = "DD_TRACE_ENABLED";
 const logInjectionEnvVar = "DD_LOGS_INJECTION";
 const ddLogsEnabledEnvVar = "DD_SERVERLESS_LOGS_ENABLED";
 const ddCaptureLambdaPayloadEnvVar = "DD_CAPTURE_LAMBDA_PAYLOAD";
-const ddApiKeyEnvVar = "DATADOG_API_KEY";
-const ddAppKeyEnvVar = "DATADOG_APP_KEY";
 
 export const defaultConfiguration: Configuration = {
   addLayers: true,
@@ -109,12 +107,16 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     if (
       process.env.DATADOG_API_KEY !== undefined &&
       environment[apiKeyEnvVar] === undefined &&
-      config.apiKMSKey === undefined
+      // Only set this from the environment if all other methods of authentication
+      // are not in use. This will set DATADOG_API_KEY on the lambda from the environment
+      // variable directly if they haven't set one of the below three options
+      // in the configuration.
+      config.apiKMSKey === undefined &&
+      config.apiKey === undefined &&
+      config.apiKeySecretArn === undefined
     ) {
       environment[apiKeyEnvVar] = process.env.DATADOG_API_KEY;
     }
-    // Overwrite the environment variable with the value in the config if
-    // they've set it explicitly
     if (config.apiKey !== undefined && environment[apiKeyEnvVar] === undefined) {
       environment[apiKeyEnvVar] = config.apiKey;
     }
@@ -126,7 +128,7 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
       const isSendingSynchronousMetrics = !config.addExtension && !config.flushMetricsToLogs;
       if (isSendingSynchronousMetrics && isNode) {
         throw new Error(
-          `\`apiKeySecretArn\` is not supported for Node runtimes when using Synchronous Metrics. Use either \`apiKey\` or \`apiKmsKey\`.`,
+          "`apiKeySecretArn` is not supported for Node runtimes when using Synchronous Metrics. Set DATADOG_API_KEY in your environment, or use `apiKmsKey` in the configuration.",
         );
       }
       environment[apiKeySecretArnEnvVar] = config.apiKeySecretArn;
@@ -164,14 +166,6 @@ export function getConfig(service: Service): Configuration {
   let datadog = custom.datadog as Partial<Configuration> | undefined;
   if (datadog === undefined) {
     datadog = {};
-  }
-
-  if (process.env[ddApiKeyEnvVar]) {
-    datadog.apiKey ??= process.env[ddApiKeyEnvVar];
-  }
-
-  if (process.env[ddAppKeyEnvVar]) {
-    datadog.appKey ??= process.env[ddAppKeyEnvVar];
   }
 
   // These values are deprecated but will supersede everything if set

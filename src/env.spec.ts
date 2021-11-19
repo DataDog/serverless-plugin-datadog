@@ -73,19 +73,6 @@ describe("getConfig", () => {
     expect(result).toEqual(defaultConfiguration);
   });
 
-  it("correctly gets datadog api and app keys from the environment", () => {
-    process.env.DATADOG_API_KEY = "api-key";
-    process.env.DATADOG_APP_KEY = "app-key";
-
-    const result = getConfig({ custom: {} } as any);
-
-    expect(result).toEqual({
-      apiKey: "api-key",
-      appKey: "app-key",
-      ...defaultConfiguration,
-    });
-  });
-
   it("uses configuration api and app keys over environment variables", () => {
     process.env.DATADOG_API_KEY = "api-key";
     process.env.DATADOG_APP_KEY = "app-key";
@@ -729,7 +716,7 @@ describe("setEnvConfiguration", () => {
         handlers,
       );
     }).toThrowError(
-      `\`apiKeySecretArn\` is not supported for Node runtimes when using Synchronous Metrics. Use either \`apiKey\` or \`apiKmsKey\`.`,
+      "apiKeySecretArn` is not supported for Node runtimes when using Synchronous Metrics. Set DATADOG_API_KEY in your environment, or use `apiKmsKey` in the configuration.",
     );
   });
 });
