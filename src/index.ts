@@ -281,7 +281,9 @@ function validateConfiguration(config: Configuration) {
       // Support deprecated monitorsApiKey and monitorsAppKey
       (config.monitorsApiKey === undefined || config.monitorsAppKey === undefined)
     ) {
-      throw new Error("When `monitors` is enabled, `DATADOG_API_KEY` and `DATADOG_APP_KEY` must be set.");
+      throw new Error(
+        "When `monitors` is enabled, `DATADOG_API_KEY` and `DATADOG_APP_KEY` environment variables must be set.",
+      );
     }
   }
 }
