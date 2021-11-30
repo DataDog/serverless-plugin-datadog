@@ -685,7 +685,7 @@ describe("ServerlessPlugin", () => {
     }
     expect(threwError).toBe(true);
     expect(thrownErrorMessage).toEqual(
-      "When `monitors` is enabled, `DATADOG_API_KEY` and `DATADOG_APP_KEY` must be set.",
+      "When `monitors` is enabled, `DATADOG_API_KEY` and `DATADOG_APP_KEY` environment variables must be set.",
     );
   });
 
