@@ -468,6 +468,36 @@ describe("applyLambdaLibraryLayers", () => {
     });
   });
 
+  it("adds correct lambda layer given architecture in provider level for node", () => {
+    const handler = {
+      handler: { runtime: "nodejs14.x" },
+      type: RuntimeType.NODE,
+      runtime: "nodejs14.x",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: {
+        "us-east-1": {
+          "nodejs14.x": "nodejs14.x",
+          extension: "extension:11",
+          "extension-arm": "extension-arm:11",
+        },
+      },
+    };
+    const mockService = createMockService(
+      "us-east-1",
+      {
+        "node-function": { handler: "myfile.handler", runtime: "nodejs14.x" },
+      },
+      "arm64",
+    );
+    applyLambdaLibraryLayers(mockService, [handler], layers);
+    applyExtensionLayer(mockService, [handler], layers);
+    expect(handler.handler).toEqual({
+      runtime: "nodejs14.x",
+      layers: ["nodejs14.x", "extension-arm:11"],
+    });
+  });
+
   it("uses default runtime layer if architecture not available for specified runtime", () => {
     const handler = {
       handler: { runtime: "python3.7", architecture: "arm64" },
@@ -495,7 +525,7 @@ describe("applyLambdaLibraryLayers", () => {
     expect(handler.handler).toEqual({
       architecture: "arm64",
       runtime: "python3.7",
-      layers: ["python:3.7", "extension:11"],
+      layers: ["python:3.7", "extension-arm:11"],
     });
   });
 

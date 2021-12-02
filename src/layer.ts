@@ -113,13 +113,12 @@ export function applyExtensionLayer(service: Service, handlers: FunctionInfo[], 
     if (handler.type === RuntimeType.UNSUPPORTED) {
       continue;
     }
-    const { runtime } = handler;
     const architecture =
       (handler.handler as any).architecture ?? (service.provider as any).architecture ?? DEFAULT_ARCHITECTURE;
     let extensionLayerARN: string | undefined;
     let extensionLayerKey: string = "extension";
 
-    if (architecture === ARM64_ARCHITECTURE && runtime && runtime in armRuntimeKeys) {
+    if (architecture === ARM64_ARCHITECTURE) {
       removePreviousLayer(service, handler, regionRuntimes[extensionLayerKey]);
       extensionLayerKey = armRuntimeKeys[extensionLayerKey];
     }
