@@ -156,14 +156,18 @@ module.exports = class ServerlessPlugin {
     const env = this.serverless.getProvider("aws").getStage();
 
     if (config.enabled === false) return;
-    if (config.monitors && config.apiKey && config.appKey) {
+    if (
+      config.monitors &&
+      (config.apiKey ?? process.env.DATADOG_API_KEY) &&
+      (config.appKey ?? process.env.DATADOG_APP_KEY)
+    ) {
       const cloudFormationStackId = await getCloudFormationStackId(this.serverless);
       try {
         const logStatements = await setMonitors(
           config.site,
           config.monitors,
-          config.apiKey,
-          config.appKey,
+          (config.apiKey ?? process.env.DATADOG_API_KEY)!,
+          (config.appKey ?? process.env.DATADOG_APP_KEY)!,
           cloudFormationStackId,
           service,
           env,
@@ -279,7 +283,7 @@ function validateConfiguration(config: Configuration) {
     if (
       (process.env.DATADOG_API_KEY === undefined || process.env.DATADOG_APP_KEY === undefined) &&
       // Support deprecated monitorsApiKey and monitorsAppKey
-      (config.monitorsApiKey === undefined || config.monitorsAppKey === undefined)
+      (config.apiKey === undefined || config.appKey === undefined)
     ) {
       throw new Error(
         "When `monitors` is enabled, `DATADOG_API_KEY` and `DATADOG_APP_KEY` environment variables must be set.",
