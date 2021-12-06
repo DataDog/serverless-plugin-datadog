@@ -318,6 +318,11 @@ describe("ServerlessPlugin", () => {
       mock.restore();
     });
 
+    beforeEach(() => {
+      jest.resetModules();
+      process.env = {};
+    });
+
     it("throws error if API key, KMS API, and API key secret ARN are defined", async () => {
       mock({});
       const serverless = {
@@ -560,9 +565,128 @@ describe("ServerlessPlugin", () => {
       }
       expect(threwError).toBe(true);
       expect(thrownErrorMessage).toEqual(
-        "When `addExtension` is true, `apiKey`, `apiKMSKey`, or `apiKeySecretArn` must also be set.",
+        "When `addExtension` is true, the environment variable `DATADOG_API_KEY` or configuration variable `apiKMSKey` or `apiKeySecretArn` must be set.",
       );
     });
+  });
+
+  it("allows use of DATADOG_API_KEY and DATADOG_APP_KEY to create monitors", async () => {
+    process.env.DATADOG_API_KEY = "1234";
+    process.env.DATADOG_APP_KEY = "5678";
+    mock({});
+    const serverless = {
+      cli: {
+        log: () => {},
+      },
+      service: {
+        provider: {
+          region: "us-east-1",
+        },
+        functions: {
+          node1: {
+            handler: "my-func.ev",
+            runtime: "nodejs14.x",
+          },
+        },
+        custom: {
+          datadog: {
+            addExtension: true,
+            flushMetricsToLogs: false,
+            monitors: true,
+          },
+        },
+      },
+    };
+
+    const plugin = new ServerlessPlugin(serverless, {});
+    let threwError: boolean = false;
+    try {
+      await plugin.hooks["after:package:initialize"]();
+    } catch (e) {
+      threwError = true;
+    }
+    expect(threwError).toBe(false);
+  });
+
+  it("allows use of monitorsApiKey and monitorsAppKey to create a lambda with monitors", async () => {
+    mock({});
+    const serverless = {
+      cli: {
+        log: () => {},
+      },
+      service: {
+        provider: {
+          region: "us-east-1",
+        },
+        functions: {
+          node1: {
+            handler: "my-func.ev",
+            runtime: "nodejs14.x",
+          },
+        },
+        custom: {
+          datadog: {
+            addExtension: true,
+            flushMetricsToLogs: false,
+            monitors: true,
+            monitorsApiKey: "1234",
+            monitorsAppKey: "5678",
+          },
+        },
+      },
+    };
+
+    const plugin = new ServerlessPlugin(serverless, {});
+    let threwError: boolean = false;
+    try {
+      await plugin.hooks["after:package:initialize"]();
+    } catch (e) {
+      threwError = true;
+    }
+    expect(threwError).toBe(false);
+  });
+
+  it("throws an error if not all keys required by monitors are defined", async () => {
+    process.env = {};
+    mock({});
+    const serverless = {
+      cli: {
+        log: () => {},
+      },
+      service: {
+        provider: {
+          region: "us-east-1",
+        },
+        functions: {
+          node1: {
+            handler: "my-func.ev",
+            runtime: "nodejs14.x",
+          },
+        },
+        custom: {
+          datadog: {
+            flushMetricsToLogs: false,
+            monitors: true,
+          },
+        },
+      },
+    };
+
+    const plugin = new ServerlessPlugin(serverless, {});
+    let threwError: boolean = false;
+    let thrownErrorMessage: string | undefined;
+    try {
+      await plugin.hooks["after:package:initialize"]();
+    } catch (e) {
+      threwError = true;
+      if (e instanceof Error) {
+        thrownErrorMessage = e.message;
+      }
+    }
+    expect(threwError).toBe(true);
+    expect(thrownErrorMessage).toEqual(
+      "When `monitors` is enabled, `DATADOG_API_KEY` and `DATADOG_APP_KEY` environment variables must be set.",
+    );
   });
 
   describe("afterPackageFunction", () => {

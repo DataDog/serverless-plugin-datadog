@@ -6,8 +6,8 @@
  * Copyright 2021 Datadog, Inc.
  */
 
-import { FunctionInfo, runtimeLookup, RuntimeType } from "./layer";
 import Service from "serverless/classes/Service";
+import { FunctionInfo, runtimeLookup, RuntimeType } from "./layer";
 
 export interface Configuration {
   // Whether Datadog is enabled. Defaults to true.
@@ -16,16 +16,18 @@ export interface Configuration {
   addLayers: boolean;
   // Datadog API Key, only necessary when using metrics without log forwarding
   apiKey?: string;
+  // Datadog App Key used for enabling monitor configuration through plugin; separate from the apiKey that is deployed with your function
+  appKey?: string;
+  // Deprecated: old DATADOG_API_KEY used to deploy monitors
+  monitorsApiKey?: string;
+  // Deprecated: old DATADOG_APP_KEY used to deploy monitors
+  monitorsAppKey?: string;
   // The ARN of the secret in AWS Secrets Manager containing the Datadog API key.
   apiKeySecretArn?: string;
   // Datadog API Key encrypted using KMS, only necessary when using metrics without log forwarding
   apiKMSKey?: string;
   // Whether to capture and store the payload and response of a lambda invocation
   captureLambdaPayload?: boolean;
-  // Datadog API Key used for enabling monitor configuration through plugin
-  monitorsApiKey?: string;
-  // Datadog App Key used for enabling monitor configuration through plugin; separate from the apiKey that is deployed with your function
-  monitorsAppKey?: string;
   // Which Site to send to, (should be datadoghq.com or datadoghq.eu)
   site: string;
   // The log level, (set to DEBUG for extended logging)
@@ -102,6 +104,19 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
   handlers.forEach(({ handler }) => {
     handler.environment ??= {};
     const environment = handler.environment as any;
+    if (
+      process.env.DATADOG_API_KEY !== undefined &&
+      environment[apiKeyEnvVar] === undefined &&
+      // Only set this from the environment if all other methods of authentication
+      // are not in use. This will set DATADOG_API_KEY on the lambda from the environment
+      // variable directly if they haven't set one of the below three options
+      // in the configuration.
+      config.apiKMSKey === undefined &&
+      config.apiKey === undefined &&
+      config.apiKeySecretArn === undefined
+    ) {
+      environment[apiKeyEnvVar] = process.env.DATADOG_API_KEY;
+    }
     if (config.apiKey !== undefined && environment[apiKeyEnvVar] === undefined) {
       environment[apiKeyEnvVar] = config.apiKey;
     }
@@ -113,7 +128,7 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
       const isSendingSynchronousMetrics = !config.addExtension && !config.flushMetricsToLogs;
       if (isSendingSynchronousMetrics && isNode) {
         throw new Error(
-          `\`apiKeySecretArn\` is not supported for Node runtimes when using Synchronous Metrics. Use either \`apiKey\` or \`apiKmsKey\`.`,
+          "`apiKeySecretArn` is not supported for Node runtimes when using Synchronous Metrics. Set DATADOG_API_KEY in your environment, or use `apiKmsKey` in the configuration.",
         );
       }
       environment[apiKeySecretArnEnvVar] = config.apiKeySecretArn;
@@ -152,10 +167,22 @@ export function getConfig(service: Service): Configuration {
   if (datadog === undefined) {
     datadog = {};
   }
-  return {
+
+  // These values are deprecated but will supersede everything if set
+  if (custom?.datadog?.monitorsApiKey) {
+    datadog.apiKey = custom?.datadog?.monitorsApiKey ?? datadog.apiKey;
+  }
+
+  if (custom?.datadog?.monitorsAppKey) {
+    datadog.appKey = custom?.datadog?.monitorsAppKey ?? datadog.appKey;
+  }
+
+  const config: Configuration = {
     ...defaultConfiguration,
     ...datadog,
   };
+
+  return config;
 }
 
 export function forceExcludeDepsFromWebpack(service: Service) {

@@ -33,16 +33,15 @@ To further configure your plugin, use the following custom parameters in your `s
 
 | Parameter                   | Description                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `flushMetricsToLogs`        | Send custom metrics by using logs with the Datadog Forwarder Lambda function (recommended). Defaults to `true`. If you disable this parameter, it's required to set `apiKey` or if encrypted, `apiKMSKey` or `apiKeySecretArn`. `flushMetricsToLogs` is ignored when `addExtension` is true.                                                                                                                                             |
+| `flushMetricsToLogs`        | Send custom metrics by using logs with the Datadog Forwarder Lambda function (recommended). Defaults to `true`. If you disable this parameter, it's required to set `DATADOG_API_KEY` in your environment, or if encrypted, `apiKMSKey` or `apiKeySecretArn` in the configuration. `flushMetricsToLogs` is ignored when `addExtension` is true.                                                                                          |
 | `site`                      | Set which Datadog site to send data, this is only used when `flushMetricsToLogs` is `false` or `addExtension` is `true`. Possible values are `datadoghq.com`, `datadoghq.eu`, `us3.datadoghq.com`, `us5.datadoghq.com`, and `ddog-gov.com`. The default is `datadoghq.com`.                                                                                                                                                              |
-| `apiKey`                    | Datadog API Key, only needed when `flushMetricsToLogs` is `false` or `addExtension` is `true`. Defining `apiKey` will add the Datadog API key directly to your Lambda functions as an environment variable. For more information about getting a Datadog API key, see the [API key documentation][3].                                                                                                                                    |
-| `apiKeySecretArn`           | The ARN of the secret storing the Datadog API key in AWS Secrets Manager. Use this parameter in place of `apiKey` when `flushMetricsToLogs` is `false` or `addExtension` is `true`. If set, remember to add the `secretsmanager:GetSecretValue` permission to the Lambda execution role.                                                                                                                                                 |
-| `apiKMSKey`                 | Datadog API Key encrypted using KMS. Use this parameter in place of `apiKey` when `flushMetricsToLogs` is `false` or `addExtension` is `true`, and you are using KMS encryption. Defining `apiKMSKey` will add the Datadog API Key directly to your Lambda functions as an environment variable.                                                                                                                                         |
+| `apiKey`                    | Datadog API Key, only needed when `flushMetricsToLogs` is `false` or `addExtension` is `true`. Not required when DATADOG_API_KEY environment variable is set. Defining `apiKey` will add the Datadog API key directly to your Lambda functions as an environment variable. For more information about getting a Datadog API key, see the [API key documentation][3].                                                                     |
+| `appKey`                    | Datadog App Key, only needed when `monitors` is defined. Not required when DATADOG_APP_KEY environment variable is set.                                                                                                                                                                                                                                                                                                                  |
+| `apiKeySecretArn`           | The ARN of the secret storing the Datadog API key in AWS Secrets Manager. Use this parameter if you're storing your secrets in AWS Secrets Manager, and when `flushMetricsToLogs` is `false` or `addExtension` is `true`. If set, remember to add the `secretsmanager:GetSecretValue` permission to the Lambda execution role.                                                                                                           |
+| `apiKMSKey`                 | Datadog API Key encrypted using KMS. Use this parameter if you're storing your secrets with KMS, and if `flushMetricsToLogs` is `false` or `addExtension` is `true`. Defining `apiKMSKey` will add the Datadog API Key directly to your Lambda functions as an environment variable.                                                                                                                                                     |
 | `captureLambdaPayload`      | (Experimental) This optional setting configures Datadog ingestion for incoming and outgoing AWS Lambda payloads. Function request and response values are added as part of outgoing APM spans sent to Datadog, and require Datadog APM to be configured on your function. Obfuscation of fields in the Lambda payload is available via the `replace_tags` block within `apm_config` settings in [datadog.yaml.][12] Defaults to `false`. |
-| `monitorsApiKey`            | Datadog API Key. Only needed when using plugin to create monitors for your functions and when `monitors` is defined. Separate from `apiKey` with your function, `monitorsApiKey` is only used to create monitors through the Datadog Monitors API. You may use the same API key for both `apiKey` and `monitorsApiKey`.                                                                                                                  |
-| `monitorsAppKey`            | Datadog Application Key. Only needed when using plugin to create monitors for your function and when `monitors` is defined.                                                                                                                                                                                                                                                                                                              |
 | `addLayers`                 | Whether to install the Datadog Lambda library as a layer. Defaults to `true`. Set to `false` when you plan to package the Datadog Lambda library to your function's deployment package on your own so that you can install a specific version of the Datadog Lambda library ([Python][4] or [Node.js][5]).                                                                                                                               |
-| `addExtension`              | Whether to install the Datadog Lambda Extension as a layer. Defaults to `false`. When enabled, it's required to set the `apiKey`, `apiKMSKey`, or `apiKeySecretArn` parameter. Learn more about the [Datadog Lambda Extension Layer][8] in the documentation. **Note**: AWS only supports Lambda Extensions for [certain runtimes][9].                                                                                                   |
+| `addExtension`              | Whether to install the Datadog Lambda Extension as a layer. Defaults to `false`. When enabled, it's required to set the environment variable `DATADOG_API_KEY`, or the configuration values `apiKMSKey` or `apiKeySecretArn`. Learn more about the [Datadog Lambda Extension Layer][8] in the documentation. **Note**: AWS only supports Lambda Extensions for [certain runtimes][9].                                                    |
 | `logLevel`                  | The log level, set to `DEBUG` for extended logging.                                                                                                                                                                                                                                                                                                                                                                                      |
 | `enableXrayTracing`         | Set `true` to enable X-Ray tracing on the Lambda functions and API Gateway integrations. Defaults to `false`.                                                                                                                                                                                                                                                                                                                            |
 | `enableDDTracing`           | Enable Datadog tracing on the Lambda function. Note: This applies only to integrations using the Datadog Extension. Defaults to `true`.                                                                                                                                                                                                                                                                                                  |
@@ -56,7 +55,7 @@ To further configure your plugin, use the following custom parameters in your `s
 | `injectLogContext`          | When set, the lambda layer will automatically patch console.log with Datadog's tracing ids. Defaults to `true`.                                                                                                                                                                                                                                                                                                                          |
 | `exclude`                   | When set, this plugin will ignore all specified functions. Use this parameter if you have any functions that should not include Datadog functionality. Defaults to `[]`.                                                                                                                                                                                                                                                                 |
 | `enabled`                   | When set to false, the Datadog plugin will stay inactive. Defaults to `true`. You can control this option using an environment variable, e.g. `enabled: ${strToBool(${env:DD_PLUGIN_ENABLED, true})}`, to activate/deactivate the plugin during deployment. Alternatively, you can also use the value passed in through `--stage` to control this option, [see example.](#disable-plugin-for-particular-environment)                     |
-| `monitors`                  | When defined, the Datadog plugin will configure monitors for the deployed function. You must also have `monitorsApiKey` and `monitorsAppKey` defined. To learn how to define monitors, see [To Enable and Configure a Recommended Serverless Monitor.](#to-enable-and-configure-a-recommended-serverless-monitor)                                                                                                                        |
+| `monitors`                  | When defined, the Datadog plugin will configure monitors for the deployed function. Requires setting `DATADOG_API_KEY` and `DATADOG_APP_KEY` in your environment. To learn how to define monitors, see [To Enable and Configure a Recommended Serverless Monitor.](#to-enable-and-configure-a-recommended-serverless-monitor)                                                                                                            |
 | `customHandler`             | When set, the specified handler is set as the handler for all the functions. By deafult, the handler is set to `/opt/nodejs/node_modules/datadog-lambda-js/handler.handler` if `addLayers` is set to `true`, or `node_modules/datadog-lambda-js/dist/handler.handler` if `addLayers` is set to `false`                                                                                                                                   |
 
 To use any of these parameters, add a `custom` > `datadog` section to your `serverless.yml` similar to this example:
@@ -65,11 +64,8 @@ To use any of these parameters, add a `custom` > `datadog` section to your `serv
 custom:
   datadog:
     flushMetricsToLogs: true
-    apiKey: "{Datadog_API_Key}"
     apiKeySecretArn: "{Datadog_API_Key_Secret_ARN}"
     apiKMSKey: "{Encrypted_Datadog_API_Key}"
-    monitorsApiKey: "{Datadog_API_Key}"
-    monitorsAppKey: "{Datadog_Application_Key}"
     addLayers: true
     logLevel: "info"
     enableXrayTracing: false
@@ -84,6 +80,8 @@ custom:
 ```
 
 **Note**: If you use webpack, Datadog recommends using the prebuilt layers by setting `addLayers` to `true`, which is the default, and add `datadog-lambda-js` and `dd-trace` to the [externals][6] section of your webpack config.
+
+**Note**: Many of the above configuration values require setting `DATADOG_API_KEY` in your environment. If you store these values in AWS Secrets Manager or AWS KMS, refer to the above options `apiKeySecretArn` and `apiKMSKey` to pull your Datadog API key from the correct location.
 
 ### TypeScript
 
@@ -173,7 +171,7 @@ There are seven recommended monitors with default values pre-configured.
 
 #### To Enable and Configure a Recommended Serverless Monitor
 
-To create a recommended monitor, you must use its respective serverless monitor ID. Note that you must also set the `monitorApiKey` and `monitorAppKey`.
+To create a recommended monitor, you must use its respective serverless monitor ID. Note that you must also set the `DATADOG_API_KEY` and `DATADOG_APP_KEY` in your environment.
 
 If you’d like to further configure the parameters for a recommended monitor, you can directly define the parameter values below the serverless monitor ID. Parameters not specified under a recommended monitor will use the default recommended value. The `query` parameter for recommended monitors cannot be directly modified and will default to using the `query` valued as defined above; however, you may change the threshold value in `query` by re-defining it within the `options` parameter. To delete a monitor, remove the monitor from the `serverless.yml` template. For further documentation on how to define monitor parameters, see the [Datadog Monitors API](https://docs.datadoghq.com/api/latest/monitors/#create-a-monitor).
 
@@ -187,8 +185,6 @@ Define the appropriate serverless monitor ID without specifying any parameter va
 custom:
   datadog:
     addLayers: true
-    monitorsApiKey: "{Datadog_API_Key}"
-    monitorsAppKey: "{Datadog_APP_Key}"
     monitors:
       - high_error_rate:
 ```
@@ -199,8 +195,6 @@ custom:
 custom:
   datadog:
     addLayers: true
-    monitorsApiKey: "{Datadog_API_Key}"
-    monitorsAppKey: "{Datadog_APP_Key}"
     monitors:
       - high_error_rate:
           name: "High Error Rate with Modified Warning Threshold"
@@ -222,14 +216,12 @@ Removing the serverless monitor ID and its parameters will delete the monitor.
 
 #### To Enable and Configure a Custom Monitor
 
-To define a custom monitor, you must define a unique serverless monitor ID string in addition to passing in the API key and Application key. The `query` parameter is required but every other parameter is optional. Define a unique serverless monitor ID string and specify the necessary parameters below. For further documentation on monitor parameters, see the [Datadog Monitors API](https://docs.datadoghq.com/api/latest/monitors/#create-a-monitor).
+To define a custom monitor, you must define a unique serverless monitor ID string in addition to passing in the API key and Application key, `DATADOG_API_KEY` and `DATADOG_APP_KEY`, in your environment. The `query` parameter is required but every other parameter is optional. Define a unique serverless monitor ID string and specify the necessary parameters below. For further documentation on monitor parameters, see the [Datadog Monitors API](https://docs.datadoghq.com/api/latest/monitors/#create-a-monitor).
 
 ```yaml
 custom:
   datadog:
     addLayers: true
-    monitorsApiKey: "{Datadog_API_Key}"
-    monitorsAppKey: "{Datadog_APP_Key}"
     monitors:
       - custom_monitor_id:
           name: "Custom Monitor"

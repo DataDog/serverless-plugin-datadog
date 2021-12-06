@@ -7,11 +7,11 @@
  */
 
 import {
-  getConfig,
   defaultConfiguration,
-  setEnvConfiguration,
   forceExcludeDepsFromWebpack,
+  getConfig,
   hasWebpackPlugin,
+  setEnvConfiguration,
 } from "./env";
 import { FunctionInfo, RuntimeType } from "./layer";
 
@@ -64,9 +64,74 @@ describe("hasWebpackPlugin", () => {
 });
 
 describe("getConfig", () => {
+  beforeEach(() => {
+    jest.resetModules();
+    process.env = {};
+  });
   it("get a default configuration when none is present", () => {
     const result = getConfig({ custom: {} } as any);
     expect(result).toEqual(defaultConfiguration);
+  });
+
+  it("uses configuration api and app keys over environment variables", () => {
+    process.env.DATADOG_API_KEY = "api-key";
+    process.env.DATADOG_APP_KEY = "app-key";
+
+    const result = getConfig({
+      custom: {
+        datadog: {
+          apiKey: "use-this-api-key",
+          appKey: "use-this-app-key",
+        },
+      },
+    } as any);
+
+    expect(result).toEqual({
+      apiKey: "use-this-api-key",
+      appKey: "use-this-app-key",
+      ...defaultConfiguration,
+    });
+  });
+
+  it("uses monitor api and app keys over everything else", () => {
+    process.env.DATADOG_API_KEY = "api-key";
+    process.env.DATADOG_APP_KEY = "app-key";
+
+    const result = getConfig({
+      custom: {
+        datadog: {
+          monitorsApiKey: "monitors-api-key",
+          monitorsAppKey: "monitors-app-key",
+          apiKey: "use-this-api-key",
+          appKey: "use-this-app-key",
+        },
+      },
+    } as any);
+
+    expect(result).toEqual({
+      apiKey: "monitors-api-key",
+      appKey: "monitors-app-key",
+      monitorsApiKey: "monitors-api-key",
+      monitorsAppKey: "monitors-app-key",
+      ...defaultConfiguration,
+    });
+  });
+
+  it("uses apiKey instead of DATADOG_API_KEY", () => {
+    process.env.DATADOG_API_KEY = "api-key";
+
+    const result = getConfig({
+      custom: {
+        datadog: {
+          apiKey: "use-this-api-key",
+        },
+      },
+    } as any);
+
+    expect(result).toEqual({
+      apiKey: "use-this-api-key",
+      ...defaultConfiguration,
+    });
   });
 
   it("gets a mixed configuration when some values are present", () => {
@@ -234,6 +299,11 @@ describe("forceExcludeDepsFromWebpack", () => {
 });
 
 describe("setEnvConfiguration", () => {
+  beforeEach(() => {
+    jest.resetModules();
+    process.env = {};
+  });
+
   it("sets env vars for all handlers", () => {
     const handlers: FunctionInfo[] = [
       {
@@ -396,6 +466,65 @@ describe("setEnvConfiguration", () => {
           events: [],
         },
         name: "function2",
+        type: RuntimeType.NODE,
+      },
+    ]);
+  });
+
+  it("doesn't set DD_API_KEY if apiKMSKey and DATADOG_API_KEY in the environment are defined", () => {
+    process.env = {};
+    process.env.DATADOG_API_KEY = "dd-api-key";
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {
+            DD_FLUSH_TO_LOG: "true",
+            DD_LOG_LEVEL: "debug",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: "false",
+            DD_LOGS_INJECTION: "false",
+          },
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
+
+    setEnvConfiguration(
+      {
+        addLayers: false,
+        apiKMSKey: "bbbb",
+        site: "datadoghq.com",
+        logLevel: "info",
+        flushMetricsToLogs: false,
+        enableXrayTracing: true,
+        enableDDTracing: true,
+        enableDDLogs: true,
+        addExtension: false,
+        enableTags: true,
+        injectLogContext: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
+        exclude: [],
+      },
+      handlers,
+    );
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_FLUSH_TO_LOG: "true",
+            DD_KMS_API_KEY: "bbbb",
+            DD_LOG_LEVEL: "debug",
+            DD_SITE: "datadoghq.eu",
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_TRACE_ENABLED: "false",
+            DD_LOGS_INJECTION: "false",
+          },
+          events: [],
+        },
+        name: "function",
         type: RuntimeType.NODE,
       },
     ]);
@@ -587,7 +716,7 @@ describe("setEnvConfiguration", () => {
         handlers,
       );
     }).toThrowError(
-      `\`apiKeySecretArn\` is not supported for Node runtimes when using Synchronous Metrics. Use either \`apiKey\` or \`apiKmsKey\`.`,
+      "apiKeySecretArn` is not supported for Node runtimes when using Synchronous Metrics. Set DATADOG_API_KEY in your environment, or use `apiKmsKey` in the configuration.",
     );
   });
 });

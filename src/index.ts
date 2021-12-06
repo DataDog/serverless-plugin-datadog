@@ -7,18 +7,17 @@
  */
 
 import * as Serverless from "serverless";
-import * as layers from "./layers.json";
-import * as govLayers from "./layers-gov.json";
 import { version } from "../package.json";
-
-import { getConfig, setEnvConfiguration, forceExcludeDepsFromWebpack, hasWebpackPlugin, Configuration } from "./env";
-import { applyExtensionLayer, applyLambdaLibraryLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
-import { TracingMode, enableTracing } from "./tracing";
-import { redirectHandlers } from "./wrapper";
+import { Configuration, forceExcludeDepsFromWebpack, getConfig, hasWebpackPlugin, setEnvConfiguration } from "./env";
 import { addCloudWatchForwarderSubscriptions, addExecutionLogGroupsAndSubscriptions } from "./forwarder";
-import { addOutputLinks, printOutputs } from "./output";
-import { setMonitors } from "./monitors";
+import { applyExtensionLayer, applyLambdaLibraryLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
+import * as govLayers from "./layers-gov.json";
+import * as layers from "./layers.json";
 import { getCloudFormationStackId } from "./monitor-api-requests";
+import { setMonitors } from "./monitors";
+import { addOutputLinks, printOutputs } from "./output";
+import { enableTracing, TracingMode } from "./tracing";
+import { redirectHandlers } from "./wrapper";
 
 enum TagKeys {
   Service = "service",
@@ -63,6 +62,11 @@ module.exports = class ServerlessPlugin {
     if (config.enabled === false) return;
     this.serverless.cli.log("Auto instrumenting functions with Datadog");
     configHasOldProperties(config);
+    if (config.monitorsApiKey !== undefined || config.monitorsAppKey !== undefined) {
+      this.serverless.cli.log(
+        "Warning: `monitorsApiKey` and `monitorsAppKey` have been deprecated. Please set DATADOG_API_KEY and DATADOG_APP_KEY in your environment instead.",
+      );
+    }
     validateConfiguration(config);
 
     const defaultRuntime = this.serverless.service.provider.runtime;
@@ -152,14 +156,18 @@ module.exports = class ServerlessPlugin {
     const env = this.serverless.getProvider("aws").getStage();
 
     if (config.enabled === false) return;
-    if (config.monitors && config.monitorsApiKey && config.monitorsAppKey) {
+    if (
+      config.monitors &&
+      (config.apiKey ?? process.env.DATADOG_API_KEY) &&
+      (config.appKey ?? process.env.DATADOG_APP_KEY)
+    ) {
       const cloudFormationStackId = await getCloudFormationStackId(this.serverless);
       try {
         const logStatements = await setMonitors(
           config.site,
           config.monitors,
-          config.monitorsApiKey,
-          config.monitorsAppKey,
+          (config.apiKey ?? process.env.DATADOG_API_KEY)!,
+          (config.appKey ?? process.env.DATADOG_APP_KEY)!,
           cloudFormationStackId,
           service,
           env,
@@ -168,7 +176,9 @@ module.exports = class ServerlessPlugin {
           this.serverless.cli.log(logStatement);
         }
       } catch (err) {
-        this.serverless.cli.log("Error occurred when configuring monitors.");
+        if (err instanceof Error) {
+          this.serverless.cli.log(`Error occurred when configuring monitors: ${err.message}`);
+        }
       }
     }
     return printOutputs(this.serverless, config.site);
@@ -258,13 +268,26 @@ function validateConfiguration(config: Configuration) {
     );
   }
   if (config.addExtension) {
-    if (config.apiKey === undefined && config.apiKMSKey === undefined && config.apiKeySecretArn === undefined) {
-      throw new Error("When `addExtension` is true, `apiKey`, `apiKMSKey`, or `apiKeySecretArn` must also be set.");
+    if (
+      config.apiKey === undefined &&
+      process.env.DATADOG_API_KEY === undefined &&
+      config.apiKMSKey === undefined &&
+      config.apiKeySecretArn === undefined
+    ) {
+      throw new Error(
+        "When `addExtension` is true, the environment variable `DATADOG_API_KEY` or configuration variable `apiKMSKey` or `apiKeySecretArn` must be set.",
+      );
     }
   }
   if (config.monitors) {
-    if (config.monitorsApiKey === undefined || config.monitorsAppKey === undefined) {
-      throw new Error("When `monitors` is defined, `monitorsApiKey` and `monitorsAppKey` must also be defined");
+    if (
+      (process.env.DATADOG_API_KEY === undefined || process.env.DATADOG_APP_KEY === undefined) &&
+      // Support deprecated monitorsApiKey and monitorsAppKey
+      (config.apiKey === undefined || config.appKey === undefined)
+    ) {
+      throw new Error(
+        "When `monitors` is enabled, `DATADOG_API_KEY` and `DATADOG_APP_KEY` environment variables must be set.",
+      );
     }
   }
 }
