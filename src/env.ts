@@ -85,6 +85,8 @@ const logInjectionEnvVar = "DD_LOGS_INJECTION";
 const ddLogsEnabledEnvVar = "DD_SERVERLESS_LOGS_ENABLED";
 const ddCaptureLambdaPayloadEnvVar = "DD_CAPTURE_LAMBDA_PAYLOAD";
 
+export const ddTagsEnvVar = "DD_TAGS";
+
 export const defaultConfiguration: Configuration = {
   addLayers: true,
   flushMetricsToLogs: true,

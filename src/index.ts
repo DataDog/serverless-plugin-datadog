@@ -10,7 +10,14 @@ import * as Serverless from "serverless";
 import { FunctionDefinition } from "serverless";
 import { SimpleGit } from "simple-git";
 import { version } from "../package.json";
-import { Configuration, forceExcludeDepsFromWebpack, getConfig, hasWebpackPlugin, setEnvConfiguration } from "./env";
+import {
+  Configuration,
+  ddTagsEnvVar,
+  forceExcludeDepsFromWebpack,
+  getConfig,
+  hasWebpackPlugin,
+  setEnvConfiguration,
+} from "./env";
 import { addCloudWatchForwarderSubscriptions, addExecutionLogGroupsAndSubscriptions } from "./forwarder";
 import { newSimpleGit } from "./git";
 import { applyExtensionLayer, applyLambdaLibraryLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
@@ -33,7 +40,6 @@ enum TagKeys {
   Service = "service",
   Env = "env",
   Plugin = "dd_sls_plugin",
-  GitCommitHash = "git.commit.sha",
 }
 
 module.exports = class ServerlessPlugin {
@@ -159,9 +165,18 @@ module.exports = class ServerlessPlugin {
     // 1. The flag is enabled (it's enabled by default)
     // 2. They've provided a DATADOG_API_KEY (this will silently fail if they do not provide an API key)
     // 3. They're in a Git repo (this will silently fail if they do not provide an API key)
-    if (config.enableSourceCodeIntegration && config.apiKey !== undefined && (await simpleGit.checkIsRepo())) {
+    if (
+      config.enableSourceCodeIntegration &&
+      (process.env.DATADOG_API_KEY ?? config.apiKey) !== undefined &&
+      (await simpleGit.checkIsRepo())
+    ) {
       try {
-        await this.addSourceCodeIntegration(handlers, simpleGit, config.apiKey!, config.site);
+        await this.addSourceCodeIntegration(
+          handlers,
+          simpleGit,
+          (process.env.DATADOG_API_KEY ?? config.apiKey)!,
+          config.site,
+        );
       } catch (err) {
         this.serverless.cli.log(`Error occurred when adding source code integration: ${err}`);
         return;
@@ -268,8 +283,8 @@ module.exports = class ServerlessPlugin {
     const gitCommitHash = await sourceCodeIntegration.uploadGitMetadata();
 
     handlers.forEach(({ handler }) => {
-      handler.tags ??= {};
-      handler.tags[TagKeys.GitCommitHash] = gitCommitHash;
+      handler.environment ??= {};
+      handler.environment[ddTagsEnvVar] = "git.commit.sha:" + gitCommitHash;
     });
   }
 };
