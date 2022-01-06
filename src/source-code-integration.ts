@@ -1,7 +1,6 @@
 import { SimpleGit } from "simple-git";
 import { version } from "../package.json";
 import { getCommitInfo } from "./git";
-import { getBaseIntakeUrl } from "./git-metadata/api";
 import { CommitInfo } from "./git-metadata/interfaces";
 import { newApiKeyValidator } from "./helpers/apikey";
 import { InvalidConfigurationError } from "./helpers/errors";
@@ -62,7 +61,7 @@ export class SourceCodeIntegration {
 
     return getRequestBuilder({
       apiKey: this.apiKey!,
-      baseUrl: getBaseIntakeUrl(),
+      baseUrl: "https://sourcemap-intake." + this.datadogSite,
     });
   }
 
