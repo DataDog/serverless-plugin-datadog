@@ -161,10 +161,6 @@ module.exports = class ServerlessPlugin {
 
     const simpleGit = await newSimpleGit();
 
-    // We only want to enable source code integration if the following conditions are met:
-    // 1. The flag is enabled (it's enabled by default)
-    // 2. They've provided a DATADOG_API_KEY (this will silently fail if they do not provide an API key)
-    // 3. They're in a Git repo (this will silently fail if they do not provide an API key)
     if (
       config.enableSourceCodeIntegration &&
       (process.env.DATADOG_API_KEY ?? config.apiKey) !== undefined &&
