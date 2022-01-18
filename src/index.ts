@@ -164,6 +164,7 @@ module.exports = class ServerlessPlugin {
     if (
       config.enableSourceCodeIntegration &&
       (process.env.DATADOG_API_KEY ?? config.apiKey) !== undefined &&
+      simpleGit !== undefined &&
       (await simpleGit.checkIsRepo())
     ) {
       try {
