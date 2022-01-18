@@ -3,7 +3,7 @@ import { URL } from "url";
 import { CommitInfo } from "./git-metadata/interfaces";
 
 // Returns a configured SimpleGit.
-export const newSimpleGit = async (): Promise<simpleGit.SimpleGit> => {
+export const newSimpleGit = async (): Promise<simpleGit.SimpleGit | undefined> => {
   const options = {
     baseDir: process.cwd(),
     binary: "git",
@@ -16,7 +16,7 @@ export const newSimpleGit = async (): Promise<simpleGit.SimpleGit> => {
     const root = await git.revparse("--show-toplevel");
     options.baseDir = root;
   } catch {
-    // Ignore exception as it will fail if we are not inside a git repository.
+    return undefined;
   }
 
   return simpleGit.gitP(options);
