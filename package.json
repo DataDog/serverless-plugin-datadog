@@ -63,7 +63,7 @@
     "@types/datadog-metrics": "^0.6.2",
     "@types/deep-extend": "^0.4.32",
     "datadog-metrics": "^0.9.3",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.1.1",
     "proxy": "^1.0.2",
     "simple-git": "^2.48.0"
   }
