@@ -1,9 +1,8 @@
-import { AxiosPromise } from "axios";
 import { retryRequest } from "./retry";
 
 describe("retry", () => {
   const retryCallback = jest.fn();
-  const createResultWithErrors = (errors: any[]): (() => AxiosPromise) => {
+  const createResultWithErrors = (errors: any[]): (() => Promise<any>) => {
     let i = -1;
 
     return () => {
