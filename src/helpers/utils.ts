@@ -94,6 +94,7 @@ export const getRequestBuilder = (options: RequestOptions) => {
 
     if (options.headers !== undefined) {
       options.headers.forEach((value, key) => {
+        // @ts-ignore
         newArguments.headers[key] = value;
       });
     }
