@@ -63,7 +63,7 @@ class ApiKeyValidatorImplem {
     try {
       const response = await axios.get(this.getApiKeyValidationURL(), {
         headers: {
-          "DD-API-KEY": this.apiKey!,
+          "DD-API-KEY": this.apiKey,
         },
       });
 
