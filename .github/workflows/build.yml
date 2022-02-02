@@ -33,7 +33,7 @@ jobs:
         run: yarn lint
 
       - name: Install depcheck
-        run: yarn install -g depcheck
+        run: yarn global add depcheck
 
       - name: Run depcheck
         run: ./scripts/depcheck.sh
