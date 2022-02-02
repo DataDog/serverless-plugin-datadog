@@ -36,7 +36,7 @@ jobs:
         run: yarn global add depcheck
 
       - name: Run depcheck
-        run: depcheck
+        run: depcheck --ignores @types/jest
 
   test:
     runs-on: ubuntu-latest
