@@ -79,7 +79,7 @@ export const getRequestBuilder = (options: RequestOptions) => {
         "DD-API-KEY": apiKey,
         ...(appKey ? { "DD-APPLICATION-KEY": appKey } : {}),
         ...args.headers,
-      },
+      } as Record<string, string>,
     };
 
     if (overrideUrl !== undefined) {
@@ -94,11 +94,6 @@ export const getRequestBuilder = (options: RequestOptions) => {
 
     if (options.headers !== undefined) {
       options.headers.forEach((value, key) => {
-        // @ts-ignore
-        // The key value has an 'any' type that typescript complains about.
-        // We're going to ignore it here as the behavior from datadog-ci is wonky.
-        // Attempting to fix this causes incorrect behavior, as this foreach actually does
-        // include additional headers, not just DD-API-KEY and DD-APPLICATION-KEY.
         newArguments.headers[key] = value;
       });
     }
