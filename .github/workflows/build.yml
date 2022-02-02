@@ -32,6 +32,32 @@ jobs:
       - name: Lint
         run: yarn lint
 
+  depcheck:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up Node 12.7
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.7
+
+    - name: Cache Node modules
+      id: cache-node-modules
+      uses: actions/cache@v2
+      with:
+        path: '**/node_modules'
+        key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+    - name: Install dependencies
+      if: steps.cache-node-modules.outputs.cache-hit != 'true'
+      run: yarn install
+
+    - name: Install dpecheck
+      run: yarn install -g depcheck
+
+    - name: Run depcheck
+      run: ./scripts/depcheck.sh
+
   test:
     runs-on: ubuntu-latest
     strategy:
