@@ -1,5 +1,5 @@
-import { FunctionInfo } from "layer";
 import * as Serverless from "serverless";
+import { FunctionInfo } from "./layer";
 
 const yellowFont = "\x1b[33m";
 const underlineFont = "\x1b[4m";

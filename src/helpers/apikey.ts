@@ -10,7 +10,7 @@ export interface ApiKeyValidator {
 }
 
 export interface ApiKeyValidatorParams {
-  apiKey: string | undefined;
+  apiKey: string;
   datadogSite: string;
 }
 
@@ -21,12 +21,12 @@ export const newApiKeyValidator = (params: ApiKeyValidatorParams): ApiKeyValidat
  * validity of the api key.
  */
 class ApiKeyValidatorImplem {
-  public apiKey: string | undefined;
+  public apiKey: string;
   public datadogSite: string;
 
   private isValid?: boolean;
 
-  constructor(apiKey: string | undefined, datadogSite: string) {
+  constructor(apiKey: string, datadogSite: string) {
     this.apiKey = apiKey;
     this.datadogSite = datadogSite;
   }

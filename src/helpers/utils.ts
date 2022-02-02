@@ -79,7 +79,7 @@ export const getRequestBuilder = (options: RequestOptions) => {
         "DD-API-KEY": apiKey,
         ...(appKey ? { "DD-APPLICATION-KEY": appKey } : {}),
         ...args.headers,
-      },
+      } as Record<string, string>,
     };
 
     if (overrideUrl !== undefined) {

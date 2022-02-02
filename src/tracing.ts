@@ -6,8 +6,8 @@
  * Copyright 2021 Datadog, Inc.
  */
 
-import { FunctionInfo } from "layer";
 import Service from "serverless/classes/Service";
+import { FunctionInfo } from "./layer";
 
 const ddTraceEnabledEnvVar = "DD_TRACE_ENABLED";
 const ddMergeXrayTracesEnvVar = "DD_MERGE_XRAY_TRACES";

@@ -1,7 +1,6 @@
-import { MonitorParams } from "monitors";
-import { Response } from "node-fetch";
+import fetch, { Response } from "node-fetch";
 import * as Serverless from "serverless";
-import fetch from "node-fetch";
+import { MonitorParams } from "./monitors";
 
 export class InvalidAuthenticationError extends Error {
   constructor(message: string) {
