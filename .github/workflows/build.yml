@@ -37,7 +37,6 @@ jobs:
 
       - name: Run depcheck
         run: ./scripts/depcheck.sh
-        working-directory: scripts
 
   test:
     runs-on: ubuntu-latest
