@@ -36,7 +36,8 @@ jobs:
         run: yarn global add depcheck
 
       - name: Run depcheck
-        run: ./scripts/depcheck.sh
+        run: ./depcheck.sh
+        working-directory: scripts
 
   test:
     runs-on: ubuntu-latest
