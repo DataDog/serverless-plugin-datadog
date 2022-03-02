@@ -52,7 +52,7 @@ describe("ServerlessPlugin", () => {
       mock({});
       const serverless = {
         cli: {
-          log: () => { },
+          log: () => {},
         },
         service: {
           provider: {
@@ -66,9 +66,9 @@ describe("ServerlessPlugin", () => {
           },
           custom: {
             datadog: {
-              apiKey: 1234
-            }
-          }
+              apiKey: 1234,
+            },
+          },
         },
       };
 
@@ -79,8 +79,10 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              layers: [expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:.*/),
-                "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:16",],
+              layers: [
+                expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:.*/),
+                "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:16",
+              ],
               runtime: "nodejs14.x",
             },
           },
@@ -95,7 +97,7 @@ describe("ServerlessPlugin", () => {
       mock({});
       const serverless = {
         cli: {
-          log: () => { },
+          log: () => {},
         },
         service: {
           provider: {
@@ -140,7 +142,7 @@ describe("ServerlessPlugin", () => {
       mock({});
       const serverless = {
         cli: {
-          log: () => { },
+          log: () => {},
         },
         service: {
           provider: {
@@ -188,7 +190,7 @@ describe("ServerlessPlugin", () => {
       mock({});
       const serverless = {
         cli: {
-          log: () => { },
+          log: () => {},
         },
         service: {
           provider: {
@@ -217,9 +219,7 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              layers: [
-                "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:16",
-              ],
+              layers: ["arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:16"],
               runtime: "nodejs14.x",
             },
           },
@@ -234,7 +234,7 @@ describe("ServerlessPlugin", () => {
       mock({});
       const serverless = {
         cli: {
-          log: () => { },
+          log: () => {},
         },
         service: {
           provider: {
@@ -279,7 +279,7 @@ describe("ServerlessPlugin", () => {
       mock({});
       const serverless = {
         cli: {
-          log: () => { },
+          log: () => {},
         },
         service: {
           provider: {
@@ -308,7 +308,8 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              layers: [expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:.*/),
+              layers: [
+                expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:.*/),
                 "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:16",
               ],
               runtime: "nodejs14.x",
@@ -340,7 +341,7 @@ describe("ServerlessPlugin", () => {
       mock({});
       const serverless = {
         cli: {
-          log: () => { },
+          log: () => {},
         },
         service: {
           provider: {
@@ -383,7 +384,7 @@ describe("ServerlessPlugin", () => {
       mock({});
       const serverless = {
         cli: {
-          log: () => { },
+          log: () => {},
         },
         service: {
           provider: {
@@ -423,7 +424,7 @@ describe("ServerlessPlugin", () => {
       mock({});
       const serverless = {
         cli: {
-          log: () => { },
+          log: () => {},
         },
         service: {
           provider: {
@@ -463,7 +464,7 @@ describe("ServerlessPlugin", () => {
       mock({});
       const serverless = {
         cli: {
-          log: () => { },
+          log: () => {},
         },
         service: {
           provider: {
@@ -503,7 +504,7 @@ describe("ServerlessPlugin", () => {
       mock({});
       const serverless = {
         cli: {
-          log: () => { },
+          log: () => {},
         },
         service: {
           provider: {
@@ -544,7 +545,7 @@ describe("ServerlessPlugin", () => {
       mock({});
       const serverless = {
         cli: {
-          log: () => { },
+          log: () => {},
         },
         service: {
           provider: {
@@ -589,7 +590,7 @@ describe("ServerlessPlugin", () => {
     mock({});
     const serverless = {
       cli: {
-        log: () => { },
+        log: () => {},
       },
       service: {
         provider: {
@@ -625,7 +626,7 @@ describe("ServerlessPlugin", () => {
     mock({});
     const serverless = {
       cli: {
-        log: () => { },
+        log: () => {},
       },
       service: {
         provider: {
@@ -664,7 +665,7 @@ describe("ServerlessPlugin", () => {
     mock({});
     const serverless = {
       cli: {
-        log: () => { },
+        log: () => {},
       },
       service: {
         provider: {
@@ -709,7 +710,7 @@ describe("ServerlessPlugin", () => {
     });
     it("adds subscription filters when forwarderArn is set", async () => {
       const serverless = {
-        cli: { log: () => { } },
+        cli: { log: () => {} },
         getProvider: (_name: string) => awsMock(),
         service: {
           getServiceName: () => "dev",
@@ -746,7 +747,7 @@ describe("ServerlessPlugin", () => {
 
     it("adds subscription filters when forwarder is set", async () => {
       const serverless = {
-        cli: { log: () => { } },
+        cli: { log: () => {} },
         getProvider: awsMock,
         service: {
           getServiceName: () => "dev",
@@ -783,7 +784,7 @@ describe("ServerlessPlugin", () => {
 
     it("does not subscribe to lambda log groups when the extension is enabled", async () => {
       const serverless = {
-        cli: { log: () => { } },
+        cli: { log: () => {} },
         getProvider: awsMock,
         service: {
           getServiceName: () => "dev",
@@ -819,7 +820,7 @@ describe("ServerlessPlugin", () => {
     });
     it("does subscribe to non-lambda log groups when the extension is enabled", async () => {
       const serverless = {
-        cli: { log: () => { } },
+        cli: { log: () => {} },
         getProvider: awsMock,
         service: {
           getServiceName: () => "dev",
@@ -867,7 +868,7 @@ describe("ServerlessPlugin", () => {
     });
     it("throws an error when forwarderArn and forwarder are set", async () => {
       const serverless = {
-        cli: { log: () => { } },
+        cli: { log: () => {} },
         getProvider: awsMock,
         service: {
           getServiceName: () => "dev",
@@ -905,7 +906,7 @@ describe("ServerlessPlugin", () => {
 
     it("does not add subscription filters when neither the forwarderArn nor the forwarder are set", async () => {
       const serverless = {
-        cli: { log: () => { } },
+        cli: { log: () => {} },
         getProvider: awsMock,
         service: {
           getServiceName: () => "dev",
@@ -938,7 +939,7 @@ describe("ServerlessPlugin", () => {
     it("only adds dd_sls_plugin tag when enabledTags is false", async () => {
       const function_ = functionMock({ env: "test" });
       const serverless = {
-        cli: { log: () => { } },
+        cli: { log: () => {} },
         getProvider: awsMock,
         service: {
           provider: {
@@ -968,7 +969,7 @@ describe("ServerlessPlugin", () => {
     it("adds tags by default with service name and stage values", async () => {
       const function_ = functionMock({});
       const serverless = {
-        cli: { log: () => { } },
+        cli: { log: () => {} },
         getProvider: awsMock,
         service: {
           getServiceName: () => "dev",
@@ -994,7 +995,7 @@ describe("ServerlessPlugin", () => {
     it("does not override existing tags on function", async () => {
       const function_ = functionMock({ service: "test" });
       const serverless = {
-        cli: { log: () => { } },
+        cli: { log: () => {} },
         getProvider: awsMock,
         service: {
           getServiceName: () => "dev",
@@ -1020,7 +1021,7 @@ describe("ServerlessPlugin", () => {
     it("does not override tags set on provider level", async () => {
       const function_ = functionMock({});
       const serverless = {
-        cli: { log: () => { } },
+        cli: { log: () => {} },
         getProvider: awsMock,
         service: {
           getServiceName: () => "my-service",
@@ -1050,7 +1051,7 @@ describe("ServerlessPlugin", () => {
     it("does not override tags on an excluded function", async () => {
       const function_ = functionMock({});
       const serverless = {
-        cli: { log: () => { } },
+        cli: { log: () => {} },
         getProvider: awsMock,
         service: {
           getServiceName: () => "my-service",
@@ -1091,7 +1092,7 @@ describe("ServerlessPlugin", () => {
 
     it("Does not attempt add execution log groups if subscribeToExecutionLogs is false", async () => {
       const serverless = {
-        cli: { log: () => { } },
+        cli: { log: () => {} },
         getProvider: (_name: string) => awsMock(),
         service: {
           getServiceName: () => "dev",
@@ -1131,7 +1132,7 @@ describe("ServerlessPlugin", () => {
 
     it("Does attempt to add execution log groups if subscribeToExecutionLogs is true", async () => {
       const serverless = {
-        cli: { log: () => { } },
+        cli: { log: () => {} },
         getProvider: (_name: string) => awsMock(),
         service: {
           getServiceName: () => "dev",
@@ -1171,7 +1172,7 @@ describe("ServerlessPlugin", () => {
 
     it("Throws an error if the config has old properties", async () => {
       const serverless = {
-        cli: { log: () => { } },
+        cli: { log: () => {} },
         getProvider: (_name: string) => awsMock(),
         service: {
           getServiceName: () => "dev",
@@ -1213,7 +1214,7 @@ describe("ServerlessPlugin", () => {
 
     it("Throws the correct error if the config has multiple old properties", async () => {
       const serverless = {
-        cli: { log: () => { } },
+        cli: { log: () => {} },
         getProvider: (_name: string) => awsMock(),
         service: {
           getServiceName: () => "dev",
