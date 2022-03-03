@@ -160,6 +160,7 @@ describe("getConfig", () => {
       integrationTesting: false,
       subscribeToAccessLogs: true,
       subscribeToExecutionLogs: false,
+      enableSourceCodeIntegration: true,
     });
   });
 
@@ -190,6 +191,7 @@ describe("getConfig", () => {
       integrationTesting: false,
       subscribeToAccessLogs: true,
       subscribeToExecutionLogs: false,
+      enableSourceCodeIntegration: true,
     });
   });
 
@@ -221,7 +223,39 @@ describe("getConfig", () => {
       subscribeToAccessLogs: true,
       subscribeToExecutionLogs: false,
       customHandler: "/src/custom-handler.handler",
+      enableSourceCodeIntegration: true,
     });
+  });
+});
+
+it("disable source code integration", () => {
+  const result = getConfig({
+    custom: {
+      datadog: {
+        apiKey: "1234",
+        logLevel: "debug",
+        enableSourceCodeIntegration: false,
+      },
+    },
+  } as any);
+  expect(result).toEqual({
+    addLayers: true,
+    apiKey: "1234",
+    captureLambdaPayload: false,
+    flushMetricsToLogs: true,
+    logLevel: "debug",
+    site: "datadoghq.com",
+    enableXrayTracing: false,
+    enableDDTracing: true,
+    enableDDLogs: true,
+    addExtension: false,
+    enableTags: true,
+    injectLogContext: true,
+    exclude: [],
+    integrationTesting: false,
+    subscribeToAccessLogs: true,
+    subscribeToExecutionLogs: false,
+    enableSourceCodeIntegration: false,
   });
 });
 
@@ -342,6 +376,7 @@ describe("setEnvConfiguration", () => {
         subscribeToAccessLogs: true,
         subscribeToExecutionLogs: false,
         exclude: ["dd-excluded-function"],
+        enableSourceCodeIntegration: true,
       },
       handlers,
     );
@@ -430,6 +465,7 @@ describe("setEnvConfiguration", () => {
         subscribeToAccessLogs: true,
         subscribeToExecutionLogs: false,
         exclude: [],
+        enableSourceCodeIntegration: true,
       },
       handlers,
     );
@@ -507,6 +543,7 @@ describe("setEnvConfiguration", () => {
         subscribeToAccessLogs: true,
         subscribeToExecutionLogs: false,
         exclude: [],
+        enableSourceCodeIntegration: true,
       },
       handlers,
     );
@@ -558,6 +595,7 @@ describe("setEnvConfiguration", () => {
         enableTags: true,
         injectLogContext: false,
         exclude: ["dd-excluded-function"],
+        enableSourceCodeIntegration: true,
       },
       handlers,
     );
@@ -609,6 +647,7 @@ describe("setEnvConfiguration", () => {
         enableTags: true,
         injectLogContext: false,
         exclude: ["dd-excluded-function"],
+        enableSourceCodeIntegration: true,
       },
       handlers,
     );
@@ -659,6 +698,7 @@ describe("setEnvConfiguration", () => {
         enableTags: true,
         injectLogContext: false,
         exclude: ["dd-excluded-function"],
+        enableSourceCodeIntegration: true,
       },
       handlers,
     );
@@ -712,6 +752,7 @@ describe("setEnvConfiguration", () => {
           enableTags: true,
           injectLogContext: false,
           exclude: ["dd-excluded-function"],
+          enableSourceCodeIntegration: true,
         },
         handlers,
       );

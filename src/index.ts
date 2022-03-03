@@ -7,17 +7,34 @@
  */
 
 import * as Serverless from "serverless";
+import { FunctionDefinition } from "serverless";
+import { SimpleGit } from "simple-git";
 import { version } from "../package.json";
-import { Configuration, forceExcludeDepsFromWebpack, getConfig, hasWebpackPlugin, setEnvConfiguration } from "./env";
+import {
+  Configuration,
+  ddTagsEnvVar,
+  forceExcludeDepsFromWebpack,
+  getConfig,
+  hasWebpackPlugin,
+  setEnvConfiguration,
+} from "./env";
 import { addCloudWatchForwarderSubscriptions, addExecutionLogGroupsAndSubscriptions } from "./forwarder";
+import { newSimpleGit } from "./git";
 import { applyExtensionLayer, applyLambdaLibraryLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
 import * as govLayers from "./layers-gov.json";
 import * as layers from "./layers.json";
 import { getCloudFormationStackId } from "./monitor-api-requests";
 import { setMonitors } from "./monitors";
 import { addOutputLinks, printOutputs } from "./output";
+import { SourceCodeIntegration } from "./source-code-integration";
 import { enableTracing, TracingMode } from "./tracing";
 import { redirectHandlers } from "./wrapper";
+
+// Separate interface since DefinitelyTyped currently doesn't include tags or env
+export interface ExtendedFunctionDefinition extends FunctionDefinition {
+  tags?: { [key: string]: string };
+  environment?: { [key: string]: string };
+}
 
 enum TagKeys {
   Service = "service",
@@ -142,6 +159,27 @@ module.exports = class ServerlessPlugin {
 
     this.addTags(handlers, config.enableTags);
 
+    const simpleGit = await newSimpleGit();
+
+    if (
+      config.enableSourceCodeIntegration &&
+      (process.env.DATADOG_API_KEY ?? config.apiKey) !== undefined &&
+      simpleGit !== undefined &&
+      (await simpleGit.checkIsRepo())
+    ) {
+      try {
+        await this.addSourceCodeIntegration(
+          handlers,
+          simpleGit,
+          (process.env.DATADOG_API_KEY ?? config.apiKey)!,
+          config.site,
+        );
+      } catch (err) {
+        this.serverless.cli.log(`Error occurred when adding source code integration: ${err}`);
+        return;
+      }
+    }
+
     redirectHandlers(handlers, config.addLayers, config.customHandler);
     if (config.integrationTesting === false) {
       await addOutputLinks(this.serverless, config.site, handlers);
@@ -225,6 +263,25 @@ module.exports = class ServerlessPlugin {
           handler.tags[TagKeys.Env] ??= this.serverless.getProvider("aws").getStage();
         }
       }
+    });
+  }
+
+  /**
+   * Uploads git metadata for the current directory to Datadog and goes through
+   * each function defined in serverless and attaches the git.commit.sha to DD_TAGS.
+   */
+  private async addSourceCodeIntegration(
+    handlers: FunctionInfo[],
+    simpleGit: SimpleGit,
+    apiKey: string,
+    datadogSite: string,
+  ) {
+    const sourceCodeIntegration = new SourceCodeIntegration(apiKey, datadogSite, simpleGit);
+    const gitCommitHash = await sourceCodeIntegration.uploadGitMetadata();
+
+    handlers.forEach(({ handler }) => {
+      handler.environment ??= {};
+      handler.environment[ddTagsEnvVar] = "git.commit.sha:" + gitCommitHash;
     });
   }
 };

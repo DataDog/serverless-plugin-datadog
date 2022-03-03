@@ -18,6 +18,7 @@ custom:
     apiKey: 1234
     addExtension: true
     forwarderArn: arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder
+    enableSourceCodeIntegration: false
     integrationTesting: true
     logLevel: "info"
 
