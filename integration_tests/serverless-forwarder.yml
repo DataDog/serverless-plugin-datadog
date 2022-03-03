@@ -23,6 +23,7 @@ custom:
     integrationTesting: true
     logLevel: "info"
     subscribeToExecutionLogs: true
+    addExtension: false
     exclude:
       - ExcludeThis
       - Exclude-This

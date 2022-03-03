@@ -94,7 +94,7 @@ export const defaultConfiguration: Configuration = {
   site: "datadoghq.com",
   enableXrayTracing: false,
   enableDDTracing: true,
-  addExtension: false,
+  addExtension: true,
   enableTags: true,
   injectLogContext: true,
   enableSourceCodeIntegration: true,

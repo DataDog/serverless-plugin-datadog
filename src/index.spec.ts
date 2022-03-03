@@ -64,6 +64,11 @@ describe("ServerlessPlugin", () => {
               runtime: "nodejs14.x",
             },
           },
+          custom: {
+            datadog: {
+              apiKey: 1234,
+            },
+          },
         },
       };
 
@@ -74,7 +79,10 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              layers: [expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:.*/)],
+              layers: [
+                expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:.*/),
+                "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:20",
+              ],
               runtime: "nodejs14.x",
             },
           },
@@ -198,6 +206,7 @@ describe("ServerlessPlugin", () => {
           custom: {
             datadog: {
               addLayers: false,
+              apiKey: 1234,
             },
           },
         },
@@ -210,7 +219,7 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              layers: [],
+              layers: ["arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:20"],
               runtime: "nodejs14.x",
             },
           },
@@ -242,6 +251,7 @@ describe("ServerlessPlugin", () => {
             datadog: {
               exclude: ["node1"],
               addLayers: true,
+              apiKey: 1234,
             },
           },
         },
@@ -285,6 +295,7 @@ describe("ServerlessPlugin", () => {
           custom: {
             datadog: {
               enableXrayTracing: true,
+              apiKey: 1234,
             },
           },
         },
@@ -297,7 +308,10 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              layers: [expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:.*/)],
+              layers: [
+                expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:.*/),
+                "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:20",
+              ],
               runtime: "nodejs14.x",
             },
           },
@@ -667,6 +681,7 @@ describe("ServerlessPlugin", () => {
           datadog: {
             flushMetricsToLogs: false,
             monitors: true,
+            apiKey: 1234,
           },
         },
       },
@@ -718,6 +733,7 @@ describe("ServerlessPlugin", () => {
           custom: {
             datadog: {
               forwarderArn: "some-arn",
+              addExtension: false,
             },
           },
         },
@@ -754,6 +770,7 @@ describe("ServerlessPlugin", () => {
           custom: {
             datadog: {
               forwarder: "some-arn",
+              addExtension: false,
             },
           },
         },
