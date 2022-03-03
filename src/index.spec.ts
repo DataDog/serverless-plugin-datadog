@@ -81,7 +81,7 @@ describe("ServerlessPlugin", () => {
               handler: "my-func.ev",
               layers: [
                 expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:.*/),
-                "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:16",
+                "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:20",
               ],
               runtime: "nodejs14.x",
             },
@@ -219,7 +219,7 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              layers: ["arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:16"],
+              layers: ["arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:20"],
               runtime: "nodejs14.x",
             },
           },
@@ -310,7 +310,7 @@ describe("ServerlessPlugin", () => {
               handler: "my-func.ev",
               layers: [
                 expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:.*/),
-                "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:16",
+                "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:20",
               ],
               runtime: "nodejs14.x",
             },

@@ -248,7 +248,7 @@ it("disable source code integration", () => {
     enableXrayTracing: false,
     enableDDTracing: true,
     enableDDLogs: true,
-    addExtension: false,
+    addExtension: true,
     enableTags: true,
     injectLogContext: true,
     exclude: [],
