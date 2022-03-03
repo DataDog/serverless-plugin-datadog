@@ -455,6 +455,156 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     `);
   });
 
+  it("it doesn't subscribe to lambda log groups when both the extension and forwarder are enabled", async () => {
+    const service = serviceWithResources({
+      FirstLogGroup: {
+        Type: "AWS::Logs::LogGroup",
+        Properties: {
+          LogGroupName: "/aws/lambda/first",
+        },
+      },
+      SecondLogGroup: {
+        Type: "AWS::Logs::LogGroup",
+        Properties: {
+          LogGroupName: "/aws/lambda/second",
+        },
+      },
+      ApiGatewayGroup: {
+        Type: "AWS::Logs::LogGroup",
+        Properties: {
+          LogGroupName: "/aws/api-gateway/gateway-group",
+        },
+      },
+      NonLambdaGroup: {
+        Type: "AWS::Logs::LogGroup",
+        Properties: {
+          LogGroupName: "/aws/apigateway/second-group",
+        },
+      },
+      UnrelatedResource: {
+        Type: "AWS::AnotherResourceType",
+        Properties: {},
+      },
+      HttpApiGroup: {
+        Type: "AWS::Logs::LogGroup",
+        Properties: {
+          LogGroupName: "/aws/http-api/http-group",
+        },
+      },
+      WebsocketGroup: {
+        Type: "AWS::Logs::LogGroup",
+        Properties: {
+          LogGroupName: "/aws/websocket/websocket-group",
+        },
+      },
+    });
+
+    const aws = awsMock({});
+
+    const forwarderConfigs = {
+      AddExtension: true,
+      ApiKey: 1234,
+      IntegrationTesting: false,
+      SubToAccessLogGroups: true,
+      SubToExecutionLogGroups: true,
+    };
+
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "first",
+        type: RuntimeType.NODE,
+      },
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "second",
+        type: RuntimeType.NODE,
+      },
+    ];
+
+    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs, handlers);
+    expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
+      Object {
+        "ApiGatewayGroup": Object {
+          "Properties": Object {
+            "LogGroupName": "/aws/api-gateway/gateway-group",
+          },
+          "Type": "AWS::Logs::LogGroup",
+        },
+        "ApiGatewayGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "my-func",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Ref": "ApiGatewayGroup",
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
+        },
+        "FirstLogGroup": Object {
+          "Properties": Object {
+            "LogGroupName": "/aws/lambda/first",
+          },
+          "Type": "AWS::Logs::LogGroup",
+        },
+        "HttpApiGroup": Object {
+          "Properties": Object {
+            "LogGroupName": "/aws/http-api/http-group",
+          },
+          "Type": "AWS::Logs::LogGroup",
+        },
+        "HttpApiGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "my-func",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Ref": "HttpApiGroup",
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
+        },
+        "NonLambdaGroup": Object {
+          "Properties": Object {
+            "LogGroupName": "/aws/apigateway/second-group",
+          },
+          "Type": "AWS::Logs::LogGroup",
+        },
+        "SecondLogGroup": Object {
+          "Properties": Object {
+            "LogGroupName": "/aws/lambda/second",
+          },
+          "Type": "AWS::Logs::LogGroup",
+        },
+        "UnrelatedResource": Object {
+          "Properties": Object {},
+          "Type": "AWS::AnotherResourceType",
+        },
+        "WebsocketGroup": Object {
+          "Properties": Object {
+            "LogGroupName": "/aws/websocket/websocket-group",
+          },
+          "Type": "AWS::Logs::LogGroup",
+        },
+        "WebsocketGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "my-func",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Ref": "WebsocketGroup",
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
+        },
+      }
+    `);
+  });
+
   it("doesn't add subscription when two non-Datadog subscriptions already exist", async () => {
     const service = serviceWithResources({
       FirstLogGroup: {
