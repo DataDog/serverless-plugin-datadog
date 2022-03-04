@@ -138,8 +138,7 @@ module.exports = class ServerlessPlugin {
     const handlers = findHandlers(this.serverless.service, config.exclude, defaultRuntime);
 
     let datadogForwarderArn;
-    datadogForwarderArn = setDatadogForwarder(config);
-    this.serverless.cli.log("Setting Datadog Forwarder");
+    datadogForwarderArn = this.setDatadogForwarder(config);
     if (datadogForwarderArn) {
       const aws = this.serverless.getProvider("aws");
       const errors = await addCloudWatchForwarderSubscriptions(
@@ -284,6 +283,22 @@ module.exports = class ServerlessPlugin {
       handler.environment[ddTagsEnvVar] = "git.commit.sha:" + gitCommitHash;
     });
   }
+
+  private setDatadogForwarder(config: Configuration) {
+    const forwarderArn: string | undefined = config.forwarderArn;
+    const forwarder: string | undefined = config.forwarder;
+    if (forwarderArn && forwarder) {
+      throw new Error(
+        "Both 'forwarderArn' and 'forwarder' parameters are set. Please only use the 'forwarderArn' parameter.",
+      );
+    } else if (forwarderArn !== undefined && forwarder === undefined) {
+      this.serverless.cli.log("Setting Datadog Forwarder");
+      return forwarderArn;
+    } else if (forwarder !== undefined && forwarderArn === undefined) {
+      this.serverless.cli.log("Setting Datadog Forwarder");
+      return forwarder;
+    }
+  }
 };
 
 function configHasOldProperties(obj: any) {
@@ -363,19 +378,5 @@ function checkForMultipleApiKeys(config: Configuration) {
 
   if (multipleApiKeysMessage) {
     throw new Error(`${multipleApiKeysMessage} should not be set at the same time.`);
-  }
-}
-
-function setDatadogForwarder(config: Configuration) {
-  const forwarderArn: string | undefined = config.forwarderArn;
-  const forwarder: string | undefined = config.forwarder;
-  if (forwarderArn && forwarder) {
-    throw new Error(
-      "Both 'forwarderArn' and 'forwarder' parameters are set. Please only use the 'forwarderArn' parameter.",
-    );
-  } else if (forwarderArn !== undefined && forwarder === undefined) {
-    return forwarderArn;
-  } else if (forwarder !== undefined && forwarderArn === undefined) {
-    return forwarder;
   }
 }
