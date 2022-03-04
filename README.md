@@ -243,8 +243,9 @@ custom:
 
 ## Breaking Changes
 
-### v4.0.0
-- The Datadog Lambda Extension is now the default mechanism for transmitting telemetry back to Datadog. (https://github.com/DataDog/serverless-plugin-datadog/releases/tag/v4.0.0)
+### [v4.0.0](https://github.com/DataDog/serverless-plugin-datadog/releases/tag/v4.0.0)
+
+- The Datadog Lambda Extension is now the default mechanism for transmitting telemetry to Datadog.
 
 ## Opening Issues
 
