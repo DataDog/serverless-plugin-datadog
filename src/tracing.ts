@@ -27,12 +27,12 @@ export function enableTracing(service: Service, tracingMode: TracingMode, handle
       lambda: true,
     };
   }
-  if (tracingMode === TracingMode.HYBRID || tracingMode === TracingMode.DD_TRACE) {
-    handlers.forEach(({ handler }) => {
-      handler.environment ??= {};
-      const environment = handler.environment as any;
-      environment[ddTraceEnabledEnvVar] = true;
-      environment[ddMergeXrayTracesEnvVar] = tracingMode === TracingMode.HYBRID;
-    });
-  }
+  handlers.forEach(({ handler }) => {
+    handler.environment ??= {};
+    const environment = handler.environment as any;
+    // if tracing is not enabled, merge x-ray cannot be enabled
+    if (environment[ddTraceEnabledEnvVar] === false || environment[ddTraceEnabledEnvVar] === "false") {
+      environment[ddMergeXrayTracesEnvVar] = false;
+    }
+  });
 }
