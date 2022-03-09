@@ -106,7 +106,11 @@ export const defaultConfiguration: Configuration = {
   captureLambdaPayload: false,
 };
 
-export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]) {
+export function setEnvConfiguration(
+  config: Configuration,
+  handlers: FunctionInfo[],
+  defaultRuntime: string | undefined,
+) {
   handlers.forEach(({ handler }) => {
     handler.environment ??= {};
     const environment = handler.environment as any;
@@ -159,6 +163,12 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     }
     if (environment[ddCaptureLambdaPayloadEnvVar] === undefined) {
       environment[ddCaptureLambdaPayloadEnvVar] = config.captureLambdaPayload;
+    }
+    if (runtimeLookup[defaultRuntime!] === RuntimeType.DOTNET) {
+      environment["CORECLR_ENABLE_PROFILING"] = "1";
+      environment["CORECLR_PROFILER"] = "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}";
+      environment["CORECLR_PROFILER_PATH"] = "/opt/datadog/Datadog.Trace.ClrProfiler.Native.so";
+      environment["DD_DOTNET_TRACER_HOME"] = "/opt/datadog";
     }
   });
 }

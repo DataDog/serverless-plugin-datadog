@@ -10,6 +10,10 @@ import Service from "serverless/classes/Service";
 export enum RuntimeType {
   NODE,
   PYTHON,
+  DOTNET,
+  CUSTOM,
+  JAVA,
+  RUBY,
   UNSUPPORTED,
 }
 
@@ -48,12 +52,19 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
   "python3.7": RuntimeType.PYTHON,
   "python3.8": RuntimeType.PYTHON,
   "python3.9": RuntimeType.PYTHON,
+  "dotnetcore3.1": RuntimeType.DOTNET,
+  java11: RuntimeType.JAVA,
+  "java8.al2": RuntimeType.JAVA,
+  "provided.al2": RuntimeType.CUSTOM,
+  "ruby2.5": RuntimeType.RUBY,
+  "ruby2.7": RuntimeType.RUBY,
 };
 
 export const armRuntimeKeys: { [key: string]: string } = {
   "python3.8": "python3.8-arm",
   "python3.9": "python3.9-arm",
   extension: "extension-arm",
+  "dotnetcore3.1": "dd-trace-dotnet",
 };
 
 export function findHandlers(service: Service, exclude: string[], defaultRuntime?: string): FunctionInfo[] {
@@ -126,6 +137,27 @@ export function applyExtensionLayer(service: Service, handlers: FunctionInfo[], 
     extensionLayerARN = regionRuntimes[extensionLayerKey];
     if (extensionLayerARN) {
       addLayer(service, handler, extensionLayerARN);
+    }
+  }
+}
+
+export function applyDotnetTracingLayer(service: Service, handlers: FunctionInfo[], layers: LayerJSON) {
+  const { region } = service.provider;
+  const regionRuntimes = layers.regions[region];
+  if (regionRuntimes === undefined) {
+    return;
+  }
+
+  for (const handler of handlers) {
+    if (handler.type === RuntimeType.UNSUPPORTED) {
+      continue;
+    }
+    const traceLayerKey: string = "dotnetcore3.1";
+
+    const traceLayerARN: string | undefined = regionRuntimes[traceLayerKey];
+
+    if (traceLayerARN) {
+      addLayer(service, handler, traceLayerARN);
     }
   }
 }

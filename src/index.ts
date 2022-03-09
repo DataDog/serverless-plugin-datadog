@@ -20,7 +20,15 @@ import {
 } from "./env";
 import { addCloudWatchForwarderSubscriptions, addExecutionLogGroupsAndSubscriptions } from "./forwarder";
 import { newSimpleGit } from "./git";
-import { applyExtensionLayer, applyLambdaLibraryLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
+import {
+  applyExtensionLayer,
+  applyDotnetTracingLayer,
+  applyLambdaLibraryLayers,
+  findHandlers,
+  FunctionInfo,
+  runtimeLookup,
+  RuntimeType,
+} from "./layer";
 import * as govLayers from "./layers-gov.json";
 import * as layers from "./layers.json";
 import { getCloudFormationStackId } from "./monitor-api-requests";
@@ -89,7 +97,7 @@ module.exports = class ServerlessPlugin {
     const defaultRuntime = this.serverless.service.provider.runtime;
     const handlers = findHandlers(this.serverless.service, config.exclude, defaultRuntime);
 
-    setEnvConfiguration(config, handlers);
+    setEnvConfiguration(config, handlers, defaultRuntime);
 
     const allLayers = { regions: { ...layers.regions, ...govLayers.regions } };
     if (config.addLayers) {
@@ -109,6 +117,12 @@ module.exports = class ServerlessPlugin {
       applyExtensionLayer(this.serverless.service, handlers, allLayers);
     } else {
       this.serverless.cli.log("Skipping adding Lambda Extension Layer");
+    }
+
+    if (runtimeLookup[defaultRuntime!] === RuntimeType.DOTNET) {
+      this.serverless.cli.log("Adding Dotnet Tracing Layer to functions");
+      this.debugLogHandlers(handlers);
+      applyDotnetTracingLayer(this.serverless.service, handlers, allLayers);
     }
 
     let tracingMode = TracingMode.NONE;
