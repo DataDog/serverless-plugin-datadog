@@ -327,6 +327,52 @@ describe("ServerlessPlugin", () => {
     });
   });
 
+  it("Adds tracing layer for dotnet", async () => {
+    mock({});
+    const serverless = {
+      cli: {
+        log: () => {},
+      },
+      service: {
+        provider: {
+          region: "us-east-1",
+        },
+        functions: {
+          node1: {
+            handler: "my-func.ev",
+            layers: [],
+            runtime: "dotnetcore3.1",
+          },
+        },
+        custom: {
+          datadog: {
+            apiKey: 1234,
+          },
+        },
+      },
+    };
+
+    const plugin = new ServerlessPlugin(serverless, {});
+    await plugin.hooks["after:package:initialize"]();
+    expect(serverless).toMatchObject({
+      service: {
+        functions: {
+          node1: {
+            handler: "my-func.ev",
+            layers: [
+              "arn:aws:lambda:us-east-1:464622532012:layer:dd-trace-dotnet:1",
+              "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:21",
+            ],
+            runtime: "dotnetcore3.1",
+          },
+        },
+        provider: {
+          region: "us-east-1",
+        },
+      },
+    });
+  });
+
   describe("validateConfiguration", () => {
     afterEach(() => {
       mock.restore();
