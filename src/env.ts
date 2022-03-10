@@ -85,6 +85,16 @@ const logInjectionEnvVar = "DD_LOGS_INJECTION";
 const ddLogsEnabledEnvVar = "DD_SERVERLESS_LOGS_ENABLED";
 const ddCaptureLambdaPayloadEnvVar = "DD_CAPTURE_LAMBDA_PAYLOAD";
 
+// .NET tracer env variables
+const ENABLE_PROFILING_ENV_VAR = "CORECLR_ENABLE_PROFILING";
+const PROFILER_ENV_VAR = "CORECLR_PROFILER";
+const PROFILER_PATH_ENV_VAR = "CORECLR_PROFILER_PATH";
+const DOTNET_TRACER_HOME_ENV_VAR = "DD_DOTNET_TRACER_HOME";
+const CORECLR_ENABLE_PROFILING = "1";
+const CORECLR_PROFILER = "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}";
+const CORECLR_PROFILER_PATH = "/opt/datadog/Datadog.Trace.ClrProfiler.Native.so";
+const DD_DOTNET_TRACER_HOME = "/opt/datadog";
+
 export const ddTagsEnvVar = "DD_TAGS";
 
 export const defaultConfiguration: Configuration = {
@@ -165,10 +175,10 @@ export function setEnvConfiguration(
       environment[ddCaptureLambdaPayloadEnvVar] = config.captureLambdaPayload;
     }
     if (runtimeLookup[defaultRuntime!] === RuntimeType.DOTNET) {
-      environment["CORECLR_ENABLE_PROFILING"] = "1";
-      environment["CORECLR_PROFILER"] = "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}";
-      environment["CORECLR_PROFILER_PATH"] = "/opt/datadog/Datadog.Trace.ClrProfiler.Native.so";
-      environment["DD_DOTNET_TRACER_HOME"] = "/opt/datadog";
+      environment[ENABLE_PROFILING_ENV_VAR] = CORECLR_ENABLE_PROFILING;
+      environment[PROFILER_ENV_VAR] = CORECLR_PROFILER;
+      environment[PROFILER_PATH_ENV_VAR] = CORECLR_PROFILER_PATH;
+      environment[DOTNET_TRACER_HOME_ENV_VAR] = DD_DOTNET_TRACER_HOME;
     }
   });
 }
