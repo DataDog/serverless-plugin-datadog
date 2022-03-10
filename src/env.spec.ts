@@ -379,6 +379,7 @@ describe("setEnvConfiguration", () => {
         enableSourceCodeIntegration: true,
       },
       handlers,
+      "nodejs10.x",
     );
     expect(handlers).toEqual([
       {
@@ -468,6 +469,7 @@ describe("setEnvConfiguration", () => {
         enableSourceCodeIntegration: true,
       },
       handlers,
+      "nodejs10.x",
     );
     expect(handlers).toEqual([
       {
@@ -546,6 +548,7 @@ describe("setEnvConfiguration", () => {
         enableSourceCodeIntegration: true,
       },
       handlers,
+      "nodejs10.x",
     );
     expect(handlers).toEqual([
       {
@@ -598,6 +601,7 @@ describe("setEnvConfiguration", () => {
         enableSourceCodeIntegration: true,
       },
       handlers,
+      "nodejs10.x",
     );
     expect(handlers).toEqual([
       {
@@ -650,6 +654,7 @@ describe("setEnvConfiguration", () => {
         enableSourceCodeIntegration: true,
       },
       handlers,
+      "nodejs10.x",
     );
     expect(handlers).toEqual([
       {
@@ -701,6 +706,7 @@ describe("setEnvConfiguration", () => {
         enableSourceCodeIntegration: true,
       },
       handlers,
+      "nodejs10.x",
     );
     expect(handlers).toEqual([
       {
@@ -755,6 +761,7 @@ describe("setEnvConfiguration", () => {
           enableSourceCodeIntegration: true,
         },
         handlers,
+        "nodejs10.x",
       );
     }).toThrowError(
       "apiKeySecretArn` is not supported for Node runtimes when using Synchronous Metrics. Set DATADOG_API_KEY in your environment, or use `apiKmsKey` in the configuration.",
