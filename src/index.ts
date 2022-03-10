@@ -97,7 +97,7 @@ module.exports = class ServerlessPlugin {
     const defaultRuntime = this.serverless.service.provider.runtime;
     const handlers = findHandlers(this.serverless.service, config.exclude, defaultRuntime);
 
-    setEnvConfiguration(config, handlers, defaultRuntime);
+    setEnvConfiguration(config, handlers);
 
     const allLayers = { regions: { ...layers.regions, ...govLayers.regions } };
     if (config.addLayers) {

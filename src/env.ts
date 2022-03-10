@@ -116,12 +116,8 @@ export const defaultConfiguration: Configuration = {
   captureLambdaPayload: false,
 };
 
-export function setEnvConfiguration(
-  config: Configuration,
-  handlers: FunctionInfo[],
-  defaultRuntime: string | undefined,
-) {
-  handlers.forEach(({ handler }) => {
+export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]) {
+  handlers.forEach(({ handler, type }) => {
     handler.environment ??= {};
     const environment = handler.environment as any;
     if (
@@ -174,7 +170,7 @@ export function setEnvConfiguration(
     if (environment[ddCaptureLambdaPayloadEnvVar] === undefined) {
       environment[ddCaptureLambdaPayloadEnvVar] = config.captureLambdaPayload;
     }
-    if (runtimeLookup[defaultRuntime!] === RuntimeType.DOTNET) {
+    if (type === RuntimeType.DOTNET) {
       environment[ENABLE_PROFILING_ENV_VAR] = CORECLR_ENABLE_PROFILING;
       environment[PROFILER_ENV_VAR] = CORECLR_PROFILER;
       environment[PROFILER_PATH_ENV_VAR] = CORECLR_PROFILER_PATH;
