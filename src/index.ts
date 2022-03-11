@@ -114,17 +114,16 @@ module.exports = class ServerlessPlugin {
       this.serverless.cli.log("Adding Datadog Lambda Extension Layer to functions");
       this.debugLogHandlers(handlers);
       applyExtensionLayer(this.serverless.service, handlers, allLayers);
+      handlers.forEach((functionInfo) => {
+        if (functionInfo.type === RuntimeType.DOTNET) {
+          this.serverless.cli.log("Adding Dotnet Tracing Layer to functions");
+          this.debugLogHandlers(handlers);
+          applyDotnetTracingLayer(this.serverless.service, functionInfo, allLayers);
+        }
+      });
     } else {
       this.serverless.cli.log("Skipping adding Lambda Extension Layer");
     }
-
-    handlers.forEach((functionInfo) => {
-      if (functionInfo.type === RuntimeType.DOTNET) {
-        this.serverless.cli.log("Adding Dotnet Tracing Layer to functions");
-        this.debugLogHandlers(handlers);
-        applyDotnetTracingLayer(this.serverless.service, functionInfo, allLayers);
-      }
-    });
 
     let tracingMode = TracingMode.NONE;
     if (config.enableXrayTracing && config.enableDDTracing) {
