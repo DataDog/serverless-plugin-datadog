@@ -341,7 +341,7 @@ describe("ServerlessPlugin", () => {
           node1: {
             handler: "my-func.ev",
             layers: [],
-            runtime: "dotnetcore3.1",
+            runtime: "dotnet6",
           },
         },
         custom: {
@@ -360,10 +360,10 @@ describe("ServerlessPlugin", () => {
           node1: {
             handler: "my-func.ev",
             layers: [
-              "arn:aws:lambda:us-east-1:464622532012:layer:dd-trace-dotnet:1",
               "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:21",
+              "arn:aws:lambda:us-east-1:464622532012:layer:dd-trace-dotnet:1",
             ],
-            runtime: "dotnetcore3.1",
+            runtime: "dotnet6",
           },
         },
         provider: {

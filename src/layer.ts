@@ -53,6 +53,7 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
   "python3.8": RuntimeType.PYTHON,
   "python3.9": RuntimeType.PYTHON,
   "dotnetcore3.1": RuntimeType.DOTNET,
+  dotnet6: RuntimeType.DOTNET,
   java11: RuntimeType.JAVA,
   "java8.al2": RuntimeType.JAVA,
   "provided.al2": RuntimeType.CUSTOM,
@@ -64,7 +65,6 @@ export const armRuntimeKeys: { [key: string]: string } = {
   "python3.8": "python3.8-arm",
   "python3.9": "python3.9-arm",
   extension: "extension-arm",
-  "dotnetcore3.1": "dd-trace-dotnet",
 };
 
 export function findHandlers(service: Service, exclude: string[], defaultRuntime?: string): FunctionInfo[] {
@@ -141,24 +141,19 @@ export function applyExtensionLayer(service: Service, handlers: FunctionInfo[], 
   }
 }
 
-export function applyDotnetTracingLayer(service: Service, handlers: FunctionInfo[], layers: LayerJSON) {
+export function applyDotnetTracingLayer(service: Service, handler: FunctionInfo, layers: LayerJSON) {
   const { region } = service.provider;
   const regionRuntimes = layers.regions[region];
   if (regionRuntimes === undefined) {
     return;
   }
 
-  for (const handler of handlers) {
-    if (handler.type === RuntimeType.UNSUPPORTED) {
-      continue;
-    }
-    const traceLayerKey: string = "dotnetcore3.1";
+  const traceLayerKey: string = "dotnet";
 
-    const traceLayerARN: string | undefined = regionRuntimes[traceLayerKey];
+  const traceLayerARN: string | undefined = regionRuntimes[traceLayerKey];
 
-    if (traceLayerARN) {
-      addLayer(service, handler, traceLayerARN);
-    }
+  if (traceLayerARN) {
+    addLayer(service, handler, traceLayerARN);
   }
 }
 

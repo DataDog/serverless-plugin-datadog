@@ -26,7 +26,6 @@ import {
   applyLambdaLibraryLayers,
   findHandlers,
   FunctionInfo,
-  runtimeLookup,
   RuntimeType,
 } from "./layer";
 import * as govLayers from "./layers-gov.json";
@@ -119,11 +118,13 @@ module.exports = class ServerlessPlugin {
       this.serverless.cli.log("Skipping adding Lambda Extension Layer");
     }
 
-    if (runtimeLookup[defaultRuntime!] === RuntimeType.DOTNET) {
-      this.serverless.cli.log("Adding Dotnet Tracing Layer to functions");
-      this.debugLogHandlers(handlers);
-      applyDotnetTracingLayer(this.serverless.service, handlers, allLayers);
-    }
+    handlers.forEach((functionInfo) => {
+      if (functionInfo.type === RuntimeType.DOTNET) {
+        this.serverless.cli.log("Adding Dotnet Tracing Layer to functions");
+        this.debugLogHandlers(handlers);
+        applyDotnetTracingLayer(this.serverless.service, functionInfo, allLayers);
+      }
+    });
 
     let tracingMode = TracingMode.NONE;
     if (config.enableXrayTracing && config.enableDDTracing) {
