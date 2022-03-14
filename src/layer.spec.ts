@@ -42,10 +42,8 @@ describe("findHandlers", () => {
   it("finds all node and python layers with matching layers", () => {
     const mockService = createMockService("us-east-1", {
       "go-function": { handler: "myfile.handler", runtime: "go1.10" },
-      "node10-function": { handler: "myfile.handler", runtime: "nodejs10.x" },
       "node12-function": { handler: "myfile.handler", runtime: "nodejs12.x" },
       "node14-function": { handler: "myfile.handler", runtime: "nodejs14.x" },
-      "python27-function": { handler: "myfile.handler", runtime: "python2.7" },
       "python36-function": { handler: "myfile.handler", runtime: "python3.6" },
       "python37-function": { handler: "myfile.handler", runtime: "python3.7" },
       "python38-function": { handler: "myfile.handler", runtime: "python3.8" },
@@ -61,12 +59,6 @@ describe("findHandlers", () => {
         runtime: "go1.10",
       },
       {
-        name: "node10-function",
-        handler: { handler: "myfile.handler", runtime: "nodejs10.x" },
-        type: RuntimeType.NODE,
-        runtime: "nodejs10.x",
-      },
-      {
         name: "node12-function",
         handler: { handler: "myfile.handler", runtime: "nodejs12.x" },
         type: RuntimeType.NODE,
@@ -77,12 +69,6 @@ describe("findHandlers", () => {
         handler: { handler: "myfile.handler", runtime: "nodejs14.x" },
         type: RuntimeType.NODE,
         runtime: "nodejs14.x",
-      },
-      {
-        name: "python27-function",
-        handler: { handler: "myfile.handler", runtime: "python2.7" },
-        type: RuntimeType.PYTHON,
-        runtime: "python2.7",
       },
       {
         name: "python36-function",
