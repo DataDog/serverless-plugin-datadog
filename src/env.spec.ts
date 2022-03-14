@@ -393,6 +393,7 @@ describe("setEnvConfiguration", () => {
         subscribeToExecutionLogs: false,
         exclude: ["dd-excluded-function"],
         enableSourceCodeIntegration: true,
+        captureLambdaPayload: false,
       },
       handlers,
     );
@@ -402,6 +403,7 @@ describe("setEnvConfiguration", () => {
           environment: {
             DD_API_KEY: "1234",
             DD_API_KEY_SECRET_ARN: "some-resource:from:aws:secrets-manager:arn",
+            DD_CAPTURE_LAMBDA_PAYLOAD: false,
             DD_FLUSH_TO_LOG: true,
             DD_KMS_API_KEY: "0912",
             DD_LOG_LEVEL: "debug",
@@ -421,6 +423,7 @@ describe("setEnvConfiguration", () => {
           environment: {
             DD_API_KEY: "1234",
             DD_API_KEY_SECRET_ARN: "some-resource:from:aws:secrets-manager:arn",
+            DD_CAPTURE_LAMBDA_PAYLOAD: false,
             DD_FLUSH_TO_LOG: true,
             DD_KMS_API_KEY: "0912",
             DD_LOG_LEVEL: "debug",
@@ -444,11 +447,13 @@ describe("setEnvConfiguration", () => {
           environment: {
             DD_API_KEY: "1234",
             DD_API_KEY_SECRET_ARN: "some-resource:from:aws:secrets-manager:arn",
+            DD_CAPTURE_LAMBDA_PAYLOAD: false,
             DD_FLUSH_TO_LOG: true,
             DD_KMS_API_KEY: "0912",
             DD_LOG_LEVEL: "debug",
             DD_SITE: "datadoghq.eu",
             DD_TRACE_ENABLED: true,
+            DD_MERGE_XRAY_TRACES: true,
             DD_LOGS_INJECTION: false,
             DD_SERVERLESS_LOGS_ENABLED: true,
           },
@@ -462,11 +467,13 @@ describe("setEnvConfiguration", () => {
           environment: {
             DD_API_KEY: "1234",
             DD_API_KEY_SECRET_ARN: "some-resource:from:aws:secrets-manager:arn",
+            DD_CAPTURE_LAMBDA_PAYLOAD: false,
             DD_FLUSH_TO_LOG: true,
             DD_KMS_API_KEY: "0912",
             DD_LOG_LEVEL: "debug",
             DD_SITE: "datadoghq.eu",
             DD_TRACE_ENABLED: true,
+            DD_MERGE_XRAY_TRACES: true,
             DD_LOGS_INJECTION: false,
             DD_SERVERLESS_LOGS_ENABLED: true,
           },
