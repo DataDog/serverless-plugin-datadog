@@ -21,9 +21,6 @@ custom:
       - ExcludeThis
 
 functions:
-  PythonHello27:
-    handler: py_handler.hello
-    runtime: python2.7
   PythonHello36:
     handler: py_handler.hello
     runtime: python3.6
@@ -36,9 +33,6 @@ functions:
   PythonHello39:
     handler: py_handler.hello
     runtime: python3.9
-  JavascriptHello10-x:
-    handler: js_handler.hello
-    runtime: nodejs10.x
   JavascriptHello12-x:
     handler: js_handler.hello
     runtime: nodejs12.x
