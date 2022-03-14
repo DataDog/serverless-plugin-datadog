@@ -81,6 +81,7 @@ const siteURLEnvVar = "DD_SITE";
 const logLevelEnvVar = "DD_LOG_LEVEL";
 const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
 const ddTracingEnabledEnvVar = "DD_TRACE_ENABLED";
+const ddMergeXrayTracesEnvVar = "DD_MERGE_XRAY_TRACES";
 const logInjectionEnvVar = "DD_LOGS_INJECTION";
 const ddLogsEnabledEnvVar = "DD_SERVERLESS_LOGS_ENABLED";
 const ddCaptureLambdaPayloadEnvVar = "DD_CAPTURE_LAMBDA_PAYLOAD";
@@ -160,6 +161,9 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     }
     if (config.enableDDTracing !== undefined && environment[ddTracingEnabledEnvVar] === undefined) {
       environment[ddTracingEnabledEnvVar] = config.enableDDTracing;
+    }
+    if (config.enableXrayTracing !== undefined && environment[ddMergeXrayTracesEnvVar] === undefined) {
+      environment[ddMergeXrayTracesEnvVar] = config.enableXrayTracing;
     }
     if (config.injectLogContext !== undefined && environment[logInjectionEnvVar] === undefined) {
       environment[logInjectionEnvVar] = config.injectLogContext;
