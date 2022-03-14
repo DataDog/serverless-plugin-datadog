@@ -14,6 +14,7 @@ export enum RuntimeType {
   CUSTOM,
   JAVA,
   RUBY,
+  GO,
   UNSUPPORTED,
 }
 
@@ -44,10 +45,8 @@ export interface LayerJSON {
 }
 
 export const runtimeLookup: { [key: string]: RuntimeType } = {
-  "nodejs10.x": RuntimeType.NODE,
   "nodejs12.x": RuntimeType.NODE,
   "nodejs14.x": RuntimeType.NODE,
-  "python2.7": RuntimeType.PYTHON,
   "python3.6": RuntimeType.PYTHON,
   "python3.7": RuntimeType.PYTHON,
   "python3.8": RuntimeType.PYTHON,
@@ -56,9 +55,11 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
   dotnet6: RuntimeType.DOTNET,
   java11: RuntimeType.JAVA,
   "java8.al2": RuntimeType.JAVA,
+  java8: RuntimeType.JAVA,
   "provided.al2": RuntimeType.CUSTOM,
-  "ruby2.5": RuntimeType.RUBY,
+  provided: RuntimeType.CUSTOM,
   "ruby2.7": RuntimeType.RUBY,
+  "go1.x": RuntimeType.GO,
 };
 
 export const armRuntimeKeys: { [key: string]: string } = {
@@ -66,6 +67,8 @@ export const armRuntimeKeys: { [key: string]: string } = {
   "python3.9": "python3.9-arm",
   extension: "extension-arm",
 };
+
+const dotnetTraceLayerKey: string = "dotnet";
 
 export function findHandlers(service: Service, exclude: string[], defaultRuntime?: string): FunctionInfo[] {
   return Object.entries(service.functions)
@@ -148,9 +151,7 @@ export function applyDotnetTracingLayer(service: Service, handler: FunctionInfo,
     return;
   }
 
-  const traceLayerKey: string = "dotnet";
-
-  const traceLayerARN: string | undefined = regionRuntimes[traceLayerKey];
+  const traceLayerARN: string | undefined = regionRuntimes[dotnetTraceLayerKey];
 
   if (traceLayerARN) {
     addLayer(service, handler, traceLayerARN);

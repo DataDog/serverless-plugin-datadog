@@ -13,7 +13,7 @@
       "python3.9-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python39-ARM:52",
       "extension": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Extension-ARM:21",
-      "dotnetcore3.1": "arn:aws:lambda:us-gov-west-1:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:us-gov-west-1:464622532012:layer:dd-trace-dotnet:1"
     },
     "us-gov-east-1": {
       "nodejs10.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node10-x:59",
@@ -28,7 +28,7 @@
       "python3.9-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python39-ARM:52",
       "extension": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Extension-ARM:21",
-      "dotnetcore3.1": "arn:aws:lambda:us-gov-east-1:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:us-gov-east-1:464622532012:layer:dd-trace-dotnet:1"
     }
   }
 }
