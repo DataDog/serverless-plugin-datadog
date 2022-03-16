@@ -119,6 +119,36 @@
         "LogGroupName": "/aws/lambda/dd-sls-plugin-integration-test-dev-Exclude-This"
       }
     },
+    "DotnetHello6LogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/dd-sls-plugin-integration-test-dev-DotnetHello6"
+      }
+    },
+    "DotnetcoreHello31LogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/dd-sls-plugin-integration-test-dev-DotnetcoreHello31"
+      }
+    },
+    "JavaHello8LogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/dd-sls-plugin-integration-test-dev-JavaHello8"
+      }
+    },
+    "JavaHello11LogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/dd-sls-plugin-integration-test-dev-JavaHello11"
+      }
+    },
+    "ProvidedHelloLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/dd-sls-plugin-integration-test-dev-providedHello"
+      }
+    },
     "IamRoleLambdaExecution": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -264,6 +294,56 @@
         "FilterPattern": "",
         "LogGroupName": {
           "Ref": "JavascriptHello14DashxLogGroup"
+        }
+      }
+    },
+    "DotnetHello6LogGroupSubscription": {
+      "Type": "AWS::Logs::SubscriptionFilter",
+      "Properties": {
+        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
+        "FilterPattern": "",
+        "LogGroupName": {
+          "Ref": "DotnetHello6LogGroup"
+        }
+      }
+    },
+    "DotnetcoreHello31LogGroupSubscription": {
+      "Type": "AWS::Logs::SubscriptionFilter",
+      "Properties": {
+        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
+        "FilterPattern": "",
+        "LogGroupName": {
+          "Ref": "DotnetcoreHello31LogGroup"
+        }
+      }
+    },
+    "JavaHello8LogGroupSubscription": {
+      "Type": "AWS::Logs::SubscriptionFilter",
+      "Properties": {
+        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
+        "FilterPattern": "",
+        "LogGroupName": {
+          "Ref": "JavaHello8LogGroup"
+        }
+      }
+    },
+    "JavaHello11LogGroupSubscription": {
+      "Type": "AWS::Logs::SubscriptionFilter",
+      "Properties": {
+        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
+        "FilterPattern": "",
+        "LogGroupName": {
+          "Ref": "JavaHello11LogGroup"
+        }
+      }
+    },
+    "ProvidedHelloLogGroupSubscription": {
+      "Type": "AWS::Logs::SubscriptionFilter",
+      "Properties": {
+        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
+        "FilterPattern": "",
+        "LogGroupName": {
+          "Ref": "ProvidedHelloLogGroup"
         }
       }
     },
@@ -675,6 +755,269 @@
         "ExcludeDashThisLogGroup"
       ]
     },
+    "DotnetHello6LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/dd-sls-plugin-integration-test.zip"
+        },
+        "Handler": "dotnet_handler.hello",
+        "Runtime": "dotnet6",
+        "FunctionName": "dd-sls-plugin-integration-test-dev-DotnetHello6",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Tags": [
+          {
+            "Key": "dd_sls_plugin",
+            "Value": "vX.XX.X"
+          },
+          {
+            "Key": "service",
+            "Value": "dd-sls-plugin-integration-test"
+          },
+          {
+            "Key": "env",
+            "Value": "dev"
+          }
+        ],
+        "Environment": {
+          "Variables": {
+            "DD_SITE": "datadoghq.com",
+            "DD_LOG_LEVEL": "info",
+            "DD_FLUSH_TO_LOG": true,
+            "DD_TRACE_ENABLED": true,
+            "DD_MERGE_XRAY_TRACES": false,
+            "DD_LOGS_INJECTION": true,
+            "DD_SERVERLESS_LOGS_ENABLED": true,
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "CORECLR_ENABLE_PROFILING": "1",
+            "CORECLR_PROFILER": "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}",
+            "CORECLR_PROFILER_PATH": "/opt/datadog/Datadog.Trace.ClrProfiler.Native.so",
+            "DD_DOTNET_TRACER_HOME": "/opt/datadog"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "DotnetHello6LogGroup"
+      ]
+    },
+    "DotnetcoreHello31LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/dd-sls-plugin-integration-test.zip"
+        },
+        "Handler": "dotnet_handler.hello",
+        "Runtime": "dotnetcore3.1",
+        "FunctionName": "dd-sls-plugin-integration-test-dev-DotnetcoreHello31",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Tags": [
+          {
+            "Key": "dd_sls_plugin",
+            "Value": "vX.XX.X"
+          },
+          {
+            "Key": "service",
+            "Value": "dd-sls-plugin-integration-test"
+          },
+          {
+            "Key": "env",
+            "Value": "dev"
+          }
+        ],
+        "Environment": {
+          "Variables": {
+            "DD_SITE": "datadoghq.com",
+            "DD_LOG_LEVEL": "info",
+            "DD_FLUSH_TO_LOG": true,
+            "DD_TRACE_ENABLED": true,
+            "DD_MERGE_XRAY_TRACES": false,
+            "DD_LOGS_INJECTION": true,
+            "DD_SERVERLESS_LOGS_ENABLED": true,
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "CORECLR_ENABLE_PROFILING": "1",
+            "CORECLR_PROFILER": "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}",
+            "CORECLR_PROFILER_PATH": "/opt/datadog/Datadog.Trace.ClrProfiler.Native.so",
+            "DD_DOTNET_TRACER_HOME": "/opt/datadog"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "DotnetcoreHello31LogGroup"
+      ]
+    },
+    "JavaHello8LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/dd-sls-plugin-integration-test.zip"
+        },
+        "Handler": "java_handler.hello",
+        "Runtime": "java8",
+        "FunctionName": "dd-sls-plugin-integration-test-dev-JavaHello8",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Tags": [
+          {
+            "Key": "dd_sls_plugin",
+            "Value": "vX.XX.X"
+          },
+          {
+            "Key": "service",
+            "Value": "dd-sls-plugin-integration-test"
+          },
+          {
+            "Key": "env",
+            "Value": "dev"
+          }
+        ],
+        "Environment": {
+          "Variables": {
+            "DD_SITE": "datadoghq.com",
+            "DD_LOG_LEVEL": "info",
+            "DD_FLUSH_TO_LOG": true,
+            "DD_TRACE_ENABLED": true,
+            "DD_MERGE_XRAY_TRACES": false,
+            "DD_LOGS_INJECTION": true,
+            "DD_SERVERLESS_LOGS_ENABLED": true,
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "JavaHello8LogGroup"
+      ]
+    },
+    "JavaHello11LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/dd-sls-plugin-integration-test.zip"
+        },
+        "Handler": "java_handler.hello",
+        "Runtime": "java11",
+        "FunctionName": "dd-sls-plugin-integration-test-dev-JavaHello11",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Tags": [
+          {
+            "Key": "dd_sls_plugin",
+            "Value": "vX.XX.X"
+          },
+          {
+            "Key": "service",
+            "Value": "dd-sls-plugin-integration-test"
+          },
+          {
+            "Key": "env",
+            "Value": "dev"
+          }
+        ],
+        "Environment": {
+          "Variables": {
+            "DD_SITE": "datadoghq.com",
+            "DD_LOG_LEVEL": "info",
+            "DD_FLUSH_TO_LOG": true,
+            "DD_TRACE_ENABLED": true,
+            "DD_MERGE_XRAY_TRACES": false,
+            "DD_LOGS_INJECTION": true,
+            "DD_SERVERLESS_LOGS_ENABLED": true,
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "JavaHello11LogGroup"
+      ]
+    },
+    "ProvidedHelloLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/dd-sls-plugin-integration-test.zip"
+        },
+        "Handler": "provided_handler.hello",
+        "Runtime": "provided",
+        "FunctionName": "dd-sls-plugin-integration-test-dev-providedHello",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Tags": [
+          {
+            "Key": "dd_sls_plugin",
+            "Value": "vX.XX.X"
+          },
+          {
+            "Key": "service",
+            "Value": "dd-sls-plugin-integration-test"
+          },
+          {
+            "Key": "env",
+            "Value": "dev"
+          }
+        ],
+        "Environment": {
+          "Variables": {
+            "DD_SITE": "datadoghq.com",
+            "DD_LOG_LEVEL": "info",
+            "DD_FLUSH_TO_LOG": true,
+            "DD_TRACE_ENABLED": true,
+            "DD_MERGE_XRAY_TRACES": false,
+            "DD_LOGS_INJECTION": true,
+            "DD_SERVERLESS_LOGS_ENABLED": true,
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "ProvidedHelloLogGroup"
+      ]
+    },
     "PythonHello36LambdaVersionXXXX": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
@@ -751,6 +1094,56 @@
       "Properties": {
         "FunctionName": {
           "Ref": "ExcludeDashThisLambdaFunction"
+        },
+        "CodeSha256": "XXXX"
+      }
+    },
+    "DotnetHello6LambdaVersionXXXX": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "DotnetHello6LambdaFunction"
+        },
+        "CodeSha256": "XXXX"
+      }
+    },
+    "DotnetcoreHello31LambdaVersionXXXX": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "DotnetcoreHello31LambdaFunction"
+        },
+        "CodeSha256": "XXXX"
+      }
+    },
+    "JavaHello8LambdaVersionXXXX": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "JavaHello8LambdaFunction"
+        },
+        "CodeSha256": "XXXX"
+      }
+    },
+    "JavaHello11LambdaVersionXXXX": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "JavaHello11LambdaFunction"
+        },
+        "CodeSha256": "XXXX"
+      }
+    },
+    "ProvidedHelloLambdaVersionXXXX": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "ProvidedHelloLambdaFunction"
         },
         "CodeSha256": "XXXX"
       }
@@ -1540,6 +1933,51 @@
       },
       "Export": {
         "Name": "sls-dd-sls-plugin-integration-test-dev-ExcludeDashThisLambdaFunctionQualifiedArn"
+      }
+    },
+    "DotnetHello6LambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "DotnetHello6LambdaVersionXXXX"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-DotnetHello6LambdaFunctionQualifiedArn"
+      }
+    },
+    "DotnetcoreHello31LambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "DotnetcoreHello31LambdaVersionXXXX"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-DotnetcoreHello31LambdaFunctionQualifiedArn"
+      }
+    },
+    "JavaHello8LambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "JavaHello8LambdaVersionXXXX"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-JavaHello8LambdaFunctionQualifiedArn"
+      }
+    },
+    "JavaHello11LambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "JavaHello11LambdaVersionXXXX"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-JavaHello11LambdaFunctionQualifiedArn"
+      }
+    },
+    "ProvidedHelloLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "ProvidedHelloLambdaVersionXXXX"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-ProvidedHelloLambdaFunctionQualifiedArn"
       }
     },
     "ServiceEndpoint": {

@@ -57,3 +57,18 @@ functions:
   JavascriptHello14-x:
     handler: js_handler.hello
     runtime: nodejs14.x
+  DotnetHello6:
+    handler: dotnet_handler.hello
+    runtime: dotnet6
+  DotnetcoreHello31:
+    handler: dotnet_handler.hello
+    runtime: dotnetcore3.1
+  JavaHello8:
+    handler: java_handler.hello
+    runtime: java8
+  JavaHello11:
+    handler: java_handler.hello
+    runtime: java11
+  providedHello:
+    handler: provided_handler.hello
+    runtime: provided
