@@ -1,5 +1,5 @@
 service: dd-sls-plugin-integration-test
-frameworkVersion: "2"
+frameworkVersion: "3"
 
 plugins:
   - ../dist/src
@@ -7,15 +7,12 @@ plugins:
 provider:
   name: aws
   region: sa-east-1
-  lambdaHashingVersion: 20201221
   logs:
     restApi:
       accessLogging: true
       executionLogging: false
     httpApi: false
-    websocket:
-      accessLogging: true
-      executionLogging: true
+    websocket: true
 
 custom:
   datadog:
@@ -75,12 +72,12 @@ functions:
   DotnetcoreHello31:
     handler: dotnet_handler.hello
     runtime: dotnetcore3.1
-  # JavaHello8:
-  #   handler: java_handler.hello
-  #   runtime: java8
-  # JavaHello11:
-  #   handler: java_handler.hello
-  #   runtime: java11
-  # providedHello:
-  #   handler: provided_handler.hello
-  #   runtime: provided
+  JavaHello8:
+    handler: java_handler.hello
+    runtime: java8
+  JavaHello11:
+    handler: java_handler.hello
+    runtime: java11
+  providedHello:
+    handler: provided_handler.hello
+    runtime: provided
