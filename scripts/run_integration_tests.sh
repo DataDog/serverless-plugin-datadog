@@ -49,6 +49,7 @@ for ((i = 0; i < ${#SERVERLESS_CONFIGS[@]}; i++)); do
     perl -p -i -e 's/(v\d+.\d+.\d+)/vX.XX.X/g' ${RAW_CFN_TEMPLATE}
     # Normalize Datadog Layer Arn versions
     perl -p -i -e 's/(arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-(Python36|Python37|Python38|Python39|Node12-x|Node14-x|Extension):\d+)/arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-\2:XXX/g' ${RAW_CFN_TEMPLATE}
+    perl -p -i -e 's/(arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-dotnet:\d+)/arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-dotnet:XXX/g' ${RAW_CFN_TEMPLATE}
     # Normalize API Gateway timestamps
     perl -p -i -e 's/("ApiGatewayDeployment.*")/"ApiGatewayDeploymentxxxx"/g' ${RAW_CFN_TEMPLATE}
     # Normalize layer timestamps

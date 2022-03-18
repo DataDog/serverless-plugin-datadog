@@ -116,7 +116,7 @@ module.exports = class ServerlessPlugin {
       applyExtensionLayer(this.serverless.service, handlers, allLayers);
       handlers.forEach((functionInfo) => {
         if (functionInfo.type === RuntimeType.DOTNET) {
-          this.serverless.cli.log("Adding Dotnet Tracing Layer to functions");
+          this.serverless.cli.log("Adding .NET Tracing Layer to functions");
           this.debugLogHandlers(handlers);
           applyDotnetTracingLayer(this.serverless.service, functionInfo, allLayers);
         }
