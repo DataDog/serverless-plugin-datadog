@@ -66,6 +66,6 @@
     "node-fetch": "^2.6.1",
     "proxy": "^1.0.2",
     "proxy-agent": "^5.0.0",
-    "simple-git": "^2.48.0"
+    "simple-git": "^3.3.0"
   }
 }
