@@ -121,6 +121,7 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
   handlers.forEach(({ handler, type }) => {
     handler.environment ??= {};
     const environment = handler.environment as any;
+    const functionName = handler.name ?? "";
     if (
       process.env.DATADOG_API_KEY !== undefined &&
       environment[apiKeyEnvVar] === undefined &&
@@ -178,29 +179,29 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
       if (environment[ENABLE_PROFILING_ENV_VAR] === undefined) {
         environment[ENABLE_PROFILING_ENV_VAR] = CORECLR_ENABLE_PROFILING;
       } else if (environment[ENABLE_PROFILING_ENV_VAR] !== CORECLR_ENABLE_PROFILING) {
-        throwEnvVariableError("CORECLR_ENABLE_PROFILING", CORECLR_ENABLE_PROFILING);
+        throwEnvVariableError("CORECLR_ENABLE_PROFILING", CORECLR_ENABLE_PROFILING, functionName);
       }
       if (environment[PROFILER_ENV_VAR] === undefined) {
         environment[PROFILER_ENV_VAR] = CORECLR_PROFILER;
       } else if (environment[PROFILER_ENV_VAR] !== CORECLR_PROFILER) {
-        throwEnvVariableError("CORECLR_PROFILER", CORECLR_PROFILER);
+        throwEnvVariableError("CORECLR_PROFILER", CORECLR_PROFILER, functionName);
       }
       if (environment[PROFILER_PATH_ENV_VAR] === undefined) {
         environment[PROFILER_PATH_ENV_VAR] = CORECLR_PROFILER_PATH;
       } else if (environment[PROFILER_PATH_ENV_VAR] !== CORECLR_PROFILER_PATH) {
-        throwEnvVariableError("CORECLR_PROFILER_PATH", CORECLR_PROFILER_PATH);
+        throwEnvVariableError("CORECLR_PROFILER_PATH", CORECLR_PROFILER_PATH, functionName);
       }
       if (environment[DOTNET_TRACER_HOME_ENV_VAR] === undefined) {
         environment[DOTNET_TRACER_HOME_ENV_VAR] = DD_DOTNET_TRACER_HOME;
       } else if (environment[DOTNET_TRACER_HOME_ENV_VAR] !== DD_DOTNET_TRACER_HOME) {
-        throwEnvVariableError("DD_DOTNET_TRACER_HOME", DD_DOTNET_TRACER_HOME);
+        throwEnvVariableError("DD_DOTNET_TRACER_HOME", DD_DOTNET_TRACER_HOME, functionName);
       }
     }
   });
 }
 
-function throwEnvVariableError(variable: string, value: string) {
-  throw new Error(`Environment variable ${variable} should be set to ${value}`);
+function throwEnvVariableError(variable: string, value: string, functionName: string) {
+  throw new Error(`Environment variable ${variable} should be set to ${value} for function ${functionName}`);
 }
 
 export function getConfig(service: Service): Configuration {
