@@ -178,29 +178,29 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
       if (environment[ENABLE_PROFILING_ENV_VAR] === undefined) {
         environment[ENABLE_PROFILING_ENV_VAR] = CORECLR_ENABLE_PROFILING;
       } else if (environment[ENABLE_PROFILING_ENV_VAR] !== CORECLR_ENABLE_PROFILING) {
-        throwEnvVariableError("CORECLR_ENABLE_PROFILING");
+        throwEnvVariableError("CORECLR_ENABLE_PROFILING", CORECLR_ENABLE_PROFILING);
       }
       if (environment[PROFILER_ENV_VAR] === undefined) {
         environment[PROFILER_ENV_VAR] = CORECLR_PROFILER;
       } else if (environment[PROFILER_ENV_VAR] !== CORECLR_PROFILER) {
-        throwEnvVariableError("CORECLR_PROFILER");
+        throwEnvVariableError("CORECLR_PROFILER", CORECLR_PROFILER);
       }
       if (environment[PROFILER_PATH_ENV_VAR] === undefined) {
         environment[PROFILER_PATH_ENV_VAR] = CORECLR_PROFILER_PATH;
       } else if (environment[PROFILER_PATH_ENV_VAR] !== CORECLR_PROFILER_PATH) {
-        throwEnvVariableError("CORECLR_PROFILER_PATH");
+        throwEnvVariableError("CORECLR_PROFILER_PATH", CORECLR_PROFILER_PATH);
       }
       if (environment[DOTNET_TRACER_HOME_ENV_VAR] === undefined) {
         environment[DOTNET_TRACER_HOME_ENV_VAR] = DD_DOTNET_TRACER_HOME;
       } else if (environment[DOTNET_TRACER_HOME_ENV_VAR] !== DD_DOTNET_TRACER_HOME) {
-        throwEnvVariableError("DD_DOTNET_TRACER_HOME");
+        throwEnvVariableError("DD_DOTNET_TRACER_HOME", DD_DOTNET_TRACER_HOME);
       }
     }
   });
 }
 
-function throwEnvVariableError(variable: string) {
-  throw new Error(`Environment variable ${variable} not set up correctly for datadog monitoring`);
+function throwEnvVariableError(variable: string, value: string) {
+  throw new Error(`Environment variable ${variable} should be set to ${value}`);
 }
 
 export function getConfig(service: Service): Configuration {
