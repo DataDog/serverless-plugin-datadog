@@ -65,6 +65,8 @@ export interface Configuration {
   // When set, this plugin will configure the specified monitors for the function
   monitors?: { [id: string]: { [key: string]: any } }[];
 
+  // When set, this plugin will fail a deployment if monitors can't be created
+  failOnError: boolean;
   // API Gateway Access logging
   subscribeToAccessLogs: boolean;
   // API Gateway Execution logging - handles rest and websocket. Http not supported as of Sept.21
@@ -105,6 +107,7 @@ export const defaultConfiguration: Configuration = {
   subscribeToExecutionLogs: false,
   enableDDLogs: true,
   captureLambdaPayload: false,
+  failOnError: false,
 };
 
 export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]) {
