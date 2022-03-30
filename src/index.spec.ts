@@ -5,9 +5,17 @@
  * This product includes software developed at Datadog (https://www.datadoghq.com/).
  * Copyright 2021 Datadog, Inc.
  */
-
+jest.mock("./monitors.ts", () => {
+  return {
+    setMonitors: async (shouldThrow: Boolean) => {
+      if (shouldThrow) {
+        throw new Error("Some Error Occurred");
+      }
+      return true;
+    },
+  };
+});
 const ServerlessPlugin = require("./index");
-
 import mock from "mock-fs";
 import { FunctionDefinition } from "serverless";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
@@ -19,6 +27,7 @@ function awsMock(): Aws {
   return {
     getAccountId: () => Promise.resolve("111111111111"),
     getStage: () => "dev",
+    getRegion: () => "us-east-1",
     request: (_service, method, _params: any) => {
       if (method == "describeSubscriptionFilters") {
         return Promise.reject("Log group doesn't exist");
@@ -704,6 +713,52 @@ describe("ServerlessPlugin", () => {
     );
   });
 
+  it("throws an error if failOnError is set", async () => {
+    process.env = {};
+    const serverless = {
+      cli: {
+        log: () => {},
+      },
+      getProvider: (_name: string) => awsMock(),
+      service: {
+        getServiceName: () => "dev",
+        getAllFunctions: () => [],
+        provider: {
+          region: "us-east-1",
+        },
+        functions: {
+          node1: {
+            handler: "my-func.ev",
+            runtime: "nodejs14.x",
+          },
+        },
+        custom: {
+          datadog: {
+            flushMetricsToLogs: false,
+            failOnError: true,
+            monitors: true,
+            monitorsApiKey: "1234",
+            monitorsAppKey: "5678",
+          },
+        },
+      },
+    };
+
+    const plugin = new ServerlessPlugin(serverless, {});
+    let threwError: boolean = false;
+    let thrownErrorMessage: string | undefined;
+    try {
+      await plugin.hooks["after:deploy:deploy"]();
+    } catch (e) {
+      threwError = true;
+      if (e instanceof Error) {
+        thrownErrorMessage = e.message;
+      }
+    }
+    expect(threwError).toBe(true);
+    expect(thrownErrorMessage).toEqual("Some Error Occurred");
+  });
+
   describe("afterPackageFunction", () => {
     afterEach(() => {
       mock.restore();
@@ -941,6 +996,7 @@ describe("ServerlessPlugin", () => {
       const serverless = {
         cli: { log: () => {} },
         getProvider: awsMock,
+        enabled: true,
         service: {
           provider: {
             region: "us-east-1",
