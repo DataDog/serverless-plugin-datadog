@@ -88,6 +88,16 @@ const logInjectionEnvVar = "DD_LOGS_INJECTION";
 const ddLogsEnabledEnvVar = "DD_SERVERLESS_LOGS_ENABLED";
 const ddCaptureLambdaPayloadEnvVar = "DD_CAPTURE_LAMBDA_PAYLOAD";
 
+// .NET tracer env variables
+const ENABLE_PROFILING_ENV_VAR = "CORECLR_ENABLE_PROFILING";
+const PROFILER_ENV_VAR = "CORECLR_PROFILER";
+const PROFILER_PATH_ENV_VAR = "CORECLR_PROFILER_PATH";
+const DOTNET_TRACER_HOME_ENV_VAR = "DD_DOTNET_TRACER_HOME";
+const CORECLR_ENABLE_PROFILING = "1";
+const CORECLR_PROFILER = "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}";
+const CORECLR_PROFILER_PATH = "/opt/datadog/Datadog.Trace.ClrProfiler.Native.so";
+const DD_DOTNET_TRACER_HOME = "/opt/datadog";
+
 export const ddTagsEnvVar = "DD_TAGS";
 
 export const defaultConfiguration: Configuration = {
@@ -111,9 +121,10 @@ export const defaultConfiguration: Configuration = {
 };
 
 export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]) {
-  handlers.forEach(({ handler }) => {
+  handlers.forEach(({ handler, type }) => {
     handler.environment ??= {};
     const environment = handler.environment as any;
+    const functionName = handler.name ?? "";
     if (
       process.env.DATADOG_API_KEY !== undefined &&
       environment[apiKeyEnvVar] === undefined &&
@@ -167,7 +178,33 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     if (environment[ddCaptureLambdaPayloadEnvVar] === undefined) {
       environment[ddCaptureLambdaPayloadEnvVar] = config.captureLambdaPayload;
     }
+    if (type === RuntimeType.DOTNET) {
+      if (environment[ENABLE_PROFILING_ENV_VAR] === undefined) {
+        environment[ENABLE_PROFILING_ENV_VAR] = CORECLR_ENABLE_PROFILING;
+      } else if (environment[ENABLE_PROFILING_ENV_VAR] !== CORECLR_ENABLE_PROFILING) {
+        throwEnvVariableError("CORECLR_ENABLE_PROFILING", CORECLR_ENABLE_PROFILING, functionName);
+      }
+      if (environment[PROFILER_ENV_VAR] === undefined) {
+        environment[PROFILER_ENV_VAR] = CORECLR_PROFILER;
+      } else if (environment[PROFILER_ENV_VAR] !== CORECLR_PROFILER) {
+        throwEnvVariableError("CORECLR_PROFILER", CORECLR_PROFILER, functionName);
+      }
+      if (environment[PROFILER_PATH_ENV_VAR] === undefined) {
+        environment[PROFILER_PATH_ENV_VAR] = CORECLR_PROFILER_PATH;
+      } else if (environment[PROFILER_PATH_ENV_VAR] !== CORECLR_PROFILER_PATH) {
+        throwEnvVariableError("CORECLR_PROFILER_PATH", CORECLR_PROFILER_PATH, functionName);
+      }
+      if (environment[DOTNET_TRACER_HOME_ENV_VAR] === undefined) {
+        environment[DOTNET_TRACER_HOME_ENV_VAR] = DD_DOTNET_TRACER_HOME;
+      } else if (environment[DOTNET_TRACER_HOME_ENV_VAR] !== DD_DOTNET_TRACER_HOME) {
+        throwEnvVariableError("DD_DOTNET_TRACER_HOME", DD_DOTNET_TRACER_HOME, functionName);
+      }
+    }
   });
+}
+
+function throwEnvVariableError(variable: string, value: string, functionName: string) {
+  throw new Error(`Environment variable ${variable} should be set to ${value} for function ${functionName}`);
 }
 
 export function getConfig(service: Service): Configuration {

@@ -20,7 +20,14 @@ import {
 } from "./env";
 import { addCloudWatchForwarderSubscriptions, addExecutionLogGroupsAndSubscriptions } from "./forwarder";
 import { newSimpleGit } from "./git";
-import { applyExtensionLayer, applyLambdaLibraryLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
+import {
+  applyExtensionLayer,
+  applyDotnetTracingLayer,
+  applyLambdaLibraryLayers,
+  findHandlers,
+  FunctionInfo,
+  RuntimeType,
+} from "./layer";
 import * as govLayers from "./layers-gov.json";
 import * as layers from "./layers.json";
 import { getCloudFormationStackId } from "./monitor-api-requests";
@@ -107,6 +114,13 @@ module.exports = class ServerlessPlugin {
       this.serverless.cli.log("Adding Datadog Lambda Extension Layer to functions");
       this.debugLogHandlers(handlers);
       applyExtensionLayer(this.serverless.service, handlers, allLayers);
+      handlers.forEach((functionInfo) => {
+        if (functionInfo.type === RuntimeType.DOTNET) {
+          this.serverless.cli.log("Adding .NET Tracing Layer to functions");
+          this.debugLogHandlers(handlers);
+          applyDotnetTracingLayer(this.serverless.service, functionInfo, allLayers);
+        }
+      });
     } else {
       this.serverless.cli.log("Skipping adding Lambda Extension Layer");
     }

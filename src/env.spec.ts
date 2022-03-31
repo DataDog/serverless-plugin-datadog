@@ -342,7 +342,7 @@ describe("setEnvConfiguration", () => {
     process.env = {};
   });
 
-  it("sets env vars for all handlers", () => {
+  it("sets env vars for all handlers with different runtimes", () => {
     const handlers: FunctionInfo[] = [
       {
         handler: {
@@ -358,7 +358,23 @@ describe("setEnvConfiguration", () => {
           events: [],
         },
         name: "function2",
-        type: RuntimeType.NODE,
+        type: RuntimeType.DOTNET,
+      },
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function3",
+        type: RuntimeType.RUBY,
+      },
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function4",
+        type: RuntimeType.JAVA,
       },
     ];
 
@@ -381,6 +397,7 @@ describe("setEnvConfiguration", () => {
         subscribeToExecutionLogs: false,
         exclude: ["dd-excluded-function"],
         enableSourceCodeIntegration: true,
+        captureLambdaPayload: false,
         failOnError: false,
       },
       handlers,
@@ -391,6 +408,7 @@ describe("setEnvConfiguration", () => {
           environment: {
             DD_API_KEY: "1234",
             DD_API_KEY_SECRET_ARN: "some-resource:from:aws:secrets-manager:arn",
+            DD_CAPTURE_LAMBDA_PAYLOAD: false,
             DD_FLUSH_TO_LOG: true,
             DD_KMS_API_KEY: "0912",
             DD_LOG_LEVEL: "debug",
@@ -410,6 +428,31 @@ describe("setEnvConfiguration", () => {
           environment: {
             DD_API_KEY: "1234",
             DD_API_KEY_SECRET_ARN: "some-resource:from:aws:secrets-manager:arn",
+            DD_CAPTURE_LAMBDA_PAYLOAD: false,
+            DD_FLUSH_TO_LOG: true,
+            DD_KMS_API_KEY: "0912",
+            DD_LOG_LEVEL: "debug",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_MERGE_XRAY_TRACES: true,
+            DD_LOGS_INJECTION: false,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            CORECLR_ENABLE_PROFILING: "1",
+            CORECLR_PROFILER: "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}",
+            CORECLR_PROFILER_PATH: "/opt/datadog/Datadog.Trace.ClrProfiler.Native.so",
+            DD_DOTNET_TRACER_HOME: "/opt/datadog",
+          },
+          events: [],
+        },
+        name: "function2",
+        type: RuntimeType.DOTNET,
+      },
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_API_KEY_SECRET_ARN: "some-resource:from:aws:secrets-manager:arn",
+            DD_CAPTURE_LAMBDA_PAYLOAD: false,
             DD_FLUSH_TO_LOG: true,
             DD_KMS_API_KEY: "0912",
             DD_LOG_LEVEL: "debug",
@@ -421,8 +464,28 @@ describe("setEnvConfiguration", () => {
           },
           events: [],
         },
-        name: "function2",
-        type: RuntimeType.NODE,
+        name: "function3",
+        type: RuntimeType.RUBY,
+      },
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_API_KEY_SECRET_ARN: "some-resource:from:aws:secrets-manager:arn",
+            DD_CAPTURE_LAMBDA_PAYLOAD: false,
+            DD_FLUSH_TO_LOG: true,
+            DD_KMS_API_KEY: "0912",
+            DD_LOG_LEVEL: "debug",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_MERGE_XRAY_TRACES: true,
+            DD_LOGS_INJECTION: false,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+          },
+          events: [],
+        },
+        name: "function4",
+        type: RuntimeType.JAVA,
       },
     ]);
   });

@@ -1,5 +1,5 @@
 service: dd-sls-plugin-integration-test
-frameworkVersion: "2"
+frameworkVersion: "3"
 
 plugins:
   - ../dist/src
@@ -7,7 +7,6 @@ plugins:
 provider:
   name: aws
   region: sa-east-1
-  lambdaHashingVersion: 20201221
   logs:
     restApi: true
     httpApi: true
@@ -23,17 +22,6 @@ custom:
     logLevel: "info"
 
 functions:
-  PythonHello27:
-    handler: py_handler.hello
-    runtime: python2.7
-    events:
-      - http:
-          path: users/create
-          method: get
-      - httpApi:
-          path: /users/update
-          method: put
-      - websocket: $connect
   PythonHello36:
     handler: py_handler.hello
     runtime: python3.6
@@ -46,9 +34,17 @@ functions:
   PythonHello39:
     handler: py_handler.hello
     runtime: python3.9
-  JavascriptHello10-x:
+    events:
+      - http:
+          path: users/create
+          method: get
+      - httpApi:
+          path: /users/update
+          method: put
+      - websocket: $connect
+  JavascriptHello12-x:
     handler: js_handler.hello
-    runtime: nodejs10.x
+    runtime: nodejs12.x
     events:
       - http:
           path: users/create
@@ -57,9 +53,21 @@ functions:
           path: /users/remove
           method: delete
       - websocket: $connect
-  JavascriptHello12-x:
-    handler: js_handler.hello
-    runtime: nodejs12.x
   JavascriptHello14-x:
     handler: js_handler.hello
     runtime: nodejs14.x
+  DotnetHello6:
+    handler: dotnet_handler.hello
+    runtime: dotnet6
+  DotnetcoreHello31:
+    handler: dotnet_handler.hello
+    runtime: dotnetcore3.1
+  JavaHello8:
+    handler: java_handler.hello
+    runtime: java8
+  JavaHello11:
+    handler: java_handler.hello
+    runtime: java11
+  providedHello:
+    handler: provided_handler.hello
+    runtime: provided
