@@ -161,6 +161,7 @@ describe("getConfig", () => {
       subscribeToAccessLogs: true,
       subscribeToExecutionLogs: false,
       enableSourceCodeIntegration: true,
+      failOnError: false,
     });
   });
 
@@ -192,6 +193,7 @@ describe("getConfig", () => {
       subscribeToAccessLogs: true,
       subscribeToExecutionLogs: false,
       enableSourceCodeIntegration: true,
+      failOnError: false,
     });
   });
 
@@ -224,6 +226,7 @@ describe("getConfig", () => {
       subscribeToExecutionLogs: false,
       customHandler: "/src/custom-handler.handler",
       enableSourceCodeIntegration: true,
+      failOnError: false,
     });
   });
 });
@@ -256,6 +259,7 @@ it("disable source code integration", () => {
     subscribeToAccessLogs: true,
     subscribeToExecutionLogs: false,
     enableSourceCodeIntegration: false,
+    failOnError: false,
   });
 });
 
@@ -394,6 +398,7 @@ describe("setEnvConfiguration", () => {
         exclude: ["dd-excluded-function"],
         enableSourceCodeIntegration: true,
         captureLambdaPayload: false,
+        failOnError: false,
       },
       handlers,
     );
@@ -532,6 +537,7 @@ describe("setEnvConfiguration", () => {
         subscribeToExecutionLogs: false,
         exclude: [],
         enableSourceCodeIntegration: true,
+        failOnError: false,
       },
       handlers,
     );
@@ -612,6 +618,7 @@ describe("setEnvConfiguration", () => {
         subscribeToExecutionLogs: false,
         exclude: [],
         enableSourceCodeIntegration: true,
+        failOnError: false,
       },
       handlers,
     );
@@ -665,6 +672,7 @@ describe("setEnvConfiguration", () => {
         injectLogContext: false,
         exclude: ["dd-excluded-function"],
         enableSourceCodeIntegration: true,
+        failOnError: false,
       },
       handlers,
     );
@@ -718,6 +726,7 @@ describe("setEnvConfiguration", () => {
         injectLogContext: false,
         exclude: ["dd-excluded-function"],
         enableSourceCodeIntegration: true,
+        failOnError: false,
       },
       handlers,
     );
@@ -770,6 +779,7 @@ describe("setEnvConfiguration", () => {
         injectLogContext: false,
         exclude: ["dd-excluded-function"],
         enableSourceCodeIntegration: true,
+        failOnError: false,
       },
       handlers,
     );
@@ -825,6 +835,7 @@ describe("setEnvConfiguration", () => {
           injectLogContext: false,
           exclude: ["dd-excluded-function"],
           enableSourceCodeIntegration: true,
+          failOnError: false,
         },
         handlers,
       );

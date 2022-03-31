@@ -229,6 +229,9 @@ module.exports = class ServerlessPlugin {
       } catch (err) {
         if (err instanceof Error) {
           this.serverless.cli.log(`Error occurred when configuring monitors: ${err.message}`);
+          if (config.failOnError) {
+            throw err;
+          }
         }
       }
     }
