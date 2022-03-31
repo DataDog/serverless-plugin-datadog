@@ -373,6 +373,144 @@ describe("ServerlessPlugin", () => {
     });
   });
 
+  it("Adds tracing layer for java11", async () => {
+    mock({});
+    const serverless = {
+      cli: {
+        log: () => {},
+      },
+      service: {
+        provider: {
+          region: "us-east-1",
+        },
+        functions: {
+          node1: {
+            handler: "my-func.ev",
+            layers: [],
+            runtime: "java11",
+          },
+        },
+        custom: {
+          datadog: {
+            apiKey: 1234,
+          },
+        },
+      },
+    };
+
+    const plugin = new ServerlessPlugin(serverless, {});
+    await plugin.hooks["after:package:initialize"]();
+    expect(serverless).toMatchObject({
+      service: {
+        functions: {
+          node1: {
+            handler: "my-func.ev",
+            layers: [
+              expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:Datadog-Extension\:.*/),
+              expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:dd-trace-java\:.*/),
+            ],
+            runtime: "java11",
+          },
+        },
+        provider: {
+          region: "us-east-1",
+        },
+      },
+    });
+  });
+
+  it("Adds tracing layer for java8.al2", async () => {
+    mock({});
+    const serverless = {
+      cli: {
+        log: () => {},
+      },
+      service: {
+        provider: {
+          region: "us-east-1",
+        },
+        functions: {
+          node1: {
+            handler: "my-func.ev",
+            layers: [],
+            runtime: "java8.al2",
+          },
+        },
+        custom: {
+          datadog: {
+            apiKey: 1234,
+          },
+        },
+      },
+    };
+
+    const plugin = new ServerlessPlugin(serverless, {});
+    await plugin.hooks["after:package:initialize"]();
+    expect(serverless).toMatchObject({
+      service: {
+        functions: {
+          node1: {
+            handler: "my-func.ev",
+            layers: [
+              expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:Datadog-Extension\:.*/),
+              expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:dd-trace-java\:.*/),
+            ],
+            runtime: "java8.al2",
+          },
+        },
+        provider: {
+          region: "us-east-1",
+        },
+      },
+    });
+  });
+
+  it("Adds tracing layer for java8", async () => {
+    mock({});
+    const serverless = {
+      cli: {
+        log: () => {},
+      },
+      service: {
+        provider: {
+          region: "us-east-1",
+        },
+        functions: {
+          node1: {
+            handler: "my-func.ev",
+            layers: [],
+            runtime: "java8",
+          },
+        },
+        custom: {
+          datadog: {
+            apiKey: 1234,
+          },
+        },
+      },
+    };
+
+    const plugin = new ServerlessPlugin(serverless, {});
+    await plugin.hooks["after:package:initialize"]();
+    expect(serverless).toMatchObject({
+      service: {
+        functions: {
+          node1: {
+            handler: "my-func.ev",
+            layers: [
+              expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:Datadog-Extension\:.*/),
+              expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:dd-trace-java\:.*/),
+            ],
+            runtime: "java8",
+          },
+        },
+        provider: {
+          region: "us-east-1",
+        },
+      },
+    });
+  });
+
   describe("validateConfiguration", () => {
     afterEach(() => {
       mock.restore();
