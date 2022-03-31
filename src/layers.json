@@ -11,7 +11,8 @@
       "python3.9-arm": "arn:aws:lambda:af-south-1:464622532012:layer:Datadog-Python39-ARM:53",
       "extension": "arn:aws:lambda:af-south-1:464622532012:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws:lambda:af-south-1:464622532012:layer:Datadog-Extension-ARM:21",
-      "dotnet": "arn:aws:lambda:af-south-1:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:af-south-1:464622532012:layer:dd-trace-dotnet:1",
+      "java": "arn:aws:lambda:af-south-1:464622532012:layer:dd-trace-java:4"
     },
     "eu-north-1": {
       "nodejs12.x": "arn:aws:lambda:eu-north-1:464622532012:layer:Datadog-Node12-x:74",
@@ -24,7 +25,8 @@
       "python3.9-arm": "arn:aws:lambda:eu-north-1:464622532012:layer:Datadog-Python39-ARM:53",
       "extension": "arn:aws:lambda:eu-north-1:464622532012:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws:lambda:eu-north-1:464622532012:layer:Datadog-Extension-ARM:21",
-      "dotnet": "arn:aws:lambda:eu-north-1:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:eu-north-1:464622532012:layer:dd-trace-dotnet:1",
+      "java": "arn:aws:lambda:eu-north-1:464622532012:layer:dd-trace-java:4"
     },
     "ap-south-1": {
       "nodejs12.x": "arn:aws:lambda:ap-south-1:464622532012:layer:Datadog-Node12-x:74",
@@ -37,7 +39,8 @@
       "python3.9-arm": "arn:aws:lambda:ap-south-1:464622532012:layer:Datadog-Python39-ARM:53",
       "extension": "arn:aws:lambda:ap-south-1:464622532012:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws:lambda:ap-south-1:464622532012:layer:Datadog-Extension-ARM:21",
-      "dotnet": "arn:aws:lambda:ap-south-1:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:ap-south-1:464622532012:layer:dd-trace-dotnet:1",
+      "java": "arn:aws:lambda:ap-south-1:464622532012:layer:dd-trace-java:4"
     },
     "eu-west-3": {
       "nodejs12.x": "arn:aws:lambda:eu-west-3:464622532012:layer:Datadog-Node12-x:74",
@@ -50,7 +53,8 @@
       "python3.9-arm": "arn:aws:lambda:eu-west-3:464622532012:layer:Datadog-Python39-ARM:53",
       "extension": "arn:aws:lambda:eu-west-3:464622532012:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws:lambda:eu-west-3:464622532012:layer:Datadog-Extension-ARM:21",
-      "dotnet": "arn:aws:lambda:eu-west-3:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:eu-west-3:464622532012:layer:dd-trace-dotnet:1",
+      "java": "arn:aws:lambda:eu-west-3:464622532012:layer:dd-trace-java:4"
     },
     "eu-west-2": {
       "nodejs12.x": "arn:aws:lambda:eu-west-2:464622532012:layer:Datadog-Node12-x:74",
@@ -63,7 +67,8 @@
       "python3.9-arm": "arn:aws:lambda:eu-west-2:464622532012:layer:Datadog-Python39-ARM:53",
       "extension": "arn:aws:lambda:eu-west-2:464622532012:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws:lambda:eu-west-2:464622532012:layer:Datadog-Extension-ARM:21",
-      "dotnet": "arn:aws:lambda:eu-west-2:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:eu-west-2:464622532012:layer:dd-trace-dotnet:1",
+      "java": "arn:aws:lambda:eu-west-2:464622532012:layer:dd-trace-java:4"
     },
     "eu-south-1": {
       "nodejs12.x": "arn:aws:lambda:eu-south-1:464622532012:layer:Datadog-Node12-x:74",
@@ -76,7 +81,8 @@
       "python3.9-arm": "arn:aws:lambda:eu-south-1:464622532012:layer:Datadog-Python39-ARM:53",
       "extension": "arn:aws:lambda:eu-south-1:464622532012:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws:lambda:eu-south-1:464622532012:layer:Datadog-Extension-ARM:21",
-      "dotnet": "arn:aws:lambda:eu-south-1:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:eu-south-1:464622532012:layer:dd-trace-dotnet:1",
+      "java": "arn:aws:lambda:eu-south-1:464622532012:layer:dd-trace-java:4"
     },
     "eu-west-1": {
       "nodejs12.x": "arn:aws:lambda:eu-west-1:464622532012:layer:Datadog-Node12-x:74",
@@ -89,7 +95,8 @@
       "python3.9-arm": "arn:aws:lambda:eu-west-1:464622532012:layer:Datadog-Python39-ARM:53",
       "extension": "arn:aws:lambda:eu-west-1:464622532012:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws:lambda:eu-west-1:464622532012:layer:Datadog-Extension-ARM:21",
-      "dotnet": "arn:aws:lambda:eu-west-1:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:eu-west-1:464622532012:layer:dd-trace-dotnet:1",
+      "java": "arn:aws:lambda:eu-west-1:464622532012:layer:dd-trace-java:4"
     },
     "ap-northeast-3": {
       "nodejs12.x": "arn:aws:lambda:ap-northeast-3:464622532012:layer:Datadog-Node12-x:74",
@@ -102,7 +109,8 @@
       "python3.9-arm": "arn:aws:lambda:ap-northeast-3:464622532012:layer:Datadog-Python39-ARM:53",
       "extension": "arn:aws:lambda:ap-northeast-3:464622532012:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws:lambda:ap-northeast-3:464622532012:layer:Datadog-Extension-ARM:21",
-      "dotnet": "arn:aws:lambda:ap-northeast-3:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:ap-northeast-3:464622532012:layer:dd-trace-dotnet:1",
+      "java": "arn:aws:lambda:ap-northeast-3:464622532012:layer:dd-trace-java:4"
     },
     "ap-northeast-2": {
       "nodejs12.x": "arn:aws:lambda:ap-northeast-2:464622532012:layer:Datadog-Node12-x:74",
@@ -115,7 +123,8 @@
       "python3.9-arm": "arn:aws:lambda:ap-northeast-2:464622532012:layer:Datadog-Python39-ARM:53",
       "extension": "arn:aws:lambda:ap-northeast-2:464622532012:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws:lambda:ap-northeast-2:464622532012:layer:Datadog-Extension-ARM:21",
-      "dotnet": "arn:aws:lambda:ap-northeast-2:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:ap-northeast-2:464622532012:layer:dd-trace-dotnet:1",
+      "java": "arn:aws:lambda:ap-northeast-2:464622532012:layer:dd-trace-java:4"
     },
     "me-south-1": {
       "nodejs12.x": "arn:aws:lambda:me-south-1:464622532012:layer:Datadog-Node12-x:74",
@@ -128,7 +137,8 @@
       "python3.9-arm": "arn:aws:lambda:me-south-1:464622532012:layer:Datadog-Python39-ARM:53",
       "extension": "arn:aws:lambda:me-south-1:464622532012:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws:lambda:me-south-1:464622532012:layer:Datadog-Extension-ARM:21",
-      "dotnet": "arn:aws:lambda:me-south-1:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:me-south-1:464622532012:layer:dd-trace-dotnet:1",
+      "java": "arn:aws:lambda:me-south-1:464622532012:layer:dd-trace-java:4"
     },
     "ap-northeast-1": {
       "nodejs12.x": "arn:aws:lambda:ap-northeast-1:464622532012:layer:Datadog-Node12-x:74",
@@ -141,7 +151,8 @@
       "python3.9-arm": "arn:aws:lambda:ap-northeast-1:464622532012:layer:Datadog-Python39-ARM:53",
       "extension": "arn:aws:lambda:ap-northeast-1:464622532012:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws:lambda:ap-northeast-1:464622532012:layer:Datadog-Extension-ARM:21",
-      "dotnet": "arn:aws:lambda:ap-northeast-1:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:ap-northeast-1:464622532012:layer:dd-trace-dotnet:1",
+      "java": "arn:aws:lambda:ap-northeast-1:464622532012:layer:dd-trace-java:4"
     },
     "sa-east-1": {
       "nodejs12.x": "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node12-x:74",
@@ -154,7 +165,8 @@
       "python3.9-arm": "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python39-ARM:53",
       "extension": "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension-ARM:21",
-      "dotnet": "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-dotnet:1",
+      "java": "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-java:4"
     },
     "ca-central-1": {
       "nodejs12.x": "arn:aws:lambda:ca-central-1:464622532012:layer:Datadog-Node12-x:74",
@@ -167,7 +179,8 @@
       "python3.9-arm": "arn:aws:lambda:ca-central-1:464622532012:layer:Datadog-Python39-ARM:53",
       "extension": "arn:aws:lambda:ca-central-1:464622532012:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws:lambda:ca-central-1:464622532012:layer:Datadog-Extension-ARM:21",
-      "dotnet": "arn:aws:lambda:ca-central-1:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:ca-central-1:464622532012:layer:dd-trace-dotnet:1",
+      "java": "arn:aws:lambda:ca-central-1:464622532012:layer:dd-trace-java:4"
     },
     "ap-east-1": {
       "nodejs12.x": "arn:aws:lambda:ap-east-1:464622532012:layer:Datadog-Node12-x:74",
@@ -180,7 +193,8 @@
       "python3.9-arm": "arn:aws:lambda:ap-east-1:464622532012:layer:Datadog-Python39-ARM:53",
       "extension": "arn:aws:lambda:ap-east-1:464622532012:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws:lambda:ap-east-1:464622532012:layer:Datadog-Extension-ARM:21",
-      "dotnet": "arn:aws:lambda:ap-east-1:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:ap-east-1:464622532012:layer:dd-trace-dotnet:1",
+      "java": "arn:aws:lambda:ap-east-1:464622532012:layer:dd-trace-java:4"
     },
     "ap-southeast-1": {
       "nodejs12.x": "arn:aws:lambda:ap-southeast-1:464622532012:layer:Datadog-Node12-x:74",
@@ -193,7 +207,8 @@
       "python3.9-arm": "arn:aws:lambda:ap-southeast-1:464622532012:layer:Datadog-Python39-ARM:53",
       "extension": "arn:aws:lambda:ap-southeast-1:464622532012:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws:lambda:ap-southeast-1:464622532012:layer:Datadog-Extension-ARM:21",
-      "dotnet": "arn:aws:lambda:ap-southeast-1:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:ap-southeast-1:464622532012:layer:dd-trace-dotnet:1",
+      "java": "arn:aws:lambda:ap-southeast-1:464622532012:layer:dd-trace-java:4"
     },
     "ap-southeast-2": {
       "nodejs12.x": "arn:aws:lambda:ap-southeast-2:464622532012:layer:Datadog-Node12-x:74",
@@ -206,7 +221,8 @@
       "python3.9-arm": "arn:aws:lambda:ap-southeast-2:464622532012:layer:Datadog-Python39-ARM:53",
       "extension": "arn:aws:lambda:ap-southeast-2:464622532012:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws:lambda:ap-southeast-2:464622532012:layer:Datadog-Extension-ARM:21",
-      "dotnet": "arn:aws:lambda:ap-southeast-2:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:ap-southeast-2:464622532012:layer:dd-trace-dotnet:1",
+      "java": "arn:aws:lambda:ap-southeast-2:464622532012:layer:dd-trace-java:4"
     },
     "eu-central-1": {
       "nodejs12.x": "arn:aws:lambda:eu-central-1:464622532012:layer:Datadog-Node12-x:74",
@@ -219,7 +235,8 @@
       "python3.9-arm": "arn:aws:lambda:eu-central-1:464622532012:layer:Datadog-Python39-ARM:53",
       "extension": "arn:aws:lambda:eu-central-1:464622532012:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws:lambda:eu-central-1:464622532012:layer:Datadog-Extension-ARM:21",
-      "dotnet": "arn:aws:lambda:eu-central-1:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:eu-central-1:464622532012:layer:dd-trace-dotnet:1",
+      "java": "arn:aws:lambda:eu-central-1:464622532012:layer:dd-trace-java:4"
     },
     "us-east-1": {
       "nodejs12.x": "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Node12-x:74",
@@ -232,7 +249,8 @@
       "python3.9-arm": "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Python39-ARM:53",
       "extension": "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension-ARM:21",
-      "dotnet": "arn:aws:lambda:us-east-1:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:us-east-1:464622532012:layer:dd-trace-dotnet:1",
+      "java": "arn:aws:lambda:us-east-1:464622532012:layer:dd-trace-java:4"
     },
     "us-east-2": {
       "nodejs12.x": "arn:aws:lambda:us-east-2:464622532012:layer:Datadog-Node12-x:74",
@@ -245,7 +263,8 @@
       "python3.9-arm": "arn:aws:lambda:us-east-2:464622532012:layer:Datadog-Python39-ARM:53",
       "extension": "arn:aws:lambda:us-east-2:464622532012:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws:lambda:us-east-2:464622532012:layer:Datadog-Extension-ARM:21",
-      "dotnet": "arn:aws:lambda:us-east-2:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:us-east-2:464622532012:layer:dd-trace-dotnet:1",
+      "java": "arn:aws:lambda:us-east-2:464622532012:layer:dd-trace-java:4"
     },
     "us-west-1": {
       "nodejs12.x": "arn:aws:lambda:us-west-1:464622532012:layer:Datadog-Node12-x:74",
@@ -258,7 +277,8 @@
       "python3.9-arm": "arn:aws:lambda:us-west-1:464622532012:layer:Datadog-Python39-ARM:53",
       "extension": "arn:aws:lambda:us-west-1:464622532012:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws:lambda:us-west-1:464622532012:layer:Datadog-Extension-ARM:21",
-      "dotnet": "arn:aws:lambda:us-west-1:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:us-west-1:464622532012:layer:dd-trace-dotnet:1",
+      "java": "arn:aws:lambda:us-west-1:464622532012:layer:dd-trace-java:4"
     },
     "us-west-2": {
       "nodejs12.x": "arn:aws:lambda:us-west-2:464622532012:layer:Datadog-Node12-x:74",
@@ -271,7 +291,8 @@
       "python3.9-arm": "arn:aws:lambda:us-west-2:464622532012:layer:Datadog-Python39-ARM:53",
       "extension": "arn:aws:lambda:us-west-2:464622532012:layer:Datadog-Extension:21",
       "extension-arm": "arn:aws:lambda:us-west-2:464622532012:layer:Datadog-Extension-ARM:21",
-      "dotnet": "arn:aws:lambda:us-west-2:464622532012:layer:dd-trace-dotnet:1"
+      "dotnet": "arn:aws:lambda:us-west-2:464622532012:layer:dd-trace-dotnet:1",
+      "java": "arn:aws:lambda:us-west-2:464622532012:layer:dd-trace-java:4"
     }
   }
 }
