@@ -21,7 +21,7 @@ The plugin automatically enables instrumentation for applications to collect met
 
 ## Getting started
 
-To quickly get started, follow the installation instructions for [Python][1], [Node.js][2], [Ruby][3], [Java][4], [Go][5], or [.NET][6] and view your function's enhanced metrics, traces, and logs in Datadog. These instructions will get you a basic working setup. If working in Ruby, Java, or Go, further code changes are required.
+To quickly get started, follow the installation instructions for [Python][1], [Node.js][2], [Ruby][3], [Java][4], [Go][5], or [.NET][6] and view your function's enhanced metrics, traces, and logs in Datadog. These instructions will get you a basic working setup. If working in Ruby or Go, further code changes are required.
 
 ## Upgrade
 
