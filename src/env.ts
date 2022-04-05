@@ -204,7 +204,7 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
         throwEnvVariableError("DD_DOTNET_TRACER_HOME", DD_DOTNET_TRACER_HOME, functionName);
       }
     }
-    if (type == RuntimeType.JAVA) {
+    if (type === RuntimeType.JAVA) {
       if (environment[JAVA_TOOL_OPTIONS_VAR] === undefined) {
         environment[JAVA_TOOL_OPTIONS_VAR] = JAVA_TOOL_OPTIONS;
       } else if (environment[JAVA_TOOL_OPTIONS_VAR] !== JAVA_TOOL_OPTIONS) {
