@@ -100,7 +100,7 @@ const DD_DOTNET_TRACER_HOME = "/opt/datadog";
 
 // Java tracer env variables
 const JAVA_TOOL_OPTIONS_VAR = "JAVA_TOOL_OPTIONS";
-const JAVA_TOOL_OPTIONS = "-javaagent:\"/opt/java/lib/dd-java-agent.jar\" -XX:+TieredCompilation -XX:TieredStopAtLevel=1";
+const JAVA_TOOL_OPTIONS = '-javaagent:"/opt/java/lib/dd-java-agent.jar" -XX:+TieredCompilation -XX:TieredStopAtLevel=1';
 
 export const ddTagsEnvVar = "DD_TAGS";
 
@@ -207,6 +207,8 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     if (type == RuntimeType.JAVA) {
       if (environment[JAVA_TOOL_OPTIONS_VAR] === undefined) {
         environment[JAVA_TOOL_OPTIONS_VAR] = JAVA_TOOL_OPTIONS;
+      } else if (environment[JAVA_TOOL_OPTIONS_VAR] !== JAVA_TOOL_OPTIONS) {
+        throwEnvVariableError("JAVA_TOOL_OPTIONS", JAVA_TOOL_OPTIONS, functionName);
       }
     }
   });

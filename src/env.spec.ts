@@ -481,7 +481,8 @@ describe("setEnvConfiguration", () => {
             DD_MERGE_XRAY_TRACES: true,
             DD_LOGS_INJECTION: false,
             DD_SERVERLESS_LOGS_ENABLED: true,
-            JAVA_TOOL_OPTIONS: "-javaagent:\"/opt/java/lib/dd-java-agent.jar\" -XX:+TieredCompilation -XX:TieredStopAtLevel=1",
+            JAVA_TOOL_OPTIONS:
+              '-javaagent:"/opt/java/lib/dd-java-agent.jar" -XX:+TieredCompilation -XX:TieredStopAtLevel=1',
           },
           events: [],
         },
