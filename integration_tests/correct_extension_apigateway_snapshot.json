@@ -717,7 +717,8 @@
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
-            "JAVA_TOOL_OPTIONS": "-javaagent:\"/opt/java/lib/dd-java-agent.jar\" -XX:+TieredCompilation -XX:TieredStopAtLevel=1"
+            "JAVA_TOOL_OPTIONS": "-javaagent:\"/opt/java/lib/dd-java-agent.jar\" -XX:+TieredCompilation -XX:TieredStopAtLevel=1",
+            "DD_JMXFETCH_ENABLED": false
           }
         },
         "Role": {
@@ -773,7 +774,8 @@
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
-            "JAVA_TOOL_OPTIONS": "-javaagent:\"/opt/java/lib/dd-java-agent.jar\" -XX:+TieredCompilation -XX:TieredStopAtLevel=1"
+            "JAVA_TOOL_OPTIONS": "-javaagent:\"/opt/java/lib/dd-java-agent.jar\" -XX:+TieredCompilation -XX:TieredStopAtLevel=1",
+            "DD_JMXFETCH_ENABLED": false
           }
         },
         "Role": {
