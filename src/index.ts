@@ -174,22 +174,23 @@ module.exports = class ServerlessPlugin {
 
     const simpleGit = await newSimpleGit();
 
-    if (
-      config.enableSourceCodeIntegration &&
-      (process.env.DATADOG_API_KEY ?? config.apiKey) !== undefined &&
-      simpleGit !== undefined &&
-      (await simpleGit.checkIsRepo())
-    ) {
-      try {
-        await this.addSourceCodeIntegration(
-          handlers,
-          simpleGit,
-          (process.env.DATADOG_API_KEY ?? config.apiKey)!,
-          config.site,
-        );
-      } catch (err) {
-        this.serverless.cli.log(`Error occurred when adding source code integration: ${err}`);
-        return;
+    if ((process.env.DATADOG_API_KEY ?? config.apiKey) === undefined) {
+      this.serverless.cli.log(
+        "Skipping installing GitHub integration because Datadog credentials were not found. Please set either DATADOG_API_KEY in your environment, or set the apiKey parameter in Serverless.",
+      );
+    } else {
+      if (config.enableSourceCodeIntegration && simpleGit !== undefined && (await simpleGit.checkIsRepo())) {
+        try {
+          await this.addSourceCodeIntegration(
+            handlers,
+            simpleGit,
+            (process.env.DATADOG_API_KEY ?? config.apiKey)!,
+            config.site,
+          );
+        } catch (err) {
+          this.serverless.cli.log(`Error occurred when adding source code integration: ${err}`);
+          return;
+        }
       }
     }
 
@@ -294,6 +295,8 @@ module.exports = class ServerlessPlugin {
   ) {
     const sourceCodeIntegration = new SourceCodeIntegration(apiKey, datadogSite, simpleGit);
     const gitCommitHash = await sourceCodeIntegration.uploadGitMetadata();
+
+    this.serverless.cli.log(`Adding GitHub integration with git commit hash ${gitCommitHash}`);
 
     handlers.forEach(({ handler }) => {
       handler.environment ??= {};
