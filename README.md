@@ -272,7 +272,7 @@ This product includes software developed at Datadog (<https://www.datadoghq.com/
 
 [1]: https://docs.datadoghq.com/serverless/installation/python/?tab=serverlessframework
 [2]: https://docs.datadoghq.com/serverless/installation/nodejs/?tab=serverlessframework
-[3]: https://docs.datadoghq.com/serverless/installation/Ruby/?tab=serverlessframework
+[3]: https://docs.datadoghq.com/serverless/installation/ruby/?tab=serverlessframework
 [4]: https://docs.datadoghq.com/serverless/installation/java/?tab=serverlessframework
 [5]: https://docs.datadoghq.com/serverless/installation/go/?tab=serverlessframework
 [6]: https://docs.datadoghq.com/serverless/installation/dotnet/?tab=serverlessframework
