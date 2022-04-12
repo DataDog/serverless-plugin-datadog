@@ -69,6 +69,7 @@ export const armRuntimeKeys: { [key: string]: string } = {
 };
 
 const dotnetTraceLayerKey: string = "dotnet";
+const javaTraceLayerKey: string = "java";
 
 export function findHandlers(service: Service, exclude: string[], defaultRuntime?: string): FunctionInfo[] {
   return Object.entries(service.functions)
@@ -152,6 +153,20 @@ export function applyDotnetTracingLayer(service: Service, handler: FunctionInfo,
   }
 
   const traceLayerARN: string | undefined = regionRuntimes[dotnetTraceLayerKey];
+
+  if (traceLayerARN) {
+    addLayer(service, handler, traceLayerARN);
+  }
+}
+
+export function applyJavaTracingLayer(service: Service, handler: FunctionInfo, layers: LayerJSON) {
+  const { region } = service.provider;
+  const regionRuntimes = layers.regions[region];
+  if (regionRuntimes === undefined) {
+    return;
+  }
+
+  const traceLayerARN: string | undefined = regionRuntimes[javaTraceLayerKey];
 
   if (traceLayerARN) {
     addLayer(service, handler, traceLayerARN);

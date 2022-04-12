@@ -98,6 +98,11 @@ const CORECLR_PROFILER = "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}";
 const CORECLR_PROFILER_PATH = "/opt/datadog/Datadog.Trace.ClrProfiler.Native.so";
 const DD_DOTNET_TRACER_HOME = "/opt/datadog";
 
+// Java tracer env variables
+const JAVA_TOOL_OPTIONS_VAR = "JAVA_TOOL_OPTIONS";
+const JAVA_TOOL_OPTIONS = '-javaagent:"/opt/java/lib/dd-java-agent.jar" -XX:+TieredCompilation -XX:TieredStopAtLevel=1';
+const JAVA_JMXFETCH_ENABLED_VAR = "DD_JMXFETCH_ENABLED";
+
 export const ddTagsEnvVar = "DD_TAGS";
 
 export const defaultConfiguration: Configuration = {
@@ -198,6 +203,18 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
         environment[DOTNET_TRACER_HOME_ENV_VAR] = DD_DOTNET_TRACER_HOME;
       } else if (environment[DOTNET_TRACER_HOME_ENV_VAR] !== DD_DOTNET_TRACER_HOME) {
         throwEnvVariableError("DD_DOTNET_TRACER_HOME", DD_DOTNET_TRACER_HOME, functionName);
+      }
+    }
+    if (type === RuntimeType.JAVA) {
+      if (environment[JAVA_TOOL_OPTIONS_VAR] === undefined) {
+        environment[JAVA_TOOL_OPTIONS_VAR] = JAVA_TOOL_OPTIONS;
+      } else if (environment[JAVA_TOOL_OPTIONS_VAR] !== JAVA_TOOL_OPTIONS) {
+        throwEnvVariableError("JAVA_TOOL_OPTIONS", JAVA_TOOL_OPTIONS, functionName);
+      }
+      if (environment[JAVA_JMXFETCH_ENABLED_VAR] === undefined) {
+        environment[JAVA_JMXFETCH_ENABLED_VAR] = false;
+      } else if (environment[JAVA_JMXFETCH_ENABLED_VAR] !== false) {
+        throwEnvVariableError("DD_JMXFETCH_ENABLED", "false", functionName);
       }
     }
   });

@@ -785,7 +785,9 @@
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
-            "DD_CAPTURE_LAMBDA_PAYLOAD": false
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "JAVA_TOOL_OPTIONS": "-javaagent:\"/opt/java/lib/dd-java-agent.jar\" -XX:+TieredCompilation -XX:TieredStopAtLevel=1",
+            "DD_JMXFETCH_ENABLED": false
           }
         },
         "Role": {
@@ -798,7 +800,8 @@
           {
             "Ref": "ProviderLevelLayerLambdaLayer"
           },
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX",
+          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-java:XXX"
         ]
       },
       "DependsOn": [
@@ -841,7 +844,9 @@
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
-            "DD_CAPTURE_LAMBDA_PAYLOAD": false
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "JAVA_TOOL_OPTIONS": "-javaagent:\"/opt/java/lib/dd-java-agent.jar\" -XX:+TieredCompilation -XX:TieredStopAtLevel=1",
+            "DD_JMXFETCH_ENABLED": false
           }
         },
         "Role": {
@@ -854,7 +859,8 @@
           {
             "Ref": "ProviderLevelLayerLambdaLayer"
           },
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX",
+          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-java:XXX"
         ]
       },
       "DependsOn": [

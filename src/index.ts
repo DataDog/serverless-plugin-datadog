@@ -23,6 +23,7 @@ import { newSimpleGit } from "./git";
 import {
   applyExtensionLayer,
   applyDotnetTracingLayer,
+  applyJavaTracingLayer,
   applyLambdaLibraryLayers,
   findHandlers,
   FunctionInfo,
@@ -119,6 +120,10 @@ module.exports = class ServerlessPlugin {
           this.serverless.cli.log("Adding .NET Tracing Layer to functions");
           this.debugLogHandlers(handlers);
           applyDotnetTracingLayer(this.serverless.service, functionInfo, allLayers);
+        } else if (functionInfo.type === RuntimeType.JAVA) {
+          this.serverless.cli.log("Adding Java Tracing Layer to functions");
+          this.debugLogHandlers(handlers);
+          applyJavaTracingLayer(this.serverless.service, functionInfo, allLayers);
         }
       });
     } else {
