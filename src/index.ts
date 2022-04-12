@@ -12,7 +12,10 @@ import { SimpleGit } from "simple-git";
 import { version } from "../package.json";
 import {
   Configuration,
+  ddEnvEnvVar,
+  ddServiceEnvVar,
   ddTagsEnvVar,
+  ddVersionEnvVar,
   forceExcludeDepsFromWebpack,
   getConfig,
   hasWebpackPlugin,
@@ -47,6 +50,7 @@ export interface ExtendedFunctionDefinition extends FunctionDefinition {
 enum TagKeys {
   Service = "service",
   Env = "env",
+  Version = "version",
   Plugin = "dd_sls_plugin",
 }
 
@@ -130,6 +134,14 @@ module.exports = class ServerlessPlugin {
       this.serverless.cli.log("Skipping adding Lambda Extension Layer");
     }
 
+    if (config.addExtension) {
+      this.serverless.cli.log("Adding DD_XXX Env Vars");
+      this.addDDEnvVars(handlers);
+    }
+    if (config.forwarderArn !== undefined || config.forwarderArn !== undefined) {
+      this.addDDTags(handlers);
+    }
+
     let tracingMode = TracingMode.NONE;
     if (config.enableXrayTracing && config.enableDDTracing) {
       tracingMode = TracingMode.HYBRID;
@@ -175,7 +187,7 @@ module.exports = class ServerlessPlugin {
       }
     }
 
-    this.addTags(handlers, config.enableTags);
+    this.addTags(handlers, config.enableTags, datadogForwarderArn !== undefined);
 
     const simpleGit = await newSimpleGit();
 
@@ -259,15 +271,94 @@ module.exports = class ServerlessPlugin {
   }
 
   /**
+   * Check for service, env, version, and additional tags at the custom level.
+   * If these don't already exsist on the function level as env vars, adds them as DD_XXX env vars
+   */
+  private addDDEnvVars(handlers: FunctionInfo[]) {
+    const service = this.serverless.service as any;
+
+    let custom = service.custom as any;
+    if (custom === undefined) {
+      custom = {};
+    }
+
+    handlers.forEach(({ handler }) => {
+      handler.environment ??= {};
+      const environment = handler.environment as any;
+
+      if (custom?.datadog?.service !== undefined && environment[ddServiceEnvVar] === undefined) {
+        environment[ddServiceEnvVar] = custom.datadog.service;
+      }
+
+      if (custom?.datadog?.env !== undefined && environment[ddEnvEnvVar] === undefined) {
+        environment[ddEnvEnvVar] = custom.datadog.env;
+      }
+
+      if (custom?.datadog?.version !== undefined && environment[ddVersionEnvVar] === undefined) {
+        environment[ddVersionEnvVar] = custom.datadog.version;
+      }
+
+      if (custom?.datadog?.tags !== undefined && environment[ddTagsEnvVar] === undefined) {
+        environment[ddTagsEnvVar] = custom.datadog.tags;
+      }
+
+      // default to service and stage if env vars aren't set
+      environment[ddServiceEnvVar] ??= service.getServiceName();
+      environment[ddEnvEnvVar] ??= this.serverless.getProvider("aws").getStage();
+    });
+  }
+
+  /**
+   * Check for service, env, version, and additional tags at the custom level.
+   * If these tags don't already exsist on the function level, adds them as tags
+   */
+  private addDDTags(handlers: FunctionInfo[]) {
+    const service = this.serverless.service as any;
+
+    let custom = service.custom as any;
+    if (custom === undefined) {
+      custom = {};
+    }
+
+    handlers.forEach(({ handler }) => {
+      handler.tags ??= {};
+      const tags = handler.tags as any;
+
+      if (custom?.datadog?.service !== undefined && tags[TagKeys.Service] === undefined) {
+        tags[TagKeys.Service] = custom.datadog.service;
+      }
+
+      if (custom?.datadog?.env !== undefined && tags[TagKeys.Env] === undefined) {
+        tags[TagKeys.Env] = custom.datadog.env;
+      }
+
+      if (custom?.datadog?.version !== undefined && tags[TagKeys.Version] === undefined) {
+        tags[TagKeys.Version] = custom.datadog.version;
+      }
+
+      if (custom?.datadog?.tags !== undefined) {
+        const tagsArray = custom.datadog.tags.split(",");
+        tagsArray.forEach((tag: string) => {
+          const key = tag.split(":")[0];
+          const value = tag.split(":")[1];
+          if (key && value && tags[key] !== undefined) {
+            tags[key] = value;
+          }
+        });
+      }
+    });
+  }
+
+  /**
    * Check for service and env tags on provider level (under tags and stackTags),
    * as well as function level. Automatically create tags for service and env with
    * properties from deployment configurations if needed; does not override any existing values.
    */
-  private addTags(handlers: FunctionInfo[], enableTags: boolean) {
+  private addTags(handlers: FunctionInfo[], enableTags: boolean, usingForwarder: boolean) {
     const provider = this.serverless.service.provider as any;
     this.serverless.cli.log(`Adding Plugin Version ${version} tag`);
 
-    if (enableTags) {
+    if (enableTags && usingForwarder) {
       this.serverless.cli.log(`Adding service and environment tags`);
     }
 
@@ -276,7 +367,7 @@ module.exports = class ServerlessPlugin {
 
       handler.tags[TagKeys.Plugin] = `v${version}`;
 
-      if (enableTags) {
+      if (enableTags && usingForwarder) {
         if (!provider.tags?.[TagKeys.Service] && !provider.stackTags?.[TagKeys.Service]) {
           handler.tags[TagKeys.Service] ??= this.serverless.service.getServiceName();
         }
