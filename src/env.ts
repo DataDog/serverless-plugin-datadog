@@ -102,6 +102,7 @@ const DD_DOTNET_TRACER_HOME = "/opt/datadog";
 const JAVA_TOOL_OPTIONS_VAR = "JAVA_TOOL_OPTIONS";
 const JAVA_TOOL_OPTIONS = '-javaagent:"/opt/java/lib/dd-java-agent.jar" -XX:+TieredCompilation -XX:TieredStopAtLevel=1';
 const JAVA_JMXFETCH_ENABLED_VAR = "DD_JMXFETCH_ENABLED";
+const JAVA_JMXFETCH_ENABLED = false;
 
 export const ddTagsEnvVar = "DD_TAGS";
 
@@ -212,9 +213,9 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
         throwEnvVariableError("JAVA_TOOL_OPTIONS", JAVA_TOOL_OPTIONS, functionName);
       }
       if (environment[JAVA_JMXFETCH_ENABLED_VAR] === undefined) {
-        environment[JAVA_JMXFETCH_ENABLED_VAR] = false;
-      } else if (environment[JAVA_JMXFETCH_ENABLED_VAR] !== false) {
-        throwEnvVariableError("DD_JMXFETCH_ENABLED", "false", functionName);
+        environment[JAVA_JMXFETCH_ENABLED_VAR] = JAVA_JMXFETCH_ENABLED;
+      } else if (environment[JAVA_JMXFETCH_ENABLED_VAR] !== JAVA_JMXFETCH_ENABLED) {
+        throwEnvVariableError("DD_JMXFETCH_ENABLED", `${JAVA_JMXFETCH_ENABLED}`, functionName);
       }
     }
   });
