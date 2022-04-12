@@ -63,7 +63,9 @@ describe("ServerlessPlugin", () => {
         cli: {
           log: () => {},
         },
+        getProvider: (_name: string) => awsMock(),
         service: {
+          getServiceName: () => "dev",
           provider: {
             region: "us-east-1",
           },
@@ -108,7 +110,9 @@ describe("ServerlessPlugin", () => {
         cli: {
           log: () => {},
         },
+        getProvider: (_name: string) => awsMock(),
         service: {
+          getServiceName: () => "dev",
           provider: {
             region: "us-east-1",
           },
@@ -153,7 +157,9 @@ describe("ServerlessPlugin", () => {
         cli: {
           log: () => {},
         },
+        getProvider: (_name: string) => awsMock(),
         service: {
+          getServiceName: () => "dev",
           provider: {
             region: "us-east-1",
           },
@@ -201,7 +207,9 @@ describe("ServerlessPlugin", () => {
         cli: {
           log: () => {},
         },
+        getProvider: (_name: string) => awsMock(),
         service: {
+          getServiceName: () => "dev",
           provider: {
             region: "us-east-1",
           },
@@ -290,7 +298,9 @@ describe("ServerlessPlugin", () => {
         cli: {
           log: () => {},
         },
+        getProvider: (_name: string) => awsMock(),
         service: {
+          getServiceName: () => "dev",
           provider: {
             region: "us-east-1",
           },
@@ -342,7 +352,9 @@ describe("ServerlessPlugin", () => {
       cli: {
         log: () => {},
       },
+      getProvider: (_name: string) => awsMock(),
       service: {
+        getServiceName: () => "dev",
         provider: {
           region: "us-east-1",
         },
@@ -388,7 +400,9 @@ describe("ServerlessPlugin", () => {
       cli: {
         log: () => {},
       },
+      getProvider: (_name: string) => awsMock(),
       service: {
+        getServiceName: () => "dev",
         provider: {
           region: "us-east-1",
         },
@@ -434,7 +448,9 @@ describe("ServerlessPlugin", () => {
       cli: {
         log: () => {},
       },
+      getProvider: (_name: string) => awsMock(),
       service: {
+        getServiceName: () => "dev",
         provider: {
           region: "us-east-1",
         },
@@ -480,7 +496,9 @@ describe("ServerlessPlugin", () => {
       cli: {
         log: () => {},
       },
+      getProvider: (_name: string) => awsMock(),
       service: {
+        getServiceName: () => "dev",
         provider: {
           region: "us-east-1",
         },
@@ -785,7 +803,9 @@ describe("ServerlessPlugin", () => {
       cli: {
         log: () => {},
       },
+      getProvider: (_name: string) => awsMock(),
       service: {
+        getServiceName: () => "dev",
         provider: {
           region: "us-east-1",
         },
@@ -821,7 +841,9 @@ describe("ServerlessPlugin", () => {
       cli: {
         log: () => {},
       },
+      getProvider: (_name: string) => awsMock(),
       service: {
+        getServiceName: () => "dev",
         provider: {
           region: "us-east-1",
         },
@@ -1206,7 +1228,7 @@ describe("ServerlessPlugin", () => {
       });
     });
 
-    it("adds tags by default with service name and stage values", async () => {
+    it("adds tags by default with service name and stage values when using forwarder", async () => {
       const function_ = functionMock({});
       const serverless = {
         cli: { log: () => {} },
@@ -1220,6 +1242,11 @@ describe("ServerlessPlugin", () => {
           },
           functions: {
             node1: function_,
+          },
+          custom: {
+            datadog: {
+              forwarderArn: "some-arn",
+            },
           },
         },
       };
@@ -1246,6 +1273,11 @@ describe("ServerlessPlugin", () => {
           },
           functions: {
             node1: function_,
+          },
+          custom: {
+            datadog: {
+              forwarderArn: "some-arn",
+            },
           },
         },
       };
