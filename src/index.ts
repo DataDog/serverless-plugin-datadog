@@ -275,6 +275,7 @@ module.exports = class ServerlessPlugin {
    * If these don't already exsist on the function level as env vars, adds them as DD_XXX env vars
    */
   private addDDEnvVars(handlers: FunctionInfo[]) {
+    const provider = this.serverless.service.provider as any;
     const service = this.serverless.service as any;
 
     let custom = service.custom as any;
@@ -285,21 +286,23 @@ module.exports = class ServerlessPlugin {
     handlers.forEach(({ handler }) => {
       handler.environment ??= {};
       const environment = handler.environment as any;
+      provider.environment ??= {};
+      const providerEnvironment = provider.environment as any;
 
       if (custom?.datadog?.service !== undefined && environment[ddServiceEnvVar] === undefined) {
-        environment[ddServiceEnvVar] = custom.datadog.service;
+        environment[ddServiceEnvVar] = providerEnvironment[ddServiceEnvVar] ?? custom.datadog.service;
       }
 
       if (custom?.datadog?.env !== undefined && environment[ddEnvEnvVar] === undefined) {
-        environment[ddEnvEnvVar] = custom.datadog.env;
+        environment[ddEnvEnvVar] = providerEnvironment[ddEnvEnvVar] ?? custom.datadog.env;
       }
 
       if (custom?.datadog?.version !== undefined && environment[ddVersionEnvVar] === undefined) {
-        environment[ddVersionEnvVar] = custom.datadog.version;
+        environment[ddVersionEnvVar] = providerEnvironment[ddVersionEnvVar] ?? custom.datadog.version;
       }
 
       if (custom?.datadog?.tags !== undefined && environment[ddTagsEnvVar] === undefined) {
-        environment[ddTagsEnvVar] = custom.datadog.tags;
+        environment[ddTagsEnvVar] = providerEnvironment[ddTagsEnvVar] ?? custom.datadog.tags;
       }
 
       // default to service and stage if env vars aren't set
@@ -341,7 +344,7 @@ module.exports = class ServerlessPlugin {
         tagsArray.forEach((tag: string) => {
           const key = tag.split(":")[0];
           const value = tag.split(":")[1];
-          if (key && value && tags[key] !== undefined) {
+          if (key && value && tags[key] === undefined) {
             tags[key] = value;
           }
         });
