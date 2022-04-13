@@ -135,7 +135,7 @@ module.exports = class ServerlessPlugin {
     }
 
     if (config.addExtension) {
-      this.serverless.cli.log("Adding DD_XXX Env Vars");
+      this.serverless.cli.log("Adding Datadog Env Vars");
       this.addDDEnvVars(handlers);
     }
     if (config.forwarderArn !== undefined || config.forwarderArn !== undefined) {
@@ -185,6 +185,12 @@ module.exports = class ServerlessPlugin {
       for (const error of errors) {
         this.serverless.cli.log(error);
       }
+    }
+
+    if (datadogForwarderArn && config.addExtension) {
+      this.serverless.cli.log(
+        "Warning: Datadog Lambda Extension and forwarder are both enabled. Only APIGateway log groups will be subscribed to the forwarder.",
+      );
     }
 
     this.addTags(handlers, config.enableTags, datadogForwarderArn !== undefined);
