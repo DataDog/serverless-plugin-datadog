@@ -8,6 +8,8 @@
 
 import * as Serverless from "serverless";
 import { FunctionDefinition } from "serverless";
+import Service from "serverless/classes/Service";
+import { Provider } from "serverless/plugins/aws/provider/awsProvider";
 import { SimpleGit } from "simple-git";
 import { version } from "../package.json";
 import {
@@ -281,8 +283,8 @@ module.exports = class ServerlessPlugin {
    * If these don't already exsist on the function level as env vars, adds them as DD_XXX env vars
    */
   private addDDEnvVars(handlers: FunctionInfo[]) {
-    const provider = this.serverless.service.provider as any;
-    const service = this.serverless.service as any;
+    const provider = this.serverless.service.provider as Provider;
+    const service = this.serverless.service as Service;
 
     let custom = service.custom as any;
     if (custom === undefined) {
@@ -295,20 +297,20 @@ module.exports = class ServerlessPlugin {
       provider.environment ??= {};
       const providerEnvironment = provider.environment as any;
 
-      if (custom?.datadog?.service !== undefined && environment[ddServiceEnvVar] === undefined) {
-        environment[ddServiceEnvVar] = providerEnvironment[ddServiceEnvVar] ?? custom.datadog.service;
+      if (custom?.datadog?.service) {
+        environment[ddServiceEnvVar] ??= providerEnvironment[ddServiceEnvVar] ?? custom.datadog.service;
       }
 
-      if (custom?.datadog?.env !== undefined && environment[ddEnvEnvVar] === undefined) {
-        environment[ddEnvEnvVar] = providerEnvironment[ddEnvEnvVar] ?? custom.datadog.env;
+      if (custom?.datadog?.env) {
+        environment[ddEnvEnvVar] ??= providerEnvironment[ddEnvEnvVar] ?? custom.datadog.env;
       }
 
-      if (custom?.datadog?.version !== undefined && environment[ddVersionEnvVar] === undefined) {
-        environment[ddVersionEnvVar] = providerEnvironment[ddVersionEnvVar] ?? custom.datadog.version;
+      if (custom?.datadog?.version) {
+        environment[ddVersionEnvVar] ??= providerEnvironment[ddVersionEnvVar] ?? custom.datadog.version;
       }
 
-      if (custom?.datadog?.tags !== undefined && environment[ddTagsEnvVar] === undefined) {
-        environment[ddTagsEnvVar] = providerEnvironment[ddTagsEnvVar] ?? custom.datadog.tags;
+      if (custom?.datadog?.tags) {
+        environment[ddTagsEnvVar] ??= providerEnvironment[ddTagsEnvVar] ?? custom.datadog.tags;
       }
 
       // default to service and stage if env vars aren't set
@@ -322,7 +324,7 @@ module.exports = class ServerlessPlugin {
    * If these tags don't already exsist on the function level, adds them as tags
    */
   private addDDTags(handlers: FunctionInfo[]) {
-    const service = this.serverless.service as any;
+    const service = this.serverless.service as Service;
 
     let custom = service.custom as any;
     if (custom === undefined) {
@@ -333,25 +335,24 @@ module.exports = class ServerlessPlugin {
       handler.tags ??= {};
       const tags = handler.tags as any;
 
-      if (custom?.datadog?.service !== undefined && tags[TagKeys.Service] === undefined) {
-        tags[TagKeys.Service] = custom.datadog.service;
+      if (custom?.datadog?.service) {
+        tags[TagKeys.Service] ??= custom.datadog.service;
       }
 
-      if (custom?.datadog?.env !== undefined && tags[TagKeys.Env] === undefined) {
-        tags[TagKeys.Env] = custom.datadog.env;
+      if (custom?.datadog?.env) {
+        tags[TagKeys.Env] ??= custom.datadog.env;
       }
 
-      if (custom?.datadog?.version !== undefined && tags[TagKeys.Version] === undefined) {
-        tags[TagKeys.Version] = custom.datadog.version;
+      if (custom?.datadog?.version) {
+        tags[TagKeys.Version] ??= custom.datadog.version;
       }
 
-      if (custom?.datadog?.tags !== undefined) {
+      if (custom?.datadog?.tags) {
         const tagsArray = custom.datadog.tags.split(",");
         tagsArray.forEach((tag: string) => {
-          const key = tag.split(":")[0];
-          const value = tag.split(":")[1];
-          if (key && value && tags[key] === undefined) {
-            tags[key] = value;
+          const [key, value] = tag.split(":");
+          if (key && value) {
+            tags[key] ??= value;
           }
         });
       }
@@ -364,7 +365,7 @@ module.exports = class ServerlessPlugin {
    * properties from deployment configurations if needed; does not override any existing values.
    */
   private addTags(handlers: FunctionInfo[], enableTags: boolean, usingForwarder: boolean) {
-    const provider = this.serverless.service.provider as any;
+    const provider = this.serverless.service.provider as Provider;
     this.serverless.cli.log(`Adding Plugin Version ${version} tag`);
 
     if (enableTags && usingForwarder) {
