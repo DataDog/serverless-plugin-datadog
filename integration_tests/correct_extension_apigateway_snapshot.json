@@ -263,6 +263,8 @@
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "DD_SERVICE": "dd-sls-plugin-integration-test",
+            "DD_ENV": "dev",
             "DD_LAMBDA_HANDLER": "py_handler.hello"
           }
         },
@@ -319,6 +321,8 @@
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "DD_SERVICE": "dd-sls-plugin-integration-test",
+            "DD_ENV": "dev",
             "DD_LAMBDA_HANDLER": "py_handler.hello"
           }
         },
@@ -375,6 +379,8 @@
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "DD_SERVICE": "dd-sls-plugin-integration-test",
+            "DD_ENV": "dev",
             "DD_LAMBDA_HANDLER": "py_handler.hello"
           }
         },
@@ -431,6 +437,8 @@
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "DD_SERVICE": "dd-sls-plugin-integration-test",
+            "DD_ENV": "dev",
             "DD_LAMBDA_HANDLER": "py_handler.hello"
           }
         },
@@ -487,6 +495,8 @@
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "DD_SERVICE": "dd-sls-plugin-integration-test",
+            "DD_ENV": "dev",
             "DD_LAMBDA_HANDLER": "js_handler.hello"
           }
         },
@@ -543,6 +553,8 @@
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "DD_SERVICE": "dd-sls-plugin-integration-test",
+            "DD_ENV": "dev",
             "DD_LAMBDA_HANDLER": "js_handler.hello"
           }
         },
@@ -602,7 +614,9 @@
             "CORECLR_ENABLE_PROFILING": "1",
             "CORECLR_PROFILER": "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}",
             "CORECLR_PROFILER_PATH": "/opt/datadog/Datadog.Trace.ClrProfiler.Native.so",
-            "DD_DOTNET_TRACER_HOME": "/opt/datadog"
+            "DD_DOTNET_TRACER_HOME": "/opt/datadog",
+            "DD_SERVICE": "dd-sls-plugin-integration-test",
+            "DD_ENV": "dev"
           }
         },
         "Role": {
@@ -661,7 +675,9 @@
             "CORECLR_ENABLE_PROFILING": "1",
             "CORECLR_PROFILER": "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}",
             "CORECLR_PROFILER_PATH": "/opt/datadog/Datadog.Trace.ClrProfiler.Native.so",
-            "DD_DOTNET_TRACER_HOME": "/opt/datadog"
+            "DD_DOTNET_TRACER_HOME": "/opt/datadog",
+            "DD_SERVICE": "dd-sls-plugin-integration-test",
+            "DD_ENV": "dev"
           }
         },
         "Role": {
@@ -718,7 +734,9 @@
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "JAVA_TOOL_OPTIONS": "-javaagent:\"/opt/java/lib/dd-java-agent.jar\" -XX:+TieredCompilation -XX:TieredStopAtLevel=1",
-            "DD_JMXFETCH_ENABLED": false
+            "DD_JMXFETCH_ENABLED": false,
+            "DD_SERVICE": "dd-sls-plugin-integration-test",
+            "DD_ENV": "dev"
           }
         },
         "Role": {
@@ -775,7 +793,9 @@
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "JAVA_TOOL_OPTIONS": "-javaagent:\"/opt/java/lib/dd-java-agent.jar\" -XX:+TieredCompilation -XX:TieredStopAtLevel=1",
-            "DD_JMXFETCH_ENABLED": false
+            "DD_JMXFETCH_ENABLED": false,
+            "DD_SERVICE": "dd-sls-plugin-integration-test",
+            "DD_ENV": "dev"
           }
         },
         "Role": {
@@ -830,7 +850,9 @@
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
-            "DD_CAPTURE_LAMBDA_PAYLOAD": false
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "DD_SERVICE": "dd-sls-plugin-integration-test",
+            "DD_ENV": "dev"
           }
         },
         "Role": {

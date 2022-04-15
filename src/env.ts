@@ -88,6 +88,11 @@ const logInjectionEnvVar = "DD_LOGS_INJECTION";
 const ddLogsEnabledEnvVar = "DD_SERVERLESS_LOGS_ENABLED";
 const ddCaptureLambdaPayloadEnvVar = "DD_CAPTURE_LAMBDA_PAYLOAD";
 
+export const ddServiceEnvVar = "DD_SERVICE";
+export const ddEnvEnvVar = "DD_ENV";
+export const ddVersionEnvVar = "DD_VERSION";
+export const ddTagsEnvVar = "DD_TAGS";
+
 // .NET tracer env variables
 const ENABLE_PROFILING_ENV_VAR = "CORECLR_ENABLE_PROFILING";
 const PROFILER_ENV_VAR = "CORECLR_PROFILER";
@@ -103,8 +108,6 @@ const JAVA_TOOL_OPTIONS_VAR = "JAVA_TOOL_OPTIONS";
 const JAVA_TOOL_OPTIONS = '-javaagent:"/opt/java/lib/dd-java-agent.jar" -XX:+TieredCompilation -XX:TieredStopAtLevel=1';
 const JAVA_JMXFETCH_ENABLED_VAR = "DD_JMXFETCH_ENABLED";
 const JAVA_JMXFETCH_ENABLED = false;
-
-export const ddTagsEnvVar = "DD_TAGS";
 
 export const defaultConfiguration: Configuration = {
   addLayers: true,
