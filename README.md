@@ -244,6 +244,12 @@ custom:
 
 ## Breaking Changes
 
+### [v5.0.0](https://github.com/DataDog/serverless-plugin-datadog/releases/tag/v5.0.0)
+
+- This plugin stops setting tags for Service and ENV, and instead uses environment variables (when used in conjunction with the Datadog Extension).
+
+v5.0 is compatible with v10+ of the Datadog Extension, and all version of the Datadog Forwarder.
+
 ### [v4.0.0](https://github.com/DataDog/serverless-plugin-datadog/releases/tag/v4.0.0)
 
 - The Datadog Lambda Extension is now the default mechanism for transmitting telemetry to Datadog.
