@@ -1,11 +1,3 @@
----
-title: Datadog Serverless Plugin
-kind: documentation
-aliases:
-  - /serverless/serverless_integrations/plugin/
-dependencies: ["https://github.com/DataDog/serverless-plugin-datadog/blob/master/README.md"]
----
-
 ![build](https://github.com/DataDog/serverless-plugin-datadog/workflows/build/badge.svg)
 [![Code Coverage](https://img.shields.io/codecov/c/github/DataDog/serverless-plugin-datadog)](https://codecov.io/gh/DataDog/serverless-plugin-datadog)
 [![NPM](https://img.shields.io/npm/v/serverless-plugin-datadog)](https://www.npmjs.com/package/serverless-plugin-datadog)
@@ -21,71 +13,69 @@ The plugin automatically enables instrumentation for applications to collect met
 
 ## Getting started
 
-To quickly get started, follow the installation instructions for [Python][1], [Node.js][2], [Ruby][3], [Java][4], [Go][5], or [.NET][6] and view your function's enhanced metrics, traces, and logs in Datadog. These instructions will get you a basic working setup. If working in Ruby or Go, further code changes are required.
+To quickly get started, follow the installation instructions for [Python][1], [Node.js][2], [Ruby][3], [Java][4], [Go][5], or [.NET][6] and view your function's enhanced metrics, traces, and logs in Datadog.
+
+After installation is complete, configure the [advanced options](https://docs.datadoghq.com/serverless/configuration) to suit your monitoring needs.
 
 ## Upgrade
 
 Each version of the plugin is published with a [specific set of versions of the Datadog Lambda layers][15]. To pick up new features and bug fixes provided by the latest versions of Datadog Lambda layers, upgrade the serverless framework plugin. Test the new version before applying it on your production applications.
 
-## More configuration options
+## Configuration parameters
 
 To further configure your plugin, use the following custom parameters in your `serverless.yml`:
 
 | Parameter                     | Description                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `flushMetricsToLogs`          | Send custom metrics by using logs with the Datadog Forwarder Lambda function (recommended). Defaults to `true`. To use an encrypted key, set `apiKMSKey` or `apiKeySecretArn` in the configuration. `flushMetricsToLogs` is ignored when `addExtension` is true.                                                                                                                                                                    |
-| `site`                        | Set which Datadog site to send data to. This is only used when `flushMetricsToLogs` is `false` or `addExtension` is `true`. Possible values are `datadoghq.com`, `datadoghq.eu`, `us3.datadoghq.com`, `us5.datadoghq.com`, and `ddog-gov.com`. The default is `datadoghq.com`.                                                                                                                                                      |
-| `apiKey`                      | Datadog API key. Required when `flushMetricsToLogs` is `false` or `addExtension` is `true`. Defining `apiKey` adds the Datadog API key directly to your Lambda functions as an environment variable. For more information about getting a Datadog API key, see the [API key documentation][7]. Can also be set through the `DATADOG_API_KEY` environment variable.                                                                  |
-| `appKey`                      | Datadog app key. Only needed when the `monitors` field is defined. Can also be set through the `DATADOG_APP_KEY` environment variable.                                                                                                                                                                                                                                                                                              |
-| `apiKeySecretArn`             | An alternative to using the `apiKey` field. The ARN of the secret storing the Datadog API key in AWS Secrets Manager. Use this parameter if you're storing your secrets in AWS Secrets Manager, and when `flushMetricsToLogs` is `false` or `addExtension` is `true`. If set, remember to add the `secretsmanager:GetSecretValue` permission to the Lambda execution role.                                                          |
-| `apiKMSKey`                   | An alternative to using the `apiKey` field. Datadog API key encrypted using KMS. Use this parameter if you're storing your secrets with KMS, and if `flushMetricsToLogs` is `false` or `addExtension` is `true`. Defining `apiKMSKey` adds the Datadog API Key directly to your Lambda functions as an environment variable.                                                                                                        |
-| `captureLambdaPayload`        | (Experimental) This optional setting configures Datadog ingestion for incoming and outgoing AWS Lambda payloads. Function request and response values are added as part of outgoing APM spans sent to Datadog, and require Datadog APM to be configured on your function. You can obfuscate fields in the Lambda payload by using the `replace_tags` block within `apm_config` settings in [datadog.yaml.][16] Defaults to `false`. |
-| `addLayers`                   | Whether to install the Datadog Lambda library as a layer. Defaults to `true`. Set to `false` when you plan to package the Datadog Lambda library to your function's deployment package on your own so that you can install a specific version of the Datadog Lambda library ([Python][8] or [Node.js][9]).                                                                                                                          |
-| `addExtension`                | Whether to install the Datadog Lambda Extension as a layer. Defaults to `true`. When enabled, it's required to set the environment variable `DATADOG_API_KEY`, or the configuration values `apiKMSKey` or `apiKeySecretArn`. Learn more about the [Datadog Lambda Extension Layer][12] in the documentation. **Note:** AWS only supports Lambda Extensions for [certain runtimes][13].                                              |
-| `logLevel`                    | The log level, set to `DEBUG` for extended logging.                                                                                                                                                                                                                                                                                                                                                                                 |
-| `enableXrayTracing`           | Set `true` to enable X-Ray tracing on the Lambda functions and API Gateway integrations. Defaults to `false`.                                                                                                                                                                                                                                                                                                                       |
-| `enableDDTracing`             | Enable Datadog tracing on the Lambda function. Note: This applies only to integrations using the Datadog Extension. Defaults to `true`.                                                                                                                                                                                                                                                                                             |
-| `enableDDLogs`                | Enable Datadog log collection for the Lambda function. Note: This setting has no effect on logs sent by the Datadog Forwarder. Defaults to `true`.                                                                                                                                                                                                                                                                                  |
-| `enableSourceCodeIntegration` | Enable Datadog source code integration for the function. This feature links your Github repository information to the function in Datadog and allows you to view stack traces from Datadog directly in Github. For more information, see [Source Code Integration](https://docs.datadoghq.com/integrations/guide/source-code-integration).                                                                                          |
-| `subscribeToApiGatewayLogs`   | Enable automatic subscription of the Datadog Forwarder to API Gateway log groups. Defaults to `true`.                                                                                                                                                                                                                                                                                                                               |
-| `subscribeToHttpApiLogs`      | Enable automatic subscription of the Datadog Forwarder to HTTP API log groups. Defaults to `true`.                                                                                                                                                                                                                                                                                                                                  |
-| `subscribeToWebsocketLogs`    | Enable automatic subscription of the Datadog Forwarder to WebSocket log groups. Defaults to `true`.                                                                                                                                                                                                                                                                                                                                 |
-| `forwarderArn`                | Setting this parameter subscribes the given Datadog forwarder to the Lambda functions’ CloudWatch log groups. Required when `enableDDTracing` is set to `true` unless the subscription is otherwise applied. For example, if a Datadog Forwarder subscription is applied using Datadog's AWS Integration, then `forwarderArn` is not required.                                                                                      |
-| `integrationTesting`          | Set `true` when running integration tests. This bypasses the validation of the Forwarder ARN and the addition of Datadog Monitor output links. Defaults to `false`.                                                                                                                                                                                                                                                                 |
-| `enableTags`                  | When set, automatically tag the Lambda functions with the `service` and `env` tags using the `service` and `stage` values from the serverless application definition. It does NOT override if a `service` or `env` tag already exists. Defaults to `true`.                                                                                                                                                                          |
-| `injectLogContext`            | When set, the Lambda layer automatically patches `console.log` with Datadog's tracing IDs. Defaults to `true`.                                                                                                                                                                                                                                                                                                                      |
-| `exclude`                     | When set, this plugin ignores all specified functions. Use this parameter if you have any functions that should not include Datadog functionality. Defaults to `[]`.                                                                                                                                                                                                                                                                |
-| `enabled`                     | When set to `false`, the Datadog plugin stays inactive. Defaults to `true`. You can control this option using an environment variable. For example, use `enabled: ${strToBool(${env:DD_PLUGIN_ENABLED, true})}` to activate/deactivate the plugin during deployment. Alternatively, you can also use the value passed in through `--stage` to control this option—[see example](#disable-plugin-for-particular-environment).        |
-| `monitors`                    | When defined, the Datadog plugin will configure monitors for the deployed function. Requires setting `DATADOG_API_KEY` and `DATADOG_APP_KEY` in your environment. To learn how to define monitors, see [To Enable and Configure a Recommended Serverless Monitor](#to-enable-and-configure-a-recommended-serverless-monitor).                                                                                                       |
-| `customHandler`               | When set, the specified handler is set as the handler for all the functions. By default, the handler is set to `/opt/nodejs/node_modules/datadog-lambda-js/handler.handler` if `addLayers` is set to `true`, or `node_modules/datadog-lambda-js/dist/handler.handler` if `addLayers` is set to `false`.                                                                                                                             |
-| `failOnError`                 | When set, this plugin will throw an error if any custom Datadog monitors fail to create or update. This occurs after deploy, but will cause the result of `serverless deploy` to return a nonzero exit code (to fail user CI). Defaults to `false`.                                                                                                                                                                                 |
+| `site`                        | Set which Datadog site to send data to, such as `datadoghq.com` (default), `datadoghq.eu`, `us3.datadoghq.com`, `us5.datadoghq.com`, and `ddog-gov.com`. This parameter is required when collecting telemtry using the Datadog Lambda Extension. |
+| `apiKey`                      | [Datadog API key][7]. This parameter is required when collecting telemtry using the Datadog Lambda Extension. Alternatively you can set the `DATADOG_API_KEY` environment variable in your deployment environment. |
+| `appKey`                      | Datadog app key. Only needed when the `monitors` field is defined. Alternatively you can set the `DATADOG_APP_KEY` environment variable in your deployment environment. |
+| `apiKeySecretArn`             | An alternative to using the `apiKey` field. The ARN of the secret storing the Datadog API key in AWS Secrets Manager. Remember to add the `secretsmanager:GetSecretValue` permission to the Lambda execution role. |
+| `apiKMSKey`                   | An alternative to using the `apiKey` field. Datadog API key encrypted using KMS. Remember to add the `kms:Decrypt` permission to the Lambda execution role. |
+| `env`                         | Tag your Datadog telemetry with the desired `env`. |
+| `service`                     | Tag your Datadog telemetry with the desired `service`. |
+| `version`                     | Tag your Datadog telemetry with the desired `version`. |
+| `enableXrayTracing`           | Set `true` to enable X-Ray tracing on the Lambda functions and API Gateway integrations. Defaults to `false`. |
+| `enableDDTracing`             | Enable Datadog tracing on the Lambda function. Defaults to `true`. |
+| `enableDDLogs`                | Enable Datadog log collection using the Lambda Extension. Defaults to `true`. Note: This setting has no effect on logs sent by the Datadog Forwarder. |
+| `monitors`                    | When defined, the Datadog plugin will configure monitors for the deployed function. Requires setting `DATADOG_API_KEY` and `DATADOG_APP_KEY` in your environment. To learn how to define monitors, see [To Enable and Configure a Recommended Serverless Monitor](#to-enable-and-configure-a-recommended-serverless-monitor). |
+| `captureLambdaPayload`        | [Captures incoming and outgoing AWS Lambda payloads][17] in the Datadog APM spans for Lambda invocations. Defaults to `false`. |
+| `enableSourceCodeIntegration` | Enable [Datadog source code integration][18] for the function. Defaults to `true`. |
+| `subscribeToApiGatewayLogs`   | Enable automatic subscription of the Datadog Forwarder to API Gateway log groups. Requires setting `forwarderArn`. Defaults to `true`. |
+| `subscribeToHttpApiLogs`      | Enable automatic subscription of the Datadog Forwarder to HTTP API log groups. Requires setting `forwarderArn`. Defaults to `true`. |
+| `subscribeToWebsocketLogs`    | Enable automatic subscription of the Datadog Forwarder to WebSocket log groups. Requires setting `forwarderArn`. Defaults to `true`. |
+| `forwarderArn`                | The ARN of the Datadog Forwarder to be subscribed to the Lambda or API Gateway log groups. |
+| `addLayers`                   | Whether to install the Datadog Lambda library as a layer. Defaults to `true`. Set to `false` when you plan to package the Datadog Lambda library to your function's deployment package on your own so that you can install a specific version of the Datadog Lambda library ([Python][8] or [Node.js][9]). |
+| `addExtension`                | Whether to install the Datadog Lambda Extension as a layer. Defaults to `true`. When enabled, it's required to set the `apiKey` and `site`. |
+| `exclude`                     | When set, this plugin ignores all specified functions. Use this parameter if you have any functions that should not include Datadog functionality. Defaults to `[]`. |
+| `enabled`                     | When set to `false`, the Datadog plugin stays inactive. Defaults to `true`. You can control this option using an environment variable. For example, use `enabled: ${strToBool(${env:DD_PLUGIN_ENABLED, true})}` to activate/deactivate the plugin during deployment. Alternatively, you can also use the value passed in through `--stage` to control this option—[see example](#disable-plugin-for-particular-environment). |
+| `customHandler`               | When set, the specified handler is set as the handler for all the functions. |
+| `failOnError`                 | When set, this plugin will throw an error if any custom Datadog monitors fail to create or update. This occurs after deploy, but will cause the result of `serverless deploy` to return a nonzero exit code (to fail user CI). Defaults to `false`. |
+| `integrationTesting`          | Set `true` when running integration tests. This bypasses the validation of the Forwarder ARN and the addition of Datadog Monitor output links. Defaults to `false`. |
+| `logLevel`                    | The log level, set to `DEBUG` for extended logging. |
 
 To use any of these parameters, add a `custom` > `datadog` section to your `serverless.yml` similar to this example:
 
 ```yaml
 custom:
   datadog:
-    flushMetricsToLogs: true
     apiKeySecretArn: "{Datadog_API_Key_Secret_ARN}"
-    apiKMSKey: "{Encrypted_Datadog_API_Key}"
-    addLayers: true
-    logLevel: "info"
     enableXrayTracing: false
     enableDDTracing: true
     enableDDLogs: true
     subscribeToAccessLogs: true
     forwarderArn: arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder
-    enableTags: true
-    injectLogContext: true
     exclude:
       - dd-excluded-function
 ```
 
-**Note**: If you use webpack, Datadog recommends using the prebuilt layers by setting `addLayers` to `true`, which is the default, and add `datadog-lambda-js` and `dd-trace` to the [externals][10] section of your webpack config.
+### Webpack
 
-**Note**: Many of the above configuration values require setting `DATADOG_API_KEY` in your environment. If you store these values in AWS Secrets Manager or AWS KMS, refer to the above options `apiKeySecretArn` and `apiKMSKey` to pull your Datadog API key from the correct location.
+If you are using a bundler, such as webpack, see this [guide](https://docs.datadoghq.com/serverless/guide/serverless_tracing_and_webpack/). 
 
 ### TypeScript
+
+You may encounter the error of missing type definitions. To resolve the error, add `datadog-lambda-js` and `dd-trace` to the `devDependencies` list of your project's package.json.
 
 If you are using serverless-typescript, make sure that `serverless-datadog` is above the `serverless-typescript` entry in your `serverless.yml`. The plugin will automatically detect `.ts` files.
 
@@ -93,49 +83,6 @@ If you are using serverless-typescript, make sure that `serverless-datadog` is a
 plugins:
   - serverless-plugin-datadog
   - serverless-typescript
-```
-
-If you use TypeScript, you may encounter the error of missing type definitions. A missing type definition happens when you use the prebuilt layers (for example, set `addLayers` to `true`, which is the default) and need to import helper functions from the `datadog-lambda-js` and `dd-trace` packages to submit custom metrics or instrument a specific function. To resolve the error, add `datadog-lambda-js` and `dd-trace` to the `devDependencies` list of your project's package.json.
-
-### Webpack
-
-`dd-trace` is known to be not compatible with webpack due to the use of conditional import and other issues. If using webpack, make sure to mark `datadog-lambda-js` and `dd-trace` as [externals](https://webpack.js.org/configuration/externals/) for webpack, so webpack knows these dependencies will be available in the runtime. You should also remove `datadog-lambda-js` and `dd-trace` from `package.json` and the build process to ensure you're using the versions provided by the Datadog Lambda Layer.
-
-#### serverless-webpack
-
-If using `serverless-webpack`, make sure to also exclude `datadog-lambda-js` and `dd-trace` in your `serverless.yml` in addition to declaring them as external in your webpack config file.
-
-**webpack.config.js**
-
-```javascript
-var nodeExternals = require("webpack-node-externals");
-
-module.exports = {
-  // we use webpack-node-externals to excludes all node deps.
-  // You can manually set the externals too.
-  externals: [nodeExternals(), "dd-trace", "datadog-lambda-js"],
-};
-```
-
-**serverless.yml**
-
-```yaml
-custom:
-  webpack:
-    includeModules:
-      forceExclude:
-        - dd-trace
-        - datadog-lambda-js
-```
-
-### Forwarder
-
-The [Datadog Forwarder Lambda function][11] needs to be installed and subscribed to your Lambda functions' log groups. The plugin automatically creates the log subscriptions when the Forwarder's ARN is supplied via the `forwarderArn` option.
-
-If you run into the following error, double check the supplied Forwarder ARN is correct and ensure it is from the same region and account where your serverless application is deployed.
-
-```
-An error occurred: GetaccountapiLogGroupSubscription - Could not execute the lambda function. Make sure you have given CloudWatch Logs permission to execute your function. (Service: AWSLogs; Status Code: 400; Error Code: InvalidParameterException).
 ```
 
 ### Disable Plugin for Particular Environment
@@ -292,3 +239,5 @@ This product includes software developed at Datadog (<https://www.datadoghq.com/
 [14]: https://github.com/DataDog/serverless-plugin-datadog/blob/master/CONTRIBUTING.md
 [15]: https://github.com/DataDog/serverless-plugin-datadog/blob/master/src/layers.json
 [16]: https://docs.datadoghq.com/tracing/setup_overview/configure_data_security/?tab=mongodb#replace-rules-for-tag-filtering
+[17]: https://www.datadoghq.com/blog/troubleshoot-lambda-function-request-response-payloads/
+[18]: https://docs.datadoghq.com/integrations/guide/source-code-integration
