@@ -92,7 +92,7 @@ describe("ServerlessPlugin", () => {
               handler: "my-func.ev",
               layers: [
                 expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:.*/),
-                "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:21",
+                "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:22",
               ],
               runtime: "nodejs14.x",
             },
