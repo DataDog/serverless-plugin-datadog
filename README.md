@@ -27,10 +27,10 @@ To further configure your plugin, use the following custom parameters in your `s
 
 | Parameter                     | Description                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `site`                        | Set which Datadog site to send data to, such as `datadoghq.com` (default), `datadoghq.eu`, `us3.datadoghq.com`, `us5.datadoghq.com`, and `ddog-gov.com`. This parameter is required when collecting telemtry using the Datadog Lambda Extension. |
-| `apiKey`                      | [Datadog API key][7]. This parameter is required when collecting telemtry using the Datadog Lambda Extension. Alternatively you can set the `DATADOG_API_KEY` environment variable in your deployment environment. |
-| `appKey`                      | Datadog app key. Only needed when the `monitors` field is defined. Alternatively you can set the `DATADOG_APP_KEY` environment variable in your deployment environment. |
-| `apiKeySecretArn`             | An alternative to using the `apiKey` field. The ARN of the secret storing the Datadog API key in AWS Secrets Manager. Remember to add the `secretsmanager:GetSecretValue` permission to the Lambda execution role. |
+| `site`                        | Set which Datadog site to send data to, such as `datadoghq.com` (default), `datadoghq.eu`, `us3.datadoghq.com`, `us5.datadoghq.com`, or `ddog-gov.com`. This parameter is required when collecting telemtry using the Datadog Lambda Extension. |
+| `apiKey`                      | [Datadog API key][7]. This parameter is required when collecting telemetry using the Datadog Lambda Extension. Alternatively, you can also set the `DATADOG_API_KEY` environment variable in your deployment environment. |
+| `appKey`                      | Datadog app key. Only needed when the `monitors` field is defined. Alternatively, you can also set the `DATADOG_APP_KEY` environment variable in your deployment environment. |
+| `apiKeySecretArn`             | An alternative to using the `apiKey` field. The ARN of the secret that is storing the Datadog API key in AWS Secrets Manager. Remember to add the `secretsmanager:GetSecretValue` permission to the Lambda execution role. |
 | `apiKMSKey`                   | An alternative to using the `apiKey` field. Datadog API key encrypted using KMS. Remember to add the `kms:Decrypt` permission to the Lambda execution role. |
 | `env`                         | Tag your Datadog telemetry with the desired `env`. |
 | `service`                     | Tag your Datadog telemetry with the desired `service`. |
@@ -38,7 +38,7 @@ To further configure your plugin, use the following custom parameters in your `s
 | `enableXrayTracing`           | Set `true` to enable X-Ray tracing on the Lambda functions and API Gateway integrations. Defaults to `false`. |
 | `enableDDTracing`             | Enable Datadog tracing on the Lambda function. Defaults to `true`. |
 | `enableDDLogs`                | Enable Datadog log collection using the Lambda Extension. Defaults to `true`. Note: This setting has no effect on logs sent by the Datadog Forwarder. |
-| `monitors`                    | When defined, the Datadog plugin will configure monitors for the deployed function. Requires setting `DATADOG_API_KEY` and `DATADOG_APP_KEY` in your environment. To learn how to define monitors, see [To Enable and Configure a Recommended Serverless Monitor](#to-enable-and-configure-a-recommended-serverless-monitor). |
+| `monitors`                    | When defined, the Datadog plugin configures monitors for the deployed function. Requires setting `DATADOG_API_KEY` and `DATADOG_APP_KEY` in your environment. To learn how to define monitors, see [To Enable and Configure a Recommended Serverless Monitor](#to-enable-and-configure-a-recommended-serverless-monitor). |
 | `captureLambdaPayload`        | [Captures incoming and outgoing AWS Lambda payloads][17] in the Datadog APM spans for Lambda invocations. Defaults to `false`. |
 | `enableSourceCodeIntegration` | Enable [Datadog source code integration][18] for the function. Defaults to `true`. |
 | `subscribeToApiGatewayLogs`   | Enable automatic subscription of the Datadog Forwarder to API Gateway log groups. Requires setting `forwarderArn`. Defaults to `true`. |
@@ -50,7 +50,7 @@ To further configure your plugin, use the following custom parameters in your `s
 | `exclude`                     | When set, this plugin ignores all specified functions. Use this parameter if you have any functions that should not include Datadog functionality. Defaults to `[]`. |
 | `enabled`                     | When set to `false`, the Datadog plugin stays inactive. Defaults to `true`. You can control this option using an environment variable. For example, use `enabled: ${strToBool(${env:DD_PLUGIN_ENABLED, true})}` to activate/deactivate the plugin during deployment. Alternatively, you can also use the value passed in through `--stage` to control this option—[see example](#disable-plugin-for-particular-environment). |
 | `customHandler`               | When set, the specified handler is set as the handler for all the functions. |
-| `failOnError`                 | When set, this plugin will throw an error if any custom Datadog monitors fail to create or update. This occurs after deploy, but will cause the result of `serverless deploy` to return a nonzero exit code (to fail user CI). Defaults to `false`. |
+| `failOnError`                 | When set, this plugin throws an error if any custom Datadog monitors fail to create or update. This occurs after deploy, but will cause the result of `serverless deploy` to return a nonzero exit code (to fail user CI). Defaults to `false`. |
 | `integrationTesting`          | Set `true` when running integration tests. This bypasses the validation of the Forwarder ARN and the addition of Datadog Monitor output links. Defaults to `false`. |
 | `logLevel`                    | The log level, set to `DEBUG` for extended logging. |
 
@@ -71,7 +71,7 @@ custom:
 
 ### Webpack
 
-If you are using a bundler, such as webpack, see this [guide](https://docs.datadoghq.com/serverless/guide/serverless_tracing_and_webpack/). 
+If you are using a bundler, such as webpack, see [Serverless Tracing and Webpack](https://docs.datadoghq.com/serverless/guide/serverless_tracing_and_webpack/). 
 
 ### TypeScript
 
