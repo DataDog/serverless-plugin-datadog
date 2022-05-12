@@ -23,7 +23,7 @@ export function enableTracing(service: Service, tracingMode: TracingMode, handle
   const provider = service.provider as any;
   if (tracingMode === TracingMode.XRAY || tracingMode === TracingMode.HYBRID) {
     provider.tracing = {
-      apiGateway: service.provider.apiGateway.restApiId ? null : true,
+      apiGateway: service.provider['apiGateway']?.restApiId ? null : true,
       lambda: true,
     };
   }
