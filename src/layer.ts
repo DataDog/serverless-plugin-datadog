@@ -47,6 +47,7 @@ export interface LayerJSON {
 export const runtimeLookup: { [key: string]: RuntimeType } = {
   "nodejs12.x": RuntimeType.NODE,
   "nodejs14.x": RuntimeType.NODE,
+  "nodejs16.x": RuntimeType.NODE,
   "python3.6": RuntimeType.PYTHON,
   "python3.7": RuntimeType.PYTHON,
   "python3.8": RuntimeType.PYTHON,
