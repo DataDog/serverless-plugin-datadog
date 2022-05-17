@@ -243,14 +243,6 @@
           {
             "Key": "dd_sls_plugin",
             "Value": "vX.XX.X"
-          },
-          {
-            "Key": "service",
-            "Value": "dd-sls-plugin-integration-test"
-          },
-          {
-            "Key": "env",
-            "Value": "dev"
           }
         ],
         "Environment": {
@@ -301,14 +293,6 @@
           {
             "Key": "dd_sls_plugin",
             "Value": "vX.XX.X"
-          },
-          {
-            "Key": "service",
-            "Value": "dd-sls-plugin-integration-test"
-          },
-          {
-            "Key": "env",
-            "Value": "dev"
           }
         ],
         "Environment": {
@@ -359,14 +343,6 @@
           {
             "Key": "dd_sls_plugin",
             "Value": "vX.XX.X"
-          },
-          {
-            "Key": "service",
-            "Value": "dd-sls-plugin-integration-test"
-          },
-          {
-            "Key": "env",
-            "Value": "dev"
           }
         ],
         "Environment": {
@@ -417,14 +393,6 @@
           {
             "Key": "dd_sls_plugin",
             "Value": "vX.XX.X"
-          },
-          {
-            "Key": "service",
-            "Value": "dd-sls-plugin-integration-test"
-          },
-          {
-            "Key": "env",
-            "Value": "dev"
           }
         ],
         "Environment": {
@@ -475,14 +443,6 @@
           {
             "Key": "dd_sls_plugin",
             "Value": "vX.XX.X"
-          },
-          {
-            "Key": "service",
-            "Value": "dd-sls-plugin-integration-test"
-          },
-          {
-            "Key": "env",
-            "Value": "dev"
           }
         ],
         "Environment": {
@@ -533,14 +493,6 @@
           {
             "Key": "dd_sls_plugin",
             "Value": "vX.XX.X"
-          },
-          {
-            "Key": "service",
-            "Value": "dd-sls-plugin-integration-test"
-          },
-          {
-            "Key": "env",
-            "Value": "dev"
           }
         ],
         "Environment": {
@@ -591,14 +543,6 @@
           {
             "Key": "dd_sls_plugin",
             "Value": "vX.XX.X"
-          },
-          {
-            "Key": "service",
-            "Value": "dd-sls-plugin-integration-test"
-          },
-          {
-            "Key": "env",
-            "Value": "dev"
           }
         ],
         "Environment": {
@@ -652,14 +596,6 @@
           {
             "Key": "dd_sls_plugin",
             "Value": "vX.XX.X"
-          },
-          {
-            "Key": "service",
-            "Value": "dd-sls-plugin-integration-test"
-          },
-          {
-            "Key": "env",
-            "Value": "dev"
           }
         ],
         "Environment": {
@@ -713,14 +649,6 @@
           {
             "Key": "dd_sls_plugin",
             "Value": "vX.XX.X"
-          },
-          {
-            "Key": "service",
-            "Value": "dd-sls-plugin-integration-test"
-          },
-          {
-            "Key": "env",
-            "Value": "dev"
           }
         ],
         "Environment": {
@@ -772,14 +700,6 @@
           {
             "Key": "dd_sls_plugin",
             "Value": "vX.XX.X"
-          },
-          {
-            "Key": "service",
-            "Value": "dd-sls-plugin-integration-test"
-          },
-          {
-            "Key": "env",
-            "Value": "dev"
           }
         ],
         "Environment": {
@@ -831,14 +751,6 @@
           {
             "Key": "dd_sls_plugin",
             "Value": "vX.XX.X"
-          },
-          {
-            "Key": "service",
-            "Value": "dd-sls-plugin-integration-test"
-          },
-          {
-            "Key": "env",
-            "Value": "dev"
           }
         ],
         "Environment": {

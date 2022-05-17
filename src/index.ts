@@ -139,8 +139,7 @@ module.exports = class ServerlessPlugin {
     if (config.addExtension) {
       this.serverless.cli.log("Adding Datadog Env Vars");
       this.addDDEnvVars(handlers);
-    }
-    if (config.forwarderArn !== undefined || config.forwarderArn !== undefined) {
+    } else {
       this.addDDTags(handlers);
     }
 
