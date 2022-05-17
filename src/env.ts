@@ -47,6 +47,10 @@ export interface Configuration {
   forwarderArn?: string;
   forwarder?: string;
 
+  // Whether forwarder subscriptions are managed by the Datadog AWS Integration. When true, forwarderArn
+  // should be omitted.
+  awsIntegration?: boolean;
+
   // Set this to true when you are running the Serverless Plugin's integration tests. This prevents the
   // plugin from validating the Forwarder ARN and adding Datadog Monitor output links. Defaults to false.
   integrationTesting?: boolean;

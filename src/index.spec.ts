@@ -1259,6 +1259,37 @@ describe("ServerlessPlugin", () => {
       });
     });
 
+    it("adds tags by default with service name and stage values when using aws integration", async () => {
+      const function_ = functionMock({});
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: awsMock,
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [function_],
+          getFunction: () => function_,
+          provider: {
+            region: "us-east-1",
+          },
+          functions: {
+            node1: function_,
+          },
+          custom: {
+            datadog: {
+              awsIntegration: true,
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(function_).toHaveProperty("tags", {
+        env: "dev",
+        service: "dev",
+        dd_sls_plugin: expect.stringMatching(SEM_VER_REGEX),
+      });
+    });
+
     it("does not override existing tags on function", async () => {
       const function_ = functionMock({ service: "test" });
       const serverless = {

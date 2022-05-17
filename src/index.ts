@@ -140,7 +140,7 @@ module.exports = class ServerlessPlugin {
       this.serverless.cli.log("Adding Datadog Env Vars");
       this.addDDEnvVars(handlers);
     }
-    if (config.forwarderArn !== undefined || config.forwarderArn !== undefined) {
+    if (config.forwarderArn !== undefined || config.forwarder !== undefined || config.awsIntegration) {
       this.addDDTags(handlers);
     }
 
@@ -195,7 +195,7 @@ module.exports = class ServerlessPlugin {
       );
     }
 
-    this.addTags(handlers, config.enableTags, datadogForwarderArn !== undefined);
+    this.addTags(handlers, config.enableTags, config.awsIntegration || datadogForwarderArn !== undefined);
 
     const simpleGit = await newSimpleGit();
 
