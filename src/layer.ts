@@ -37,10 +37,10 @@ export interface ExtendedFunctionDefinition extends FunctionDefinition {
 export interface LayerJSON {
   regions: {
     [region: string]:
-    | {
-      [runtime: string]: string | undefined;
-    }
-    | undefined;
+      | {
+          [runtime: string]: string | undefined;
+        }
+      | undefined;
   };
 }
 
