@@ -32,10 +32,9 @@ To further configure your plugin, use the following custom parameters in your `s
 | `appKey`                      | Datadog app key. Only needed when the `monitors` field is defined. Alternatively, you can also set the `DATADOG_APP_KEY` environment variable in your deployment environment. |
 | `apiKeySecretArn`             | An alternative to using the `apiKey` field. The ARN of the secret that is storing the Datadog API key in AWS Secrets Manager. Remember to add the `secretsmanager:GetSecretValue` permission to the Lambda execution role. |
 | `apiKMSKey`                   | An alternative to using the `apiKey` field. Datadog API key encrypted using KMS. Remember to add the `kms:Decrypt` permission to the Lambda execution role. |
-| `env`                         | When set along with `addExtension`, a `DD_ENV` environment variable is added to all Lambda functions with the provided value. When set along with `forwarderArn`, an `env` tag is added to all Lambda functions with the provided value. |
-| `service`                     | When set along with `addExtension`, a `DD_SERVICE` environment variable is added to all Lambda functions with the provided value. When set along with `forwarderArn`, a `service` tag is added to all Lambda functions with the provided value. |
-| `version`                     | When set along with `addExtension`, a `DD_VERSION` environment variable is added to all Lambda functions with the provided value. When set along with `forwarderArn`, a `version` tag is added to all Lambda functions with the provided value. |
-| `tags`                        | A comma separated list of key:value pairs as a single string. When set along with `extensionLayerVersion`, a `DD_TAGS` environment variable is added to all Lambda functions with the provided value. When set along with `forwarderArn`, the plugin parses the string and sets each key:value pair as a tag to all Lambda functions. |
+| `env`                         | When set along with `addExtension`, a `DD_ENV` environment variable is added to all Lambda functions with the provided value. Otherwise, an `env` tag is added to all Lambda functions with the provided value. Defaults to the `stage` value of the serverless deployment. |
+| `service`                     | When set along with `addExtension`, a `DD_SERVICE` environment variable is added to all Lambda functions with the provided value. Otherwise, a `service` tag is added to all Lambda functions with the provided value. Defaults to the `service` value of the serverless project. | `version`                     | When set along with `addExtension`, a `DD_VERSION` environment variable is added to all Lambda functions with the provided value. When set along with `forwarderArn`, a `version` tag is added to all Lambda functions with the provided value. |
+| `tags`                        | A comma separated list of `key`:`value` pairs as a single string. When set along with `extensionLayerVersion`, a `DD_TAGS` environment variable is added to all Lambda functions with the provided value. When set along with `forwarderArn`, the plugin parses the string and sets each `key`:`value` pair as a tag on all Lambda functions. |
 | `enableXrayTracing`           | Set `true` to enable X-Ray tracing on the Lambda functions and API Gateway integrations. Defaults to `false`. |
 | `enableDDTracing`             | Enable Datadog tracing on the Lambda function. Defaults to `true`. |
 | `enableDDLogs`                | Enable Datadog log collection using the Lambda Extension. Defaults to `true`. Note: This setting has no effect on logs sent by the Datadog Forwarder. |
@@ -194,8 +193,8 @@ custom:
 
 ### [v5.0.0](https://github.com/DataDog/serverless-plugin-datadog/releases/tag/v5.0.0)
 
-- When used in conjunction with the Datadog Extension, this plugin stops setting tags for Service and ENV, and instead uses environment variables.
-- This plugin replaces `enableTags` with Service and ENV parameters.
+- When used in conjunction with the Datadog Extension, this plugin sets `service` and `env` tags through environment variables instead of Lambda resource tags.
+- The `enableTags` parameter was replaced by the new `service`, `env` parameters.
 
 ### [v4.0.0](https://github.com/DataDog/serverless-plugin-datadog/releases/tag/v4.0.0)
 
