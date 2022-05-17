@@ -194,9 +194,8 @@ custom:
 
 ### [v5.0.0](https://github.com/DataDog/serverless-plugin-datadog/releases/tag/v5.0.0)
 
-- This plugin stops setting tags for Service and ENV, and instead uses environment variables (when used in conjunction with the Datadog Extension).
-
-v5.0 is compatible with v10+ of the Datadog Extension, and all version of the Datadog Forwarder.
+- When used in conjunction with the Datadog Extension, this plugin stops setting tags for Service and ENV, and instead uses environment variables.
+- This plugin replaces `enableTags` with Service and ENV parameters.
 
 ### [v4.0.0](https://github.com/DataDog/serverless-plugin-datadog/releases/tag/v4.0.0)
 
