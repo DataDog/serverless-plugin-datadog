@@ -139,8 +139,7 @@ module.exports = class ServerlessPlugin {
     if (config.addExtension) {
       this.serverless.cli.log("Adding Datadog Env Vars");
       this.addDDEnvVars(handlers);
-    }
-    if (config.forwarderArn !== undefined || config.forwarderArn !== undefined) {
+    } else {
       this.addDDTags(handlers);
     }
 
@@ -195,7 +194,7 @@ module.exports = class ServerlessPlugin {
       );
     }
 
-    this.addTags(handlers, config.enableTags, datadogForwarderArn !== undefined);
+    this.addTags(handlers, config.addExtension !== true);
 
     const simpleGit = await newSimpleGit();
 
@@ -364,11 +363,11 @@ module.exports = class ServerlessPlugin {
    * as well as function level. Automatically create tags for service and env with
    * properties from deployment configurations if needed; does not override any existing values.
    */
-  private addTags(handlers: FunctionInfo[], enableTags: boolean, usingForwarder: boolean) {
+  private addTags(handlers: FunctionInfo[], shouldAddTags: boolean) {
     const provider = this.serverless.service.provider as Provider;
     this.serverless.cli.log(`Adding Plugin Version ${version} tag`);
 
-    if (enableTags && usingForwarder) {
+    if (shouldAddTags) {
       this.serverless.cli.log(`Adding service and environment tags`);
     }
 
@@ -377,7 +376,7 @@ module.exports = class ServerlessPlugin {
 
       handler.tags[TagKeys.Plugin] = `v${version}`;
 
-      if (enableTags && usingForwarder) {
+      if (shouldAddTags) {
         if (!provider.tags?.[TagKeys.Service] && !provider.stackTags?.[TagKeys.Service]) {
           handler.tags[TagKeys.Service] ??= this.serverless.service.getServiceName();
         }

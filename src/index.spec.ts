@@ -1228,7 +1228,7 @@ describe("ServerlessPlugin", () => {
       });
     });
 
-    it("adds tags by default with service name and stage values when using forwarder", async () => {
+    it("adds tags by default with service name and stage values when using forwarder and not extension", async () => {
       const function_ = functionMock({});
       const serverless = {
         cli: { log: () => {} },
@@ -1246,6 +1246,7 @@ describe("ServerlessPlugin", () => {
           custom: {
             datadog: {
               forwarderArn: "some-arn",
+              addExtension: false,
             },
           },
         },
@@ -1276,7 +1277,7 @@ describe("ServerlessPlugin", () => {
           },
           custom: {
             datadog: {
-              forwarderArn: "some-arn",
+              addExtension: false,
             },
           },
         },
