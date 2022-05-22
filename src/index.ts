@@ -220,7 +220,7 @@ module.exports = class ServerlessPlugin {
 
     redirectHandlers(handlers, config.addLayers, config.customHandler);
     if (config.integrationTesting === false) {
-      await addOutputLinks(this.serverless, config.site, handlers);
+      await addOutputLinks(this.serverless, config.site, config.subdomain, handlers);
     } else {
       this.serverless.cli.log("Skipped adding output links because 'integrationTesting' is set true");
     }
@@ -260,7 +260,7 @@ module.exports = class ServerlessPlugin {
         }
       }
     }
-    return printOutputs(this.serverless, config.site);
+    return printOutputs(this.serverless, config.site, config.subdomain);
   }
 
   private debugLogHandlers(handlers: FunctionInfo[]) {
