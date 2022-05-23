@@ -7,6 +7,7 @@
  */
 
 import Service from "serverless/classes/Service";
+import { Provider } from "serverless/plugins/aws/provider/awsProvider";
 import { FunctionInfo } from "./layer";
 
 const ddTraceEnabledEnvVar = "DD_TRACE_ENABLED";
@@ -20,10 +21,12 @@ export enum TracingMode {
 }
 
 export function enableTracing(service: Service, tracingMode: TracingMode, handlers: FunctionInfo[]) {
-  const provider = service.provider as any;
+  const provider = service.provider as Provider;
   if (tracingMode === TracingMode.XRAY || tracingMode === TracingMode.HYBRID) {
     provider.tracing = {
-      apiGateway: service.provider['apiGateway']?.restApiId ? null : true,
+      apiGateway: provider.apiGateway?.restApiId
+        ? (undefined as any) // Current type definition does not allow undefined however it is a valid option.
+        : true,
       lambda: true,
     };
   }
