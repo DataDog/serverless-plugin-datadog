@@ -10,7 +10,12 @@ const outputPrefix = "DatadogMonitor";
  * Builds the CloudFormation Outputs containing the alphanumeric key, description,
  * and value (URL) to the function in Datadog
  */
-export async function addOutputLinks(serverless: Serverless, site: string, handlers: FunctionInfo[]) {
+export async function addOutputLinks(
+  serverless: Serverless,
+  site: string,
+  subdomain: string,
+  handlers: FunctionInfo[],
+) {
   const awsAccount = await serverless.getProvider("aws").getAccountId();
   const region = serverless.service.provider.region;
   const outputs = serverless.service.provider.compiledCloudFormationTemplate?.Outputs;
@@ -23,12 +28,12 @@ export async function addOutputLinks(serverless: Serverless, site: string, handl
     const key = `${outputPrefix}${name}`.replace(/[^a-z0-9]/gi, "");
     outputs[key] = {
       Description: `See ${name} in Datadog`,
-      Value: `https://app.${site}/functions/${functionName}:${region}:${awsAccount}:aws?source=sls-plugin`,
+      Value: `https://${subdomain}.${site}/functions/${functionName}:${region}:${awsAccount}:aws?source=sls-plugin`,
     };
   });
 }
 
-export async function printOutputs(serverless: Serverless, site: string) {
+export async function printOutputs(serverless: Serverless, site: string, subdomain: string) {
   const stackName = serverless.getProvider("aws").naming.getStackName();
   const service = serverless.service.getServiceName();
   const env = serverless.getProvider("aws").getStage();
@@ -57,7 +62,9 @@ export async function printOutputs(serverless: Serverless, site: string) {
     }
   }
   logHeader("View Serverless Monitors", true);
-  logMessage(`https://app.${site}/monitors/manage?q=tag%3A%28%22env%3A${env}%22AND%22service%3A${service}%22%29`);
+  logMessage(
+    `https://${subdomain}.${site}/monitors/manage?q=tag%3A%28%22env%3A${env}%22AND%22service%3A${service}%22%29`,
+  );
 }
 
 function logHeader(message: string, underline = false) {

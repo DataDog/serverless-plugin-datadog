@@ -30,6 +30,8 @@ export interface Configuration {
   captureLambdaPayload?: boolean;
   // Which Site to send to, (should be datadoghq.com or datadoghq.eu)
   site: string;
+  // The subdomain to use for app url links that are printed to output. Defaults to app
+  subdomain: string;
   // The log level, (set to DEBUG for extended logging)
   logLevel: string | undefined;
   // Whether the log forwarder integration is enabled by default
@@ -114,6 +116,7 @@ export const defaultConfiguration: Configuration = {
   flushMetricsToLogs: true,
   logLevel: undefined,
   site: "datadoghq.com",
+  subdomain: "app",
   enableXrayTracing: false,
   enableDDTracing: true,
   addExtension: true,
