@@ -48,7 +48,7 @@ export class SourceCodeIntegration {
         throw new Error("Error uploading commit information.");
       }
 
-      return {hash: payload.hash, remote: payload.remote};
+      return { hash: payload.hash, remote: payload.remote };
     } catch (error) {
       throw error;
     }
