@@ -1714,18 +1714,18 @@
         },
         "StageName": "dev",
         "Description": "Serverless Websockets",
+        "DefaultRouteSettings": {
+          "DataTraceEnabled": true,
+          "LoggingLevel": "INFO"
+        },
         "AccessLogSettings": {
           "DestinationArn": {
             "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:${WebsocketsLogGroup}"
           },
           "Format": "$context.identity.sourceIp $context.identity.caller $context.identity.user [$context.requestTime] \"$context.eventType $context.routeKey $context.connectionId\" $context.requestId"
         },
-        "DefaultRouteSettings": {
-          "DataTraceEnabled": true,
-          "LoggingLevel": "INFO"
-        },
         "DeploymentId": {
-          "Ref": "WebsocketsDeploymentpBsCjV3uKVaG4szlZyTmMm9OJAhhffvn1aEJFhwkI"
+          "Ref": "WebsocketsDeploymentlV0zc2iqXFiHxw7QcuYM0WF4fPmXYd3A6RWKSnAzp4"
         }
       }
     },
@@ -1735,7 +1735,7 @@
         "LogGroupName": "/aws/websocket/dd-sls-plugin-integration-test-dev"
       }
     },
-    "WebsocketsDeploymentpBsCjV3uKVaG4szlZyTmMm9OJAhhffvn1aEJFhwkI": {
+    "WebsocketsDeploymentlV0zc2iqXFiHxw7QcuYM0WF4fPmXYd3A6RWKSnAzp4": {
       "Type": "AWS::ApiGatewayV2::Deployment",
       "DependsOn": [
         "SconnectWebsocketsRoute",
