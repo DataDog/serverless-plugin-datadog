@@ -110,6 +110,8 @@ const JAVA_TOOL_OPTIONS_VAR = "JAVA_TOOL_OPTIONS";
 const JAVA_TOOL_OPTIONS = '-javaagent:"/opt/java/lib/dd-java-agent.jar" -XX:+TieredCompilation -XX:TieredStopAtLevel=1';
 const JAVA_JMXFETCH_ENABLED_VAR = "DD_JMXFETCH_ENABLED";
 const JAVA_JMXFETCH_ENABLED = false;
+const JAVA_RUNTIME_METRICS_ENABLED_VAR = "DD_RUNTIME_METRICS_ENABLED";
+const JAVA_RUNTIME_METRICS_ENABLED = false;
 
 export const defaultConfiguration: Configuration = {
   addLayers: true,
@@ -222,6 +224,11 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
         environment[JAVA_JMXFETCH_ENABLED_VAR] = JAVA_JMXFETCH_ENABLED;
       } else if (environment[JAVA_JMXFETCH_ENABLED_VAR] !== JAVA_JMXFETCH_ENABLED) {
         throwEnvVariableError("DD_JMXFETCH_ENABLED", `${JAVA_JMXFETCH_ENABLED}`, functionName);
+      }
+      if (environment[JAVA_RUNTIME_METRICS_ENABLED_VAR] === undefined) {
+        environment[JAVA_RUNTIME_METRICS_ENABLED_VAR] = JAVA_RUNTIME_METRICS_ENABLED;
+      } else if (environment[JAVA_RUNTIME_METRICS_ENABLED_VAR] !== JAVA_RUNTIME_METRICS_ENABLED) {
+        throwEnvVariableError("DD_RUNTIME_METRICS_ENABLED", `${JAVA_RUNTIME_METRICS_ENABLED}`, functionName);
       }
     }
   });

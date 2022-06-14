@@ -489,6 +489,7 @@ describe("setEnvConfiguration", () => {
             JAVA_TOOL_OPTIONS:
               '-javaagent:"/opt/java/lib/dd-java-agent.jar" -XX:+TieredCompilation -XX:TieredStopAtLevel=1',
             DD_JMXFETCH_ENABLED: false,
+            DD_RUNTIME_METRICS_ENABLED: false,
           },
           events: [],
         },
