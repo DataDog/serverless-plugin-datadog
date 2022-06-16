@@ -95,7 +95,8 @@ export const ddEnvEnvVar = "DD_ENV";
 export const ddVersionEnvVar = "DD_VERSION";
 export const ddTagsEnvVar = "DD_TAGS";
 
-// Universal instrumentation wrapper
+// The Universal instrumentation wrapper which configures several env variables.
+// Currently it is only used for Java and .NET
 const AWS_LAMBDA_EXEC_WRAPPER_VAR = "AWS_LAMBDA_EXEC_WRAPPER";
 const AWS_LAMBDA_EXEC_WRAPPER = "/opt/datadog_wrapper";
 
