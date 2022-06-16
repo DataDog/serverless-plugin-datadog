@@ -442,7 +442,7 @@ describe("setEnvConfiguration", () => {
             DD_MERGE_XRAY_TRACES: true,
             DD_LOGS_INJECTION: false,
             DD_SERVERLESS_LOGS_ENABLED: true,
-            AWS_LAMBDA_EXEC_WRAPPER: "/opt/datadog_wrapper"
+            AWS_LAMBDA_EXEC_WRAPPER: "/opt/datadog_wrapper",
           },
           events: [],
         },
@@ -483,7 +483,7 @@ describe("setEnvConfiguration", () => {
             DD_MERGE_XRAY_TRACES: true,
             DD_LOGS_INJECTION: false,
             DD_SERVERLESS_LOGS_ENABLED: true,
-            AWS_LAMBDA_EXEC_WRAPPER: "/opt/datadog_wrapper"
+            AWS_LAMBDA_EXEC_WRAPPER: "/opt/datadog_wrapper",
           },
           events: [],
         },
