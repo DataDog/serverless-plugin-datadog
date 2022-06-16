@@ -390,7 +390,7 @@ module.exports = class ServerlessPlugin {
 
   /**
    * Uploads git metadata for the current directory to Datadog and goes through
-   * each function defined in serverless and attaches the git.commit.sha to DD_TAGS.
+   * each function defined in serverless and attaches git.commit.sha and git.repository_url to DD_TAGS.
    */
   private async addSourceCodeIntegration(
     handlers: FunctionInfo[],
@@ -399,13 +399,13 @@ module.exports = class ServerlessPlugin {
     datadogSite: string,
   ) {
     const sourceCodeIntegration = new SourceCodeIntegration(apiKey, datadogSite, simpleGit);
-    const gitCommitHash = await sourceCodeIntegration.uploadGitMetadata();
+    const info = await sourceCodeIntegration.uploadGitMetadata();
 
-    this.serverless.cli.log(`Adding GitHub integration with git commit hash ${gitCommitHash}`);
+    this.serverless.cli.log(`Adding GitHub integration with git commit hash ${info.hash} and remote ${info.remote}`);
 
     handlers.forEach(({ handler }) => {
       handler.environment ??= {};
-      handler.environment[ddTagsEnvVar] = "git.commit.sha:" + gitCommitHash;
+      handler.environment[ddTagsEnvVar] = "git.commit.sha:" + info.hash + ",git.repository_url:" + info.remote;
     });
   }
 
