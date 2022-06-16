@@ -612,8 +612,8 @@
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_SERVICE": "dd-sls-plugin-integration-test",
-            "DD_ENV": "dev",
-            "AWS_LAMBDA_EXEC_WRAPPER": "/opt/datadog_wrapper"
+            "AWS_LAMBDA_EXEC_WRAPPER": "/opt/datadog_wrapper",
+            "DD_ENV": "dev"
           }
         },
         "Role": {
@@ -662,8 +662,8 @@
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_SERVICE": "dd-sls-plugin-integration-test",
-            "DD_ENV": "dev",
-            "AWS_LAMBDA_EXEC_WRAPPER": "/opt/datadog_wrapper"
+            "AWS_LAMBDA_EXEC_WRAPPER": "/opt/datadog_wrapper",
+            "DD_ENV": "dev"
           }
         },
         "Role": {
@@ -712,8 +712,8 @@
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_SERVICE": "dd-sls-plugin-integration-test",
-            "DD_ENV": "dev",
-            "AWS_LAMBDA_EXEC_WRAPPER": "/opt/datadog_wrapper"
+            "AWS_LAMBDA_EXEC_WRAPPER": "/opt/datadog_wrapper",
+            "DD_ENV": "dev"
           }
         },
         "Role": {
