@@ -405,7 +405,7 @@ module.exports = class ServerlessPlugin {
 
     handlers.forEach(({ handler }) => {
       handler.environment ??= {};
-      handler.environment[ddTagsEnvVar] = "git.commit.sha:" + info.hash + ",git.repository_url:" + info.remote;
+      handler.environment[ddTagsEnvVar] = `git.commit.sha:${info.hash},git.repository_url:"${info.remote}"`
     });
   }
 
