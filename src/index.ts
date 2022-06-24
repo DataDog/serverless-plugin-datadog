@@ -405,8 +405,20 @@ module.exports = class ServerlessPlugin {
 
     handlers.forEach(({ handler }) => {
       handler.environment ??= {};
-      handler.environment[ddTagsEnvVar] = "git.commit.sha:" + info.hash + ",git.repository_url:" + info.remote;
+      handler.environment[ddTagsEnvVar] =
+        "git.commit.sha:" + info.hash + ",git.repository_url:" + this.removeScheme(info.remote);
     });
+  }
+
+  // Removes the scheme from the remote string.
+  // dd-trace-py does not properly parse the DD_TAGS env var when colons are present in a tag value.
+  // It will output the following error:
+  // https://github.com/DataDog/dd-trace-py/blob/30a516f1eedd9bde2444e435c3a09e99ecc181d3/ddtrace/internal/utils/formats.py#L86-L88
+  private removeScheme(remote: string) {
+    const idx = remote.indexOf("://");
+    if (idx >= 0) {
+      return remote.slice(idx + 3);
+    }
   }
 
   private setDatadogForwarder(config: Configuration) {
