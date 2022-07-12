@@ -158,6 +158,7 @@ custom:
             thresholds:
               ok: 0.025
               warning: 0.05
+              critical: 0.1
 ```
 
 ##### To delete a monitor
@@ -188,6 +189,7 @@ custom:
             thresholds:
               ok: 1
               warning: 2
+              critical: 3
 ```
 
 ## Breaking Changes
