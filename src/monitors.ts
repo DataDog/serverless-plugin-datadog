@@ -125,7 +125,18 @@ export function handleMonitorsApiResponse(response: Response, serverlessMonitorI
   if (response.status === 200) {
     return true;
   } else if (response.status === 400) {
-    throw new Error(`400 Bad Request: This could be due to incorrect syntax for ${serverlessMonitorId}`);
+    //If the Monitors API returns a bad status, its response will be {"errors": ["an array of strings describing the errors"]}
+    type MonitorsAPIErrorResponse = { errors: [string] };
+
+    let errMessage = "";
+    response.json().then((value) => {
+      const monitorsResponse = <MonitorsAPIErrorResponse>value;
+      monitorsResponse.errors.forEach((err) => {
+        errMessage = errMessage + "\t" + err + "\n";
+      });
+    });
+
+    throw new Error(`400 Bad Request for monitor ${serverlessMonitorId}. Monitors API response:\n${errMessage}`);
   } else {
     throw new Error(`${response.status} ${response.statusText}`);
   }
