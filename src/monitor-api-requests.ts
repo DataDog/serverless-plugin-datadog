@@ -22,6 +22,7 @@ export async function createMonitor(
   monitorParams: MonitorParams,
   monitorsApiKey: string,
   monitorsAppKey: string,
+  serverlessMonitorId: string,
 ) {
   const response: Response = await fetch(`https://api.${site}/api/v1/monitor`, {
     method: "POST",
@@ -33,6 +34,12 @@ export async function createMonitor(
     body: JSON.stringify(monitorParams),
   });
 
+  if (response.status !== 200) {
+    const responseText = await response.text();
+    throw new Error(
+      `${response.status} ${response.statusText} for monitor ${serverlessMonitorId}. Response from Monitors API:\n\t${responseText}`,
+    );
+  }
   return response;
 }
 
@@ -42,6 +49,7 @@ export async function updateMonitor(
   monitorParams: MonitorParams,
   monitorsApiKey: string,
   monitorsAppKey: string,
+  serverlessMonitorId: string,
 ) {
   const response: Response = await fetch(`https://api.${site}/api/v1/monitor/${monitorId}`, {
     method: "PUT",
@@ -52,6 +60,13 @@ export async function updateMonitor(
     },
     body: JSON.stringify(monitorParams),
   });
+
+  if (response.status !== 200) {
+    const responseText = await response.text();
+    throw new Error(
+      `${response.status} ${response.statusText} for monitor ${serverlessMonitorId}. Response from Monitors API: \n\t${responseText}`,
+    );
+  }
 
   return response;
 }

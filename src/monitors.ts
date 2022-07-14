@@ -1,6 +1,5 @@
 import { SERVERLESS_MONITORS } from "./serverless_monitors";
 import { updateMonitor, createMonitor, deleteMonitor, getExistingMonitors } from "./monitor-api-requests";
-import { Response } from "node-fetch";
 
 export interface MonitorParams {
   [key: string]: any;
@@ -108,38 +107,12 @@ async function deleteRemovedMonitors(
   for (const pluginMonitorId of Object.keys(existingMonitors)) {
     if (!currentMonitorIds.includes(pluginMonitorId)) {
       const response = await deleteMonitor(site, existingMonitors[pluginMonitorId], monitorsApiKey, monitorsAppKey);
-      const successfullyDeleted = handleMonitorsApiResponse(response, pluginMonitorId);
-      if (successfullyDeleted) {
+      if (response.status === 200) {
         successfullyDeletedMonitors.push(` ${pluginMonitorId}`);
       }
     }
   }
   return successfullyDeletedMonitors;
-}
-/**
- * Handles the Monitor API response and logs the appropriate error
- * @param response Monitor API Response
- * @param serverlessMonitorId Serverless Monitor ID
- */
-export function handleMonitorsApiResponse(response: Response, serverlessMonitorId?: string) {
-  if (response.status === 200) {
-    return true;
-  } else if (response.status === 400) {
-    //If the Monitors API returns a bad status, its response will be {"errors": ["an array of strings describing the errors"]}
-    type MonitorsAPIErrorResponse = { errors: [string] };
-
-    let errMessage = "";
-    response.json().then((value) => {
-      const monitorsResponse = <MonitorsAPIErrorResponse>value;
-      monitorsResponse.errors.forEach((err) => {
-        errMessage = errMessage + "\t" + err + "\n";
-      });
-    });
-
-    throw new Error(`400 Bad Request for monitor ${serverlessMonitorId}. Monitors API response:\n${errMessage}`);
-  } else {
-    throw new Error(`${response.status} ${response.statusText}`);
-  }
 }
 
 /**
@@ -177,15 +150,20 @@ export async function setMonitors(
     const monitorExists = await doesMonitorExist(serverlessMonitorId, serverlessMonitorIdByMonitorId);
 
     if (monitorExists) {
-      const response = await updateMonitor(site, monitorIdNumber, monitorParams, monitorsApiKey, monitorsAppKey);
-      const successfullyCreated = handleMonitorsApiResponse(response, serverlessMonitorId);
-      if (successfullyCreated) {
+      const response = await updateMonitor(
+        site,
+        monitorIdNumber,
+        monitorParams,
+        monitorsApiKey,
+        monitorsAppKey,
+        serverlessMonitorId,
+      );
+      if (response.status === 200) {
         successfullyUpdatedMonitors.push(` ${serverlessMonitorId}`);
       }
     } else {
-      const response = await createMonitor(site, monitorParams, monitorsApiKey, monitorsAppKey);
-      const successfullyUpdated = handleMonitorsApiResponse(response, serverlessMonitorId);
-      if (successfullyUpdated) {
+      const response = await createMonitor(site, monitorParams, monitorsApiKey, monitorsAppKey, serverlessMonitorId);
+      if (response.status === 200) {
         successfullyCreatedMonitors.push(` ${serverlessMonitorId}`);
       }
     }
