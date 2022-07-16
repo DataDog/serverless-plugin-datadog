@@ -10,8 +10,8 @@ import * as Serverless from "serverless";
 import { FunctionDefinition } from "serverless";
 import Service from "serverless/classes/Service";
 import { Provider } from "serverless/plugins/aws/provider/awsProvider";
-import { SimpleGit } from "simple-git";
 import { version } from "../package.json";
+import { gitMetadata } from "@datadog/datadog-ci";
 import {
   Configuration,
   ddEnvEnvVar,
@@ -22,6 +22,7 @@ import {
   getConfig,
   hasWebpackPlugin,
   setEnvConfiguration,
+  setSourceCodeIntegrationEnvVar,
 } from "./env";
 import { addCloudWatchForwarderSubscriptions, addExecutionLogGroupsAndSubscriptions } from "./forwarder";
 import { newSimpleGit } from "./git";
@@ -39,7 +40,6 @@ import * as layers from "./layers.json";
 import { getCloudFormationStackId } from "./monitor-api-requests";
 import { setMonitors } from "./monitors";
 import { addOutputLinks, printOutputs } from "./output";
-import { SourceCodeIntegration } from "./source-code-integration";
 import { enableTracing, TracingMode } from "./tracing";
 import { redirectHandlers } from "./wrapper";
 
@@ -205,12 +205,13 @@ module.exports = class ServerlessPlugin {
     } else {
       if (config.enableSourceCodeIntegration && simpleGit !== undefined && (await simpleGit.checkIsRepo())) {
         try {
-          await this.addSourceCodeIntegration(
-            handlers,
-            simpleGit,
+          const gitHash = await gitMetadata.uploadGitCommitHash(
             (process.env.DATADOG_API_KEY ?? config.apiKey)!,
             config.site,
           );
+          handlers.forEach(({ handler }) => {
+            setSourceCodeIntegrationEnvVar(handler, gitHash);
+          });
         } catch (err) {
           this.serverless.cli.log(`Error occurred when adding source code integration: ${err}`);
           return;
@@ -386,39 +387,6 @@ module.exports = class ServerlessPlugin {
         }
       }
     });
-  }
-
-  /**
-   * Uploads git metadata for the current directory to Datadog and goes through
-   * each function defined in serverless and attaches git.commit.sha and git.repository_url to DD_TAGS.
-   */
-  private async addSourceCodeIntegration(
-    handlers: FunctionInfo[],
-    simpleGit: SimpleGit,
-    apiKey: string,
-    datadogSite: string,
-  ) {
-    const sourceCodeIntegration = new SourceCodeIntegration(apiKey, datadogSite, simpleGit);
-    const info = await sourceCodeIntegration.uploadGitMetadata();
-
-    this.serverless.cli.log(`Adding GitHub integration with git commit hash ${info.hash} and remote ${info.remote}`);
-
-    handlers.forEach(({ handler }) => {
-      handler.environment ??= {};
-      handler.environment[ddTagsEnvVar] =
-        "git.commit.sha:" + info.hash + ",git.repository_url:" + this.removeScheme(info.remote);
-    });
-  }
-
-  // Removes the scheme from the remote string.
-  // dd-trace-py does not properly parse the DD_TAGS env var when colons are present in a tag value.
-  // It will output the following error:
-  // https://github.com/DataDog/dd-trace-py/blob/30a516f1eedd9bde2444e435c3a09e99ecc181d3/ddtrace/internal/utils/formats.py#L86-L88
-  private removeScheme(remote: string) {
-    const idx = remote.indexOf("://");
-    if (idx >= 0) {
-      return remote.slice(idx + 3);
-    }
   }
 
   private setDatadogForwarder(config: Configuration) {
