@@ -93,7 +93,7 @@ module.exports = class ServerlessPlugin {
 
   private cliSharedInitialize() {
     if (this.options!.function) {
-      log.warn("========= using serverless deploy -f option only updates the function code and will not update CloudFormation stack (env variables included).")
+      log.warn("Using serverless deploy -f option only updates the function code and will not update CloudFormation stack (env variables included).")
       log.debug("serverless CLI options:", this.options)
     }
   }
