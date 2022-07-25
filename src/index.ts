@@ -42,6 +42,7 @@ import { addOutputLinks, printOutputs } from "./output";
 import { SourceCodeIntegration } from "./source-code-integration";
 import { enableTracing, TracingMode } from "./tracing";
 import { redirectHandlers } from "./wrapper";
+const { log } = require('@serverless/utils/log');
 
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
 export interface ExtendedFunctionDefinition extends FunctionDefinition {
@@ -58,6 +59,7 @@ enum TagKeys {
 
 module.exports = class ServerlessPlugin {
   public hooks = {
+    "initialize": this.cliSharedInitialize.bind(this),
     "after:datadog:clean:init": this.afterPackageFunction.bind(this),
     "after:datadog:generate:init": this.beforePackageFunction.bind(this),
     "after:deploy:function:packageFunction": this.afterPackageFunction.bind(this),
@@ -86,7 +88,15 @@ module.exports = class ServerlessPlugin {
       usage: "Automatically instruments your lambdas with DataDog",
     },
   };
-  constructor(private serverless: Serverless, _: Serverless.Options) {}
+  constructor(private serverless: Serverless,
+              private options: Serverless.Options) {}
+
+  private cliSharedInitialize() {
+    if (this.options!.function) {
+      log.warn("========= using serverless deploy -f option only updates the function code and will not update CloudFormation stack (env variables included).")
+      log.debug("serverless CLI options:", this.options)
+    }
+  }
 
   private async beforePackageFunction() {
     const config = getConfig(this.serverless.service);
