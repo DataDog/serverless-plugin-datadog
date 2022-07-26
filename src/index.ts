@@ -87,12 +87,13 @@ module.exports = class ServerlessPlugin {
       usage: "Automatically instruments your lambdas with DataDog",
     },
   };
-  constructor(private serverless: Serverless,
-              private options: Serverless.Options) {}
+  constructor(private serverless: Serverless, private options: Serverless.Options) {}
 
   private cliSharedInitialize() {
     if (this.options!.function) {
-      this.serverless.cli.log("Warning: Using serverless deploy -f option only updates the function code and will not update CloudFormation stack (env variables included).")
+      this.serverless.cli.log(
+        "Warning: Using serverless deploy -f option only updates the function code and will not update CloudFormation stack (env variables included).",
+      );
     }
   }
 
