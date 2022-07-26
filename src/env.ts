@@ -7,7 +7,7 @@
  */
 
 import Service from "serverless/classes/Service";
-import { FunctionInfo, runtimeLookup, RuntimeType } from "./layer";
+import { ExtendedFunctionDefinition, FunctionInfo, runtimeLookup, RuntimeType } from "./layer";
 
 export interface Configuration {
   // Whether Datadog is enabled. Defaults to true.
@@ -187,6 +187,15 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
       }
     }
   });
+}
+
+export function setSourceCodeIntegrationEnvVar(handler: ExtendedFunctionDefinition, gitHash: string) {
+  handler.environment ??= {};
+  if (handler.environment[ddTagsEnvVar] !== undefined) {
+    handler.environment[ddTagsEnvVar] += `,git.commit.sha:${gitHash}`;
+  } else {
+    handler.environment[ddTagsEnvVar] = `git.commit.sha:${gitHash}`;
+  }
 }
 
 function throwEnvVariableError(variable: string, value: string, functionName: string) {

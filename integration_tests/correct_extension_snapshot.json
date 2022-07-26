@@ -611,7 +611,7 @@
           {
             "Ref": "ProviderLevelLayerLambdaLayer"
           },
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node16-x:78",
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node16-x:XXX",
           "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
       },

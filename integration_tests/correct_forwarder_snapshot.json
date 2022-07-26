@@ -769,7 +769,7 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node16-x:78"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node16-x:XXX"
         ]
       },
       "DependsOn": [

@@ -7,13 +7,39 @@
  */
 
 import {
+  ddTagsEnvVar,
   defaultConfiguration,
   forceExcludeDepsFromWebpack,
   getConfig,
   hasWebpackPlugin,
   setEnvConfiguration,
+  setSourceCodeIntegrationEnvVar,
 } from "./env";
-import { FunctionInfo, RuntimeType } from "./layer";
+import { ExtendedFunctionDefinition, FunctionInfo, RuntimeType } from "./layer";
+
+describe("addSourceCodeIntegration", () => {
+  it("does not overwrite DD_TAGS when DD_TAGS are already set", () => {
+    let handler = {
+      events: [],
+      environment: {
+        DD_TAGS: "sample_tag:sample_val",
+      },
+    } as ExtendedFunctionDefinition;
+    setSourceCodeIntegrationEnvVar(handler, "1234");
+    expect(handler.environment![ddTagsEnvVar]).toEqual("sample_tag:sample_val,git.commit.sha:1234");
+  });
+
+  it("sets git.commit.sha when no DD_TAGS are found in the environment", () => {
+    let handler = {
+      events: [],
+      environment: {
+        SOME_KEY: "some_val",
+      },
+    } as ExtendedFunctionDefinition;
+    setSourceCodeIntegrationEnvVar(handler, "1234");
+    expect(handler.environment![ddTagsEnvVar]).toEqual("git.commit.sha:1234");
+  });
+});
 
 describe("hasWebpackPlugin", () => {
   it("returns false when the serverless.yml plugins object is not defined", () => {
