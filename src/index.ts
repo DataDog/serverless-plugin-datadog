@@ -58,6 +58,7 @@ enum TagKeys {
 
 module.exports = class ServerlessPlugin {
   public hooks = {
+    initialize: this.cliSharedInitialize.bind(this),
     "after:datadog:clean:init": this.afterPackageFunction.bind(this),
     "after:datadog:generate:init": this.beforePackageFunction.bind(this),
     "after:deploy:function:packageFunction": this.afterPackageFunction.bind(this),
@@ -86,7 +87,15 @@ module.exports = class ServerlessPlugin {
       usage: "Automatically instruments your lambdas with DataDog",
     },
   };
-  constructor(private serverless: Serverless, _: Serverless.Options) {}
+  constructor(private serverless: Serverless, private options: Serverless.Options) {}
+
+  private cliSharedInitialize() {
+    if (this.options!.function) {
+      this.serverless.cli.log(
+        "Warning: Using serverless deploy -f option only updates the function code and will not update CloudFormation stack (env variables included).",
+      );
+    }
+  }
 
   private async beforePackageFunction() {
     const config = getConfig(this.serverless.service);
