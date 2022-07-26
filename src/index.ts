@@ -42,7 +42,6 @@ import { addOutputLinks, printOutputs } from "./output";
 import { SourceCodeIntegration } from "./source-code-integration";
 import { enableTracing, TracingMode } from "./tracing";
 import { redirectHandlers } from "./wrapper";
-const { log } = require('@serverless/utils/log');
 
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
 export interface ExtendedFunctionDefinition extends FunctionDefinition {
@@ -93,8 +92,7 @@ module.exports = class ServerlessPlugin {
 
   private cliSharedInitialize() {
     if (this.options!.function) {
-      log.warn("Using serverless deploy -f option only updates the function code and will not update CloudFormation stack (env variables included).")
-      log.debug("serverless CLI options:", this.options)
+      this.serverless.cli.log("Warning: Using serverless deploy -f option only updates the function code and will not update CloudFormation stack (env variables included).")
     }
   }
 
