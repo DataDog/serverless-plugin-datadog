@@ -95,21 +95,10 @@ export const ddEnvEnvVar = "DD_ENV";
 export const ddVersionEnvVar = "DD_VERSION";
 export const ddTagsEnvVar = "DD_TAGS";
 
-// .NET tracer env variables
-const ENABLE_PROFILING_ENV_VAR = "CORECLR_ENABLE_PROFILING";
-const PROFILER_ENV_VAR = "CORECLR_PROFILER";
-const PROFILER_PATH_ENV_VAR = "CORECLR_PROFILER_PATH";
-const DOTNET_TRACER_HOME_ENV_VAR = "DD_DOTNET_TRACER_HOME";
-const CORECLR_ENABLE_PROFILING = "1";
-const CORECLR_PROFILER = "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}";
-const CORECLR_PROFILER_PATH = "/opt/datadog/Datadog.Trace.ClrProfiler.Native.so";
-const DD_DOTNET_TRACER_HOME = "/opt/datadog";
-
-// Java tracer env variables
-const JAVA_TOOL_OPTIONS_VAR = "JAVA_TOOL_OPTIONS";
-const JAVA_TOOL_OPTIONS = '-javaagent:"/opt/java/lib/dd-java-agent.jar" -XX:+TieredCompilation -XX:TieredStopAtLevel=1';
-const JAVA_JMXFETCH_ENABLED_VAR = "DD_JMXFETCH_ENABLED";
-const JAVA_JMXFETCH_ENABLED = false;
+// The Universal instrumentation wrapper which configures several env variables.
+// Currently it is only used for Java and .NET
+const AWS_LAMBDA_EXEC_WRAPPER_VAR = "AWS_LAMBDA_EXEC_WRAPPER";
+const AWS_LAMBDA_EXEC_WRAPPER = "/opt/datadog_wrapper";
 
 export const defaultConfiguration: Configuration = {
   addLayers: true,
@@ -190,38 +179,11 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     if (environment[ddCaptureLambdaPayloadEnvVar] === undefined) {
       environment[ddCaptureLambdaPayloadEnvVar] = config.captureLambdaPayload;
     }
-    if (type === RuntimeType.DOTNET) {
-      if (environment[ENABLE_PROFILING_ENV_VAR] === undefined) {
-        environment[ENABLE_PROFILING_ENV_VAR] = CORECLR_ENABLE_PROFILING;
-      } else if (environment[ENABLE_PROFILING_ENV_VAR] !== CORECLR_ENABLE_PROFILING) {
-        throwEnvVariableError("CORECLR_ENABLE_PROFILING", CORECLR_ENABLE_PROFILING, functionName);
-      }
-      if (environment[PROFILER_ENV_VAR] === undefined) {
-        environment[PROFILER_ENV_VAR] = CORECLR_PROFILER;
-      } else if (environment[PROFILER_ENV_VAR] !== CORECLR_PROFILER) {
-        throwEnvVariableError("CORECLR_PROFILER", CORECLR_PROFILER, functionName);
-      }
-      if (environment[PROFILER_PATH_ENV_VAR] === undefined) {
-        environment[PROFILER_PATH_ENV_VAR] = CORECLR_PROFILER_PATH;
-      } else if (environment[PROFILER_PATH_ENV_VAR] !== CORECLR_PROFILER_PATH) {
-        throwEnvVariableError("CORECLR_PROFILER_PATH", CORECLR_PROFILER_PATH, functionName);
-      }
-      if (environment[DOTNET_TRACER_HOME_ENV_VAR] === undefined) {
-        environment[DOTNET_TRACER_HOME_ENV_VAR] = DD_DOTNET_TRACER_HOME;
-      } else if (environment[DOTNET_TRACER_HOME_ENV_VAR] !== DD_DOTNET_TRACER_HOME) {
-        throwEnvVariableError("DD_DOTNET_TRACER_HOME", DD_DOTNET_TRACER_HOME, functionName);
-      }
-    }
-    if (type === RuntimeType.JAVA) {
-      if (environment[JAVA_TOOL_OPTIONS_VAR] === undefined) {
-        environment[JAVA_TOOL_OPTIONS_VAR] = JAVA_TOOL_OPTIONS;
-      } else if (environment[JAVA_TOOL_OPTIONS_VAR] !== JAVA_TOOL_OPTIONS) {
-        throwEnvVariableError("JAVA_TOOL_OPTIONS", JAVA_TOOL_OPTIONS, functionName);
-      }
-      if (environment[JAVA_JMXFETCH_ENABLED_VAR] === undefined) {
-        environment[JAVA_JMXFETCH_ENABLED_VAR] = JAVA_JMXFETCH_ENABLED;
-      } else if (environment[JAVA_JMXFETCH_ENABLED_VAR] !== JAVA_JMXFETCH_ENABLED) {
-        throwEnvVariableError("DD_JMXFETCH_ENABLED", `${JAVA_JMXFETCH_ENABLED}`, functionName);
+    if (type === RuntimeType.DOTNET || type === RuntimeType.JAVA) {
+      if (environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] === undefined) {
+        environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] = AWS_LAMBDA_EXEC_WRAPPER;
+      } else if (environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] !== AWS_LAMBDA_EXEC_WRAPPER) {
+        throwEnvVariableError("AWS_LAMBDA_EXEC_WRAPPER", AWS_LAMBDA_EXEC_WRAPPER, functionName);
       }
     }
   });
