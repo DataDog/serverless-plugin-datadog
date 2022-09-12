@@ -25,7 +25,7 @@ if [[ "$root_dir" =~ .*"serverless-plugin-datadog/scripts".* ]]; then
     exit 1
 fi
 
-integration_tests_dir="$repo_dir/integration_tests"
+integration_tests_dir="$root_dir/integration_tests"
 if [ "$UPDATE_SNAPSHOTS" = "true" ]; then
     echo "Overwriting snapshots in this execution"
 fi
@@ -63,7 +63,10 @@ for ((i = 0; i < ${#SERVERLESS_CONFIGS[@]}; i++)); do
 
     echo "Performing diff of ${TEST_SNAPSHOTS[i]} against ${CORRECT_SNAPSHOTS[i]}"
     set +e # Dont exit right away if there is a diff in snapshots
-    diff ${TEST_SNAPSHOTS[i]} ${CORRECT_SNAPSHOTS[i]}
+    cd ..
+    python $scripts_dir/compare_snapshots.py $integration_tests_dir/${TEST_SNAPSHOTS[i]} $integration_tests_dir/${CORRECT_SNAPSHOTS[i]}
+   
+    # diff ${TEST_SNAPSHOTS[i]} ${CORRECT_SNAPSHOTS[i]}
     return_code=$?
     set -e
     if [ $return_code -eq 0 ]; then
@@ -73,6 +76,7 @@ for ((i = 0; i < ${#SERVERLESS_CONFIGS[@]}; i++)); do
         echo "If you expected the ${TEST_SNAPSHOTS[i]} to be different generate new snapshots by running this command from a development branch on your local repository: 'UPDATE_SNAPSHOTS=true ./scripts/run_integration_tests.sh'"
         exit 1
     fi
+    cd $integration_tests_dir
     echo "===================================="
 done
 exit 0
