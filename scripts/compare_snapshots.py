@@ -81,11 +81,10 @@ def main():
     if len(sys.argv) != 3:
         raise ValueError("Must provide 2 file names to compare")
 
-    do_snapshots_match = do_json_files_match(sys.argv[1], sys.argv[2])
-
-    if not do_snapshots_match:
+    if not do_json_files_match(sys.argv[1], sys.argv[2]):
         sys.exit(1)
 
+    # Exit successfully if no mismatch found
     sys.exit(0)
 
 
