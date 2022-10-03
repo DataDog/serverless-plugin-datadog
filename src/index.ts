@@ -214,7 +214,7 @@ module.exports = class ServerlessPlugin {
     } else {
       if (config.enableSourceCodeIntegration && simpleGit !== undefined && (await simpleGit.checkIsRepo())) {
         try {
-          const gitHash = await gitMetadata.uploadGitCommitHash(
+          const [, gitHash] = await gitMetadata.uploadGitCommitHash(
             (process.env.DATADOG_API_KEY ?? config.apiKey)!,
             config.site,
           );

@@ -295,10 +295,10 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@datadog/datadog-ci@^1.8.0":
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci/-/datadog-ci-1.8.0.tgz#3a91ce867e9eeef7dfdbc28360dd8141b1cd6746"
-  integrity sha512-02StMSacleyg8iJKHZOM8RuqLsjUvQJ1gMmF3yBYLuOpYUcZG1LSJ+EnHaOz6E3dqB2HB2aE0veqFYZgy3VHfA==
+"@datadog/datadog-ci@1.13.3":
+  version "1.13.3"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci/-/datadog-ci-1.13.3.tgz#74a9bd251267a49f063e226463505b96208594c9"
+  integrity sha512-kOZGMbVTD8HxH9z4Rzg1z/rfDLNDJ0MeJNbVdVuVir6xUa2mfsj2v1UDwdEpxsxFC9BlNxVukbDK7Ydj+Y7DDw==
   dependencies:
     "@types/datadog-metrics" "0.6.1"
     async-retry "1.3.1"
