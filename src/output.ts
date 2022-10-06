@@ -33,10 +33,14 @@ export async function addOutputLinks(
   });
 }
 
-export async function printOutputs(serverless: Serverless, site: string, subdomain: string) {
+export async function printOutputs(
+  serverless: Serverless,
+  site: string,
+  subdomain: string,
+  service: string,
+  env: string,
+) {
   const stackName = serverless.getProvider("aws").naming.getStackName();
-  const service = serverless.service.getServiceName();
-  const env = serverless.getProvider("aws").getStage();
   const describeStackOutput = await serverless
     .getProvider("aws")
     .request(

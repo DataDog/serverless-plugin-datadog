@@ -238,8 +238,9 @@ module.exports = class ServerlessPlugin {
 
   private async afterDeploy() {
     const config = getConfig(this.serverless.service);
-    const service = this.serverless.service.getServiceName();
-    const env = this.serverless.getProvider("aws").getStage();
+    const custom = (this.serverless.service.custom ?? {}) as any;
+    const service = custom.datadog?.service ?? this.serverless.service.getServiceName();
+    const env = custom.datadog?.env ?? this.serverless.getProvider("aws").getStage();
 
     if (config.enabled === false) return;
     if (
@@ -270,7 +271,7 @@ module.exports = class ServerlessPlugin {
         }
       }
     }
-    return printOutputs(this.serverless, config.site, config.subdomain);
+    return printOutputs(this.serverless, config.site, config.subdomain, service, env);
   }
 
   private debugLogHandlers(handlers: FunctionInfo[]) {
