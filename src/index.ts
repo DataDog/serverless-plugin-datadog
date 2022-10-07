@@ -205,25 +205,26 @@ module.exports = class ServerlessPlugin {
 
     this.addTags(handlers, config.addExtension !== true);
 
-    const simpleGit = await newSimpleGit();
-
-    if ((process.env.DATADOG_API_KEY ?? config.apiKey) === undefined) {
-      this.serverless.cli.log(
-        "Skipping installing GitHub integration because Datadog credentials were not found. Please set either DATADOG_API_KEY in your environment, or set the apiKey parameter in Serverless.",
-      );
-    } else {
-      if (config.enableSourceCodeIntegration && simpleGit !== undefined && (await simpleGit.checkIsRepo())) {
-        try {
-          const [, gitHash] = await gitMetadata.uploadGitCommitHash(
-            (process.env.DATADOG_API_KEY ?? config.apiKey)!,
-            config.site,
-          );
-          handlers.forEach(({ handler }) => {
-            setSourceCodeIntegrationEnvVar(handler, gitHash);
-          });
-        } catch (err) {
-          this.serverless.cli.log(`Error occurred when adding source code integration: ${err}`);
-          return;
+    if (config.enableSourceCodeIntegration) {
+      if ((process.env.DATADOG_API_KEY ?? config.apiKey) === undefined) {
+        this.serverless.cli.log(
+          "Skipping installing GitHub integration because Datadog credentials were not found. Please set either DATADOG_API_KEY in your environment, or set the apiKey parameter in Serverless.",
+        );
+      } else {
+        const simpleGit = await newSimpleGit();
+        if (simpleGit !== undefined && (await simpleGit.checkIsRepo())) {
+          try {
+            const [, gitHash] = await gitMetadata.uploadGitCommitHash(
+              (process.env.DATADOG_API_KEY ?? config.apiKey)!,
+              config.site,
+            );
+            handlers.forEach(({ handler }) => {
+              setSourceCodeIntegrationEnvVar(handler, gitHash);
+            });
+          } catch (err) {
+            this.serverless.cli.log(`Error occurred when adding source code integration: ${err}`);
+            return;
+          }
         }
       }
     }
