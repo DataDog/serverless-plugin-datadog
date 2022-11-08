@@ -189,6 +189,7 @@ describe("getConfig", () => {
       subscribeToExecutionLogs: false,
       enableSourceCodeIntegration: true,
       failOnError: false,
+      skipCloudformationOutputs: false,
     });
   });
 
@@ -222,6 +223,7 @@ describe("getConfig", () => {
       subscribeToExecutionLogs: false,
       enableSourceCodeIntegration: true,
       failOnError: false,
+      skipCloudformationOutputs: false,
     });
   });
 
@@ -256,6 +258,7 @@ describe("getConfig", () => {
       customHandler: "/src/custom-handler.handler",
       enableSourceCodeIntegration: true,
       failOnError: false,
+      skipCloudformationOutputs: false,
     });
   });
 });
@@ -290,6 +293,7 @@ it("disable source code integration", () => {
     subscribeToExecutionLogs: false,
     enableSourceCodeIntegration: false,
     failOnError: false,
+    skipCloudformationOutputs: false,
   });
 });
 
@@ -430,6 +434,7 @@ describe("setEnvConfiguration", () => {
         enableSourceCodeIntegration: true,
         captureLambdaPayload: false,
         failOnError: false,
+        skipCloudformationOutputs: false,
       },
       handlers,
     );
@@ -568,6 +573,7 @@ describe("setEnvConfiguration", () => {
         exclude: [],
         enableSourceCodeIntegration: true,
         failOnError: false,
+        skipCloudformationOutputs: false,
       },
       handlers,
     );
@@ -650,6 +656,7 @@ describe("setEnvConfiguration", () => {
         exclude: [],
         enableSourceCodeIntegration: true,
         failOnError: false,
+        skipCloudformationOutputs: false,
       },
       handlers,
     );
@@ -705,6 +712,7 @@ describe("setEnvConfiguration", () => {
         exclude: ["dd-excluded-function"],
         enableSourceCodeIntegration: true,
         failOnError: false,
+        skipCloudformationOutputs: false,
       },
       handlers,
     );
@@ -760,6 +768,7 @@ describe("setEnvConfiguration", () => {
         exclude: ["dd-excluded-function"],
         enableSourceCodeIntegration: true,
         failOnError: false,
+        skipCloudformationOutputs: false,
       },
       handlers,
     );
@@ -814,6 +823,7 @@ describe("setEnvConfiguration", () => {
         exclude: ["dd-excluded-function"],
         enableSourceCodeIntegration: true,
         failOnError: false,
+        skipCloudformationOutputs: false,
       },
       handlers,
     );
@@ -871,6 +881,7 @@ describe("setEnvConfiguration", () => {
           exclude: ["dd-excluded-function"],
           enableSourceCodeIntegration: true,
           failOnError: false,
+          skipCloudformationOutputs: false,
         },
         handlers,
       );
