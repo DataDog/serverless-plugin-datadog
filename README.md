@@ -53,6 +53,7 @@ To further configure your plugin, use the following custom parameters in your `s
 | `failOnError`                 | When set, this plugin throws an error if any custom Datadog monitors fail to create or update. This occurs after deploy, but will cause the result of `serverless deploy` to return a nonzero exit code (to fail user CI). Defaults to `false`. |
 | `integrationTesting`          | Set `true` when running integration tests. This bypasses the validation of the Forwarder ARN and the addition of Datadog Monitor output links. Defaults to `false`. |
 | `logLevel`                    | The log level, set to `DEBUG` for extended logging. |
+| `skipCloudformationOutputs`   | Set to `true` if you'd like to skip adding Datadog Cloudformation Outputs for your stack. Useful if you're running into the 200 output limit which can cause stack creation to fail. |
 
 To use any of these parameters, add a `custom` > `datadog` section to your `serverless.yml` similar to this example:
 
