@@ -74,6 +74,9 @@ export interface Configuration {
   // API Gateway Execution logging - handles rest and websocket. Http not supported as of Sept.21
   subscribeToExecutionLogs: boolean;
 
+  // Skip populating the Cloudformation Outputs
+  skipCloudformationOutputs: boolean;
+
   // When set, this plugin will configure the specified handler for the functions
   customHandler?: string;
 }
@@ -119,6 +122,7 @@ export const defaultConfiguration: Configuration = {
   enableDDLogs: true,
   captureLambdaPayload: false,
   failOnError: false,
+  skipCloudformationOutputs: false,
 };
 
 export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]) {

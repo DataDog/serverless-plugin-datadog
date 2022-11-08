@@ -189,6 +189,7 @@ describe("getConfig", () => {
       subscribeToExecutionLogs: false,
       enableSourceCodeIntegration: true,
       failOnError: false,
+      skipCloudformationOutputs: false,
     });
   });
 
@@ -222,6 +223,7 @@ describe("getConfig", () => {
       subscribeToExecutionLogs: false,
       enableSourceCodeIntegration: true,
       failOnError: false,
+      skipCloudformationOutputs: false,
     });
   });
 
@@ -256,6 +258,7 @@ describe("getConfig", () => {
       customHandler: "/src/custom-handler.handler",
       enableSourceCodeIntegration: true,
       failOnError: false,
+      skipCloudformationOutputs: false,
     });
   });
 });
@@ -290,6 +293,7 @@ it("disable source code integration", () => {
     subscribeToExecutionLogs: false,
     enableSourceCodeIntegration: false,
     failOnError: false,
+    skipCloudformationOutputs: false,
   });
 });
 
