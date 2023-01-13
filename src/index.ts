@@ -220,12 +220,9 @@ module.exports = class ServerlessPlugin {
         const simpleGit = await newSimpleGit();
         if (simpleGit !== undefined && (await simpleGit.checkIsRepo())) {
           try {
-            const [, gitHash] = await gitMetadata.uploadGitCommitHash(
-              (process.env.DATADOG_API_KEY ?? config.apiKey)!,
-              config.site,
-            );
+            const [gitRemote, gitHash] = await gitMetadata.getGitCommitInfo();
             handlers.forEach(({ handler }) => {
-              setSourceCodeIntegrationEnvVar(handler, gitHash);
+              setSourceCodeIntegrationEnvVar(handler, gitHash, gitRemote);
             });
           } catch (err) {
             this.serverless.cli.log(`Error occurred when adding source code integration: ${err}`);
