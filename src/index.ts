@@ -229,7 +229,6 @@ module.exports = class ServerlessPlugin {
             });
           } catch (err) {
             this.serverless.cli.log(`Error occurred when adding source code integration: ${err}`);
-            return;
           }
         }
       }
