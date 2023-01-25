@@ -207,8 +207,14 @@ module.exports = class ServerlessPlugin {
 
     if (config.enableSourceCodeIntegration) {
       if ((process.env.DATADOG_API_KEY ?? config.apiKey) === undefined) {
+        let keyError;
+        if (config.apiKeySecretArn) {
+          keyError = "encrypted credentials through KMS/Secrets Manager is not supported for this integration";
+        } else {
+          keyError = "Datadog credentials were not found";
+        }
         this.serverless.cli.log(
-          "Skipping installing GitHub integration because Datadog credentials were not found. Please set either DATADOG_API_KEY in your environment, or set the apiKey parameter in Serverless.",
+          `Skipping installing GitHub integration because ${keyError}. Please set either DATADOG_API_KEY in your environment, or set the apiKey parameter in Serverless.`,
         );
       } else {
         const simpleGit = await newSimpleGit();
@@ -223,7 +229,6 @@ module.exports = class ServerlessPlugin {
             });
           } catch (err) {
             this.serverless.cli.log(`Error occurred when adding source code integration: ${err}`);
-            return;
           }
         }
       }

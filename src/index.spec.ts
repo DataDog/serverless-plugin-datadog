@@ -1528,5 +1528,78 @@ describe("ServerlessPlugin", () => {
         "The following configuration options have been removed: subscribeToApiGatewayLogs subscribeToHttpApiLogs subscribeToWebsocketLogs. Please use the subscribeToAccessLogs or subscribeToExecutionLogs options instead.",
       );
     });
+
+    it("Logs error when enableSourceCodeIntegration is true and both API key and API key secret ARN are undefined", async () => {
+      mock({});
+      let logs = "";
+      const serverless = {
+        cli: {
+          log: (logMsg: string) => {
+            logs += logMsg;
+          },
+        },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          provider: {
+            region: "us-east-1",
+          },
+          functions: {
+            node1: {
+              handler: "my-func.ev",
+              runtime: "nodejs14.x",
+            },
+          },
+          custom: {
+            datadog: {
+              addExtension: true,
+              flushMetricsToLogs: false,
+            },
+          },
+        },
+      };
+
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(logs).toContain(
+        "Skipping installing GitHub integration because Datadog credentials were not found. Please set either DATADOG_API_KEY in your environment, or set the apiKey parameter in Serverless.",
+      );
+    });
+
+    it("logs error when enableSourceCodeIntegration is true and only API key secret ARN is defined", async () => {
+      mock({});
+      let logs = "";
+      const serverless = {
+        cli: {
+          log: (logMsg: string) => {
+            logs += logMsg;
+          },
+        },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          provider: {
+            region: "us-east-1",
+          },
+          functions: {
+            node1: {
+              handler: "my-func.ev",
+              runtime: "nodejs14.x",
+            },
+          },
+          custom: {
+            datadog: {
+              addExtension: true,
+              apiKeySecretArn: "1234",
+              flushMetricsToLogs: false,
+            },
+          },
+        },
+      };
+
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(logs).toContain(
+        "Skipping installing GitHub integration because encrypted credentials through KMS/Secrets Manager is not supported for this integration. Please set either DATADOG_API_KEY in your environment, or set the apiKey parameter in Serverless.",
+      );
+    });
   });
 });
