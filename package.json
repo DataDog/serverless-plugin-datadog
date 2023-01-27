@@ -57,7 +57,7 @@
     ]
   },
   "dependencies": {
-    "@datadog/datadog-ci": "2.2.0",
+    "@datadog/datadog-ci": "2.4.0",
     "node-fetch": "^2.6.1",
     "simple-git": "^3.3.0"
   }
