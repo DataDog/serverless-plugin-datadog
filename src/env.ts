@@ -193,7 +193,11 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
   });
 }
 
-export function setSourceCodeIntegrationEnvVar(handler: ExtendedFunctionDefinition, gitHash: string, gitRemote: string) {
+export function setSourceCodeIntegrationEnvVar(
+  handler: ExtendedFunctionDefinition,
+  gitHash: string,
+  gitRemote: string,
+) {
   handler.environment ??= {};
   if (handler.environment[ddTagsEnvVar] !== undefined) {
     handler.environment[ddTagsEnvVar] += `,git.commit.sha:${gitHash},git.repository_url:${gitRemote}`;
