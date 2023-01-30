@@ -498,6 +498,37 @@ describe("applyLambdaLibraryLayers", () => {
     });
   });
 
+  it("adds correct lambda layer given architecture in provider level for .NET", () => {
+    const handler = {
+      handler: { runtime: "dotnet6" },
+      type: RuntimeType.DOTNET,
+      runtime: "dotnet6",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: {
+        "us-east-1": {
+          "dd-trace-dotnet": "dd-trace-dotnet:6",
+          "dd-trace-dotnet-ARM": "dd-trace-dotnet-ARM:6",
+          extension: "extension:11",
+          "extension-arm": "extension-arm:11",
+        },
+      },
+    };
+    const mockService = createMockService(
+      "us-east-1",
+      {
+        ".NET-function": { handler: "myfile.handler", runtime: "dotnet6" },
+      },
+      "arm64",
+    );
+    applyLambdaLibraryLayers(mockService, [handler], layers);
+    applyExtensionLayer(mockService, [handler], layers);
+    expect(handler.handler).toEqual({
+      runtime: "dotnet6",
+      layers: ["dd-trace-dotnet-ARM:6", "extension-arm:11"],
+    });
+  });
+
   it("uses default runtime layer if architecture not available for specified runtime", () => {
     const handler = {
       handler: { runtime: "python3.7", architecture: "arm64" },
