@@ -1638,7 +1638,7 @@
         "FunctionName": "dd-sls-plugin-integration-test-dev-custom-resource-apigw-cw-role",
         "Handler": "api-gateway-cloud-watch-role/handler.handler",
         "MemorySize": 1024,
-        "Runtime": "nodejs14.x",
+        "Runtime": "nodejs16.x",
         "Timeout": 180,
         "Role": {
           "Fn::GetAtt": [
@@ -1892,7 +1892,7 @@
           ]
         },
         "PayloadFormatVersion": "2.0",
-        "TimeoutInMillis": 6500
+        "TimeoutInMillis": 30000
       }
     },
     "HttpApiRoutePutUsersUpdate": {
@@ -1967,7 +1967,7 @@
           ]
         },
         "PayloadFormatVersion": "2.0",
-        "TimeoutInMillis": 6500
+        "TimeoutInMillis": 30000
       }
     },
     "HttpApiRouteDeleteUsersRemove": {
