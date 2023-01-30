@@ -295,7 +295,7 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@datadog/datadog-ci@^2.2.0":
+"@datadog/datadog-ci@^2.4.0":
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/@datadog/datadog-ci/-/datadog-ci-2.4.0.tgz#c3e2f001491e4f87782905ab0020155acebd59be"
   integrity sha512-9zNjYQFgx9lExYKf079VHs+sK4KuRgx65PmMuQJDi4XJC+9ccpXhyzgfFc0AyYBjObh2b4MSIK7ePhP23OU5Rw==
