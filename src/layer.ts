@@ -68,6 +68,7 @@ export const armRuntimeKeys: { [key: string]: string } = {
   "python3.8": "python3.8-arm",
   "python3.9": "python3.9-arm",
   extension: "extension-arm",
+  dotnet6: "dd-trace-dotnet-ARM",
 };
 
 const dotnetTraceLayerKey: string = "dotnet";
