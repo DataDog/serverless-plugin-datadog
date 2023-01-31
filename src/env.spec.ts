@@ -25,8 +25,10 @@ describe("addSourceCodeIntegration", () => {
         DD_TAGS: "sample_tag:sample_val",
       },
     } as ExtendedFunctionDefinition;
-    setSourceCodeIntegrationEnvVar(handler, "1234");
-    expect(handler.environment![ddTagsEnvVar]).toEqual("sample_tag:sample_val,git.commit.sha:1234");
+    setSourceCodeIntegrationEnvVar(handler, "1234", "github.com/datadog/test");
+    expect(handler.environment![ddTagsEnvVar]).toEqual(
+      "sample_tag:sample_val,git.commit.sha:1234,git.repository_url:github.com/datadog/test",
+    );
   });
 
   it("sets git.commit.sha when no DD_TAGS are found in the environment", () => {
@@ -36,8 +38,10 @@ describe("addSourceCodeIntegration", () => {
         SOME_KEY: "some_val",
       },
     } as ExtendedFunctionDefinition;
-    setSourceCodeIntegrationEnvVar(handler, "1234");
-    expect(handler.environment![ddTagsEnvVar]).toEqual("git.commit.sha:1234");
+    setSourceCodeIntegrationEnvVar(handler, "1234", "github.com/datadog/test");
+    expect(handler.environment![ddTagsEnvVar]).toEqual(
+      "git.commit.sha:1234,git.repository_url:github.com/datadog/test",
+    );
   });
 });
 
