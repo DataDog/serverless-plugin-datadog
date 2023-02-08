@@ -61,8 +61,8 @@ export interface Configuration {
   // When set, the plugin will automatically tag the function with git.commit.sha and git.repository_url.
   enableSourceCodeIntegration: boolean;
   // When set, if enableSourceCodeIntegration is true, the plugin will upload git metadata to Datadog.
-  // Set this to false if you have the Datadog github integration setup (as the metadata then does not need
-  // to be installed).
+  // Set this to false if you have the Datadog github integration setup (as then git metadata does not 
+  // need to be uploaded).
   uploadGitMetadata: boolean;
 
   // When set, this plugin will not try to redirect the handlers of these specified functions;
