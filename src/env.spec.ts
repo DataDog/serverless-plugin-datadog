@@ -929,7 +929,7 @@ describe("setEnvConfiguration", () => {
           injectLogContext: false,
           exclude: ["dd-excluded-function"],
           enableSourceCodeIntegration: true,
-        uploadGitMetadata: false,
+          uploadGitMetadata: false,
           failOnError: false,
           skipCloudformationOutputs: false,
         },
