@@ -224,6 +224,12 @@ module.exports = class ServerlessPlugin {
             handlers.forEach(({ handler }) => {
               setSourceCodeIntegrationEnvVar(handler, gitHash, gitRemote);
             });
+            if (config.uploadGitMetadata) {
+              await gitMetadata.uploadGitCommitHash(
+                (process.env.DATADOG_API_KEY ?? config.apiKey)!,
+                config.site,
+              );
+            }
           } catch (err) {
             this.serverless.cli.log(`Error occurred when adding source code integration: ${err}`);
           }

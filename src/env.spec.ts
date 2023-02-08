@@ -192,6 +192,7 @@ describe("getConfig", () => {
       subscribeToAccessLogs: true,
       subscribeToExecutionLogs: false,
       enableSourceCodeIntegration: true,
+      uploadGitMetadata: true,
       failOnError: false,
       skipCloudformationOutputs: false,
     });
@@ -226,6 +227,7 @@ describe("getConfig", () => {
       subscribeToAccessLogs: true,
       subscribeToExecutionLogs: false,
       enableSourceCodeIntegration: true,
+      uploadGitMetadata: true,
       failOnError: false,
       skipCloudformationOutputs: false,
     });
@@ -261,6 +263,7 @@ describe("getConfig", () => {
       subscribeToExecutionLogs: false,
       customHandler: "/src/custom-handler.handler",
       enableSourceCodeIntegration: true,
+      uploadGitMetadata: true,
       failOnError: false,
       skipCloudformationOutputs: false,
     });
@@ -296,6 +299,42 @@ it("disable source code integration", () => {
     subscribeToAccessLogs: true,
     subscribeToExecutionLogs: false,
     enableSourceCodeIntegration: false,
+    uploadGitMetadata: true,
+    failOnError: false,
+    skipCloudformationOutputs: false,
+  });
+});
+
+it("disable git metadata upload", () => {
+  const result = getConfig({
+    custom: {
+      datadog: {
+        apiKey: "1234",
+        logLevel: "debug",
+        uploadGitMetadata: false,
+      },
+    },
+  } as any);
+  expect(result).toEqual({
+    addLayers: true,
+    apiKey: "1234",
+    captureLambdaPayload: false,
+    flushMetricsToLogs: true,
+    logLevel: "debug",
+    site: "datadoghq.com",
+    subdomain: "app",
+    enableXrayTracing: false,
+    enableDDTracing: true,
+    enableDDLogs: true,
+    addExtension: true,
+    enableTags: true,
+    injectLogContext: true,
+    exclude: [],
+    integrationTesting: false,
+    subscribeToAccessLogs: true,
+    subscribeToExecutionLogs: false,
+    enableSourceCodeIntegration: true,
+    uploadGitMetadata: false,
     failOnError: false,
     skipCloudformationOutputs: false,
   });
@@ -436,6 +475,7 @@ describe("setEnvConfiguration", () => {
         subscribeToExecutionLogs: false,
         exclude: ["dd-excluded-function"],
         enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
         captureLambdaPayload: false,
         failOnError: false,
         skipCloudformationOutputs: false,
@@ -576,6 +616,7 @@ describe("setEnvConfiguration", () => {
         subscribeToExecutionLogs: false,
         exclude: [],
         enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
         failOnError: false,
         skipCloudformationOutputs: false,
       },
@@ -659,6 +700,7 @@ describe("setEnvConfiguration", () => {
         subscribeToExecutionLogs: false,
         exclude: [],
         enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
         failOnError: false,
         skipCloudformationOutputs: false,
       },
@@ -715,6 +757,7 @@ describe("setEnvConfiguration", () => {
         injectLogContext: false,
         exclude: ["dd-excluded-function"],
         enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
         failOnError: false,
         skipCloudformationOutputs: false,
       },
@@ -771,6 +814,7 @@ describe("setEnvConfiguration", () => {
         injectLogContext: false,
         exclude: ["dd-excluded-function"],
         enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
         failOnError: false,
         skipCloudformationOutputs: false,
       },
@@ -826,6 +870,7 @@ describe("setEnvConfiguration", () => {
         injectLogContext: false,
         exclude: ["dd-excluded-function"],
         enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
         failOnError: false,
         skipCloudformationOutputs: false,
       },
@@ -884,6 +929,7 @@ describe("setEnvConfiguration", () => {
           injectLogContext: false,
           exclude: ["dd-excluded-function"],
           enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
           failOnError: false,
           skipCloudformationOutputs: false,
         },
