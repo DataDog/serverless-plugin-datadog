@@ -58,9 +58,12 @@ export interface Configuration {
   enableTags: boolean;
   // When set, the lambda layer will automatically patch console.log with Datadog's tracing ids.
   injectLogContext: boolean;
-  // When set, the plugin will automatically upload git commit data to Datadog and tag the function with
-  // git.commit.sha.
+  // When set, the plugin will automatically tag the function with git.commit.sha and git.repository_url.
   enableSourceCodeIntegration: boolean;
+  // When set, if enableSourceCodeIntegration is true, the plugin will upload git metadata to Datadog.
+  // Set this to false if you have the Datadog github integration setup (as then git metadata does not
+  // need to be uploaded).
+  uploadGitMetadata: boolean;
 
   // When set, this plugin will not try to redirect the handlers of these specified functions;
   exclude: string[];
@@ -115,6 +118,7 @@ export const defaultConfiguration: Configuration = {
   enableTags: true,
   injectLogContext: true,
   enableSourceCodeIntegration: true,
+  uploadGitMetadata: true,
   exclude: [],
   integrationTesting: false,
   subscribeToAccessLogs: true,

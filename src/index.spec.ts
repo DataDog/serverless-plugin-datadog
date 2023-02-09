@@ -1561,7 +1561,7 @@ describe("ServerlessPlugin", () => {
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
       expect(logs).toContain(
-        "Skipping installing GitHub integration because Datadog credentials were not found. Please set either DATADOG_API_KEY in your environment, or set the apiKey parameter in Serverless.",
+        "Skipping enabling source code integration because Datadog credentials were not found. Please set either DATADOG_API_KEY in your environment, or set the apiKey parameter in Serverless.",
       );
     });
 
@@ -1598,7 +1598,7 @@ describe("ServerlessPlugin", () => {
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
       expect(logs).toContain(
-        "Skipping installing GitHub integration because encrypted credentials through KMS/Secrets Manager is not supported for this integration. Please set either DATADOG_API_KEY in your environment, or set the apiKey parameter in Serverless.",
+        "Skipping enabling source code integration because encrypted credentials through KMS/Secrets Manager is not supported for this integration. Please set either DATADOG_API_KEY in your environment, or set the apiKey parameter in Serverless.",
       );
     });
   });
