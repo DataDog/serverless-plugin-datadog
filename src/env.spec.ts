@@ -939,4 +939,178 @@ describe("setEnvConfiguration", () => {
       "apiKeySecretArn` is not supported for Node runtimes when using Synchronous Metrics. Set DATADOG_API_KEY in your environment, or use `apiKmsKey` in the configuration.",
     );
   });
+ it("defines `DD_COLD_START_TRACING` when enableColdStartTracing is set", () => {
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
+    setEnvConfiguration(
+      {
+        addLayers: false,
+        apiKey: "1234",
+        apiKMSKey: "5678",
+        site: "datadoghq.eu",
+        subdomain: "app",
+        logLevel: "info",
+        flushMetricsToLogs: true,
+        enableXrayTracing: true,
+        enableDDTracing: true,
+        enableDDLogs: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
+        addExtension: true,
+        enableTags: true,
+        injectLogContext: false,
+        exclude: ["dd-excluded-function"],
+        enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
+        failOnError: false,
+        skipCloudformationOutputs: false,
+        enableColdStartTracing: false
+      },
+      handlers,
+    );
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_KMS_API_KEY: "5678",
+            DD_LOGS_INJECTION: false,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_LOG_LEVEL: "info",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_MERGE_XRAY_TRACES: true,
+            DD_COLD_START_TRACING: false
+          },
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ]);
+  }); 
+  it("defines `DD_COLD_START_TRACING_SKIP_LIBS` when coldStartTracingSkipLibs is set", () => {
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
+    setEnvConfiguration(
+      {
+        addLayers: false,
+        apiKey: "1234",
+        apiKMSKey: "5678",
+        site: "datadoghq.eu",
+        subdomain: "app",
+        logLevel: "info",
+        flushMetricsToLogs: true,
+        enableXrayTracing: true,
+        enableDDTracing: true,
+        enableDDLogs: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
+        addExtension: true,
+        enableTags: true,
+        injectLogContext: false,
+        exclude: ["dd-excluded-function"],
+        enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
+        failOnError: false,
+        skipCloudformationOutputs: false,
+        coldStartTraceSkipLibs: 'my-dep,your-dep'
+      },
+      handlers,
+    );
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_KMS_API_KEY: "5678",
+            DD_LOGS_INJECTION: false,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_LOG_LEVEL: "info",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_MERGE_XRAY_TRACES: true,
+            DD_COLD_START_TRACE_SKIP_LIB: 'my-dep,your-dep'
+          },
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ]);
+  });
+  it("defines `DD_MIN_COLD_START_DURATION` when minColdStartTraceDuration is set", () => {
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
+    setEnvConfiguration(
+      {
+        addLayers: false,
+        apiKey: "1234",
+        apiKMSKey: "5678",
+        site: "datadoghq.eu",
+        subdomain: "app",
+        logLevel: "info",
+        flushMetricsToLogs: true,
+        enableXrayTracing: true,
+        enableDDTracing: true,
+        enableDDLogs: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
+        addExtension: true,
+        enableTags: true,
+        injectLogContext: false,
+        exclude: ["dd-excluded-function"],
+        enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
+        failOnError: false,
+        skipCloudformationOutputs: false,
+        minColdStartTraceDuration: 50
+      },
+      handlers,
+    );
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_KMS_API_KEY: "5678",
+            DD_LOGS_INJECTION: false,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_LOG_LEVEL: "info",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_MERGE_XRAY_TRACES: true,
+            DD_MIN_COLD_START_DURATION: 50
+          },
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ]);
+  });
 });
