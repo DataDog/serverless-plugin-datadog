@@ -41,8 +41,8 @@ To further configure your plugin, use the following custom parameters in your `s
 | `enableDDLogs`                | Enable Datadog log collection using the Lambda Extension. Defaults to `true`. Note: This setting has no effect on logs sent by the Datadog Forwarder. |
 | `monitors`                    | When defined, the Datadog plugin configures monitors for the deployed function. Requires setting `DATADOG_API_KEY` and `DATADOG_APP_KEY` in your environment. To learn how to define monitors, see [To Enable and Configure a Recommended Serverless Monitor](#to-enable-and-configure-a-recommended-serverless-monitor). |
 | `captureLambdaPayload`        | [Captures incoming and outgoing AWS Lambda payloads][17] in the Datadog APM spans for Lambda invocations. Defaults to `false`. |
-| `enableSourceCodeIntegration` | Enable [Datadog source code integration][18] for the function. Defaults to `true`. |
-| `uploadGitMetadata`           | Enable git metadata uploading for the function, as a part of source code integration. Set this to false if you have the Datadog Github integration installed. Defaults to `true`. |
+| `enableSourceCodeIntegration` | Enable [Datadog Source Code Integration][18] for the function. Defaults to `true`. |
+| `uploadGitMetadata`           | Enable Git metadata uploading for the function, as a part of source code integration. Set this to false if you have the Datadog Github integration installed, as source code integration will work without it. Defaults to `true`. |
 | `subscribeToAccessLogs`       | Enable automatic subscription of the Datadog Forwarder to API Gateway access log groups. Requires setting `forwarderArn`. Defaults to `true`. |
 | `subscribeToExecutionLogs`    | Enable automatic subscription of the Datadog Forwarder to HTTP API  and Websocket log groups. Requires setting `forwarderArn`. Defaults to `true`. |
 | `forwarderArn`                | The ARN of the Datadog Forwarder to be subscribed to the Lambda or API Gateway log groups. |
