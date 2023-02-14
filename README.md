@@ -55,7 +55,7 @@ To further configure your plugin, use the following custom parameters in your `s
 | `logLevel`                    | The log level, set to `DEBUG` for extended logging. |
 | `skipCloudformationOutputs`   | Set to `true` if you want to skip adding Datadog Cloudformation Outputs for your stack. This is useful if you are running into the 200 output limit which can cause the stack creation to fail. |
 | `enableColdStartTracing` | Set to `false` to disable Cold Start Tracing. Used in NodeJS and Python. Defaults to `true`. |
-| `coldStartTraceMinDuration` | Sets the minimum duration for a module load event to be traced via Cold Start Tracing. Number. Defaults to `3` |
+| `coldStartTraceMinDuration` | Sets the minimum duration (in milliseconds) for a module load event to be traced via Cold Start Tracing. Number. Defaults to `3` |
 | `coldStartTraceSkipLibs` | optionally skip creating Cold Start Spans for a comma-separated list of libraries. Useful to limit depth or skip known libraries. Default depends on runtime. |
 
 To use any of these parameters, add a `custom` > `datadog` section to your `serverless.yml` similar to this example:
