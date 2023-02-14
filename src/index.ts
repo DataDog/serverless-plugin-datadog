@@ -478,7 +478,7 @@ function validateConfiguration(config: Configuration) {
     if (
       (process.env.DATADOG_API_KEY === undefined || process.env.DATADOG_APP_KEY === undefined) &&
       // Support deprecated monitorsApiKey and monitorsAppKey
-      (config.apiKey === undefined || config.appKey === undefined)
+      (config.apiKey === undefined || config.appKey === undefined) && config.integrationTesting === false
     ) {
       throw new Error(
         "When `monitors` is enabled, `DATADOG_API_KEY` and `DATADOG_APP_KEY` environment variables must be set.",
