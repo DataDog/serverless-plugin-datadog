@@ -61,6 +61,6 @@
     "simple-git": "^3.16.0"
   },
   "peerDependencies": {
-    "serverless": "3.27.0"
+    "serverless": "3.x || 2.x || 1.x"
   }
 }
