@@ -939,7 +939,7 @@ describe("setEnvConfiguration", () => {
       "apiKeySecretArn` is not supported for Node runtimes when using Synchronous Metrics. Set DATADOG_API_KEY in your environment, or use `apiKmsKey` in the configuration.",
     );
   });
- it("defines `DD_COLD_START_TRACING` when enableColdStartTracing is set", () => {
+  it("defines `DD_COLD_START_TRACING` when enableColdStartTracing is set", () => {
     const handlers: FunctionInfo[] = [
       {
         handler: {
@@ -972,7 +972,7 @@ describe("setEnvConfiguration", () => {
         uploadGitMetadata: false,
         failOnError: false,
         skipCloudformationOutputs: false,
-        enableColdStartTracing: false
+        enableColdStartTracing: false,
       },
       handlers,
     );
@@ -988,7 +988,7 @@ describe("setEnvConfiguration", () => {
             DD_SITE: "datadoghq.eu",
             DD_TRACE_ENABLED: true,
             DD_MERGE_XRAY_TRACES: true,
-            DD_COLD_START_TRACING: false
+            DD_COLD_START_TRACING: false,
           },
           events: [],
         },
@@ -996,7 +996,7 @@ describe("setEnvConfiguration", () => {
         type: RuntimeType.NODE,
       },
     ]);
-  }); 
+  });
   it("defines `DD_COLD_START_TRACING_SKIP_LIBS` when coldStartTracingSkipLibs is set", () => {
     const handlers: FunctionInfo[] = [
       {
@@ -1030,7 +1030,7 @@ describe("setEnvConfiguration", () => {
         uploadGitMetadata: false,
         failOnError: false,
         skipCloudformationOutputs: false,
-        coldStartTraceSkipLibs: 'my-dep,your-dep'
+        coldStartTraceSkipLibs: "my-dep,your-dep",
       },
       handlers,
     );
@@ -1046,7 +1046,7 @@ describe("setEnvConfiguration", () => {
             DD_SITE: "datadoghq.eu",
             DD_TRACE_ENABLED: true,
             DD_MERGE_XRAY_TRACES: true,
-            DD_COLD_START_TRACE_SKIP_LIB: 'my-dep,your-dep'
+            DD_COLD_START_TRACE_SKIP_LIB: "my-dep,your-dep",
           },
           events: [],
         },
@@ -1088,7 +1088,7 @@ describe("setEnvConfiguration", () => {
         uploadGitMetadata: false,
         failOnError: false,
         skipCloudformationOutputs: false,
-        minColdStartTraceDuration: 50
+        minColdStartTraceDuration: 50,
       },
       handlers,
     );
@@ -1104,7 +1104,7 @@ describe("setEnvConfiguration", () => {
             DD_SITE: "datadoghq.eu",
             DD_TRACE_ENABLED: true,
             DD_MERGE_XRAY_TRACES: true,
-            DD_MIN_COLD_START_DURATION: 50
+            DD_MIN_COLD_START_DURATION: 50,
           },
           events: [],
         },

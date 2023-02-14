@@ -89,7 +89,6 @@ export interface Configuration {
   minColdStartTraceDuration?: number;
   // User specified list of libraries for Cold Start Tracing to ignore
   coldStartTraceSkipLibs?: string;
-
 }
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
@@ -199,13 +198,13 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
       environment[ddCaptureLambdaPayloadEnvVar] = config.captureLambdaPayload;
     }
     if (config.enableColdStartTracing !== undefined && environment[ddColdStartTracingEnabledEnvVar] === undefined) {
-      environment[ddColdStartTracingEnabledEnvVar] = config.enableColdStartTracing
+      environment[ddColdStartTracingEnabledEnvVar] = config.enableColdStartTracing;
     }
     if (config.minColdStartTraceDuration !== undefined && environment[ddMinColdStartDurationEnvVar] === undefined) {
-      environment[ddMinColdStartDurationEnvVar] = config.minColdStartTraceDuration
+      environment[ddMinColdStartDurationEnvVar] = config.minColdStartTraceDuration;
     }
     if (config.coldStartTraceSkipLibs !== undefined && environment[ddColdStartTracingSkipLibsEnvVar] === undefined) {
-      environment[ddColdStartTracingSkipLibsEnvVar] = config.coldStartTraceSkipLibs
+      environment[ddColdStartTracingSkipLibsEnvVar] = config.coldStartTraceSkipLibs;
     }
 
     if (type === RuntimeType.DOTNET || type === RuntimeType.JAVA) {
