@@ -82,6 +82,13 @@ export interface Configuration {
 
   // When set, this plugin will configure the specified handler for the functions
   customHandler?: string;
+
+  // Cold Start Tracing is enabled by default
+  enableColdStartTracing?: boolean;
+  // minimum duration to trace a module load span
+  minColdStartTraceDuration?: number;
+  // User specified list of libraries for Cold Start Tracing to ignore
+  coldStartTraceSkipLibs?: string;
 }
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
@@ -95,6 +102,9 @@ const ddMergeXrayTracesEnvVar = "DD_MERGE_XRAY_TRACES";
 const logInjectionEnvVar = "DD_LOGS_INJECTION";
 const ddLogsEnabledEnvVar = "DD_SERVERLESS_LOGS_ENABLED";
 const ddCaptureLambdaPayloadEnvVar = "DD_CAPTURE_LAMBDA_PAYLOAD";
+const ddColdStartTracingEnabledEnvVar = "DD_COLD_START_TRACING";
+const ddMinColdStartDurationEnvVar = "DD_MIN_COLD_START_DURATION";
+const ddColdStartTracingSkipLibsEnvVar = "DD_COLD_START_TRACE_SKIP_LIB";
 
 export const ddServiceEnvVar = "DD_SERVICE";
 export const ddEnvEnvVar = "DD_ENV";
@@ -187,6 +197,16 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     if (environment[ddCaptureLambdaPayloadEnvVar] === undefined) {
       environment[ddCaptureLambdaPayloadEnvVar] = config.captureLambdaPayload;
     }
+    if (config.enableColdStartTracing !== undefined && environment[ddColdStartTracingEnabledEnvVar] === undefined) {
+      environment[ddColdStartTracingEnabledEnvVar] = config.enableColdStartTracing;
+    }
+    if (config.minColdStartTraceDuration !== undefined && environment[ddMinColdStartDurationEnvVar] === undefined) {
+      environment[ddMinColdStartDurationEnvVar] = config.minColdStartTraceDuration;
+    }
+    if (config.coldStartTraceSkipLibs !== undefined && environment[ddColdStartTracingSkipLibsEnvVar] === undefined) {
+      environment[ddColdStartTracingSkipLibsEnvVar] = config.coldStartTraceSkipLibs;
+    }
+
     if (type === RuntimeType.DOTNET || type === RuntimeType.JAVA) {
       if (environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] === undefined) {
         environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] = AWS_LAMBDA_EXEC_WRAPPER;
