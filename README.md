@@ -57,7 +57,7 @@ To further configure your plugin, use the following custom parameters in your `s
 | `enableColdStartTracing`      | Set to `false` to disable Cold Start Tracing. Used in NodeJS and Python. Defaults to `true`. |
 | `coldStartTraceMinDuration`   | Sets the minimum duration (in milliseconds) for a module load event to be traced via Cold Start Tracing. Number. Defaults to `3` |
 | `coldStartTraceSkipLibs`      | optionally skip creating Cold Start Spans for a comma-separated list of libraries. Useful to limit depth or skip known libraries. Default depends on runtime. |
-| `subdomain`                   | Set an optional subdomain to use for app url links which are printed to output. Defaults to `app` |
+| `subdomain`                   | Set an optional subdomain to use for app URLs which are printed to output. Defaults to `app`. |
 
 To use any of these parameters, add a `custom` > `datadog` section to your `serverless.yml` similar to this example:
 
