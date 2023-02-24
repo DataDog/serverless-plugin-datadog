@@ -1146,7 +1146,7 @@ describe("setEnvConfiguration", () => {
         uploadGitMetadata: false,
         failOnError: false,
         skipCloudformationOutputs: false,
-        enableProfiling: true
+        enableProfiling: true,
       },
       handlers,
     );
@@ -1162,7 +1162,7 @@ describe("setEnvConfiguration", () => {
             DD_SITE: "datadoghq.eu",
             DD_TRACE_ENABLED: true,
             DD_MERGE_XRAY_TRACES: true,
-            DD_PROFILING_ENABLED: true
+            DD_PROFILING_ENABLED: true,
           },
           events: [],
         },
