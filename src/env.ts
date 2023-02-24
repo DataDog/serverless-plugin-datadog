@@ -42,6 +42,8 @@ export interface Configuration {
   enableDDTracing: boolean;
   // Enable forwarding Logs
   enableDDLogs: boolean;
+  // Enable profiling
+  enableProfiling?: boolean;
   // Whether to add the Datadog Lambda Extension to send data without the need of the Datadog Forwarder.
   addExtension: boolean;
 
@@ -105,6 +107,7 @@ const ddCaptureLambdaPayloadEnvVar = "DD_CAPTURE_LAMBDA_PAYLOAD";
 const ddColdStartTracingEnabledEnvVar = "DD_COLD_START_TRACING";
 const ddMinColdStartDurationEnvVar = "DD_MIN_COLD_START_DURATION";
 const ddColdStartTracingSkipLibsEnvVar = "DD_COLD_START_TRACE_SKIP_LIB";
+const ddProfilingEnabledEnvVar = "DD_PROFILING_ENABLED";
 
 export const ddServiceEnvVar = "DD_SERVICE";
 export const ddEnvEnvVar = "DD_ENV";
@@ -206,7 +209,9 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     if (config.coldStartTraceSkipLibs !== undefined && environment[ddColdStartTracingSkipLibsEnvVar] === undefined) {
       environment[ddColdStartTracingSkipLibsEnvVar] = config.coldStartTraceSkipLibs;
     }
-
+    if (config.enableProfiling !== undefined && environment[ddProfilingEnabledEnvVar] === undefined) {
+      environment[ddProfilingEnabledEnvVar] = config.enableProfiling;
+    }
     if (type === RuntimeType.DOTNET || type === RuntimeType.JAVA) {
       if (environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] === undefined) {
         environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] = AWS_LAMBDA_EXEC_WRAPPER;
