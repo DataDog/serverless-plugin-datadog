@@ -91,6 +91,11 @@ export interface Configuration {
   minColdStartTraceDuration?: number;
   // User specified list of libraries for Cold Start Tracing to ignore
   coldStartTraceSkipLibs?: string;
+
+  // Whether to encode the tracing context in the lambda authorizer's reponse data. Default true
+  encodeAuthorizerContext?: boolean;
+  // Whether to parse and use the encoded tracing context from lambda authorizers. Default true
+  decodeAuthorizerContext?: boolean;
 }
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
@@ -108,6 +113,8 @@ const ddColdStartTracingEnabledEnvVar = "DD_COLD_START_TRACING";
 const ddMinColdStartDurationEnvVar = "DD_MIN_COLD_START_DURATION";
 const ddColdStartTracingSkipLibsEnvVar = "DD_COLD_START_TRACE_SKIP_LIB";
 const ddProfilingEnabledEnvVar = "DD_PROFILING_ENABLED";
+const ddEncodeAuthorizerContextEnvVar = "DD_ENCODE_AUTHORIZER_CONTEXT";
+const ddDecodeAuthorizerContextEnvVar = "DD_DECODE_AUTHORIZER_CONTEXT";
 
 export const ddServiceEnvVar = "DD_SERVICE";
 export const ddEnvEnvVar = "DD_ENV";
@@ -211,6 +218,12 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     }
     if (config.enableProfiling !== undefined && environment[ddProfilingEnabledEnvVar] === undefined) {
       environment[ddProfilingEnabledEnvVar] = config.enableProfiling;
+    }
+    if (config.encodeAuthorizerContext !== undefined && environment[ddEncodeAuthorizerContextEnvVar] === undefined) {
+      environment[ddEncodeAuthorizerContextEnvVar] = config.encodeAuthorizerContext;
+    }
+    if (config.decodeAuthorizerContext !== undefined && environment[ddDecodeAuthorizerContextEnvVar] === undefined) {
+      environment[ddDecodeAuthorizerContextEnvVar] = config.decodeAuthorizerContext;
     }
     if (type === RuntimeType.DOTNET || type === RuntimeType.JAVA) {
       if (environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] === undefined) {

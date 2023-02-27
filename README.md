@@ -60,7 +60,8 @@ To further configure your plugin, use the following custom parameters in your `s
 | `coldStartTraceSkipLibs`      | optionally skip creating Cold Start Spans for a comma-separated list of libraries. Useful to limit depth or skip known libraries. Default depends on runtime. |
 | `subdomain`                   | Set an optional subdomain to use for app URLs which are printed to output. Defaults to `app`. |
 | `enableProfiling`             | Enable the Datadog Continuous Profiler with `true`. Supported in Beta for NodeJS and Python. Defaults to `false`. |
-
+| `encodeAuthorizerContext`     | When set to `true` for Lambda authorizers, the tracing context will be encoded into the response for propagation. Supported for NodeJS and Python. Defaults to `true`. |
+| `decodeAuthorizerContext`     | When set to `true` for Lambdas that are authorized via Lambda authorizers, it will parse and use the encoded tracing context (if found). Supported for NodeJS and Python. Defaults to `true`. |
 To use any of these parameters, add a `custom` > `datadog` section to your `serverless.yml` similar to this example:
 
 ```yaml
