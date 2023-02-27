@@ -1171,4 +1171,120 @@ describe("setEnvConfiguration", () => {
       },
     ]);
   });
+  it("defines `DD_ENCODE_AUTHORIZER_CONTEXT` when encodeAuthorizerContext is set", () => {
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
+    setEnvConfiguration(
+      {
+        addLayers: false,
+        apiKey: "1234",
+        apiKMSKey: "5678",
+        site: "datadoghq.eu",
+        subdomain: "app",
+        logLevel: "info",
+        flushMetricsToLogs: true,
+        enableXrayTracing: true,
+        enableDDTracing: true,
+        enableDDLogs: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
+        addExtension: true,
+        enableTags: true,
+        injectLogContext: false,
+        exclude: ["dd-excluded-function"],
+        enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
+        failOnError: false,
+        skipCloudformationOutputs: false,
+        encodeAuthorizerContext: true,
+      },
+      handlers,
+    );
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_KMS_API_KEY: "5678",
+            DD_LOGS_INJECTION: false,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_LOG_LEVEL: "info",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_MERGE_XRAY_TRACES: true,
+            DD_ENCODE_AUTHORIZER_CONTEXT: true,
+          },
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ]);
+  });
+  it("defines `DD_DECODE_AUTHORIZER_CONTEXT` when decodeAuthorizerContext is set", () => {
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
+    setEnvConfiguration(
+      {
+        addLayers: false,
+        apiKey: "1234",
+        apiKMSKey: "5678",
+        site: "datadoghq.eu",
+        subdomain: "app",
+        logLevel: "info",
+        flushMetricsToLogs: true,
+        enableXrayTracing: true,
+        enableDDTracing: true,
+        enableDDLogs: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
+        addExtension: true,
+        enableTags: true,
+        injectLogContext: false,
+        exclude: ["dd-excluded-function"],
+        enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
+        failOnError: false,
+        skipCloudformationOutputs: false,
+        decodeAuthorizerContext: true,
+      },
+      handlers,
+    );
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_KMS_API_KEY: "5678",
+            DD_LOGS_INJECTION: false,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_LOG_LEVEL: "info",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_MERGE_XRAY_TRACES: true,
+            DD_DECODE_AUTHORIZER_CONTEXT: true,
+          },
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ]);
+  });
 });
