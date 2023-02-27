@@ -116,6 +116,53 @@ export async function addExecutionLogGroupsAndSubscriptions(
   }
 }
 
+export async function addStepFunctionLogGroup(aws: Aws, resources: any, stepFunction: any) {
+  const stepFunctionName = stepFunction.name;
+  const logGroupName = `/aws/vendedlogs/states/${stepFunctionName.toLowerCase()}-logs-${aws.getStage()}`;
+  const logGroupResourceName = `${stepFunctionName}LogGroup`;
+
+  // create log group and add it to compiled CloudFormation template
+  resources[logGroupResourceName] = {
+    Type: logGroupKey,
+    Properties: {
+      LogGroupName: logGroupName,
+    },
+  };
+
+  // add logging config to step function in serverless.yaml using newly created log group
+  // the serverless-step-functions plugin handles the IAM policy creation for the adding logs to the log group
+  stepFunction.loggingConfig = {
+    level: "ALL",
+    includeExecutionData: true,
+    destinations: [{ "Fn::GetAtt": [logGroupResourceName, "Arn"] }],
+  };
+}
+
+export async function addStepFunctionLogGroupSubscription(
+  resources: any,
+  stepFunction: any,
+  functionArn: CloudFormationObjectArn | string,
+) {
+  const logGroupSubscriptionResourceName = `${stepFunction.name}LogGroupSubscription`;
+
+  // parse log group name out of arn in logging config destination
+  resources[logGroupSubscriptionResourceName] = {
+    Type: logGroupSubscriptionKey,
+    Properties: {
+      DestinationArn: functionArn,
+      FilterPattern: "",
+      LogGroupName: {
+        "Fn::Select": [
+          6,
+          {
+            "Fn::Split": [":", stepFunction.loggingConfig.destinations[0]],
+          },
+        ],
+      },
+    },
+  };
+}
+
 export async function addCloudWatchForwarderSubscriptions(
   service: Service,
   aws: Aws,
@@ -233,6 +280,10 @@ function shouldSubscribe(
   }
   // we don't want to run the shouldSubscribe validation on execution log groups since we manually add those.
   if (typeof resource.Properties.LogGroupName !== "string") {
+    return false;
+  }
+  // we don't want to run the shouldSubscribe validation on step function log groups since we manually add those
+  if (resource.Properties.LogGroupName.startsWith("/aws/vendedlogs/states/")) {
     return false;
   }
   // if the extension is enabled, we don't want to subscribe to lambda log groups
