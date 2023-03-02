@@ -118,7 +118,7 @@ export async function addExecutionLogGroupsAndSubscriptions(
 
 export async function addStepFunctionLogGroup(aws: Aws, resources: any, stepFunction: any) {
   const stepFunctionName = stepFunction.name;
-  const logGroupName = `/aws/vendedlogs/states/${stepFunctionName.toLowerCase()}-logs-${aws.getStage()}`;
+  const logGroupName = `/aws/vendedlogs/states/${stepFunctionName}-Logs-${aws.getStage()}`;
   const logGroupResourceName = `${stepFunctionName}LogGroup`;
 
   // create log group and add it to compiled CloudFormation template

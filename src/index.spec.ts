@@ -1601,5 +1601,231 @@ describe("ServerlessPlugin", () => {
         "Skipping enabling source code integration because encrypted credentials through KMS/Secrets Manager is not supported for this integration. Please set either DATADOG_API_KEY in your environment, or set the apiKey parameter in Serverless.",
       );
     });
+
+    it("Does attempt to add Step Function log group subscription if subscribeToStepFunctionLogs is true", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            compiledCloudFormationTemplate: {
+              Resources: {},
+            },
+          },
+          functions: {
+            function1: {},
+          },
+          stepFunctions: {
+            stateMachines: {
+              stepfunction1: {
+                name: "testStepFunction",
+              },
+            },
+          },
+          custom: {
+            datadog: {
+              forwarderArn: "some-arn",
+              subscribeToStepFunctionLogs: true,
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).toHaveProperty(
+        "testStepFunctionLogGroupSubscription",
+      );
+    });
+
+    it("Does not attempt to add Step Function log group subscription if subscribeToStepFunctionLogs is false", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            compiledCloudFormationTemplate: {
+              Resources: {},
+            },
+          },
+          functions: {
+            function1: {},
+          },
+          stepFunctions: {
+            stateMachines: {
+              stepfunction1: {
+                name: "testStepFunction",
+              },
+            },
+          },
+          custom: {
+            datadog: {
+              forwarderArn: "some-arn",
+              subscribeToStepFunctionLogs: false,
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).not.toHaveProperty(
+        "testStepFunctionLogGroupSubscription",
+      );
+    });
+
+    it("Does add Step Function log group and subscription if no log group is already configured", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            compiledCloudFormationTemplate: {
+              Resources: {},
+            },
+          },
+          functions: {
+            function1: {},
+          },
+          stepFunctions: {
+            stateMachines: {
+              stepfunction1: {
+                name: "testStepFunction",
+              },
+            },
+          },
+          custom: {
+            datadog: {
+              forwarderArn: "some-arn",
+              subscribeToStepFunctionLogs: true,
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).toHaveProperty(
+        "testStepFunctionLogGroup",
+      );
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).toHaveProperty(
+        "testStepFunctionLogGroupSubscription",
+      );
+    });
+
+    it("Does add Step Function log group subscription if a log group is already configured", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            compiledCloudFormationTemplate: {
+              Resources: {},
+            },
+          },
+          functions: {
+            function1: {},
+          },
+          resources: {
+            Resources: {
+              someOtherStepFunctionLogGroup: {
+                Type: "AWS::Logs::LogGroup",
+                Properties: {
+                  LogGroupName: "/aws/vendedlogs/states/preconfigured-log-group",
+                },
+              },
+            },
+          },
+          stepFunctions: {
+            stateMachines: {
+              stepfunction1: {
+                name: "testStepFunction",
+                loggingConfig: {
+                  level: "ALL",
+                  includeExecutionData: true,
+                  destinations: [
+                    "arn:aws:logs:sa-east-1:425362996713:log-group:/aws/vendedlogs/states/preconfigured-log-group:*",
+                  ],
+                },
+              },
+            },
+          },
+          custom: {
+            datadog: {
+              forwarderArn: "some-arn",
+              subscribeToStepFunctionLogs: true,
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).not.toHaveProperty(
+        "someOtherStepFunctionLogGroup",
+      );
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).toHaveProperty(
+        "testStepFunctionLogGroupSubscription",
+      );
+    });
+
+    it("Does update Step Function logging config if level or includeExecutionData is not configured for tracing", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            compiledCloudFormationTemplate: {
+              Resources: {},
+            },
+          },
+          functions: {
+            function1: {},
+          },
+          resources: {
+            Resources: {
+              someOtherStepFunctionLogGroup: {
+                Type: "AWS::Logs::LogGroup",
+                Properties: {
+                  LogGroupName: "/aws/vendedlogs/states/preconfigured-log-group",
+                },
+              },
+            },
+          },
+          stepFunctions: {
+            stateMachines: {
+              stepfunction1: {
+                name: "testStepFunction",
+                loggingConfig: {
+                  level: "Error",
+                  includeExecutionData: false,
+                  destinations: [
+                    "arn:aws:logs:sa-east-1:425362996713:log-group:/aws/vendedlogs/states/preconfigured-log-group:*",
+                  ],
+                },
+              },
+            },
+          },
+          custom: {
+            datadog: {
+              forwarderArn: "some-arn",
+              subscribeToStepFunctionLogs: true,
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(serverless.service.stepFunctions.stateMachines.stepfunction1.loggingConfig.level).toEqual("ALL");
+      expect(serverless.service.stepFunctions.stateMachines.stepfunction1.loggingConfig.includeExecutionData).toEqual(
+        true,
+      );
+    });
   });
 });
