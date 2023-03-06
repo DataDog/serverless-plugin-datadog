@@ -89,6 +89,10 @@ export interface Configuration {
   minColdStartTraceDuration?: number;
   // User specified list of libraries for Cold Start Tracing to ignore
   coldStartTraceSkipLibs?: string;
+  // Determine when to submit spans before a timeout occurs.
+  // When the remaining time in a Lambda invocation is less than `apmFlushDeadline`, the tracer will
+  // attempt to submit the current active spans and all finished spans.
+  apmFlushDeadline?: string;
 }
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
@@ -105,6 +109,7 @@ const ddCaptureLambdaPayloadEnvVar = "DD_CAPTURE_LAMBDA_PAYLOAD";
 const ddColdStartTracingEnabledEnvVar = "DD_COLD_START_TRACING";
 const ddMinColdStartDurationEnvVar = "DD_MIN_COLD_START_DURATION";
 const ddColdStartTracingSkipLibsEnvVar = "DD_COLD_START_TRACE_SKIP_LIB";
+const ddApmFlushDeadlineMillisecondsEnvVar = "DD_APM_FLUSH_DEADLINE_MILLISECONDS";
 
 export const ddServiceEnvVar = "DD_SERVICE";
 export const ddEnvEnvVar = "DD_ENV";
@@ -205,6 +210,9 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     }
     if (config.coldStartTraceSkipLibs !== undefined && environment[ddColdStartTracingSkipLibsEnvVar] === undefined) {
       environment[ddColdStartTracingSkipLibsEnvVar] = config.coldStartTraceSkipLibs;
+    }
+    if (config.apmFlushDeadline !== undefined && environment[ddApmFlushDeadlineMillisecondsEnvVar] === undefined) {
+      environment[ddApmFlushDeadlineMillisecondsEnvVar] = config.apmFlushDeadline;
     }
 
     if (type === RuntimeType.DOTNET || type === RuntimeType.JAVA) {
