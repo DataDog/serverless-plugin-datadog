@@ -1289,7 +1289,7 @@ describe("setEnvConfiguration", () => {
   });
 
   describe("defines `DD_APM_FLUSH_DEADLINE_MILLISECONDS` when `apmFlushDeadline` is set", () => {
-    let handlers: FunctionInfo[] = []
+    let handlers: FunctionInfo[] = [];
     beforeEach(() => {
       handlers = [
         {
@@ -1301,9 +1301,9 @@ describe("setEnvConfiguration", () => {
           type: RuntimeType.NODE,
         },
       ];
-    })
-    
-    it('setting the value as a number', () => {
+    });
+
+    it("setting the value as a number", () => {
       setEnvConfiguration(
         {
           addLayers: false,
@@ -1349,9 +1349,9 @@ describe("setEnvConfiguration", () => {
           type: RuntimeType.NODE,
         },
       ]);
-    })
+    });
 
-    it('setting the value as a string', () => {
+    it("setting the value as a string", () => {
       setEnvConfiguration(
         {
           addLayers: false,
@@ -1397,6 +1397,6 @@ describe("setEnvConfiguration", () => {
           type: RuntimeType.NODE,
         },
       ]);
-    })
+    });
   });
 });
