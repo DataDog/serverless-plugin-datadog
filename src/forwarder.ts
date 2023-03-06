@@ -119,7 +119,7 @@ export async function addExecutionLogGroupsAndSubscriptions(
 export async function addStepFunctionLogGroup(aws: Aws, resources: any, stepFunction: any) {
   const stepFunctionName = stepFunction.name;
   const logGroupName = `/aws/vendedlogs/states/${stepFunctionName}-Logs-${aws.getStage()}`;
-  const logGroupResourceName = `${stepFunctionName}LogGroup`;
+  const logGroupResourceName = `${normalizeResourceName(stepFunctionName)}LogGroup`;
 
   // create log group and add it to compiled CloudFormation template
   resources[logGroupResourceName] = {
@@ -143,7 +143,7 @@ export async function addStepFunctionLogGroupSubscription(
   stepFunction: any,
   functionArn: CloudFormationObjectArn | string,
 ) {
-  const logGroupSubscriptionResourceName = `${stepFunction.name}LogGroupSubscription`;
+  const logGroupSubscriptionResourceName = `${normalizeResourceName(stepFunction.name)}LogGroupSubscription`;
 
   // parse log group name out of arn in logging config destination
   resources[logGroupSubscriptionResourceName] = {
@@ -282,7 +282,9 @@ function shouldSubscribe(
   if (typeof resource.Properties.LogGroupName !== "string") {
     return false;
   }
-  // we don't want to run the shouldSubscribe validation on step function log groups since we manually add those
+  // Step function log groups described as custom resources in serverless.yml or defined outside of serverless.yml need to be subscribed to
+  // using the log group in the step function loggingConfig rather than the log groups in the complied cloudformation template.
+  // Log groups created by this plugin are subscribed to using the same log for consistency with other step function log groups
   if (resource.Properties.LogGroupName.startsWith("/aws/vendedlogs/states/")) {
     return false;
   }
@@ -456,4 +458,9 @@ function getLogGroupLogicalId(functionName: string): string {
   const upperCasedFunctionName = uppercasedFirst + rest;
   const normalizedFunctionName = upperCasedFunctionName.replace(/-/g, "Dash").replace(/_/g, "Underscore");
   return `${normalizedFunctionName}LogGroup`;
+}
+
+// Resource names in CloudFormation Templates can only have alphanumeric characters
+function normalizeResourceName(resourceName: string) {
+  return resourceName.replace(/[^0-9a-z]/gi, "");
 }

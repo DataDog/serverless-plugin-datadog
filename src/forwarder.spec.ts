@@ -1188,6 +1188,42 @@ describe("addStepFunctionLogGroup", () => {
       }
     `);
   });
+
+  it("adds log group with a normalized alphanumeric resource name and a logging config which references the created log group", async () => {
+    const service = serviceWithResources({});
+    const aws = awsMock({});
+    const stepFunction = {
+      name: "test-StepFunction",
+    };
+    await addStepFunctionLogGroup(aws, service.provider.compiledCloudFormationTemplate.Resources, stepFunction);
+    expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
+      Object {
+        "testStepFunctionLogGroup": Object {
+          "Properties": Object {
+            "LogGroupName": "/aws/vendedlogs/states/test-StepFunction-Logs-dev",
+          },
+          "Type": "AWS::Logs::LogGroup",
+        },
+      }
+    `);
+    expect(stepFunction).toMatchInlineSnapshot(`
+      Object {
+        "loggingConfig": Object {
+          "destinations": Array [
+            Object {
+              "Fn::GetAtt": Array [
+                "testStepFunctionLogGroup",
+                "Arn",
+              ],
+            },
+          ],
+          "includeExecutionData": true,
+          "level": "ALL",
+        },
+        "name": "test-StepFunction",
+      }
+    `);
+  });
 });
 
 describe("addStepFunctionLogGroupSubscription", () => {
@@ -1195,6 +1231,51 @@ describe("addStepFunctionLogGroupSubscription", () => {
     const service = serviceWithResources({});
     const stepFunction = {
       name: "testStepFunction",
+      loggingConfig: {
+        level: "ALL",
+        includeExecutionData: true,
+        destinations: [{ "Fn::GetAtt": ["logGroupResourceName", "Arn"] }],
+      },
+    };
+    const functionArn: string = "forwarderArn";
+    await addStepFunctionLogGroupSubscription(
+      service.provider.compiledCloudFormationTemplate.Resources,
+      stepFunction,
+      functionArn,
+    );
+    expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
+      Object {
+        "testStepFunctionLogGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "forwarderArn",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Fn::Select": Array [
+                6,
+                Object {
+                  "Fn::Split": Array [
+                    ":",
+                    Object {
+                      "Fn::GetAtt": Array [
+                        "logGroupResourceName",
+                        "Arn",
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
+        },
+      }
+    `);
+  });
+
+  it("adds a subscription with a normalized alphanumeric resource name to the log group in the step function logging config", async () => {
+    const service = serviceWithResources({});
+    const stepFunction = {
+      name: "test-StepFunction",
       loggingConfig: {
         level: "ALL",
         includeExecutionData: true,
