@@ -100,7 +100,7 @@ export interface Configuration {
   // Determine when to submit spans before a timeout occurs.
   // When the remaining time in a Lambda invocation is less than `apmFlushDeadline`, the tracer will
   // attempt to submit the current active spans and all finished spans.
-  apmFlushDeadline?: string;
+  apmFlushDeadline?: string | number;
 }
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
