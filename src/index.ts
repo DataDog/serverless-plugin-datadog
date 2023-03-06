@@ -209,7 +209,7 @@ module.exports = class ServerlessPlugin {
           );
         } else {
           this.serverless.cli.log("Subscribing step function log groups to Datadog Forwarder");
-          stepFunctions.forEach(async (stepFunction: any) => {
+          for (const stepFunction of stepFunctions as any[]) {
             if (!stepFunction.hasOwnProperty("loggingConfig")) {
               this.serverless.cli.log(
                 `Warning: No logging config found for step function ${stepFunction.name}. Creating log group and logging to it with level ALL.`,
@@ -234,7 +234,7 @@ module.exports = class ServerlessPlugin {
             }
             // subscribe step function log group to datadog forwarder regardless of how the log group was created
             await addStepFunctionLogGroupSubscription(resources, stepFunction, functionArn);
-          });
+          }
         }
       }
       for (const error of errors) {
