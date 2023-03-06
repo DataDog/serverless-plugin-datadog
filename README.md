@@ -55,10 +55,13 @@ To further configure your plugin, use the following custom parameters in your `s
 | `integrationTesting`          | Set `true` when running integration tests. This bypasses the validation of the Forwarder ARN and the addition of Datadog Monitor output links. Defaults to `false`. |
 | `logLevel`                    | The log level, set to `DEBUG` for extended logging. |
 | `skipCloudformationOutputs`   | Set to `true` if you want to skip adding Datadog Cloudformation Outputs for your stack. This is useful if you are running into the 200 output limit which can cause the stack creation to fail. |
-| `enableColdStartTracing` | Set to `false` to disable Cold Start Tracing. Used in NodeJS and Python. Defaults to `true`. |
-| `coldStartTraceMinDuration` | Sets the minimum duration (in milliseconds) for a module load event to be traced via Cold Start Tracing. Number. Defaults to `3` |
-| `coldStartTraceSkipLibs` | optionally skip creating Cold Start Spans for a comma-separated list of libraries. Useful to limit depth or skip known libraries. Default depends on runtime. |
-
+| `enableColdStartTracing`      | Set to `false` to disable Cold Start Tracing. Used in NodeJS and Python. Defaults to `true`. |
+| `coldStartTraceMinDuration`   | Sets the minimum duration (in milliseconds) for a module load event to be traced via Cold Start Tracing. Number. Defaults to `3`. |
+| `coldStartTraceSkipLibs`      | optionally skip creating Cold Start Spans for a comma-separated list of libraries. Useful to limit depth or skip known libraries. Default depends on runtime. |
+| `subdomain`                   | Set an optional subdomain to use for app URLs which are printed to output. Defaults to `app`. |
+| `enableProfiling`             | Enable the Datadog Continuous Profiler with `true`. Supported in Beta for NodeJS and Python. Defaults to `false`. |
+| `encodeAuthorizerContext`     | When set to `true` for Lambda authorizers, the tracing context will be encoded into the response for propagation. Supported for NodeJS and Python. Defaults to `true`. |
+| `decodeAuthorizerContext`     | When set to `true` for Lambdas that are authorized via Lambda authorizers, it will parse and use the encoded tracing context (if found). Supported for NodeJS and Python. Defaults to `true`. |
 To use any of these parameters, add a `custom` > `datadog` section to your `serverless.yml` similar to this example:
 
 ```yaml

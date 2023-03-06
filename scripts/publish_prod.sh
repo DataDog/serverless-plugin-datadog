@@ -73,7 +73,7 @@ yarn login
 
 if [ "$UPDATE_LAYERS" != "false" ]; then
     # Verify AWS access before running the time-consuming generate_layers_json.sh
-    saml2aws login -a govcloud-us1-fed-human-engineering
+    ddsaml2aws login -a govcloud-us1-fed-human-engineering
     AWS_PROFILE=govcloud-us1-fed-human-engineering aws sts get-caller-identity
     aws-vault exec prod-engineering -- aws sts get-caller-identity
 

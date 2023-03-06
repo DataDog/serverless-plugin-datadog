@@ -42,6 +42,8 @@ export interface Configuration {
   enableDDTracing: boolean;
   // Enable forwarding Logs
   enableDDLogs: boolean;
+  // Enable profiling
+  enableProfiling?: boolean;
   // Whether to add the Datadog Lambda Extension to send data without the need of the Datadog Forwarder.
   addExtension: boolean;
 
@@ -89,6 +91,12 @@ export interface Configuration {
   minColdStartTraceDuration?: number;
   // User specified list of libraries for Cold Start Tracing to ignore
   coldStartTraceSkipLibs?: string;
+
+  // Whether to encode the tracing context in the lambda authorizer's reponse data. Default true
+  encodeAuthorizerContext?: boolean;
+  // Whether to parse and use the encoded tracing context from lambda authorizers. Default true
+  decodeAuthorizerContext?: boolean;
+
   // Determine when to submit spans before a timeout occurs.
   // When the remaining time in a Lambda invocation is less than `apmFlushDeadline`, the tracer will
   // attempt to submit the current active spans and all finished spans.
@@ -109,6 +117,9 @@ const ddCaptureLambdaPayloadEnvVar = "DD_CAPTURE_LAMBDA_PAYLOAD";
 const ddColdStartTracingEnabledEnvVar = "DD_COLD_START_TRACING";
 const ddMinColdStartDurationEnvVar = "DD_MIN_COLD_START_DURATION";
 const ddColdStartTracingSkipLibsEnvVar = "DD_COLD_START_TRACE_SKIP_LIB";
+const ddProfilingEnabledEnvVar = "DD_PROFILING_ENABLED";
+const ddEncodeAuthorizerContextEnvVar = "DD_ENCODE_AUTHORIZER_CONTEXT";
+const ddDecodeAuthorizerContextEnvVar = "DD_DECODE_AUTHORIZER_CONTEXT";
 const ddApmFlushDeadlineMillisecondsEnvVar = "DD_APM_FLUSH_DEADLINE_MILLISECONDS";
 
 export const ddServiceEnvVar = "DD_SERVICE";
@@ -211,10 +222,18 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     if (config.coldStartTraceSkipLibs !== undefined && environment[ddColdStartTracingSkipLibsEnvVar] === undefined) {
       environment[ddColdStartTracingSkipLibsEnvVar] = config.coldStartTraceSkipLibs;
     }
+    if (config.enableProfiling !== undefined && environment[ddProfilingEnabledEnvVar] === undefined) {
+      environment[ddProfilingEnabledEnvVar] = config.enableProfiling;
+    }
+    if (config.encodeAuthorizerContext !== undefined && environment[ddEncodeAuthorizerContextEnvVar] === undefined) {
+      environment[ddEncodeAuthorizerContextEnvVar] = config.encodeAuthorizerContext;
+    }
+    if (config.decodeAuthorizerContext !== undefined && environment[ddDecodeAuthorizerContextEnvVar] === undefined) {
+      environment[ddDecodeAuthorizerContextEnvVar] = config.decodeAuthorizerContext;
+    }
     if (config.apmFlushDeadline !== undefined && environment[ddApmFlushDeadlineMillisecondsEnvVar] === undefined) {
       environment[ddApmFlushDeadlineMillisecondsEnvVar] = config.apmFlushDeadline;
     }
-
     if (type === RuntimeType.DOTNET || type === RuntimeType.JAVA) {
       if (environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] === undefined) {
         environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] = AWS_LAMBDA_EXEC_WRAPPER;
