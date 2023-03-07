@@ -111,7 +111,6 @@ stepFunctions:
           State1:
             Type: Task
             Parameters:
-              Payload.$: "States.JsonMerge($$, $, false)"
               FunctionName:
                 Fn::GetAtt: [JavascriptHello18-x, Arn]
             Resource: arn:aws:states:::lambda:invoke
@@ -129,7 +128,6 @@ stepFunctions:
           State1:
             Type: Task
             Parameters:
-              Payload.$: "States.JsonMerge($$, $, false)"
               FunctionName:
                 Fn::GetAtt: [JavascriptHello18-x, Arn]
             Resource: arn:aws:states:::lambda:invoke
@@ -147,7 +145,6 @@ stepFunctions:
           State1:
             Type: Task
             Parameters:
-              Payload.$: "States.JsonMerge($$, $, false)"
               FunctionName:
                 Fn::GetAtt: [JavascriptHello18-x, Arn]
             Resource: arn:aws:states:::lambda:invoke

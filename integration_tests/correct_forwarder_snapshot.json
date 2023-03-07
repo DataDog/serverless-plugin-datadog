@@ -413,6 +413,29 @@
         "LogGroupName": "/aws/vendedlogs/states/stepFunctionNoLoggingConfig-Logs-dev"
       }
     },
+    "stepFunctionNoLoggingConfigLogGroupSubscription": {
+      "Type": "AWS::Logs::SubscriptionFilter",
+      "Properties": {
+        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
+        "FilterPattern": "",
+        "LogGroupName": {
+          "Fn::Select": [
+            6,
+            {
+              "Fn::Split": [
+                ":",
+                {
+                  "Fn::GetAtt": [
+                    "stepFunctionNoLoggingConfigLogGroup",
+                    "Arn"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
     "stepFunctionLoggingConfigDynamicArnLogGroupSubscription": {
       "Type": "AWS::Logs::SubscriptionFilter",
       "Properties": {
@@ -448,29 +471,6 @@
               "Fn::Split": [
                 ":",
                 "arn:aws:logs:sa-east-1:425362996713:log-group:/aws/vendedlogs/states/stepFunctionNoLoggingConfigStaticArn-Logs-dev:*"
-              ]
-            }
-          ]
-        }
-      }
-    },
-    "stepFunctionNoLoggingConfigLogGroupSubscription": {
-      "Type": "AWS::Logs::SubscriptionFilter",
-      "Properties": {
-        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
-        "FilterPattern": "",
-        "LogGroupName": {
-          "Fn::Select": [
-            6,
-            {
-              "Fn::Split": [
-                ":",
-                {
-                  "Fn::GetAtt": [
-                    "stepFunctionNoLoggingConfigLogGroup",
-                    "Arn"
-                  ]
-                }
               ]
             }
           ]
@@ -1591,7 +1591,7 @@
       "Properties": {
         "DefinitionString": {
           "Fn::Sub": [
-            "{\n  \"StartAt\": \"State1\",\n  \"States\": {\n    \"State1\": {\n      \"Type\": \"Task\",\n      \"Parameters\": {\n        \"Payload.$\": \"States.JsonMerge($$, $, false)\",\n        \"FunctionName\": \"${87376de2e2c34dd564ac4eb2208c4e47}\"\n      },\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"End\": true\n    }\n  }\n}",
+            "{\n  \"StartAt\": \"State1\",\n  \"States\": {\n    \"State1\": {\n      \"Type\": \"Task\",\n      \"Parameters\": {\n        \"FunctionName\": \"${87376de2e2c34dd564ac4eb2208c4e47}\"\n      },\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"End\": true\n    }\n  }\n}",
             {
               "87376de2e2c34dd564ac4eb2208c4e47": {
                 "Fn::GetAtt": [
@@ -1635,7 +1635,7 @@
       "Properties": {
         "DefinitionString": {
           "Fn::Sub": [
-            "{\n  \"StartAt\": \"State1\",\n  \"States\": {\n    \"State1\": {\n      \"Type\": \"Task\",\n      \"Parameters\": {\n        \"Payload.$\": \"States.JsonMerge($$, $, false)\",\n        \"FunctionName\": \"${87376de2e2c34dd564ac4eb2208c4e47}\"\n      },\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"End\": true\n    }\n  }\n}",
+            "{\n  \"StartAt\": \"State1\",\n  \"States\": {\n    \"State1\": {\n      \"Type\": \"Task\",\n      \"Parameters\": {\n        \"FunctionName\": \"${87376de2e2c34dd564ac4eb2208c4e47}\"\n      },\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"End\": true\n    }\n  }\n}",
             {
               "87376de2e2c34dd564ac4eb2208c4e47": {
                 "Fn::GetAtt": [
@@ -1679,7 +1679,7 @@
       "Properties": {
         "DefinitionString": {
           "Fn::Sub": [
-            "{\n  \"StartAt\": \"State1\",\n  \"States\": {\n    \"State1\": {\n      \"Type\": \"Task\",\n      \"Parameters\": {\n        \"Payload.$\": \"States.JsonMerge($$, $, false)\",\n        \"FunctionName\": \"${87376de2e2c34dd564ac4eb2208c4e47}\"\n      },\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"End\": true\n    }\n  }\n}",
+            "{\n  \"StartAt\": \"State1\",\n  \"States\": {\n    \"State1\": {\n      \"Type\": \"Task\",\n      \"Parameters\": {\n        \"FunctionName\": \"${87376de2e2c34dd564ac4eb2208c4e47}\"\n      },\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"End\": true\n    }\n  }\n}",
             {
               "87376de2e2c34dd564ac4eb2208c4e47": {
                 "Fn::GetAtt": [
