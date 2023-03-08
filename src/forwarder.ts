@@ -282,9 +282,16 @@ function shouldSubscribe(
   if (typeof resource.Properties.LogGroupName !== "string") {
     return false;
   }
-  // Step function log groups described as custom resources in serverless.yml or defined outside of serverless.yml need to be subscribed to
-  // using the log group in the step function loggingConfig rather than the log groups in the complied cloudformation template.
-  // Log groups created by this plugin are subscribed to using the same log for consistency with other step function log groups
+  /*
+    Step function log groups created as custom resources in serverless.yml need to be subscribed to using the log group in
+    the step function loggingConfig since custom resources are not in the complied cloudformation template until a later lifecycle event.
+
+    Step function log groups created outside of serverless.yml need to be subscribed to using the log group in
+    the step function loggingConfig since these log groups will never be in the compiled cloudformation template.
+
+    Step function log groups created by this plugin are also subscribed to using the log group in the step function loggingConfig
+    for consistency with step function log groups created with the above methods.
+  */
   if (resource.Properties.LogGroupName.startsWith("/aws/vendedlogs/states/")) {
     return false;
   }
