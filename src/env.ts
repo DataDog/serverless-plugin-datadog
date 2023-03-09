@@ -78,7 +78,8 @@ export interface Configuration {
   subscribeToAccessLogs: boolean;
   // API Gateway Execution logging - handles rest and websocket. Http not supported as of Sept.21
   subscribeToExecutionLogs: boolean;
-
+  // Step Function logging
+  subscribeToStepFunctionLogs: boolean;
   // Skip populating the Cloudformation Outputs
   skipCloudformationOutputs: boolean;
 
@@ -143,6 +144,7 @@ export const defaultConfiguration: Configuration = {
   integrationTesting: false,
   subscribeToAccessLogs: true,
   subscribeToExecutionLogs: false,
+  subscribeToStepFunctionLogs: false,
   enableDDLogs: true,
   captureLambdaPayload: false,
   failOnError: false,

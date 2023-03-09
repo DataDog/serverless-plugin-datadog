@@ -1,6 +1,8 @@
 import Service from "serverless/classes/Service";
 import {
   addCloudWatchForwarderSubscriptions,
+  addStepFunctionLogGroup,
+  addStepFunctionLogGroupSubscription,
   CloudFormationObjectArn,
   canSubscribeLogGroup,
   isLogsConfig,
@@ -301,6 +303,49 @@ describe("addCloudWatchForwarderSubscriptions", () => {
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
+        },
+      }
+    `);
+  });
+
+  it("does not add a subscription for a step function log group", async () => {
+    const service = serviceWithResources({
+      StepFunctionLogGroup: {
+        Type: "AWS::Logs::LogGroup",
+        Properties: {
+          LogGroupName: "/aws/vendedlogs/states/StepFunction-Logs",
+        },
+      },
+    });
+
+    const aws = awsMock({});
+
+    const forwarderConfigs = {
+      AddExtension: false,
+      IntegrationTesting: false,
+      SubToAccessLogGroups: true,
+      SubToExecutionLogGroups: true,
+    };
+
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "first",
+        type: RuntimeType.NODE,
+      },
+    ];
+
+    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs, handlers);
+    expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
+      Object {
+        "StepFunctionLogGroup": Object {
+          "Properties": Object {
+            "LogGroupName": "/aws/vendedlogs/states/StepFunction-Logs",
+          },
+          "Type": "AWS::Logs::LogGroup",
         },
       }
     `);
@@ -1104,5 +1149,171 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const provider = "some string";
     const val = isLogsConfig(provider);
     expect(val).toEqual(false);
+  });
+});
+
+describe("addStepFunctionLogGroup", () => {
+  it("adds log group with correct name and a logging config which references the created log group", async () => {
+    const service = serviceWithResources({});
+    const aws = awsMock({});
+    const stepFunction = {
+      name: "testStepFunction",
+    };
+    await addStepFunctionLogGroup(aws, service.provider.compiledCloudFormationTemplate.Resources, stepFunction);
+    expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
+      Object {
+        "testStepFunctionLogGroup": Object {
+          "Properties": Object {
+            "LogGroupName": "/aws/vendedlogs/states/testStepFunction-Logs-dev",
+          },
+          "Type": "AWS::Logs::LogGroup",
+        },
+      }
+    `);
+    expect(stepFunction).toMatchInlineSnapshot(`
+      Object {
+        "loggingConfig": Object {
+          "destinations": Array [
+            Object {
+              "Fn::GetAtt": Array [
+                "testStepFunctionLogGroup",
+                "Arn",
+              ],
+            },
+          ],
+          "includeExecutionData": true,
+          "level": "ALL",
+        },
+        "name": "testStepFunction",
+      }
+    `);
+  });
+
+  it("adds log group with a normalized alphanumeric resource name and a logging config which references the created log group", async () => {
+    const service = serviceWithResources({});
+    const aws = awsMock({});
+    const stepFunction = {
+      name: "test-StepFunction",
+    };
+    await addStepFunctionLogGroup(aws, service.provider.compiledCloudFormationTemplate.Resources, stepFunction);
+    expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
+      Object {
+        "testStepFunctionLogGroup": Object {
+          "Properties": Object {
+            "LogGroupName": "/aws/vendedlogs/states/test-StepFunction-Logs-dev",
+          },
+          "Type": "AWS::Logs::LogGroup",
+        },
+      }
+    `);
+    expect(stepFunction).toMatchInlineSnapshot(`
+      Object {
+        "loggingConfig": Object {
+          "destinations": Array [
+            Object {
+              "Fn::GetAtt": Array [
+                "testStepFunctionLogGroup",
+                "Arn",
+              ],
+            },
+          ],
+          "includeExecutionData": true,
+          "level": "ALL",
+        },
+        "name": "test-StepFunction",
+      }
+    `);
+  });
+});
+
+describe("addStepFunctionLogGroupSubscription", () => {
+  it("adds a subscription to the log group in the step function logging config", async () => {
+    const service = serviceWithResources({});
+    const stepFunction = {
+      name: "testStepFunction",
+      loggingConfig: {
+        level: "ALL",
+        includeExecutionData: true,
+        destinations: [{ "Fn::GetAtt": ["logGroupResourceName", "Arn"] }],
+      },
+    };
+    const functionArn: string = "forwarderArn";
+    await addStepFunctionLogGroupSubscription(
+      service.provider.compiledCloudFormationTemplate.Resources,
+      stepFunction,
+      functionArn,
+    );
+    expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
+      Object {
+        "testStepFunctionLogGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "forwarderArn",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Fn::Select": Array [
+                6,
+                Object {
+                  "Fn::Split": Array [
+                    ":",
+                    Object {
+                      "Fn::GetAtt": Array [
+                        "logGroupResourceName",
+                        "Arn",
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
+        },
+      }
+    `);
+  });
+
+  it("adds a subscription with a normalized alphanumeric resource name to the log group in the step function logging config", async () => {
+    const service = serviceWithResources({});
+    const stepFunction = {
+      name: "test-StepFunction",
+      loggingConfig: {
+        level: "ALL",
+        includeExecutionData: true,
+        destinations: [{ "Fn::GetAtt": ["logGroupResourceName", "Arn"] }],
+      },
+    };
+    const functionArn: string = "forwarderArn";
+    await addStepFunctionLogGroupSubscription(
+      service.provider.compiledCloudFormationTemplate.Resources,
+      stepFunction,
+      functionArn,
+    );
+    expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
+      Object {
+        "testStepFunctionLogGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "forwarderArn",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Fn::Select": Array [
+                6,
+                Object {
+                  "Fn::Split": Array [
+                    ":",
+                    Object {
+                      "Fn::GetAtt": Array [
+                        "logGroupResourceName",
+                        "Arn",
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
+        },
+      }
+    `);
   });
 });

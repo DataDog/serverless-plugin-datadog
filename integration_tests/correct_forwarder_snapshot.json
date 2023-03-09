@@ -407,6 +407,76 @@
         }
       }
     },
+    "stepFunctionNoLoggingConfigLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/vendedlogs/states/stepFunctionNoLoggingConfig-Logs-dev"
+      }
+    },
+    "stepFunctionNoLoggingConfigLogGroupSubscription": {
+      "Type": "AWS::Logs::SubscriptionFilter",
+      "Properties": {
+        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
+        "FilterPattern": "",
+        "LogGroupName": {
+          "Fn::Select": [
+            6,
+            {
+              "Fn::Split": [
+                ":",
+                {
+                  "Fn::GetAtt": [
+                    "stepFunctionNoLoggingConfigLogGroup",
+                    "Arn"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "stepFunctionLoggingConfigDynamicArnLogGroupSubscription": {
+      "Type": "AWS::Logs::SubscriptionFilter",
+      "Properties": {
+        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
+        "FilterPattern": "",
+        "LogGroupName": {
+          "Fn::Select": [
+            6,
+            {
+              "Fn::Split": [
+                ":",
+                {
+                  "Fn::GetAtt": [
+                    "stepFunction2LogGroup",
+                    "Arn"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "stepFunctionNoLoggingConfigStaticArnLogGroupSubscription": {
+      "Type": "AWS::Logs::SubscriptionFilter",
+      "Properties": {
+        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
+        "FilterPattern": "",
+        "LogGroupName": {
+          "Fn::Select": [
+            6,
+            {
+              "Fn::Split": [
+                ":",
+                "arn:aws:logs:sa-east-1:425362996713:log-group:/aws/vendedlogs/states/stepFunctionNoLoggingConfigStaticArn-Logs-dev:*"
+              ]
+            }
+          ]
+        }
+      }
+    },
     "PythonHello36LambdaFunction": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
@@ -1306,6 +1376,343 @@
         "CodeSha256": "XXXX"
       }
     },
+    "StepFunctionNoLoggingConfigRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": {
+                  "Fn::Sub": "states.${AWS::Region}.amazonaws.com"
+                }
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "dev-dd-sls-plugin-integration-test-statemachine",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "lambda:InvokeFunction"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "JavascriptHello18DashxLambdaFunction",
+                        "Arn"
+                      ]
+                    },
+                    {
+                      "Fn::Sub": [
+                        "${functionArn}:*",
+                        {
+                          "functionArn": {
+                            "Fn::GetAtt": [
+                              "JavascriptHello18DashxLambdaFunction",
+                              "Arn"
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogDelivery",
+                    "logs:GetLogDelivery",
+                    "logs:UpdateLogDelivery",
+                    "logs:DeleteLogDelivery",
+                    "logs:ListLogDeliveries",
+                    "logs:PutResourcePolicy",
+                    "logs:DescribeResourcePolicies",
+                    "logs:DescribeLogGroups"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "StepFunctionLoggingConfigDynamicArnRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": {
+                  "Fn::Sub": "states.${AWS::Region}.amazonaws.com"
+                }
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "dev-dd-sls-plugin-integration-test-statemachine",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "lambda:InvokeFunction"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "JavascriptHello18DashxLambdaFunction",
+                        "Arn"
+                      ]
+                    },
+                    {
+                      "Fn::Sub": [
+                        "${functionArn}:*",
+                        {
+                          "functionArn": {
+                            "Fn::GetAtt": [
+                              "JavascriptHello18DashxLambdaFunction",
+                              "Arn"
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogDelivery",
+                    "logs:GetLogDelivery",
+                    "logs:UpdateLogDelivery",
+                    "logs:DeleteLogDelivery",
+                    "logs:ListLogDeliveries",
+                    "logs:PutResourcePolicy",
+                    "logs:DescribeResourcePolicies",
+                    "logs:DescribeLogGroups"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "StepFunctionNoLoggingConfigStaticArnRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": {
+                  "Fn::Sub": "states.${AWS::Region}.amazonaws.com"
+                }
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "dev-dd-sls-plugin-integration-test-statemachine",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "lambda:InvokeFunction"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "JavascriptHello18DashxLambdaFunction",
+                        "Arn"
+                      ]
+                    },
+                    {
+                      "Fn::Sub": [
+                        "${functionArn}:*",
+                        {
+                          "functionArn": {
+                            "Fn::GetAtt": [
+                              "JavascriptHello18DashxLambdaFunction",
+                              "Arn"
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogDelivery",
+                    "logs:GetLogDelivery",
+                    "logs:UpdateLogDelivery",
+                    "logs:DeleteLogDelivery",
+                    "logs:ListLogDeliveries",
+                    "logs:PutResourcePolicy",
+                    "logs:DescribeResourcePolicies",
+                    "logs:DescribeLogGroups"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "StepFunctionNoLoggingConfig": {
+      "Type": "AWS::StepFunctions::StateMachine",
+      "Properties": {
+        "DefinitionString": {
+          "Fn::Sub": [
+            "{\n  \"StartAt\": \"State1\",\n  \"States\": {\n    \"State1\": {\n      \"Type\": \"Task\",\n      \"Parameters\": {\n        \"FunctionName\": \"${87376de2e2c34dd564ac4eb2208c4e47}\"\n      },\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"End\": true\n    }\n  }\n}",
+            {
+              "87376de2e2c34dd564ac4eb2208c4e47": {
+                "Fn::GetAtt": [
+                  "JavascriptHello18DashxLambdaFunction",
+                  "Arn"
+                ]
+              }
+            }
+          ]
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "StepFunctionNoLoggingConfigRole",
+            "Arn"
+          ]
+        },
+        "LoggingConfiguration": {
+          "Level": "ALL",
+          "IncludeExecutionData": true,
+          "Destinations": [
+            {
+              "CloudWatchLogsLogGroup": {
+                "LogGroupArn": {
+                  "Fn::GetAtt": [
+                    "stepFunctionNoLoggingConfigLogGroup",
+                    "Arn"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "StateMachineName": "stepFunctionNoLoggingConfig"
+      },
+      "DependsOn": [
+        "StepFunctionNoLoggingConfigRole"
+      ]
+    },
+    "StepFunctionLoggingConfigDynamicArn": {
+      "Type": "AWS::StepFunctions::StateMachine",
+      "Properties": {
+        "DefinitionString": {
+          "Fn::Sub": [
+            "{\n  \"StartAt\": \"State1\",\n  \"States\": {\n    \"State1\": {\n      \"Type\": \"Task\",\n      \"Parameters\": {\n        \"FunctionName\": \"${87376de2e2c34dd564ac4eb2208c4e47}\"\n      },\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"End\": true\n    }\n  }\n}",
+            {
+              "87376de2e2c34dd564ac4eb2208c4e47": {
+                "Fn::GetAtt": [
+                  "JavascriptHello18DashxLambdaFunction",
+                  "Arn"
+                ]
+              }
+            }
+          ]
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "StepFunctionLoggingConfigDynamicArnRole",
+            "Arn"
+          ]
+        },
+        "LoggingConfiguration": {
+          "Level": "ALL",
+          "IncludeExecutionData": true,
+          "Destinations": [
+            {
+              "CloudWatchLogsLogGroup": {
+                "LogGroupArn": {
+                  "Fn::GetAtt": [
+                    "stepFunction2LogGroup",
+                    "Arn"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "StateMachineName": "stepFunctionLoggingConfigDynamicArn"
+      },
+      "DependsOn": [
+        "StepFunctionLoggingConfigDynamicArnRole"
+      ]
+    },
+    "StepFunctionNoLoggingConfigStaticArn": {
+      "Type": "AWS::StepFunctions::StateMachine",
+      "Properties": {
+        "DefinitionString": {
+          "Fn::Sub": [
+            "{\n  \"StartAt\": \"State1\",\n  \"States\": {\n    \"State1\": {\n      \"Type\": \"Task\",\n      \"Parameters\": {\n        \"FunctionName\": \"${87376de2e2c34dd564ac4eb2208c4e47}\"\n      },\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"End\": true\n    }\n  }\n}",
+            {
+              "87376de2e2c34dd564ac4eb2208c4e47": {
+                "Fn::GetAtt": [
+                  "JavascriptHello18DashxLambdaFunction",
+                  "Arn"
+                ]
+              }
+            }
+          ]
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "StepFunctionNoLoggingConfigStaticArnRole",
+            "Arn"
+          ]
+        },
+        "LoggingConfiguration": {
+          "Level": "ALL",
+          "IncludeExecutionData": true,
+          "Destinations": [
+            {
+              "CloudWatchLogsLogGroup": {
+                "LogGroupArn": "arn:aws:logs:sa-east-1:425362996713:log-group:/aws/vendedlogs/states/stepFunctionNoLoggingConfigStaticArn-Logs-dev:*"
+              }
+            }
+          ]
+        },
+        "StateMachineName": "stepFunctionNoLoggingConfigStaticArn"
+      },
+      "DependsOn": [
+        "StepFunctionNoLoggingConfigStaticArnRole"
+      ]
+    },
     "ApiGatewayRestApi": {
       "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
@@ -2010,6 +2417,18 @@
           "Ref": "WebsocketsLogGroup"
         }
       }
+    },
+    "stepFunction2LogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/vendedlogs/states/stepFunctionLoggingConfigDynamicArn-Logs-dev"
+      }
+    },
+    "stepFunction3LogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/vendedlogs/states/stepFunctionNoLoggingConfigStaticArn-Logs-dev"
+      }
     }
   },
   "Outputs": {
@@ -2154,6 +2573,33 @@
       },
       "Export": {
         "Name": "sls-dd-sls-plugin-integration-test-dev-ProvidedHelloLambdaFunctionQualifiedArn"
+      }
+    },
+    "StepFunctionNoLoggingConfigArn": {
+      "Description": "Current StateMachine Arn",
+      "Value": {
+        "Ref": "StepFunctionNoLoggingConfig"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-StepFunctionNoLoggingConfigArn"
+      }
+    },
+    "StepFunctionLoggingConfigDynamicArnArn": {
+      "Description": "Current StateMachine Arn",
+      "Value": {
+        "Ref": "StepFunctionLoggingConfigDynamicArn"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-StepFunctionLoggingConfigDynamicArnArn"
+      }
+    },
+    "StepFunctionNoLoggingConfigStaticArnArn": {
+      "Description": "Current StateMachine Arn",
+      "Value": {
+        "Ref": "StepFunctionNoLoggingConfigStaticArn"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-StepFunctionNoLoggingConfigStaticArnArn"
       }
     },
     "ServiceEndpoint": {

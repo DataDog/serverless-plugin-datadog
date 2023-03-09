@@ -116,6 +116,53 @@ export async function addExecutionLogGroupsAndSubscriptions(
   }
 }
 
+export async function addStepFunctionLogGroup(aws: Aws, resources: any, stepFunction: any) {
+  const stepFunctionName = stepFunction.name;
+  const logGroupName = `/aws/vendedlogs/states/${stepFunctionName}-Logs-${aws.getStage()}`;
+  const logGroupResourceName = `${normalizeResourceName(stepFunctionName)}LogGroup`;
+
+  // create log group and add it to compiled CloudFormation template
+  resources[logGroupResourceName] = {
+    Type: logGroupKey,
+    Properties: {
+      LogGroupName: logGroupName,
+    },
+  };
+
+  // add logging config to step function in serverless.yaml using newly created log group
+  // the serverless-step-functions plugin handles the IAM policy creation for the adding logs to the log group
+  stepFunction.loggingConfig = {
+    level: "ALL",
+    includeExecutionData: true,
+    destinations: [{ "Fn::GetAtt": [logGroupResourceName, "Arn"] }],
+  };
+}
+
+export async function addStepFunctionLogGroupSubscription(
+  resources: any,
+  stepFunction: any,
+  functionArn: CloudFormationObjectArn | string,
+) {
+  const logGroupSubscriptionResourceName = `${normalizeResourceName(stepFunction.name)}LogGroupSubscription`;
+
+  // parse log group name out of arn in logging config destination
+  resources[logGroupSubscriptionResourceName] = {
+    Type: logGroupSubscriptionKey,
+    Properties: {
+      DestinationArn: functionArn,
+      FilterPattern: "",
+      LogGroupName: {
+        "Fn::Select": [
+          6,
+          {
+            "Fn::Split": [":", stepFunction.loggingConfig.destinations[0]],
+          },
+        ],
+      },
+    },
+  };
+}
+
 export async function addCloudWatchForwarderSubscriptions(
   service: Service,
   aws: Aws,
@@ -233,6 +280,19 @@ function shouldSubscribe(
   }
   // we don't want to run the shouldSubscribe validation on execution log groups since we manually add those.
   if (typeof resource.Properties.LogGroupName !== "string") {
+    return false;
+  }
+  /*
+    Step function log groups created as custom resources in serverless.yml need to be subscribed to using the log group in
+    the step function loggingConfig since custom resources are not in the complied cloudformation template until a later lifecycle event.
+
+    Step function log groups created outside of serverless.yml need to be subscribed to using the log group in
+    the step function loggingConfig since these log groups will never be in the compiled cloudformation template.
+
+    Step function log groups created by this plugin are also subscribed to using the log group in the step function loggingConfig
+    for consistency with step function log groups created with the above methods.
+  */
+  if (resource.Properties.LogGroupName.startsWith("/aws/vendedlogs/states/")) {
     return false;
   }
   // if the extension is enabled, we don't want to subscribe to lambda log groups
@@ -405,4 +465,9 @@ function getLogGroupLogicalId(functionName: string): string {
   const upperCasedFunctionName = uppercasedFirst + rest;
   const normalizedFunctionName = upperCasedFunctionName.replace(/-/g, "Dash").replace(/_/g, "Underscore");
   return `${normalizedFunctionName}LogGroup`;
+}
+
+// Resource names in CloudFormation Templates can only have alphanumeric characters
+function normalizeResourceName(resourceName: string) {
+  return resourceName.replace(/[^0-9a-z]/gi, "");
 }
