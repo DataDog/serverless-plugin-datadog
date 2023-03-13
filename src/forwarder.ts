@@ -126,6 +126,7 @@ export async function addStepFunctionLogGroup(aws: Aws, resources: any, stepFunc
     Type: logGroupKey,
     Properties: {
       LogGroupName: logGroupName,
+      Tags: [{ Key: "DD_INSTRUMENTATION_SOURCE", Value: "serverless-plugin-datadog" }],
     },
   };
 
