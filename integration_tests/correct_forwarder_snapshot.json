@@ -410,13 +410,7 @@
     "stepFunctionNoLoggingConfigLogGroup": {
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
-        "LogGroupName": "/aws/vendedlogs/states/stepFunctionNoLoggingConfig-Logs-dev",
-        "Tags": [
-          {
-            "Key": "DD_INSTRUMENTATION_SOURCE",
-            "Value": "serverless-plugin-datadog"
-          }
-        ]
+        "LogGroupName": "/aws/vendedlogs/states/stepFunctionNoLoggingConfig-Logs-dev"
       }
     },
     "stepFunctionNoLoggingConfigLogGroupSubscription": {
