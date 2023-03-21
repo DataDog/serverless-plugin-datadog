@@ -1165,6 +1165,12 @@ describe("addStepFunctionLogGroup", () => {
         "testStepFunctionLogGroup": Object {
           "Properties": Object {
             "LogGroupName": "/aws/vendedlogs/states/testStepFunction-Logs-dev",
+            "Tags": Array [
+              Object {
+                "Key": "dd_sls_plugin",
+                "Value": "v2.5.1",
+              },
+            ],
           },
           "Type": "AWS::Logs::LogGroup",
         },
@@ -1201,6 +1207,12 @@ describe("addStepFunctionLogGroup", () => {
         "testStepFunctionLogGroup": Object {
           "Properties": Object {
             "LogGroupName": "/aws/vendedlogs/states/test-StepFunction-Logs-dev",
+            "Tags": Array [
+              Object {
+                "Key": "dd_sls_plugin",
+                "Value": "v2.5.1",
+              },
+            ],
           },
           "Type": "AWS::Logs::LogGroup",
         },
