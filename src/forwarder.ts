@@ -144,7 +144,10 @@ export function addDdSlsPluginTag(stepFunction: any) {
   if (stepFunction === undefined || stepFunction === null) {
     return;
   }
-  if (!stepFunction?.Properties.hasOwnProperty("Tags")) {
+  if (!stepFunction.hasOwnProperty("Properties")) {
+    return
+  }
+  if (!stepFunction?.Properties?.hasOwnProperty("Tags")) {
     stepFunction.Properties.Tags = [];
   }
   stepFunction.Properties.Tags.push({ Key: "dd_sls_plugin", Value: `v${version}` });
