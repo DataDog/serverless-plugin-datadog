@@ -1,6 +1,7 @@
 import Service from "serverless/classes/Service";
 import { FunctionInfo } from "./layer";
 import Aws = require("serverless/plugins/aws/provider/awsProvider");
+import {version} from "prettier";
 
 const logGroupKey = "AWS::Logs::LogGroup";
 const logGroupSubscriptionKey = "AWS::Logs::SubscriptionFilter";
@@ -126,6 +127,7 @@ export async function addStepFunctionLogGroup(aws: Aws, resources: any, stepFunc
     Type: logGroupKey,
     Properties: {
       LogGroupName: logGroupName,
+      Tags: [{ Key: "dd_sls_plugin", Value: `v${version}` }],
     },
   };
 
