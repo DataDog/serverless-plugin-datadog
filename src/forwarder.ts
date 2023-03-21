@@ -140,6 +140,16 @@ export async function addStepFunctionLogGroup(aws: Aws, resources: any, stepFunc
   };
 }
 
+export function addDdSlsPluginTag(stepFunction: any) {
+  if (stepFunction === undefined || stepFunction === null) {
+    return;
+  }
+  if (!stepFunction?.Properties.hasOwnProperty("Tags")) {
+    stepFunction.Properties.Tags = [];
+  }
+  stepFunction.Properties.Tags.push({ Key: "dd_sls_plugin", Value: `v${version}` });
+}
+
 export async function addStepFunctionLogGroupSubscription(
   resources: any,
   stepFunction: any,

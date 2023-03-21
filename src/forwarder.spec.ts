@@ -1,6 +1,7 @@
 import Service from "serverless/classes/Service";
 import {
   addCloudWatchForwarderSubscriptions,
+  addDdSlsPluginTag,
   addStepFunctionLogGroup,
   addStepFunctionLogGroupSubscription,
   CloudFormationObjectArn,
@@ -1233,6 +1234,64 @@ describe("addStepFunctionLogGroup", () => {
           "level": "ALL",
         },
         "name": "test-StepFunction",
+      }
+    `);
+  });
+});
+
+describe("test addDdSlsPluginTag", () => {
+  it("test adding dd_sls_plugin tag to state machine with existing tags", async () => {
+    const stepFunction = {
+      Type: "AWS::StepFunctions::StateMachine",
+      Properties: {
+        LoggingConfiguration: {},
+        Tags: [
+          {
+            Key: "service",
+            Value: "test-service",
+          },
+        ],
+        StateMachineName: "unit-test-state-machine",
+      },
+    };
+    addDdSlsPluginTag(stepFunction);
+    expect(stepFunction.Properties).toMatchInlineSnapshot(`
+      Object {
+        "LoggingConfiguration": Object {},
+        "StateMachineName": "unit-test-state-machine",
+        "Tags": Array [
+          Object {
+            "Key": "service",
+            "Value": "test-service",
+          },
+          Object {
+            "Key": "dd_sls_plugin",
+            "Value": "v2.5.1",
+          },
+        ],
+      }
+    `);
+  });
+
+  it("test adding dd_sls_plugin tag to state machine without any tags", () => {
+    const stepFunction = {
+      Type: "AWS::StepFunctions::StateMachine",
+      Properties: {
+        LoggingConfiguration: {},
+        StateMachineName: "unit-test-state-machine",
+      },
+    };
+    addDdSlsPluginTag(stepFunction);
+    expect(stepFunction.Properties).toMatchInlineSnapshot(`
+      Object {
+        "LoggingConfiguration": Object {},
+        "StateMachineName": "unit-test-state-machine",
+        "Tags": Array [
+          Object {
+            "Key": "dd_sls_plugin",
+            "Value": "v2.5.1",
+          },
+        ],
       }
     `);
   });

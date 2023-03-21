@@ -26,6 +26,7 @@ import {
 } from "./env";
 import {
   addCloudWatchForwarderSubscriptions,
+  addDdSlsPluginTag,
   addExecutionLogGroupsAndSubscriptions,
   addStepFunctionLogGroup,
   addStepFunctionLogGroupSubscription,
@@ -227,6 +228,9 @@ module.exports = class ServerlessPlugin {
                 );
               }
             }
+            // add dd_sls_plugin tag
+            addDdSlsPluginTag(stepFunction);
+
             // subscribe step function log group to datadog forwarder regardless of how the log group was created
             await addStepFunctionLogGroupSubscription(resources, stepFunction, datadogForwarderArn);
           }
