@@ -97,6 +97,11 @@ export interface Configuration {
   encodeAuthorizerContext?: boolean;
   // Whether to parse and use the encoded tracing context from lambda authorizers. Default true
   decodeAuthorizerContext?: boolean;
+
+  // Determine when to submit spans before a timeout occurs.
+  // When the remaining time in a Lambda invocation is less than `apmFlushDeadline`, the tracer will
+  // attempt to submit the current active spans and all finished spans.
+  apmFlushDeadline?: string | number;
 }
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
@@ -116,6 +121,7 @@ const ddColdStartTracingSkipLibsEnvVar = "DD_COLD_START_TRACE_SKIP_LIB";
 const ddProfilingEnabledEnvVar = "DD_PROFILING_ENABLED";
 const ddEncodeAuthorizerContextEnvVar = "DD_ENCODE_AUTHORIZER_CONTEXT";
 const ddDecodeAuthorizerContextEnvVar = "DD_DECODE_AUTHORIZER_CONTEXT";
+const ddApmFlushDeadlineMillisecondsEnvVar = "DD_APM_FLUSH_DEADLINE_MILLISECONDS";
 
 export const ddServiceEnvVar = "DD_SERVICE";
 export const ddEnvEnvVar = "DD_ENV";
@@ -226,6 +232,9 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     }
     if (config.decodeAuthorizerContext !== undefined && environment[ddDecodeAuthorizerContextEnvVar] === undefined) {
       environment[ddDecodeAuthorizerContextEnvVar] = config.decodeAuthorizerContext;
+    }
+    if (config.apmFlushDeadline !== undefined && environment[ddApmFlushDeadlineMillisecondsEnvVar] === undefined) {
+      environment[ddApmFlushDeadlineMillisecondsEnvVar] = config.apmFlushDeadline;
     }
     if (type === RuntimeType.DOTNET || type === RuntimeType.JAVA) {
       if (environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] === undefined) {
