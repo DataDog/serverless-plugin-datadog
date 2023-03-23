@@ -10,6 +10,8 @@ import {
 } from "./forwarder";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
 import { FunctionInfo, RuntimeType } from "./layer";
+import { version } from "prettier";
+
 function serviceWithResources(resources?: Record<string, any>, serviceName = "my-service"): Service {
   const service = {
     getServiceName: () => serviceName,
@@ -1241,69 +1243,41 @@ describe("addStepFunctionLogGroup", () => {
 
 describe("test addDdSlsPluginTag", () => {
   it("test adding dd_sls_plugin tag to state machine with existing tags", async () => {
-    const resources = {
-      "Unit-test-step-function": {
-        Type: "AWS::StepFunctions::StateMachine",
-        Properties: {
-          Tags: [
-            {
-              Key: "service",
-              Value: "test-service",
-            },
-          ],
-          StateMachineName: "Unit-test-step-function",
-        },
-      },
-    };
-    const stepFunction = {
+    const stateMachineObj = {
       Type: "AWS::StepFunctions::StateMachine",
       Properties: {
-        LoggingConfiguration: {},
         Tags: [
           {
             Key: "service",
             Value: "test-service",
           },
         ],
-        StateMachineName: "unit-test-state-machine",
+        StateMachineName: "Unit-test-step-function",
       },
-      name: "unit-test-step-function",
     };
 
-    addDdSlsPluginTag(resources, stepFunction);
-    expect(resources["Unit-test-step-function"].Properties.Tags[0]).toStrictEqual({
+    addDdSlsPluginTag(stateMachineObj);
+    expect(stateMachineObj.Properties.Tags[0]).toStrictEqual({
       Key: "service",
       Value: "test-service",
     });
-    expect(resources["Unit-test-step-function"].Properties.Tags[1].Key).toBe("dd_sls_plugin");
-    expect(resources["Unit-test-step-function"].Properties.Tags[1].Value.startsWith("v")).toBeTruthy();
+    expect(stateMachineObj.Properties.Tags[1].Key).toBe("dd_sls_plugin");
+    expect(stateMachineObj.Properties.Tags[1].Value.startsWith("v")).toBeTruthy();
   });
 
   it("test adding dd_sls_plugin tag to state machine without any tags", () => {
-    const resources = {
-      "Unit-test-step-function": {
-        Type: "AWS::StepFunctions::StateMachine",
-        Properties: {
-          StateMachineName: "Unit-test-step-function",
-        },
-      },
-    };
-    const stepFunction = {
+    const stateMachineObj = {
       Type: "AWS::StepFunctions::StateMachine",
       Properties: {
-        LoggingConfiguration: {},
-        Tags: [
-          {
-            Key: "service",
-            Value: "test-service",
-          },
-        ],
-        StateMachineName: "unit-test-state-machine",
+        StateMachineName: "Unit-test-step-function",
       },
-      name: "unit-test-step-function",
     };
-
-    addDdSlsPluginTag(resources, stepFunction);
+    addDdSlsPluginTag(stateMachineObj);
+    expect(stateMachineObj.Properties.hasOwnProperty("Tags")).toBeTruthy();
+    // @ts-ignore
+    expect(stateMachineObj.Properties.Tags[0].Key).toBe("dd_sls_plugin");
+    // @ts-ignore
+    expect(stateMachineObj.Properties.Tags[0].Value).toBe(`v${version}`);
   });
 });
 
