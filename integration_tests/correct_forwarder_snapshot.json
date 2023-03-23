@@ -1630,7 +1630,13 @@
             }
           ]
         },
-        "StateMachineName": "stepFunctionNoLoggingConfig"
+        "StateMachineName": "stepFunctionNoLoggingConfig",
+        "Tags": [
+          {
+            "Key": "dd_sls_plugin",
+            "Value": "vX.XX.X"
+          }
+        ]
       },
       "DependsOn": [
         "StepFunctionNoLoggingConfigRole"
@@ -1674,7 +1680,13 @@
             }
           ]
         },
-        "StateMachineName": "stepFunctionLoggingConfigDynamicArn"
+        "StateMachineName": "stepFunctionLoggingConfigDynamicArn",
+        "Tags": [
+          {
+            "Key": "dd_sls_plugin",
+            "Value": "vX.XX.X"
+          }
+        ]
       },
       "DependsOn": [
         "StepFunctionLoggingConfigDynamicArnRole"
@@ -1713,7 +1725,13 @@
             }
           ]
         },
-        "StateMachineName": "stepFunctionNoLoggingConfigStaticArn"
+        "StateMachineName": "stepFunctionNoLoggingConfigStaticArn",
+        "Tags": [
+          {
+            "Key": "dd_sls_plugin",
+            "Value": "vX.XX.X"
+          }
+        ]
       },
       "DependsOn": [
         "StepFunctionNoLoggingConfigStaticArnRole"
