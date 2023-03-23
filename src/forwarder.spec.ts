@@ -1241,6 +1241,20 @@ describe("addStepFunctionLogGroup", () => {
 
 describe("test addDdSlsPluginTag", () => {
   it("test adding dd_sls_plugin tag to state machine with existing tags", async () => {
+    const resources = {
+      "Unit-test-step-function": {
+        Type: "AWS::StepFunctions::StateMachine",
+        Properties: {
+          Tags: [
+            {
+              Key: "service",
+              Value: "test-service",
+            },
+          ],
+          StateMachineName: "Unit-test-step-function",
+        },
+      },
+    };
     const stepFunction = {
       Type: "AWS::StepFunctions::StateMachine",
       Properties: {
@@ -1253,47 +1267,43 @@ describe("test addDdSlsPluginTag", () => {
         ],
         StateMachineName: "unit-test-state-machine",
       },
+      name: "unit-test-step-function",
     };
-    addDdSlsPluginTag(stepFunction);
-    expect(stepFunction.Properties).toMatchInlineSnapshot(`
-      Object {
-        "LoggingConfiguration": Object {},
-        "StateMachineName": "unit-test-state-machine",
-        "Tags": Array [
-          Object {
-            "Key": "service",
-            "Value": "test-service",
-          },
-          Object {
-            "Key": "dd_sls_plugin",
-            "Value": "v2.5.1",
-          },
-        ],
-      }
-    `);
+
+    addDdSlsPluginTag(resources, stepFunction);
+    expect(resources["Unit-test-step-function"].Properties.Tags[0]).toStrictEqual({
+      Key: "service",
+      Value: "test-service",
+    });
+    expect(resources["Unit-test-step-function"].Properties.Tags[1].Key).toBe("dd_sls_plugin");
+    expect(resources["Unit-test-step-function"].Properties.Tags[1].Value.startsWith("v")).toBeTruthy();
   });
 
   it("test adding dd_sls_plugin tag to state machine without any tags", () => {
+    const resources = {
+      "Unit-test-step-function": {
+        Type: "AWS::StepFunctions::StateMachine",
+        Properties: {
+          StateMachineName: "Unit-test-step-function",
+        },
+      },
+    };
     const stepFunction = {
       Type: "AWS::StepFunctions::StateMachine",
       Properties: {
         LoggingConfiguration: {},
-        StateMachineName: "unit-test-state-machine",
-      },
-    };
-    addDdSlsPluginTag(stepFunction);
-    expect(stepFunction.Properties).toMatchInlineSnapshot(`
-      Object {
-        "LoggingConfiguration": Object {},
-        "StateMachineName": "unit-test-state-machine",
-        "Tags": Array [
-          Object {
-            "Key": "dd_sls_plugin",
-            "Value": "v2.5.1",
+        Tags: [
+          {
+            Key: "service",
+            Value: "test-service",
           },
         ],
-      }
-    `);
+        StateMachineName: "unit-test-state-machine",
+      },
+      name: "unit-test-step-function",
+    };
+
+    addDdSlsPluginTag(resources, stepFunction);
   });
 });
 

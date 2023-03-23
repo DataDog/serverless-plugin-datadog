@@ -70,6 +70,7 @@ module.exports = class ServerlessPlugin {
     "after:deploy:function:packageFunction": this.afterPackageFunction.bind(this),
     "after:package:createDeploymentArtifacts": this.afterPackageFunction.bind(this),
     "after:package:initialize": this.beforePackageFunction.bind(this),
+    "after:package:compileFunctions": this.afterPackageCompileFunctions.bind(this),
     "before:deploy:function:packageFunction": this.beforePackageFunction.bind(this),
     "before:offline:start:init": this.beforePackageFunction.bind(this),
     "before:step-functions-offline:start": this.beforePackageFunction.bind(this),
@@ -169,6 +170,17 @@ module.exports = class ServerlessPlugin {
     enableTracing(this.serverless.service, tracingMode, handlers);
   }
 
+  private async afterPackageCompileFunctions() {
+    // State machines' "Properties" field will not be added until "after:package:compileFunctions"
+    // hook. So we are updating Properties.Tag at this hook
+
+    const resources = this.serverless.service.provider.compiledCloudFormationTemplate?.Resources;
+    const stepFunctions = Object.values((this.serverless.service as any).stepFunctions.stateMachines);
+    for (const stepFunction of stepFunctions as any[]) {
+      addDdSlsPluginTag(resources, stepFunction);
+    }
+  }
+
   private async afterPackageFunction() {
     const config = getConfig(this.serverless.service);
     if (config.enabled === false) return;
@@ -228,9 +240,6 @@ module.exports = class ServerlessPlugin {
                 );
               }
             }
-            // add dd_sls_plugin tag
-            addDdSlsPluginTag(stepFunction);
-
             // subscribe step function log group to datadog forwarder regardless of how the log group was created
             await addStepFunctionLogGroupSubscription(resources, stepFunction, datadogForwarderArn);
           }

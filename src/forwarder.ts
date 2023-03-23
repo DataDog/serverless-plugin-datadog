@@ -140,17 +140,27 @@ export async function addStepFunctionLogGroup(aws: Aws, resources: any, stepFunc
   };
 }
 
-export function addDdSlsPluginTag(stepFunction: any) {
-  if (stepFunction === undefined || stepFunction === null) {
+export function addDdSlsPluginTag(resources: any, stepFunction: any) {
+  // Getting step function name from stepFunction, and use the name to modify
+  // compiledCloudFormationTemplate in resources object
+  if (!(resources && stepFunction)) {
     return;
   }
-  if (!stepFunction.hasOwnProperty("Properties")) {
-    return
+  // camel case name
+  const stateMachineName = stepFunction.name;
+  // resources' key of the state machine name is capitalized at first char like a Class name
+  const capitalizedFirstCharStateMachineName = capitalizeFirstChar(stateMachineName);
+  if (
+    resources[capitalizedFirstCharStateMachineName] &&
+    resources[capitalizedFirstCharStateMachineName].Properties &&
+    !resources[capitalizedFirstCharStateMachineName].Properties.hasOwnProperty("Tags")
+  ) {
+    resources[capitalizedFirstCharStateMachineName].Properties.Tags = [];
   }
-  if (!stepFunction?.Properties?.hasOwnProperty("Tags")) {
-    stepFunction.Properties.Tags = [];
-  }
-  stepFunction.Properties.Tags.push({ Key: "dd_sls_plugin", Value: `v${version}` });
+  resources[capitalizedFirstCharStateMachineName]?.Properties?.Tags?.push({
+    Key: "dd_sls_plugin",
+    Value: `v${version}`,
+  });
 }
 
 export async function addStepFunctionLogGroupSubscription(
@@ -485,4 +495,11 @@ function getLogGroupLogicalId(functionName: string): string {
 // Resource names in CloudFormation Templates can only have alphanumeric characters
 function normalizeResourceName(resourceName: string) {
   return resourceName.replace(/[^0-9a-z]/gi, "");
+}
+
+function capitalizeFirstChar(s: string) {
+  if (s === undefined || s == null) {
+    return "";
+  }
+  return s.charAt(0).toUpperCase() + s.substring(1);
 }
