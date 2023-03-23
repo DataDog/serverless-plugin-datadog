@@ -26,6 +26,7 @@ import {
 } from "./env";
 import {
   addCloudWatchForwarderSubscriptions,
+  addDdSlsPluginTag,
   addExecutionLogGroupsAndSubscriptions,
   addStepFunctionLogGroup,
   addStepFunctionLogGroupSubscription,
@@ -69,6 +70,7 @@ module.exports = class ServerlessPlugin {
     "after:deploy:function:packageFunction": this.afterPackageFunction.bind(this),
     "after:package:createDeploymentArtifacts": this.afterPackageFunction.bind(this),
     "after:package:initialize": this.beforePackageFunction.bind(this),
+    "after:package:compileFunctions": this.afterPackageCompileFunctions.bind(this),
     "before:deploy:function:packageFunction": this.beforePackageFunction.bind(this),
     "before:offline:start:init": this.beforePackageFunction.bind(this),
     "before:step-functions-offline:start": this.beforePackageFunction.bind(this),
@@ -166,6 +168,19 @@ module.exports = class ServerlessPlugin {
       tracingMode = TracingMode.XRAY;
     }
     enableTracing(this.serverless.service, tracingMode, handlers);
+  }
+
+  private async afterPackageCompileFunctions() {
+    // State machines' "Properties" field will not be added until "after:package:compileFunctions"
+    // hook. So we are updating Properties.Tag at this hook
+
+    const resources = this.serverless.service.provider.compiledCloudFormationTemplate?.Resources;
+
+    for (const [_, obj] of Object.entries(resources)) {
+      if (obj.Type && obj.Type === "AWS::StepFunctions::StateMachine") {
+        addDdSlsPluginTag(obj); // obj is a state machine object
+      }
+    }
   }
 
   private async afterPackageFunction() {

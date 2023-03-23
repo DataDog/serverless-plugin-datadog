@@ -1,6 +1,7 @@
 import Service from "serverless/classes/Service";
 import {
   addCloudWatchForwarderSubscriptions,
+  addDdSlsPluginTag,
   addStepFunctionLogGroup,
   addStepFunctionLogGroupSubscription,
   CloudFormationObjectArn,
@@ -9,6 +10,8 @@ import {
 } from "./forwarder";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
 import { FunctionInfo, RuntimeType } from "./layer";
+import { version } from "prettier";
+
 function serviceWithResources(resources?: Record<string, any>, serviceName = "my-service"): Service {
   const service = {
     getServiceName: () => serviceName,
@@ -1165,6 +1168,12 @@ describe("addStepFunctionLogGroup", () => {
         "testStepFunctionLogGroup": Object {
           "Properties": Object {
             "LogGroupName": "/aws/vendedlogs/states/testStepFunction-Logs-dev",
+            "Tags": Array [
+              Object {
+                "Key": "dd_sls_plugin",
+                "Value": "v2.5.1",
+              },
+            ],
           },
           "Type": "AWS::Logs::LogGroup",
         },
@@ -1201,6 +1210,12 @@ describe("addStepFunctionLogGroup", () => {
         "testStepFunctionLogGroup": Object {
           "Properties": Object {
             "LogGroupName": "/aws/vendedlogs/states/test-StepFunction-Logs-dev",
+            "Tags": Array [
+              Object {
+                "Key": "dd_sls_plugin",
+                "Value": "v2.5.1",
+              },
+            ],
           },
           "Type": "AWS::Logs::LogGroup",
         },
@@ -1223,6 +1238,46 @@ describe("addStepFunctionLogGroup", () => {
         "name": "test-StepFunction",
       }
     `);
+  });
+});
+
+describe("test addDdSlsPluginTag", () => {
+  it("test adding dd_sls_plugin tag to state machine with existing tags", async () => {
+    const stateMachineObj = {
+      Type: "AWS::StepFunctions::StateMachine",
+      Properties: {
+        Tags: [
+          {
+            Key: "service",
+            Value: "test-service",
+          },
+        ],
+        StateMachineName: "Unit-test-step-function",
+      },
+    };
+
+    addDdSlsPluginTag(stateMachineObj);
+    expect(stateMachineObj.Properties.Tags[0]).toStrictEqual({
+      Key: "service",
+      Value: "test-service",
+    });
+    expect(stateMachineObj.Properties.Tags[1].Key).toBe("dd_sls_plugin");
+    expect(stateMachineObj.Properties.Tags[1].Value.startsWith("v")).toBeTruthy();
+  });
+
+  it("test adding dd_sls_plugin tag to state machine without any tags", () => {
+    const stateMachineObj = {
+      Type: "AWS::StepFunctions::StateMachine",
+      Properties: {
+        StateMachineName: "Unit-test-step-function",
+      },
+    };
+    addDdSlsPluginTag(stateMachineObj);
+    expect(stateMachineObj.Properties.hasOwnProperty("Tags")).toBeTruthy();
+    // @ts-ignore
+    expect(stateMachineObj.Properties.Tags[0].Key).toBe("dd_sls_plugin");
+    // @ts-ignore
+    expect(stateMachineObj.Properties.Tags[0].Value).toBe(`v${version}`);
   });
 });
 
