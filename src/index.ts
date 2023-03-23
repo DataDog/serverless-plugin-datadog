@@ -175,12 +175,8 @@ module.exports = class ServerlessPlugin {
     // hook. So we are updating Properties.Tag at this hook
 
     const resources = this.serverless.service.provider.compiledCloudFormationTemplate?.Resources;
-    // const stepFunctions = Object.values((this.serverless.service as any).stepFunctions.stateMachines);
-    // console.log("========= resources: =========")
-    // console.log(JSON.stringify(resources))
 
-    for (const [resourceName, obj] of Object.entries(resources)) {
-      console.log(" -- resourceName: " + resourceName);
+    for (const [_, obj] of Object.entries(resources)) {
       if (obj.Type && obj.Type === "AWS::StepFunctions::StateMachine") {
         addDdSlsPluginTag(obj); // obj is a state machine object
       }
