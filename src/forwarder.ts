@@ -1,7 +1,7 @@
 import Service from "serverless/classes/Service";
 import { FunctionInfo } from "./layer";
-import { version } from "../package.json";
 import Aws = require("serverless/plugins/aws/provider/awsProvider");
+import { version } from "prettier";
 
 const logGroupKey = "AWS::Logs::LogGroup";
 const logGroupSubscriptionKey = "AWS::Logs::SubscriptionFilter";
