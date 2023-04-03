@@ -10,7 +10,7 @@ import {
 } from "./forwarder";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
 import { FunctionInfo, RuntimeType } from "./layer";
-import { version } from "prettier";
+import { version } from "../package.json";
 
 function serviceWithResources(resources?: Record<string, any>, serviceName = "my-service"): Service {
   const service = {
@@ -1163,22 +1163,15 @@ describe("addStepFunctionLogGroup", () => {
       name: "testStepFunction",
     };
     await addStepFunctionLogGroup(aws, service.provider.compiledCloudFormationTemplate.Resources, stepFunction);
-    expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
-      Object {
-        "testStepFunctionLogGroup": Object {
-          "Properties": Object {
-            "LogGroupName": "/aws/vendedlogs/states/testStepFunction-Logs-dev",
-            "Tags": Array [
-              Object {
-                "Key": "dd_sls_plugin",
-                "Value": "v2.5.1",
-              },
-            ],
-          },
-          "Type": "AWS::Logs::LogGroup",
-        },
-      }
-    `);
+    expect(
+      service.provider.compiledCloudFormationTemplate.Resources.testStepFunctionLogGroup.Properties.LogGroupName,
+    ).toBe("/aws/vendedlogs/states/testStepFunction-Logs-dev");
+    expect(
+      service.provider.compiledCloudFormationTemplate.Resources.testStepFunctionLogGroup.Properties.Tags[0].Key,
+    ).toBe("dd_sls_plugin");
+    expect(
+      service.provider.compiledCloudFormationTemplate.Resources.testStepFunctionLogGroup.Properties.Tags[0].Value,
+    ).toBe(`v${version}`);
     expect(stepFunction).toMatchInlineSnapshot(`
       Object {
         "loggingConfig": Object {
@@ -1205,22 +1198,16 @@ describe("addStepFunctionLogGroup", () => {
       name: "test-StepFunction",
     };
     await addStepFunctionLogGroup(aws, service.provider.compiledCloudFormationTemplate.Resources, stepFunction);
-    expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
-      Object {
-        "testStepFunctionLogGroup": Object {
-          "Properties": Object {
-            "LogGroupName": "/aws/vendedlogs/states/test-StepFunction-Logs-dev",
-            "Tags": Array [
-              Object {
-                "Key": "dd_sls_plugin",
-                "Value": "v2.5.1",
-              },
-            ],
-          },
-          "Type": "AWS::Logs::LogGroup",
-        },
-      }
-    `);
+
+    expect(
+      service.provider.compiledCloudFormationTemplate.Resources.testStepFunctionLogGroup.Properties.LogGroupName,
+    ).toBe("/aws/vendedlogs/states/test-StepFunction-Logs-dev");
+    expect(
+      service.provider.compiledCloudFormationTemplate.Resources.testStepFunctionLogGroup.Properties.Tags[0].Key,
+    ).toBe("dd_sls_plugin");
+    expect(
+      service.provider.compiledCloudFormationTemplate.Resources.testStepFunctionLogGroup.Properties.Tags[0].Value,
+    ).toBe(`v${version}`);
     expect(stepFunction).toMatchInlineSnapshot(`
       Object {
         "loggingConfig": Object {
