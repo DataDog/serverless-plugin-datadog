@@ -28,7 +28,7 @@ export interface Configuration {
   apiKMSKey?: string;
   // Whether to capture and store the payload and response of a lambda invocation
   captureLambdaPayload?: boolean;
-  // Which Site to send to, (should be datadoghq.com or datadoghq.eu)
+  // Which Site to send to, (eg. datadoghq.com, datadoghq.eu etc)
   site: string;
   // The subdomain to use for app url links that are printed to output. Defaults to app
   subdomain: string;
