@@ -512,11 +512,12 @@ function validateConfiguration(config: Configuration) {
     "datadoghq.eu",
     "us3.datadoghq.com",
     "us5.datadoghq.com",
+    "ap1.datadoghq.com",
     "ddog-gov.com",
   ];
   if (config.site !== undefined && !siteList.includes(config.site.toLowerCase())) {
     throw new Error(
-      "Warning: Invalid site URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, us5.datadoghq.com, or ddog-gov.com.",
+      "Warning: Invalid site URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, us5.datadoghq.com, ap1.datadoghq.com, or ddog-gov.com.",
     );
   }
   if (config.addExtension) {
