@@ -50,6 +50,7 @@ describe("findHandlers", () => {
       "python37-function": { handler: "myfile.handler", runtime: "python3.7" },
       "python38-function": { handler: "myfile.handler", runtime: "python3.8" },
       "python39-function": { handler: "myfile.handler", runtime: "python3.9" },
+      "python310-function": { handler: "myfile.handler", runtime: "python3.10" },
     });
 
     const result = findHandlers(mockService, []);
@@ -107,6 +108,12 @@ describe("findHandlers", () => {
         handler: { handler: "myfile.handler", runtime: "python3.9" },
         type: RuntimeType.PYTHON,
         runtime: "python3.9",
+      },
+      {
+        name: "python310-function",
+        handler: { handler: "myfile.handler", runtime: "python3.10" },
+        type: RuntimeType.PYTHON,
+        runtime: "python3.10",
       },
     ]);
   });

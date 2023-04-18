@@ -53,6 +53,7 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
   "python3.7": RuntimeType.PYTHON,
   "python3.8": RuntimeType.PYTHON,
   "python3.9": RuntimeType.PYTHON,
+  "python3.10": RuntimeType.PYTHON,
   "dotnetcore3.1": RuntimeType.DOTNET,
   dotnet6: RuntimeType.DOTNET,
   java11: RuntimeType.JAVA,
@@ -67,6 +68,7 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
 export const armRuntimeKeys: { [key: string]: string } = {
   "python3.8": "python3.8-arm",
   "python3.9": "python3.9-arm",
+  "python3.10": "python3.10-arm",
   extension: "extension-arm",
   dotnet6: "dd-trace-dotnet-ARM",
 };
