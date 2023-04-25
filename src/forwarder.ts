@@ -327,7 +327,7 @@ function shouldSubscribe(
       validateWebsocketSubscription(resource, forwarderConfigs.SubToAccessLogGroups, extendedProvider)
     )
   ) {
-    return false;
+    return true;
   }
 
   // If the log group does not belong to our list of handlers, we don't want to subscribe to it

@@ -271,6 +271,16 @@ describe("addCloudWatchForwarderSubscriptions", () => {
           },
           "Type": "AWS::Logs::LogGroup",
         },
+        "NonLambdaGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "my-func",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Ref": "NonLambdaGroup",
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
+        },
         "SecondLogGroup": Object {
           "Properties": Object {
             "LogGroupName": "/aws/lambda/second",
@@ -435,6 +445,16 @@ describe("addCloudWatchForwarderSubscriptions", () => {
           },
           "Type": "AWS::Logs::LogGroup",
         },
+        "ApiGatewayGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "my-func",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Ref": "ApiGatewayGroup",
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
+        },
         "FirstLogGroup": Object {
           "Properties": Object {
             "LogGroupName": "/aws/lambda/first",
@@ -457,11 +477,31 @@ describe("addCloudWatchForwarderSubscriptions", () => {
           },
           "Type": "AWS::Logs::LogGroup",
         },
+        "HttpApiGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "my-func",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Ref": "HttpApiGroup",
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
+        },
         "NonLambdaGroup": Object {
           "Properties": Object {
             "LogGroupName": "/aws/apigateway/second-group",
           },
           "Type": "AWS::Logs::LogGroup",
+        },
+        "NonLambdaGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "my-func",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Ref": "NonLambdaGroup",
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
         },
         "SecondLogGroup": Object {
           "Properties": Object {
