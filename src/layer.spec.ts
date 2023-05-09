@@ -713,7 +713,7 @@ describe("applyLambdaLibraryLayers", () => {
     });
   });
 
-  it("adds an tracing layer from the local AWS account of the same name", () => {
+  it("adds a tracing layer from the local AWS account of the same name", () => {
     const handler = {
       handler: { runtime: "java11" },
       type: RuntimeType.JAVA,
@@ -734,7 +734,7 @@ describe("applyLambdaLibraryLayers", () => {
     });
   });
 
-  it("adds an tracing layer from the local AWS account regardless of whether we've published to that region", () => {
+  it("adds a tracing layer from the local AWS account regardless of whether we've published to that region", () => {
     const handler = {
       handler: { runtime: "java11" },
       type: RuntimeType.JAVA,

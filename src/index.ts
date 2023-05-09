@@ -138,14 +138,14 @@ module.exports = class ServerlessPlugin {
       this.debugLogHandlers(handlers);
       applyExtensionLayer(this.serverless.service, handlers, allLayers, accountId);
       handlers.forEach((functionInfo) => {
-        if (functionInfo.type === RuntimeType.DOTNET) {
-          this.serverless.cli.log("Adding .NET Tracing Layer to functions");
+        if (functionInfo.type === RuntimeType.DOTNET || functionInfo.type === RuntimeType.JAVA) {
+          const runtimeNameToReadable: { [key in RuntimeType.DOTNET | RuntimeType.JAVA]: string } = {
+            [RuntimeType.DOTNET]: ".NET",
+            [RuntimeType.JAVA]: "Java",
+          };
+          this.serverless.cli.log(`Adding ${runtimeNameToReadable[functionInfo.type]} Tracing Layer to functions`);
           this.debugLogHandlers(handlers);
-          applyTracingLayer(this.serverless.service, functionInfo, allLayers, RuntimeType.DOTNET, accountId);
-        } else if (functionInfo.type === RuntimeType.JAVA) {
-          this.serverless.cli.log("Adding Java Tracing Layer to functions");
-          this.debugLogHandlers(handlers);
-          applyTracingLayer(this.serverless.service, functionInfo, allLayers, RuntimeType.JAVA, accountId);
+          applyTracingLayer(this.serverless.service, functionInfo, allLayers, functionInfo.type, accountId);
         }
       });
     } else {
