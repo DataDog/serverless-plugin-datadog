@@ -94,7 +94,12 @@ export function findHandlers(service: Service, exclude: string[], defaultRuntime
     ) as FunctionInfo[];
 }
 
-export function applyLambdaLibraryLayers(service: Service, handlers: FunctionInfo[], layers: LayerJSON, accountId?: string) {
+export function applyLambdaLibraryLayers(
+  service: Service,
+  handlers: FunctionInfo[],
+  layers: LayerJSON,
+  accountId?: string,
+) {
   const { region } = service.provider;
   // It's possible a local account layer is being used in a region we have not published to so we use a default region's ARNs
   const shouldUseDefaultRegion = layers.regions[region] === undefined && accountId !== undefined;
@@ -114,17 +119,21 @@ export function applyLambdaLibraryLayers(service: Service, handlers: FunctionInf
     }
 
     let runtimeKey = runtime;
-    const architecture = handler.handler?.architecture ?? (service.provider as any).architecture ?? DEFAULT_ARCHITECTURE;
+    const architecture =
+      handler.handler?.architecture ?? (service.provider as any).architecture ?? DEFAULT_ARCHITECTURE;
     const isArm64 = architecture === ARM64_ARCHITECTURE;
     if (isArm64 && runtime in armRuntimeKeys) {
       runtimeKey = armRuntimeKeys[runtime];
-      const prevLayerARN = accountId !== undefined ? buildLocalLambdaLayerARN(regionRuntimes[runtime], accountId, region) : regionRuntimes[runtime];
+      const prevLayerARN =
+        accountId !== undefined
+          ? buildLocalLambdaLayerARN(regionRuntimes[runtime], accountId, region)
+          : regionRuntimes[runtime];
       removePreviousLayer(service, handler, prevLayerARN);
     }
 
     let layerARN = regionRuntimes[runtimeKey];
     if (accountId && layerARN) {
-      layerARN = buildLocalLambdaLayerARN(layerARN, accountId, region)
+      layerARN = buildLocalLambdaLayerARN(layerARN, accountId, region);
     }
 
     if (layerARN) {
@@ -151,14 +160,17 @@ export function applyExtensionLayer(service: Service, handlers: FunctionInfo[], 
     let extensionLayerKey: string = "extension";
 
     if (architecture === ARM64_ARCHITECTURE) {
-      const prevExtensionARN = accountId !== undefined ? buildLocalLambdaLayerARN(regionRuntimes[extensionLayerKey], accountId, region) : regionRuntimes[extensionLayerKey];
+      const prevExtensionARN =
+        accountId !== undefined
+          ? buildLocalLambdaLayerARN(regionRuntimes[extensionLayerKey], accountId, region)
+          : regionRuntimes[extensionLayerKey];
       removePreviousLayer(service, handler, prevExtensionARN);
       extensionLayerKey = armRuntimeKeys[extensionLayerKey];
     }
 
     let extensionARN = regionRuntimes[extensionLayerKey];
     if (accountId && extensionARN) {
-      extensionARN = buildLocalLambdaLayerARN(extensionARN, accountId, region)
+      extensionARN = buildLocalLambdaLayerARN(extensionARN, accountId, region);
     }
 
     if (extensionARN) {
@@ -167,7 +179,13 @@ export function applyExtensionLayer(service: Service, handlers: FunctionInfo[], 
   }
 }
 
-export function applyTracingLayer(service: Service, handler: FunctionInfo, layers: LayerJSON, runtimeKey: string, accountId?: string) {
+export function applyTracingLayer(
+  service: Service,
+  handler: FunctionInfo,
+  layers: LayerJSON,
+  runtimeKey: string,
+  accountId?: string,
+) {
   const { region } = service.provider;
   // It's possible a local account layer is being used in a region we have not published to so we use a default region's ARNs
   const shouldUseDefaultRegion = layers.regions[region] === undefined && accountId !== undefined;
@@ -229,21 +247,21 @@ function setLayers(handler: FunctionInfo, layers: string[]) {
 
 function buildLocalLambdaLayerARN(layerARN: string | undefined, accountId: string, region: string) {
   if (layerARN === undefined) {
-    return
+    return;
   }
   // Rebuild the layer ARN to use the given account's region and partition
-  const [layerName, layerVersion] = layerARN.split(":").slice(6, 8)
-  const partition = getAwsPartitionByRegion(region)
-  const localLayerARN = `arn:${partition}:lambda:${region}:${accountId}:layer:${layerName}:${layerVersion}`
-  return localLayerARN
+  const [layerName, layerVersion] = layerARN.split(":").slice(6, 8);
+  const partition = getAwsPartitionByRegion(region);
+  const localLayerARN = `arn:${partition}:lambda:${region}:${accountId}:layer:${layerName}:${layerVersion}`;
+  return localLayerARN;
 }
 
 function getAwsPartitionByRegion(region: string) {
-  if (region.startsWith('us-gov-')) {
-      return 'aws-us-gov';
+  if (region.startsWith("us-gov-")) {
+    return "aws-us-gov";
   }
-  if (region.startsWith('cn-')) {
-      return 'aws-cn';
+  if (region.startsWith("cn-")) {
+    return "aws-cn";
   }
-  return 'aws';
-};
+  return "aws";
+}
