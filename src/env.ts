@@ -103,8 +103,8 @@ export interface Configuration {
   // attempt to submit the current active spans and all finished spans.
   apmFlushDeadline?: string | number;
 
-  // Whether the plugin should look for Datadog Lambda layers in the local AWS account to use
-  useLocalAccountLayers?: boolean;
+  // Whether the plugin should look for Datadog Lambda layers in the given AWS account to use
+  useLayersFromAccount?: string;
 }
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
@@ -125,7 +125,7 @@ const ddProfilingEnabledEnvVar = "DD_PROFILING_ENABLED";
 const ddEncodeAuthorizerContextEnvVar = "DD_ENCODE_AUTHORIZER_CONTEXT";
 const ddDecodeAuthorizerContextEnvVar = "DD_DECODE_AUTHORIZER_CONTEXT";
 const ddApmFlushDeadlineMillisecondsEnvVar = "DD_APM_FLUSH_DEADLINE_MILLISECONDS";
-const ddUseLocalAccountLayers = "DD_USE_LOCAL_ACCOUNT_LAYERS";
+const ddUseLayersFromAccount = "DD_USE_LAYERS_FROM_ACCOUNT";
 
 export const ddServiceEnvVar = "DD_SERVICE";
 export const ddEnvEnvVar = "DD_ENV";
@@ -240,8 +240,8 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     if (config.apmFlushDeadline !== undefined && environment[ddApmFlushDeadlineMillisecondsEnvVar] === undefined) {
       environment[ddApmFlushDeadlineMillisecondsEnvVar] = config.apmFlushDeadline;
     }
-    if (config.useLocalAccountLayers !== undefined && environment[ddUseLocalAccountLayers] === undefined) {
-      environment[ddUseLocalAccountLayers] = config.useLocalAccountLayers;
+    if (config.useLayersFromAccount !== undefined && environment[ddUseLayersFromAccount] === undefined) {
+      environment[ddUseLayersFromAccount] = config.useLayersFromAccount;
     }
     if (type === RuntimeType.DOTNET || type === RuntimeType.JAVA) {
       if (environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] === undefined) {

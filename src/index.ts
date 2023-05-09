@@ -121,9 +121,7 @@ module.exports = class ServerlessPlugin {
     setEnvConfiguration(config, handlers);
 
     const allLayers = { regions: { ...layers.regions, ...govLayers.regions } };
-    const accountId = config.useLocalAccountLayers
-      ? await this.serverless.getProvider("aws").getAccountId()
-      : undefined;
+    const accountId = config.useLayersFromAccount;
     if (config.addLayers) {
       this.serverless.cli.log("Adding Lambda Library Layers to functions");
       this.debugLogHandlers(handlers);
