@@ -34,8 +34,7 @@ import {
 import { newSimpleGit } from "./git";
 import {
   applyExtensionLayer,
-  applyDotnetTracingLayer,
-  applyJavaTracingLayer,
+  applyTracingLayer,
   applyLambdaLibraryLayers,
   findHandlers,
   FunctionInfo,
@@ -122,10 +121,11 @@ module.exports = class ServerlessPlugin {
     setEnvConfiguration(config, handlers);
 
     const allLayers = { regions: { ...layers.regions, ...govLayers.regions } };
+    const accountId = config.useLocalAccountLayers ? await this.serverless.getProvider("aws").getAccountId() : undefined;
     if (config.addLayers) {
       this.serverless.cli.log("Adding Lambda Library Layers to functions");
       this.debugLogHandlers(handlers);
-      applyLambdaLibraryLayers(this.serverless.service, handlers, allLayers);
+      applyLambdaLibraryLayers(this.serverless.service, handlers, allLayers, accountId);
       if (hasWebpackPlugin(this.serverless.service)) {
         forceExcludeDepsFromWebpack(this.serverless.service);
       }
@@ -136,16 +136,16 @@ module.exports = class ServerlessPlugin {
     if (config.addExtension) {
       this.serverless.cli.log("Adding Datadog Lambda Extension Layer to functions");
       this.debugLogHandlers(handlers);
-      applyExtensionLayer(this.serverless.service, handlers, allLayers);
+      applyExtensionLayer(this.serverless.service, handlers, allLayers, accountId);
       handlers.forEach((functionInfo) => {
         if (functionInfo.type === RuntimeType.DOTNET) {
           this.serverless.cli.log("Adding .NET Tracing Layer to functions");
           this.debugLogHandlers(handlers);
-          applyDotnetTracingLayer(this.serverless.service, functionInfo, allLayers);
+          applyTracingLayer(this.serverless.service, functionInfo, allLayers, RuntimeType.DOTNET, accountId);
         } else if (functionInfo.type === RuntimeType.JAVA) {
           this.serverless.cli.log("Adding Java Tracing Layer to functions");
           this.debugLogHandlers(handlers);
-          applyJavaTracingLayer(this.serverless.service, functionInfo, allLayers);
+          applyTracingLayer(this.serverless.service, functionInfo, allLayers, RuntimeType.JAVA, accountId);
         }
       });
     } else {
