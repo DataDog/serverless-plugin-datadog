@@ -2,9 +2,9 @@
   "regions": {
     "us-gov-west-1": {
       "nodejs12.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node12-x:88",
-      "nodejs14.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node14-x:90",
-      "nodejs16.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node16-x:90",
-      "nodejs18.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node18-x:90",
+      "nodejs14.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node14-x:91",
+      "nodejs16.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node16-x:91",
+      "nodejs18.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node18-x:91",
       "python3.6": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python36:60",
       "python3.7": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python37:72",
       "python3.8": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python38:72",
@@ -13,15 +13,16 @@
       "python3.9-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python39-ARM:72",
       "python3.10": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python310:72",
       "python3.10-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python310-ARM:72",
-      "extension": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Extension:42",
-      "extension-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Extension-ARM:42",
-      "dotnet": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:dd-trace-dotnet:7"
+      "extension": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Extension:43",
+      "extension-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Extension-ARM:43",
+      "dotnet": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:dd-trace-dotnet:7",
+      "java": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:dd-trace-java:10"
     },
     "us-gov-east-1": {
       "nodejs12.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node12-x:88",
-      "nodejs14.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node14-x:90",
-      "nodejs16.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node16-x:90",
-      "nodejs18.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node18-x:90",
+      "nodejs14.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node14-x:91",
+      "nodejs16.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node16-x:91",
+      "nodejs18.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node18-x:91",
       "python3.6": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python36:60",
       "python3.7": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python37:72",
       "python3.8": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python38:72",
@@ -30,9 +31,10 @@
       "python3.9-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python39-ARM:72",
       "python3.10": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python310:72",
       "python3.10-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python310-ARM:72",
-      "extension": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Extension:42",
-      "extension-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Extension-ARM:42",
-      "dotnet": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:dd-trace-dotnet:7"
+      "extension": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Extension:43",
+      "extension-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Extension-ARM:43",
+      "dotnet": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:dd-trace-dotnet:7",
+      "java": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:dd-trace-java:10"
     }
   }
 }
