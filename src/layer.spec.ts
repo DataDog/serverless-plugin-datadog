@@ -52,6 +52,13 @@ describe("findHandlers", () => {
       "python38-function": { handler: "myfile.handler", runtime: "python3.8" },
       "python39-function": { handler: "myfile.handler", runtime: "python3.9" },
       "python310-function": { handler: "myfile.handler", runtime: "python3.10" },
+      "java8-function": { handler: "myfile.handler", runtime: "java8" },
+      "java8.al2-function": { handler: "myfile.handler", runtime: "java8.al2" },
+      "java11-function": { handler: "myfile.handler", runtime: "java11" },
+      "java17-function": { handler: "myfile.handler", runtime: "java17" },
+      "dotnet6-function": { handler: "myfile.handler", runtime: "dotnet6" },
+      "dotnetcore3.1-function": { handler: "myfile.handler", runtime: "dotnetcore3.1" },
+      "provided-function": { handler: "myfile.handler", runtime: "provided" },
     });
 
     const result = findHandlers(mockService, []);
@@ -115,6 +122,48 @@ describe("findHandlers", () => {
         handler: { handler: "myfile.handler", runtime: "python3.10" },
         type: RuntimeType.PYTHON,
         runtime: "python3.10",
+      },
+      {
+        name: "java8-function",
+        handler: { handler: "myfile.handler", runtime: "java8" },
+        type: RuntimeType.JAVA,
+        runtime: "java8",
+      },
+      {
+        name: "java8.al2-function",
+        handler: { handler: "myfile.handler", runtime: "java8.al2" },
+        type: RuntimeType.JAVA,
+        runtime: "java8.al2",
+      },
+      {
+        name: "java11-function",
+        handler: { handler: "myfile.handler", runtime: "java11" },
+        type: RuntimeType.JAVA,
+        runtime: "java11",
+      },
+      {
+        name: "java17-function",
+        handler: { handler: "myfile.handler", runtime: "java17" },
+        type: RuntimeType.JAVA,
+        runtime: "java17",
+      },
+      {
+        name: "dotnet6-function",
+        handler: { handler: "myfile.handler", runtime: "dotnet6" },
+        type: RuntimeType.DOTNET,
+        runtime: "dotnet6",
+      },
+      {
+        name: "dotnetcore3.1-function",
+        handler: { handler: "myfile.handler", runtime: "dotnetcore3.1" },
+        type: RuntimeType.DOTNET,
+        runtime: "dotnetcore3.1",
+      },
+      {
+        name: "provided-function",
+        handler: { handler: "myfile.handler", runtime: "provided" },
+        type: RuntimeType.CUSTOM,
+        runtime: "provided",
       },
     ]);
   });
