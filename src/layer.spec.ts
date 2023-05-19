@@ -52,7 +52,7 @@ describe("findHandlers", () => {
       "python38-function": { handler: "myfile.handler", runtime: "python3.8" },
       "python39-function": { handler: "myfile.handler", runtime: "python3.9" },
       "python310-function": { handler: "myfile.handler", runtime: "python3.10" },
-      "ruby27": { handler: "myfile.handler", runtime: "ruby2.7" }, 
+      ruby27: { handler: "myfile.handler", runtime: "ruby2.7" },
       "java8-function": { handler: "myfile.handler", runtime: "java8" },
       "java8.al2-function": { handler: "myfile.handler", runtime: "java8.al2" },
       "java11-function": { handler: "myfile.handler", runtime: "java11" },
