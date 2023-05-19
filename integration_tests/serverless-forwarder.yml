@@ -28,9 +28,6 @@ custom:
       - Exclude-This
 
 functions:
-  PythonHello36:
-    handler: py_handler.hello
-    runtime: python3.6
   PythonHello37:
     handler: py_handler.hello
     runtime: python3.7
