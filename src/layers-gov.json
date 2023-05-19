@@ -1,7 +1,6 @@
 {
   "regions": {
     "us-gov-west-1": {
-      "nodejs12.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node12-x:88",
       "nodejs14.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node14-x:91",
       "nodejs16.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node16-x:91",
       "nodejs18.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node18-x:91",
@@ -19,7 +18,6 @@
       "java": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:dd-trace-java:10"
     },
     "us-gov-east-1": {
-      "nodejs12.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node12-x:88",
       "nodejs14.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node14-x:91",
       "nodejs16.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node16-x:91",
       "nodejs18.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node18-x:91",
