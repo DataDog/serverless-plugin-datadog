@@ -73,6 +73,7 @@ export const armRuntimeKeys: { [key: string]: string } = {
   "python3.8": "python3.8-arm",
   "python3.9": "python3.9-arm",
   "python3.10": "python3.10-arm",
+  "ruby2.7": "ruby2.7-arm",
   extension: "extension-arm",
   dotnet6: "dd-trace-dotnet-ARM",
 };
