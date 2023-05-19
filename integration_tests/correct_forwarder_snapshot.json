@@ -193,8 +193,7 @@
                   "Effect": "Allow",
                   "Action": [
                     "logs:CreateLogStream",
-                    "logs:CreateLogGroup",
-                    "logs:TagResource"
+                    "logs:CreateLogGroup"
                   ],
                   "Resource": [
                     {
