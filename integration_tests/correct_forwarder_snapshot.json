@@ -530,7 +530,10 @@
             "IamRoleLambdaExecution",
             "Arn"
           ]
-        }
+        },
+        "Layers": [
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python36:XXX"
+        ]
       },
       "DependsOn": [
         "PythonHello36LogGroup"
@@ -584,7 +587,7 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:425362996713:layer:Datadog-Python37:3"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python37:XXX"
         ]
       },
       "DependsOn": [
@@ -639,7 +642,7 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:425362996713:layer:Datadog-Python38:3"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python38:XXX"
         ]
       },
       "DependsOn": [
@@ -694,7 +697,7 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:425362996713:layer:Datadog-Python39:3"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python39:XXX"
         ]
       },
       "DependsOn": [
@@ -749,7 +752,7 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:425362996713:layer:Datadog-Node12-x:7"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node12-x:XXX"
         ]
       },
       "DependsOn": [
@@ -804,7 +807,7 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:425362996713:layer:Datadog-Node14-x:7"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node14-x:XXX"
         ]
       },
       "DependsOn": [
@@ -859,7 +862,7 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:425362996713:layer:Datadog-Node16-x:7"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node16-x:XXX"
         ]
       },
       "DependsOn": [
@@ -914,7 +917,7 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:425362996713:layer:Datadog-Node18-x:8"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node18-x:XXX"
         ]
       },
       "DependsOn": [
