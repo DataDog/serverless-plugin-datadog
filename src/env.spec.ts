@@ -852,7 +852,7 @@ describe("setEnvConfiguration", () => {
       },
     ]);
   });
-  
+
   it("does not define `DD_LOG_LEVEL` by default when logLevel is undefined", () => {
     const handlers: FunctionInfo[] = [
       {
