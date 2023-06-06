@@ -67,6 +67,9 @@ functions:
   RubyHello27:
     handler: rb_handler.hello
     runtime: ruby2.7
+  RubyHello32:
+    handler: rb_handler.hello
+    runtime: ruby3.2
 layers:
   ProviderLevelLayer:
     path: ProviderLevelLayer # required, path to layer contents on disk
