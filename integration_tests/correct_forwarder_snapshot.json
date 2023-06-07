@@ -1294,7 +1294,7 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Ruby3-2:19"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Ruby3-2:XXX"
         ]
       },
       "DependsOn": [
