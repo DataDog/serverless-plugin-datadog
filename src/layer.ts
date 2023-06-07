@@ -66,6 +66,7 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
   "provided.al2": RuntimeType.CUSTOM,
   provided: RuntimeType.CUSTOM,
   "ruby2.7": RuntimeType.RUBY,
+  "ruby3.2": RuntimeType.RUBY,
   "go1.x": RuntimeType.GO,
 };
 
@@ -73,6 +74,8 @@ export const armRuntimeKeys: { [key: string]: string } = {
   "python3.8": "python3.8-arm",
   "python3.9": "python3.9-arm",
   "python3.10": "python3.10-arm",
+  "ruby2.7": "ruby2.7-arm",
+  "ruby3.2": "ruby3.2-arm",
   extension: "extension-arm",
   dotnet6: "dd-trace-dotnet-ARM",
 };
