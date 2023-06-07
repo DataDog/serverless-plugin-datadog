@@ -47,7 +47,6 @@ describe("findHandlers", () => {
       "node14-function": { handler: "myfile.handler", runtime: "nodejs14.x" },
       "node16-function": { handler: "myfile.handler", runtime: "nodejs16.x" },
       "node18-function": { handler: "myfile.handler", runtime: "nodejs18.x" },
-      "python36-function": { handler: "myfile.handler", runtime: "python3.6" },
       "python37-function": { handler: "myfile.handler", runtime: "python3.7" },
       "python38-function": { handler: "myfile.handler", runtime: "python3.8" },
       "python39-function": { handler: "myfile.handler", runtime: "python3.9" },
@@ -94,12 +93,6 @@ describe("findHandlers", () => {
         handler: { handler: "myfile.handler", runtime: "nodejs18.x" },
         type: RuntimeType.NODE,
         runtime: "nodejs18.x",
-      },
-      {
-        name: "python36-function",
-        handler: { handler: "myfile.handler", runtime: "python3.6" },
-        type: RuntimeType.PYTHON,
-        runtime: "python3.6",
       },
       {
         name: "python37-function",
