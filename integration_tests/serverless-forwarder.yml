@@ -18,7 +18,7 @@ provider:
 custom:
   datadog:
     forwarderArn: arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder
-    integrationTesting: true
+    testingMode: true
     logLevel: "info"
     subscribeToExecutionLogs: true
     subscribeToStepFunctionLogs: true

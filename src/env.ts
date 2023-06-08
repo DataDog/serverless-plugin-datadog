@@ -51,9 +51,10 @@ export interface Configuration {
   forwarderArn?: string;
   forwarder?: string;
 
-  // Set this to true when you are running the Serverless Plugin's integration tests. This prevents the
-  // plugin from validating the Forwarder ARN and adding Datadog Monitor output links. Defaults to false.
-  integrationTesting?: boolean;
+  // Set this to true when you are running the Serverless Plugin's integration tests or want to bypass
+  // site check during manual testing. This prevents the plugin from validating the Forwarder ARN, prevents
+  // the plugin from adding Datadog Monitor output links, and bypasses the site check. Defaults to false.
+  testingMode?: boolean;
 
   // When set, the plugin will try to automatically tag customers' lambda functions with service and env,
   // but will not override existing tags set on function or provider levels. Defaults to true
@@ -151,7 +152,7 @@ export const defaultConfiguration: Configuration = {
   enableSourceCodeIntegration: true,
   uploadGitMetadata: true,
   exclude: [],
-  integrationTesting: false,
+  testingMode: false,
   subscribeToAccessLogs: true,
   subscribeToExecutionLogs: false,
   subscribeToStepFunctionLogs: false,

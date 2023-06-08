@@ -24,7 +24,7 @@ interface LogGroupResource {
 
 interface ForwarderConfigs {
   AddExtension: boolean;
-  IntegrationTesting: boolean | undefined;
+  TestingMode: boolean | undefined;
   SubToAccessLogGroups: boolean;
   SubToExecutionLogGroups: boolean;
 }
@@ -189,8 +189,8 @@ export async function addCloudWatchForwarderSubscriptions(
   const errors = [];
   if (typeof functionArn !== "string") {
     errors.push("Skipping forwarder ARN validation because forwarder string defined with CloudFormation function.");
-  } else if (forwarderConfigs.IntegrationTesting === true) {
-    errors.push("Skipping forwarder ARN validation because 'integrationTesting' is set to true");
+  } else if (forwarderConfigs.TestingMode === true) {
+    errors.push("Skipping forwarder ARN validation because 'testingMode' is set to true");
   } else {
     await validateForwarderArn(aws, functionArn);
   }

@@ -190,7 +190,7 @@ module.exports = class ServerlessPlugin {
     // Create an object that contains some of our booleans for the forwarder
     const forwarderConfigs = {
       AddExtension: config.addExtension,
-      IntegrationTesting: config.integrationTesting,
+      TestingMode: config.testingMode,
       SubToAccessLogGroups: config.subscribeToAccessLogs,
       SubToExecutionLogGroups: config.subscribeToExecutionLogs,
       SubToStepFunctionLogGroups: config.subscribeToStepFunctionLogs,
@@ -294,7 +294,7 @@ module.exports = class ServerlessPlugin {
     }
 
     redirectHandlers(handlers, config.addLayers, config.customHandler);
-    if (config.integrationTesting === false && config.skipCloudformationOutputs === false) {
+    if (config.testingMode === false && config.skipCloudformationOutputs === false) {
       await addOutputLinks(this.serverless, config.site, config.subdomain, handlers);
     } else {
       this.serverless.cli.log("Skipped adding output links");
@@ -515,7 +515,7 @@ function validateConfiguration(config: Configuration) {
     "ap1.datadoghq.com",
     "ddog-gov.com",
   ];
-  if (config.site !== undefined && !siteList.includes(config.site.toLowerCase())) {
+  if (!config.testingMode && config.site !== undefined && !siteList.includes(config.site.toLowerCase())) {
     throw new Error(
       "Warning: Invalid site URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, us5.datadoghq.com, ap1.datadoghq.com, or ddog-gov.com.",
     );
@@ -537,7 +537,7 @@ function validateConfiguration(config: Configuration) {
       (process.env.DATADOG_API_KEY === undefined || process.env.DATADOG_APP_KEY === undefined) &&
       // Support deprecated monitorsApiKey and monitorsAppKey
       (config.apiKey === undefined || config.appKey === undefined) &&
-      config.integrationTesting === false
+      config.testingMode === false
     ) {
       throw new Error(
         "When `monitors` is enabled, `DATADOG_API_KEY` and `DATADOG_APP_KEY` environment variables must be set.",
