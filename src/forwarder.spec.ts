@@ -190,7 +190,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const forwarderConfigs = {
       AddExtension: false,
-      IntegrationTesting: false,
+      TestingMode: false,
       SubToAccessLogGroups: true,
       SubToExecutionLogGroups: true,
     };
@@ -335,7 +335,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const forwarderConfigs = {
       AddExtension: false,
-      IntegrationTesting: false,
+      TestingMode: false,
       SubToAccessLogGroups: true,
       SubToExecutionLogGroups: true,
     };
@@ -412,7 +412,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const forwarderConfigs = {
       AddExtension: false,
-      IntegrationTesting: false,
+      TestingMode: false,
       SubToAccessLogGroups: true,
       SubToExecutionLogGroups: false,
     };
@@ -592,7 +592,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: true,
       ApiKey: 1234,
-      IntegrationTesting: false,
+      TestingMode: false,
       SubToAccessLogGroups: true,
       SubToExecutionLogGroups: true,
     };
@@ -709,7 +709,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const forwarderConfigs = {
       AddExtension: false,
-      IntegrationTesting: false,
+      TestingMode: false,
       SubToAccessLogGroups: true,
       SubToExecutionLogGroups: false,
     };
@@ -745,7 +745,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const forwarderConfigs = {
       AddExtension: false,
-      IntegrationTesting: false,
+      TestingMode: false,
       SubToAccessLogGroups: true,
       SubToExecutionLogGroups: false,
     };
@@ -794,7 +794,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const forwarderConfigs = {
       AddExtension: false,
-      IntegrationTesting: false,
+      TestingMode: false,
       SubToAccessLogGroups: true,
 
       SubToExecutionLogGroups: false,
@@ -854,7 +854,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const forwarderConfigs = {
       AddExtension: false,
-      IntegrationTesting: false,
+      TestingMode: false,
       SubToAccessLogGroups: true,
 
       SubToExecutionLogGroups: false,
@@ -932,7 +932,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const forwarderConfigs = {
       AddExtension: false,
-      IntegrationTesting: false,
+      TestingMode: false,
       SubToAccessLogGroups: true,
 
       SubToExecutionLogGroups: false,
@@ -979,7 +979,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const forwarderConfigs = {
       AddExtension: false,
-      IntegrationTesting: false,
+      TestingMode: false,
       SubToAccessLogGroups: true,
 
       SubToExecutionLogGroups: false,
@@ -1010,7 +1010,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     ).toBe(true);
   });
 
-  it("skips validating the forwarder when `integrationTesting` is true", async () => {
+  it("skips validating the forwarder when `testingMode` is true", async () => {
     const service = serviceWithResources({});
     const aws = awsMock(
       {
@@ -1024,7 +1024,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const functionArn: string = "forwarderArn";
     const forwarderConfigs = {
       AddExtension: false,
-      IntegrationTesting: true,
+      TestingMode: true,
       SubToAccessLogGroups: true,
 
       SubToExecutionLogGroups: false,
@@ -1047,7 +1047,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       forwarderConfigs,
       handlers,
     );
-    expect(errors.includes("Skipping forwarder ARN validation because 'integrationTesting' is set to true")).toBe(true);
+    expect(errors.includes("Skipping forwarder ARN validation because 'testingMode' is set to true")).toBe(true);
   });
 
   it("skips creating a forwarder for the SecondLogGroup when the function Second is not in the list of handlers", async () => {
@@ -1070,7 +1070,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const forwarderConfigs = {
       AddExtension: false,
-      IntegrationTesting: false,
+      TestingMode: false,
       SubToAccessLogGroups: true,
 
       SubToExecutionLogGroups: false,
@@ -1130,7 +1130,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const forwarderConfigs = {
       AddExtension: false,
-      IntegrationTesting: false,
+      TestingMode: false,
       SubToAccessLogGroups: true,
 
       SubToExecutionLogGroups: false,

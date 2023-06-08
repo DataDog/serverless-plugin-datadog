@@ -15,7 +15,7 @@ custom:
     addExtension: true
     apiKey: 1234
     enableSourceCodeIntegration: false
-    integrationTesting: true
+    testingMode: true
     exclude:
       - ExcludeThis
 

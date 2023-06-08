@@ -748,8 +748,49 @@ describe("ServerlessPlugin", () => {
       }
       expect(threwError).toBe(true);
       expect(thrownErrorMessage).toEqual(
-        "Warning: Invalid site URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, us5.datadoghq.com, ap1.datadoghq.com, or ddog-gov.com.",
+          "Warning: Invalid site URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, us5.datadoghq.com, ap1.datadoghq.com, or ddog-gov.com.",
       );
+    });
+
+    it("does not throw an invalid site error when testingMode is true", async () => {
+      mock({});
+      const serverless = {
+        cli: {
+          log: () => {},
+        },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          provider: {
+            region: "us-east-1",
+          },
+          functions: {
+            node1: {
+              handler: "my-func.ev",
+              runtime: "nodejs14.x",
+            },
+          },
+          custom: {
+            datadog: {
+              site: "datadogehq.com",
+              testingMode: true,
+              apiKey: "1234",
+            },
+          },
+        },
+      };
+
+      const plugin = new ServerlessPlugin(serverless, {});
+      let threwError: boolean = false;
+      try {
+        await plugin.hooks["after:package:initialize"]();
+      } catch (e) {
+        threwError = true;
+        if (e instanceof Error) {
+          console.log(e.message);
+        }
+      }
+      expect(threwError).toBe(false);
     });
 
     it("throws error when addExtension is true and both API key and KMS API key are undefined", async () => {
