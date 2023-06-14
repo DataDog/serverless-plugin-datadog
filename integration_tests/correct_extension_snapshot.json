@@ -238,19 +238,6 @@
         }
       }
     },
-    "FunctionLevelLayerLambdaLayer": {
-      "Type": "AWS::Lambda::LayerVersion",
-      "Properties": {
-        "Content": {
-          "S3Bucket": {
-            "Ref": "ServerlessDeploymentBucket"
-          },
-          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/FunctionLevelLayer.zip"
-        },
-        "LayerName": "dd-sls-plugin-integration-test-dev-FunctionLevelLayer",
-        "Description": "It's also a text file"
-      }
-    },
     "ProviderLevelLayerLambdaLayer": {
       "Type": "AWS::Lambda::LayerVersion",
       "Properties": {
@@ -265,6 +252,19 @@
         "CompatibleRuntimes": [
           "nodejs12.x"
         ]
+      }
+    },
+    "FunctionLevelLayerLambdaLayer": {
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "Content": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/FunctionLevelLayer.zip"
+        },
+        "LayerName": "dd-sls-plugin-integration-test-dev-FunctionLevelLayer",
+        "Description": "It's also a text file"
       }
     },
     "PythonHello37LambdaFunction": {
@@ -293,7 +293,7 @@
             "DD_SITE": "datadoghq.com",
             "DD_TRACE_ENABLED": true,
             "DD_MERGE_XRAY_TRACES": false,
-            "DD_LOGS_INJECTION": true,
+            "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_SERVICE": "dd-sls-plugin-integration-test",
@@ -345,7 +345,7 @@
             "DD_SITE": "datadoghq.com",
             "DD_TRACE_ENABLED": true,
             "DD_MERGE_XRAY_TRACES": false,
-            "DD_LOGS_INJECTION": true,
+            "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_SERVICE": "dd-sls-plugin-integration-test",
@@ -397,7 +397,7 @@
             "DD_SITE": "datadoghq.com",
             "DD_TRACE_ENABLED": true,
             "DD_MERGE_XRAY_TRACES": false,
-            "DD_LOGS_INJECTION": true,
+            "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_SERVICE": "dd-sls-plugin-integration-test",
@@ -449,7 +449,7 @@
             "DD_SITE": "datadoghq.com",
             "DD_TRACE_ENABLED": true,
             "DD_MERGE_XRAY_TRACES": false,
-            "DD_LOGS_INJECTION": true,
+            "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_SERVICE": "dd-sls-plugin-integration-test",
@@ -501,7 +501,7 @@
             "DD_SITE": "datadoghq.com",
             "DD_TRACE_ENABLED": true,
             "DD_MERGE_XRAY_TRACES": false,
-            "DD_LOGS_INJECTION": true,
+            "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_SERVICE": "dd-sls-plugin-integration-test",
@@ -553,7 +553,7 @@
             "DD_SITE": "datadoghq.com",
             "DD_TRACE_ENABLED": true,
             "DD_MERGE_XRAY_TRACES": false,
-            "DD_LOGS_INJECTION": true,
+            "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_SERVICE": "dd-sls-plugin-integration-test",
@@ -605,7 +605,7 @@
             "DD_SITE": "datadoghq.com",
             "DD_TRACE_ENABLED": true,
             "DD_MERGE_XRAY_TRACES": false,
-            "DD_LOGS_INJECTION": true,
+            "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_SERVICE": "dd-sls-plugin-integration-test",
@@ -690,7 +690,7 @@
             "DD_SITE": "datadoghq.com",
             "DD_TRACE_ENABLED": true,
             "DD_MERGE_XRAY_TRACES": false,
-            "DD_LOGS_INJECTION": true,
+            "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "AWS_LAMBDA_EXEC_WRAPPER": "/opt/datadog_wrapper",
@@ -742,7 +742,7 @@
             "DD_SITE": "datadoghq.com",
             "DD_TRACE_ENABLED": true,
             "DD_MERGE_XRAY_TRACES": false,
-            "DD_LOGS_INJECTION": true,
+            "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "AWS_LAMBDA_EXEC_WRAPPER": "/opt/datadog_wrapper",
@@ -794,7 +794,7 @@
             "DD_SITE": "datadoghq.com",
             "DD_TRACE_ENABLED": true,
             "DD_MERGE_XRAY_TRACES": false,
-            "DD_LOGS_INJECTION": true,
+            "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "AWS_LAMBDA_EXEC_WRAPPER": "/opt/datadog_wrapper",
@@ -846,7 +846,7 @@
             "DD_SITE": "datadoghq.com",
             "DD_TRACE_ENABLED": true,
             "DD_MERGE_XRAY_TRACES": false,
-            "DD_LOGS_INJECTION": true,
+            "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "AWS_LAMBDA_EXEC_WRAPPER": "/opt/datadog_wrapper",
@@ -898,7 +898,7 @@
             "DD_SITE": "datadoghq.com",
             "DD_TRACE_ENABLED": true,
             "DD_MERGE_XRAY_TRACES": false,
-            "DD_LOGS_INJECTION": true,
+            "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_SERVICE": "dd-sls-plugin-integration-test",
@@ -948,7 +948,7 @@
             "DD_SITE": "datadoghq.com",
             "DD_TRACE_ENABLED": true,
             "DD_MERGE_XRAY_TRACES": false,
-            "DD_LOGS_INJECTION": true,
+            "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_SERVICE": "dd-sls-plugin-integration-test",
@@ -999,7 +999,7 @@
             "DD_SITE": "datadoghq.com",
             "DD_TRACE_ENABLED": true,
             "DD_MERGE_XRAY_TRACES": false,
-            "DD_LOGS_INJECTION": true,
+            "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_SERVICE": "dd-sls-plugin-integration-test",
@@ -1023,6 +1023,16 @@
       "DependsOn": [
         "RubyHello32LogGroup"
       ]
+    },
+    "JavascriptHello12DashxLambdaVersionXXXX": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "JavascriptHello12DashxLambdaFunction"
+        },
+        "CodeSha256": "XXXX"
+      }
     },
     "PythonHello37LambdaVersionXXXX": {
       "Type": "AWS::Lambda::Version",
@@ -1163,16 +1173,6 @@
         },
         "CodeSha256": "XXXX"
       }
-    },
-    "JavascriptHello12DashxLambdaVersionXXXX": {
-      "Type": "AWS::Lambda::Version",
-      "DeletionPolicy": "Retain",
-      "Properties": {
-        "FunctionName": {
-          "Ref": "JavascriptHello12DashxLambdaFunction"
-        },
-        "CodeSha256": "XXXX"
-      }
     }
   },
   "Outputs": {
@@ -1182,6 +1182,29 @@
       },
       "Export": {
         "Name": "sls-dd-sls-plugin-integration-test-dev-ServerlessDeploymentBucketName"
+      }
+    },
+    "ProviderLevelLayerLambdaLayerQualifiedArn": {
+      "Description": "Current Lambda layer version",
+      "Value": {
+        "Ref": "ProviderLevelLayerLambdaLayer"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-ProviderLevelLayerLambdaLayerQualifiedArn"
+      }
+    },
+    "ProviderLevelLayerLambdaLayerHash": {
+      "Description": "Current Lambda layer hash",
+      "Value": "ca99f65eb22bc573edd4f9ac2a087d0dd5acc751",
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-ProviderLevelLayerLambdaLayerHash"
+      }
+    },
+    "ProviderLevelLayerLambdaLayerS3Key": {
+      "Description": "Current Lambda layer S3Key",
+      "Value": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/ProviderLevelLayer.zip",
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-ProviderLevelLayerLambdaLayerS3Key"
       }
     },
     "FunctionLevelLayerLambdaLayerQualifiedArn": {
@@ -1207,27 +1230,13 @@
         "Name": "sls-dd-sls-plugin-integration-test-dev-FunctionLevelLayerLambdaLayerS3Key"
       }
     },
-    "ProviderLevelLayerLambdaLayerQualifiedArn": {
-      "Description": "Current Lambda layer version",
+    "JavascriptHello12DashxLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "ProviderLevelLayerLambdaLayer"
+        "Ref": "JavascriptHello12DashxLambdaVersionXXXX"
       },
       "Export": {
-        "Name": "sls-dd-sls-plugin-integration-test-dev-ProviderLevelLayerLambdaLayerQualifiedArn"
-      }
-    },
-    "ProviderLevelLayerLambdaLayerHash": {
-      "Description": "Current Lambda layer hash",
-      "Value": "ca99f65eb22bc573edd4f9ac2a087d0dd5acc751",
-      "Export": {
-        "Name": "sls-dd-sls-plugin-integration-test-dev-ProviderLevelLayerLambdaLayerHash"
-      }
-    },
-    "ProviderLevelLayerLambdaLayerS3Key": {
-      "Description": "Current Lambda layer S3Key",
-      "Value": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/ProviderLevelLayer.zip",
-      "Export": {
-        "Name": "sls-dd-sls-plugin-integration-test-dev-ProviderLevelLayerLambdaLayerS3Key"
+        "Name": "sls-dd-sls-plugin-integration-test-dev-JavascriptHello12DashxLambdaFunctionQualifiedArn"
       }
     },
     "PythonHello37LambdaFunctionQualifiedArn": {
@@ -1354,15 +1363,6 @@
       },
       "Export": {
         "Name": "sls-dd-sls-plugin-integration-test-dev-RubyHello32LambdaFunctionQualifiedArn"
-      }
-    },
-    "JavascriptHello12DashxLambdaFunctionQualifiedArn": {
-      "Description": "Current Lambda function version",
-      "Value": {
-        "Ref": "JavascriptHello12DashxLambdaVersionXXXX"
-      },
-      "Export": {
-        "Name": "sls-dd-sls-plugin-integration-test-dev-JavascriptHello12DashxLambdaFunctionQualifiedArn"
       }
     }
   }
