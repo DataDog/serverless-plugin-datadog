@@ -53,7 +53,6 @@ To further configure your plugin, use the following custom parameters in your `s
 | `enabled`                     | When set to `false`, the Datadog plugin stays inactive. Defaults to `true`. You can control this option using an environment variable. For example, use `enabled: ${strToBool(${env:DD_PLUGIN_ENABLED, true})}` to activate/deactivate the plugin during deployment. Alternatively, you can also use the value passed in through `--stage` to control this option—[see example](#disable-plugin-for-particular-environment). |
 | `customHandler`               | When set, the specified handler is set as the handler for all the functions. |
 | `failOnError`                 | When set, this plugin throws an error if any custom Datadog monitors fail to create or update. This occurs after deploy, but will cause the result of `serverless deploy` to return a nonzero exit code (to fail user CI). Defaults to `false`. |
-| `integrationTesting`          | Set `true` when running integration tests. This bypasses the validation of the Forwarder ARN and the addition of Datadog Monitor output links. Defaults to `false`. |
 | `logLevel`                    | The log level, set to `DEBUG` for extended logging. |
 | `skipCloudformationOutputs`   | Set to `true` if you want to skip adding Datadog Cloudformation Outputs for your stack. This is useful if you are running into the 200 output limit which can cause the stack creation to fail. |
 | `enableColdStartTracing`      | Set to `false` to disable Cold Start Tracing. Used in NodeJS and Python. Defaults to `true`. |

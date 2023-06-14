@@ -15,14 +15,11 @@ custom:
     addExtension: true
     apiKey: 1234
     enableSourceCodeIntegration: false
-    integrationTesting: true
+    testingMode: true
     exclude:
       - ExcludeThis
 
 functions:
-  PythonHello36:
-    handler: py_handler.hello
-    runtime: python3.6
   PythonHello37:
     handler: py_handler.hello
     runtime: python3.7
@@ -64,6 +61,12 @@ functions:
   providedHello:
     handler: provided_handler.hello
     runtime: provided
+  RubyHello27:
+    handler: rb_handler.hello
+    runtime: ruby2.7
+  RubyHello32:
+    handler: rb_handler.hello
+    runtime: ruby3.2
 layers:
   ProviderLevelLayer:
     path: ProviderLevelLayer # required, path to layer contents on disk

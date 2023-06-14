@@ -18,7 +18,7 @@ provider:
 custom:
   datadog:
     forwarderArn: arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder
-    integrationTesting: true
+    testingMode: true
     logLevel: "info"
     subscribeToExecutionLogs: true
     subscribeToStepFunctionLogs: true
@@ -28,9 +28,6 @@ custom:
       - Exclude-This
 
 functions:
-  PythonHello36:
-    handler: py_handler.hello
-    runtime: python3.6
   PythonHello37:
     handler: py_handler.hello
     runtime: python3.7
@@ -89,6 +86,12 @@ functions:
   providedHello:
     handler: provided_handler.hello
     runtime: provided
+  RubyHello27:
+    handler: rb_handler.hello
+    runtime: ruby2.7
+  RubyHello32:
+    handler: rb_handler.hello
+    runtime: ruby3.2
 
 resources:
   Resources:

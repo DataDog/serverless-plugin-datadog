@@ -71,12 +71,6 @@
         }
       }
     },
-    "PythonHello36LogGroup": {
-      "Type": "AWS::Logs::LogGroup",
-      "Properties": {
-        "LogGroupName": "/aws/lambda/dd-sls-plugin-integration-test-dev-PythonHello36"
-      }
-    },
     "PythonHello37LogGroup": {
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
@@ -147,6 +141,18 @@
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
         "LogGroupName": "/aws/lambda/dd-sls-plugin-integration-test-dev-providedHello"
+      }
+    },
+    "RubyHello27LogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/dd-sls-plugin-integration-test-dev-RubyHello27"
+      }
+    },
+    "RubyHello32LogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/dd-sls-plugin-integration-test-dev-RubyHello32"
       }
     },
     "IamRoleLambdaExecution": {
@@ -236,56 +242,6 @@
           ]
         }
       }
-    },
-    "PythonHello36LambdaFunction": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-          "S3Bucket": {
-            "Ref": "ServerlessDeploymentBucket"
-          },
-          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/dd-sls-plugin-integration-test.zip"
-        },
-        "Handler": "datadog_lambda.handler.handler",
-        "Runtime": "python3.6",
-        "FunctionName": "dd-sls-plugin-integration-test-dev-PythonHello36",
-        "MemorySize": 1024,
-        "Timeout": 6,
-        "Tags": [
-          {
-            "Key": "dd_sls_plugin",
-            "Value": "vX.XX.X"
-          }
-        ],
-        "Environment": {
-          "Variables": {
-            "DD_API_KEY": 1234,
-            "DD_SITE": "datadoghq.com",
-            "DD_LOG_LEVEL": "info",
-            "DD_TRACE_ENABLED": true,
-            "DD_MERGE_XRAY_TRACES": false,
-            "DD_LOGS_INJECTION": false,
-            "DD_SERVERLESS_LOGS_ENABLED": true,
-            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
-            "DD_SERVICE": "dd-sls-plugin-integration-test",
-            "DD_ENV": "dev",
-            "DD_LAMBDA_HANDLER": "py_handler.hello"
-          }
-        },
-        "Role": {
-          "Fn::GetAtt": [
-            "IamRoleLambdaExecution",
-            "Arn"
-          ]
-        },
-        "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python36:XXX",
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
-        ]
-      },
-      "DependsOn": [
-        "PythonHello36LogGroup"
-      ]
     },
     "PythonHello37LambdaFunction": {
       "Type": "AWS::Lambda::Function",
@@ -885,15 +841,103 @@
         "ProvidedHelloLogGroup"
       ]
     },
-    "PythonHello36LambdaVersionXXXX": {
-      "Type": "AWS::Lambda::Version",
-      "DeletionPolicy": "Retain",
+    "RubyHello27LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
       "Properties": {
-        "FunctionName": {
-          "Ref": "PythonHello36LambdaFunction"
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/dd-sls-plugin-integration-test.zip"
         },
-        "CodeSha256": "XXXX"
-      }
+        "Handler": "rb_handler.hello",
+        "Runtime": "ruby2.7",
+        "FunctionName": "dd-sls-plugin-integration-test-dev-RubyHello27",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Tags": [
+          {
+            "Key": "dd_sls_plugin",
+            "Value": "vX.XX.X"
+          }
+        ],
+        "Environment": {
+          "Variables": {
+            "DD_API_KEY": 1234,
+            "DD_SITE": "datadoghq.com",
+            "DD_LOG_LEVEL": "info",
+            "DD_TRACE_ENABLED": true,
+            "DD_MERGE_XRAY_TRACES": false,
+            "DD_LOGS_INJECTION": true,
+            "DD_SERVERLESS_LOGS_ENABLED": true,
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "DD_SERVICE": "dd-sls-plugin-integration-test",
+            "DD_ENV": "dev"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Layers": [
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Ruby2-7:XXX",
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
+        ]
+      },
+      "DependsOn": [
+        "RubyHello27LogGroup"
+      ]
+    },
+    "RubyHello32LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/dd-sls-plugin-integration-test.zip"
+        },
+        "Handler": "rb_handler.hello",
+        "Runtime": "ruby3.2",
+        "FunctionName": "dd-sls-plugin-integration-test-dev-RubyHello32",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Tags": [
+          {
+            "Key": "dd_sls_plugin",
+            "Value": "vX.XX.X"
+          }
+        ],
+        "Environment": {
+          "Variables": {
+            "DD_API_KEY": 1234,
+            "DD_SITE": "datadoghq.com",
+            "DD_LOG_LEVEL": "info",
+            "DD_TRACE_ENABLED": true,
+            "DD_MERGE_XRAY_TRACES": false,
+            "DD_LOGS_INJECTION": true,
+            "DD_SERVERLESS_LOGS_ENABLED": true,
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "DD_SERVICE": "dd-sls-plugin-integration-test",
+            "DD_ENV": "dev"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Layers": [
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Ruby3-2:XXX",
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
+        ]
+      },
+      "DependsOn": [
+        "RubyHello32LogGroup"
+      ]
     },
     "PythonHello37LambdaVersionXXXX": {
       "Type": "AWS::Lambda::Version",
@@ -1011,6 +1055,26 @@
       "Properties": {
         "FunctionName": {
           "Ref": "ProvidedHelloLambdaFunction"
+        },
+        "CodeSha256": "XXXX"
+      }
+    },
+    "RubyHello27LambdaVersionXXXX": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "RubyHello27LambdaFunction"
+        },
+        "CodeSha256": "XXXX"
+      }
+    },
+    "RubyHello32LambdaVersionXXXX": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "RubyHello32LambdaFunction"
         },
         "CodeSha256": "XXXX"
       }
@@ -1756,15 +1820,6 @@
         "Name": "sls-dd-sls-plugin-integration-test-dev-ServerlessDeploymentBucketName"
       }
     },
-    "PythonHello36LambdaFunctionQualifiedArn": {
-      "Description": "Current Lambda function version",
-      "Value": {
-        "Ref": "PythonHello36LambdaVersionXXXX"
-      },
-      "Export": {
-        "Name": "sls-dd-sls-plugin-integration-test-dev-PythonHello36LambdaFunctionQualifiedArn"
-      }
-    },
     "PythonHello37LambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
@@ -1871,6 +1926,24 @@
       },
       "Export": {
         "Name": "sls-dd-sls-plugin-integration-test-dev-ProvidedHelloLambdaFunctionQualifiedArn"
+      }
+    },
+    "RubyHello27LambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "RubyHello27LambdaVersionXXXX"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-RubyHello27LambdaFunctionQualifiedArn"
+      }
+    },
+    "RubyHello32LambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "RubyHello32LambdaVersionXXXX"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-RubyHello32LambdaFunctionQualifiedArn"
       }
     },
     "ServiceEndpoint": {
