@@ -295,7 +295,10 @@ module.exports = class ServerlessPlugin {
     }
 
     redirectHandlers(handlers, config.addLayers, config.customHandler);
-    if ((config.testingMode === false || config.integrationTesting === false) && config.skipCloudformationOutputs === false) {
+    if (
+      (config.testingMode === false || config.integrationTesting === false) &&
+      config.skipCloudformationOutputs === false
+    ) {
       await addOutputLinks(this.serverless, config.site, config.subdomain, handlers);
     } else {
       this.serverless.cli.log("Skipped adding output links");
