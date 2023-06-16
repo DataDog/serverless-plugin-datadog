@@ -191,6 +191,7 @@ module.exports = class ServerlessPlugin {
     const forwarderConfigs = {
       AddExtension: config.addExtension,
       TestingMode: config.testingMode,
+      IntegrationTesting: config.integrationTesting,
       SubToAccessLogGroups: config.subscribeToAccessLogs,
       SubToExecutionLogGroups: config.subscribeToExecutionLogs,
       SubToStepFunctionLogGroups: config.subscribeToStepFunctionLogs,
@@ -294,7 +295,7 @@ module.exports = class ServerlessPlugin {
     }
 
     redirectHandlers(handlers, config.addLayers, config.customHandler);
-    if (config.testingMode === false && config.skipCloudformationOutputs === false) {
+    if ((config.testingMode === false || config.integrationTesting === false) && config.skipCloudformationOutputs === false) {
       await addOutputLinks(this.serverless, config.site, config.subdomain, handlers);
     } else {
       this.serverless.cli.log("Skipped adding output links");
@@ -537,7 +538,7 @@ function validateConfiguration(config: Configuration) {
       (process.env.DATADOG_API_KEY === undefined || process.env.DATADOG_APP_KEY === undefined) &&
       // Support deprecated monitorsApiKey and monitorsAppKey
       (config.apiKey === undefined || config.appKey === undefined) &&
-      config.testingMode === false
+      (config.testingMode === false || config.integrationTesting === false)
     ) {
       throw new Error(
         "When `monitors` is enabled, `DATADOG_API_KEY` and `DATADOG_APP_KEY` environment variables must be set.",
