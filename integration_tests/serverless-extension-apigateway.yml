@@ -19,6 +19,7 @@ custom:
     forwarderArn: arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder
     enableSourceCodeIntegration: false
     testingMode: true
+    integrationTesting: true
     logLevel: "info"
 
 functions:

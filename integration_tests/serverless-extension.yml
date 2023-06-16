@@ -16,6 +16,7 @@ custom:
     apiKey: 1234
     enableSourceCodeIntegration: false
     testingMode: true
+    integrationTesting: true
     exclude:
       - ExcludeThis
 
