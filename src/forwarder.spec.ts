@@ -191,6 +191,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       TestingMode: false,
+      IntegrationTesting: false,
       SubToAccessLogGroups: true,
       SubToExecutionLogGroups: true,
     };
@@ -336,6 +337,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       TestingMode: false,
+      IntegrationTesting: false,
       SubToAccessLogGroups: true,
       SubToExecutionLogGroups: true,
     };
@@ -413,6 +415,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       TestingMode: false,
+      IntegrationTesting: false,
       SubToAccessLogGroups: true,
       SubToExecutionLogGroups: false,
     };
@@ -593,6 +596,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       AddExtension: true,
       ApiKey: 1234,
       TestingMode: false,
+      IntegrationTesting: false,
       SubToAccessLogGroups: true,
       SubToExecutionLogGroups: true,
     };
@@ -710,6 +714,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       TestingMode: false,
+      IntegrationTesting: false,
       SubToAccessLogGroups: true,
       SubToExecutionLogGroups: false,
     };
@@ -746,6 +751,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       TestingMode: false,
+      IntegrationTesting: false,
       SubToAccessLogGroups: true,
       SubToExecutionLogGroups: false,
     };
@@ -795,6 +801,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       TestingMode: false,
+      IntegrationTesting: false,
       SubToAccessLogGroups: true,
 
       SubToExecutionLogGroups: false,
@@ -855,6 +862,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       TestingMode: false,
+      IntegrationTesting: false,
       SubToAccessLogGroups: true,
 
       SubToExecutionLogGroups: false,
@@ -933,6 +941,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       TestingMode: false,
+      IntegrationTesting: false,
       SubToAccessLogGroups: true,
 
       SubToExecutionLogGroups: false,
@@ -980,6 +989,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       TestingMode: false,
+      IntegrationTesting: false,
       SubToAccessLogGroups: true,
 
       SubToExecutionLogGroups: false,
@@ -1025,6 +1035,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       TestingMode: true,
+      IntegrationTesting: false,
       SubToAccessLogGroups: true,
 
       SubToExecutionLogGroups: false,
@@ -1071,6 +1082,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       TestingMode: false,
+      IntegrationTesting: false,
       SubToAccessLogGroups: true,
 
       SubToExecutionLogGroups: false,
@@ -1131,6 +1143,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: false,
       TestingMode: false,
+      IntegrationTesting: false,
       SubToAccessLogGroups: true,
 
       SubToExecutionLogGroups: false,

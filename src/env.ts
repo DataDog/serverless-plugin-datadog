@@ -56,6 +56,9 @@ export interface Configuration {
   // the plugin from adding Datadog Monitor output links, and bypasses the site check. Defaults to false.
   testingMode?: boolean;
 
+  // Deprecated: renamed to testingMode
+  integrationTesting?: boolean;
+
   // When set, the plugin will try to automatically tag customers' lambda functions with service and env,
   // but will not override existing tags set on function or provider levels. Defaults to true
   enableTags: boolean;
@@ -153,6 +156,7 @@ export const defaultConfiguration: Configuration = {
   uploadGitMetadata: true,
   exclude: [],
   testingMode: false,
+  integrationTesting: false,
   subscribeToAccessLogs: true,
   subscribeToExecutionLogs: false,
   subscribeToStepFunctionLogs: false,
