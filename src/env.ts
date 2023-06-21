@@ -215,7 +215,11 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     if (config.enableXrayTracing !== undefined && environment[ddMergeXrayTracesEnvVar] === undefined) {
       environment[ddMergeXrayTracesEnvVar] = config.enableXrayTracing;
     }
-    if (!config.addExtension && config.injectLogContext !== undefined && environment[logInjectionEnvVar] === undefined) {
+    if (
+      !config.addExtension &&
+      config.injectLogContext !== undefined &&
+      environment[logInjectionEnvVar] === undefined
+    ) {
       environment[logInjectionEnvVar] = config.injectLogContext;
     }
     if (config.enableDDLogs !== undefined && environment[ddLogsEnabledEnvVar] === undefined) {

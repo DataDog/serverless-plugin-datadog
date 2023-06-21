@@ -568,7 +568,7 @@ describe("setEnvConfiguration", () => {
             DD_TRACE_ENABLED: true,
             DD_MERGE_XRAY_TRACES: true,
             DD_LOGS_INJECTION: false,
-             DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_SERVERLESS_LOGS_ENABLED: true,
             AWS_LAMBDA_EXEC_WRAPPER: "/opt/datadog_wrapper",
           },
           events: [],
@@ -842,7 +842,7 @@ describe("setEnvConfiguration", () => {
           environment: {
             DD_API_KEY: "1234",
             DD_KMS_API_KEY: "5678",
-             DD_LOG_LEVEL: "debug",
+            DD_LOG_LEVEL: "debug",
             DD_SERVERLESS_LOGS_ENABLED: true,
             DD_SITE: "datadoghq.eu",
             DD_TRACE_ENABLED: true,
@@ -899,7 +899,7 @@ describe("setEnvConfiguration", () => {
           environment: {
             DD_API_KEY: "1234",
             DD_KMS_API_KEY: "5678",
-             DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_SERVERLESS_LOGS_ENABLED: true,
             DD_SITE: "datadoghq.eu",
             DD_TRACE_ENABLED: true,
             DD_MERGE_XRAY_TRACES: true,
@@ -955,7 +955,7 @@ describe("setEnvConfiguration", () => {
           environment: {
             DD_API_KEY: "1234",
             DD_KMS_API_KEY: "5678",
-             DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_SERVERLESS_LOGS_ENABLED: true,
             DD_LOG_LEVEL: "info",
             DD_SITE: "datadoghq.eu",
             DD_TRACE_ENABLED: true,
@@ -1056,7 +1056,7 @@ describe("setEnvConfiguration", () => {
           environment: {
             DD_API_KEY: "1234",
             DD_KMS_API_KEY: "5678",
-             DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_SERVERLESS_LOGS_ENABLED: true,
             DD_LOG_LEVEL: "info",
             DD_SITE: "datadoghq.eu",
             DD_TRACE_ENABLED: true,
