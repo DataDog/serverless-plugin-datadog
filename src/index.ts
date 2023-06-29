@@ -29,7 +29,7 @@ import {
   addDdSlsPluginTag,
   addExecutionLogGroupsAndSubscriptions,
   addStepFunctionLogGroup,
-  addStepFunctionLogGroupSubscription,
+  addStepFunctionLogGroupSubscription, mergeStepFunctionsAndLambdaTraces,
 } from "./forwarder";
 import { newSimpleGit } from "./git";
 import {
@@ -246,6 +246,11 @@ module.exports = class ServerlessPlugin {
             // subscribe step function log group to datadog forwarder regardless of how the log group was created
             await addStepFunctionLogGroupSubscription(resources, stepFunction, datadogForwarderArn);
           }
+        }
+
+        if (config.mergeStepFunctionsAndLambdaTraces) {
+          mergeStepFunctionsAndLambdaTraces(resources)
+          this.serverless.cli.log("Merging");
         }
       }
       for (const error of errors) {

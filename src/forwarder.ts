@@ -2,6 +2,8 @@ import Service from "serverless/classes/Service";
 import { FunctionInfo } from "./layer";
 import Aws = require("serverless/plugins/aws/provider/awsProvider");
 import { version } from "../package.json";
+import any = jasmine.any;
+import * as console from "console";
 
 const logGroupKey = "AWS::Logs::LogGroup";
 const logGroupSubscriptionKey = "AWS::Logs::SubscriptionFilter";
@@ -149,6 +151,41 @@ export function addDdSlsPluginTag(stateMachineObj: any) {
     Key: "dd_sls_plugin",
     Value: `v${version}`,
   });
+}
+
+export function mergeStepFunctionsAndLambdaTraces(
+  resources: { [key: string]: any },
+) {
+  Object.entries(resources).forEach(
+
+    ([_, resourceObj]) => {
+      if (typeof resourceObj === 'object' && resourceObj.hasOwnProperty("Type") && resourceObj.Type === "AWS::StepFunctions::StateMachine") {
+        // access def
+        let definitionObj = null;
+        const definitionString = resourceObj.Properties?.DefinitionString;
+        if ("Fn::Sub" in definitionString && definitionString["Fn::Sub"].length > 0) {
+          const unparsedDefinition = definitionString["Fn::Sub"][0]
+          definitionObj = JSON.parse(unparsedDefinition)
+        } else {
+          console.log("Fn::Sub not in definitionString")
+          return
+        }
+
+        if (definitionObj != null && definitionObj.hasOwnProperty("States")) {
+          let k: keyof typeof definitionObj;
+          // tslint:disable-next-line:forin
+          for (k in definitionObj) {
+            const stateObj = definitionObj[k];
+            if (typeof stateObj === "object" && stateObj != null && stateObj.hasOwnProperty("Resource") && stateObj.Resource === "arn:aws:states:::lambda:invoke") {  // need to check legacy as well
+              if (!stateObj.hasOwnProperty("Payload.$")) {  // if the field has already been set, do nothing
+                 stateObj["Payload.$"] = "States.JsonMerge($$, $, false)"
+              }
+            }
+          })
+        }
+      }
+    }
+  );
 }
 
 export async function addStepFunctionLogGroupSubscription(
