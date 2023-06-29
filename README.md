@@ -212,6 +212,16 @@ custom:
 
 - The Datadog Lambda Extension is now the default mechanism for transmitting telemetry to Datadog.
 
+## Working with serverless-plugin-warmup
+This library is compatible at best effort with [serverless-plugin-warmup](https://github.com/juanjoDiaz/serverless-plugin-warmup). If you want to exclude the warmer function from Datadog, you can dot hat with the `exclude` feature of this library.
+
+To properly package your application this plugin *must* be listed _after_ `serverless-plugin-warmup` in your `serverless.yml` file:
+```yaml
+plugins:
+  - serverless-plugin-warmup
+  - serverless-plugin-datadog
+```
+
 ## Opening Issues
 
 If you encounter a bug with this package, let us know by filing an issue! Before opening a new issue, please search the existing issues to avoid duplicates.
