@@ -215,7 +215,7 @@ custom:
 ## Working with serverless-plugin-warmup
 This library is compatible at best effort with [serverless-plugin-warmup](https://github.com/juanjoDiaz/serverless-plugin-warmup). If you want to exclude the warmer function from Datadog, use the `exclude` feature of this library.
 
-To properly package your application this plugin *must* be listed _after_ `serverless-plugin-warmup` in your `serverless.yml` file:
+To properly package your application, this plugin *must* be listed _after_ `serverless-plugin-warmup` in your `serverless.yml` file:
 ```yaml
 plugins:
   - serverless-plugin-warmup
