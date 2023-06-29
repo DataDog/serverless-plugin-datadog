@@ -68,7 +68,7 @@ module.exports = class ServerlessPlugin {
     "after:datadog:generate:init": this.beforePackageFunction.bind(this),
     "after:deploy:function:packageFunction": this.afterPackageFunction.bind(this),
     "after:package:createDeploymentArtifacts": this.afterPackageFunction.bind(this),
-    "after:package:initialize": this.beforePackageFunction.bind(this),
+    "before:package:createDeploymentArtifacts": this.beforePackageFunction.bind(this),
     "after:package:compileFunctions": this.afterPackageCompileFunctions.bind(this),
     "before:deploy:function:packageFunction": this.beforePackageFunction.bind(this),
     "before:offline:start:init": this.beforePackageFunction.bind(this),
