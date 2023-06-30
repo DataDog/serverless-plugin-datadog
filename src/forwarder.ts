@@ -1,6 +1,6 @@
 import Service from "serverless/classes/Service";
-import {FunctionInfo} from "./layer";
-import {version} from "../package.json";
+import { FunctionInfo } from "./layer";
+import { version } from "../package.json";
 import Serverless from "serverless";
 import Aws = require("serverless/plugins/aws/provider/awsProvider");
 
@@ -169,7 +169,7 @@ export function mergeStepFunctionsAndLambdaTraces(
           const unparsedDefinition = definitionString["Fn::Sub"][0];
           const definitionObj: StateMachineDefinition = JSON.parse(unparsedDefinition as string);
 
-          const states = definitionObj.States
+          const states = definitionObj.States;
           for (const stepName in states) {
             if (states.hasOwnProperty(stepName)) {
               const step: StateMachineStep = states[stepName];
@@ -193,8 +193,7 @@ export function mergeStepFunctionsAndLambdaTraces(
               }
             }
           }
-          definitionString["Fn::Sub"][0] = JSON.stringify(definitionObj)  // writing back to the original JSON created by Serverless framework
-
+          definitionString["Fn::Sub"][0] = JSON.stringify(definitionObj); // writing back to the original JSON created by Serverless framework
         } else {
           serverless.cli.log(
             `Step function definition not found in the first element of Properties.DefinitionString.Fn::Sub array of state machine: ${resourceName}.`,
@@ -562,7 +561,8 @@ interface StateMachineStep {
   End?: boolean;
 }
 
-function isDefaultLambdaApiStep(resource: string): boolean {  // default means not legacy lambda api
+function isDefaultLambdaApiStep(resource: string): boolean {
+  // default means not legacy lambda api
   if (resource == null) {
     return false;
   }
