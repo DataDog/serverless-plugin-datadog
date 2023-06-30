@@ -250,8 +250,8 @@ module.exports = class ServerlessPlugin {
         }
 
         if (config.mergeStepFunctionsAndLambdaTraces) {
+          this.serverless.cli.log(`mergeStepFunctionsAndLambdaTraces is true, trying to modify SF def to merge traces`);
           mergeStepFunctionsAndLambdaTraces(resources, this.serverless);
-          this.serverless.cli.log("Merging");
         }
       }
       for (const error of errors) {

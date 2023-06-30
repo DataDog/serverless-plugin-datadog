@@ -1,8 +1,8 @@
 import Service from "serverless/classes/Service";
-import { FunctionInfo } from "./layer";
-import Aws = require("serverless/plugins/aws/provider/awsProvider");
-import { version } from "../package.json";
+import {FunctionInfo} from "./layer";
+import {version} from "../package.json";
 import Serverless from "serverless";
+import Aws = require("serverless/plugins/aws/provider/awsProvider");
 
 const logGroupKey = "AWS::Logs::LogGroup";
 const logGroupSubscriptionKey = "AWS::Logs::SubscriptionFilter";
@@ -166,29 +166,33 @@ export function mergeStepFunctionsAndLambdaTraces(
           "Fn::Sub" in definitionString &&
           definitionString["Fn::Sub"].length > 0
         ) {
+          serverless.cli.log(`==== find definition string`)
           const unparsedDefinition = definitionString["Fn::Sub"][0];
           const definitionObj: StateMachineDefinition = JSON.parse(unparsedDefinition as string);
 
-          for (const stateName in definitionObj.States) {
-            if (definitionObj.hasOwnProperty(stateName)) {
-              const step: StateMachineStep = definitionObj.States[stateName];
+          const states = definitionObj.States
+          for (const stateName in states) {
+            if (states.hasOwnProperty(stateName)) {
+              const step: StateMachineStep = states[stateName];
               if (typeof step.Parameters === "object") {
                 if (step.Parameters.hasOwnProperty("Payload.$")) {
                   if (step.Parameters["Payload.$"] === "$") {
                     step.Parameters["Payload.$"] = "States.JsonMerge($$, $, false)";
                     serverless.cli.log(
-                      `JsonMerge Step Functions context object with payload of state machine: ${resourceName} in step: ${stateName}.`,
+                      `JsonMerge Step Functions context object with payload in step: ${stateName} of state machine: ${resourceName}.`,
                     );
                   }
                 } else {
                   step.Parameters["Payload.$"] = "States.JsonMerge($$, $, false)";
                   serverless.cli.log(
-                    `JsonMerge Step Functions context object with payload of state machine: ${resourceName} in step: ${stateName}.`,
+                    `JsonMerge Step Functions context object with payload in step: ${stateName} of state machine: ${resourceName}.`,
                   );
                 }
               }
             }
           }
+          definitionString["Fn::Sub"][0] = JSON.stringify(definitionObj)  // writing back to the original JSON created by Serverless framework
+
         } else {
           serverless.cli.log(
             `Step function definition not found in the first element of Properties.DefinitionString.Fn::Sub array of state machine: ${resourceName}.`,
