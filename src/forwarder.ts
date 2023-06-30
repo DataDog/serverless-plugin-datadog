@@ -166,26 +166,28 @@ export function mergeStepFunctionsAndLambdaTraces(
           "Fn::Sub" in definitionString &&
           definitionString["Fn::Sub"].length > 0
         ) {
-          serverless.cli.log(`==== find definition string`)
           const unparsedDefinition = definitionString["Fn::Sub"][0];
           const definitionObj: StateMachineDefinition = JSON.parse(unparsedDefinition as string);
 
           const states = definitionObj.States
-          for (const stateName in states) {
-            if (states.hasOwnProperty(stateName)) {
-              const step: StateMachineStep = states[stateName];
+          for (const stepName in states) {
+            if (states.hasOwnProperty(stepName)) {
+              const step: StateMachineStep = states[stepName];
+              if (!isDefaultLambdaApiStep(step.Resource)) {
+                continue;
+              }
               if (typeof step.Parameters === "object") {
                 if (step.Parameters.hasOwnProperty("Payload.$")) {
                   if (step.Parameters["Payload.$"] === "$") {
                     step.Parameters["Payload.$"] = "States.JsonMerge($$, $, false)";
                     serverless.cli.log(
-                      `JsonMerge Step Functions context object with payload in step: ${stateName} of state machine: ${resourceName}.`,
+                      `JsonMerge Step Functions context object with payload in step: ${stepName} of state machine: ${resourceName}.`,
                     );
                   }
                 } else {
                   step.Parameters["Payload.$"] = "States.JsonMerge($$, $, false)";
                   serverless.cli.log(
-                    `JsonMerge Step Functions context object with payload in step: ${stateName} of state machine: ${resourceName}.`,
+                    `JsonMerge Step Functions context object with payload in step: ${stepName} of state machine: ${resourceName}.`,
                   );
                 }
               }
@@ -558,4 +560,15 @@ interface StateMachineStep {
   };
   Next?: string;
   End?: boolean;
+}
+
+function isDefaultLambdaApiStep(resource: string): boolean {  // default means not legacy lambda api
+  if (resource == null) {
+    return false;
+  }
+  if (resource === "arn:aws:states:::lambda:invoke") {
+    // Legacy Lambda API resource.startsWith("arn:aws:lambda"), but it cannot inject context obj.
+    return true;
+  }
+  return false;
 }
