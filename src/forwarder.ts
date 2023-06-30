@@ -2,8 +2,7 @@ import Service from "serverless/classes/Service";
 import { FunctionInfo } from "./layer";
 import Aws = require("serverless/plugins/aws/provider/awsProvider");
 import { version } from "../package.json";
-import any = jasmine.any;
-import * as console from "console";
+import Serverless from "serverless";
 
 const logGroupKey = "AWS::Logs::LogGroup";
 const logGroupSubscriptionKey = "AWS::Logs::SubscriptionFilter";
@@ -154,38 +153,50 @@ export function addDdSlsPluginTag(stateMachineObj: any) {
 }
 
 export function mergeStepFunctionsAndLambdaTraces(
-  resources: { [key: string]: any },
+  resources: { [key: string]: GeneralResource },
+  serverless: Serverless,
 ) {
-  Object.entries(resources).forEach(
-
-    ([_, resourceObj]) => {
-      if (typeof resourceObj === 'object' && resourceObj.hasOwnProperty("Type") && resourceObj.Type === "AWS::StepFunctions::StateMachine") {
-        // access def
-        let definitionObj = null;
+  for (const resourceName in resources) {
+    if (resources.hasOwnProperty(resourceName)) {
+      const resourceObj: GeneralResource = resources[resourceName];
+      if (resourceObj.Type === "AWS::StepFunctions::StateMachine") {
         const definitionString = resourceObj.Properties?.DefinitionString;
-        if ("Fn::Sub" in definitionString && definitionString["Fn::Sub"].length > 0) {
-          const unparsedDefinition = definitionString["Fn::Sub"][0]
-          definitionObj = JSON.parse(unparsedDefinition)
-        } else {
-          console.log("Fn::Sub not in definitionString")
-          return
-        }
+        if (
+          typeof definitionString === "object" &&
+          "Fn::Sub" in definitionString &&
+          definitionString["Fn::Sub"].length > 0
+        ) {
+          const unparsedDefinition = definitionString["Fn::Sub"][0];
+          const definitionObj: StateMachineDefinition = JSON.parse(unparsedDefinition as string);
 
-        if (definitionObj != null && definitionObj.hasOwnProperty("States")) {
-          let k: keyof typeof definitionObj;
-          // tslint:disable-next-line:forin
-          for (k in definitionObj) {
-            const stateObj = definitionObj[k];
-            if (typeof stateObj === "object" && stateObj != null && stateObj.hasOwnProperty("Resource") && stateObj.Resource === "arn:aws:states:::lambda:invoke") {  // need to check legacy as well
-              if (!stateObj.hasOwnProperty("Payload.$")) {  // if the field has already been set, do nothing
-                 stateObj["Payload.$"] = "States.JsonMerge($$, $, false)"
+          for (const stateName in definitionObj.States) {
+            if (definitionObj.hasOwnProperty(stateName)) {
+              const step: StateMachineStep = definitionObj.States[stateName];
+              if (typeof step.Parameters === "object") {
+                if (step.Parameters.hasOwnProperty("Payload.$")) {
+                  if (step.Parameters["Payload.$"] === "$") {
+                    step.Parameters["Payload.$"] = "States.JsonMerge($$, $, false)";
+                    serverless.cli.log(
+                      `JsonMerge Step Functions context object with payload of state machine: ${resourceName} in step: ${stateName}.`,
+                    );
+                  }
+                } else {
+                  step.Parameters["Payload.$"] = "States.JsonMerge($$, $, false)";
+                  serverless.cli.log(
+                    `JsonMerge Step Functions context object with payload of state machine: ${resourceName} in step: ${stateName}.`,
+                  );
+                }
               }
             }
-          })
+          }
+        } else {
+          serverless.cli.log(
+            `Step function definition not found in the first element of Properties.DefinitionString.Fn::Sub array of state machine: ${resourceName}.`,
+          );
         }
       }
     }
-  );
+  }
 }
 
 export async function addStepFunctionLogGroupSubscription(
@@ -520,4 +531,27 @@ function getLogGroupLogicalId(functionName: string): string {
 // Resource names in CloudFormation Templates can only have alphanumeric characters
 function normalizeResourceName(resourceName: string) {
   return resourceName.replace(/[^0-9a-z]/gi, "");
+}
+
+interface GeneralResource {
+  Type: string;
+  Properties?: {
+    DefinitionString?: {
+      "Fn::Sub": [string | object];
+    };
+  };
+}
+
+interface StateMachineDefinition {
+  States: { [key: string]: StateMachineStep };
+}
+
+interface StateMachineStep {
+  Resource: string;
+  Parameters?: {
+    FunctionName?: string;
+    "Payload.$"?: string;
+  };
+  Next?: string;
+  End?: boolean;
 }

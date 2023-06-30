@@ -29,7 +29,8 @@ import {
   addDdSlsPluginTag,
   addExecutionLogGroupsAndSubscriptions,
   addStepFunctionLogGroup,
-  addStepFunctionLogGroupSubscription, mergeStepFunctionsAndLambdaTraces,
+  addStepFunctionLogGroupSubscription,
+  mergeStepFunctionsAndLambdaTraces,
 } from "./forwarder";
 import { newSimpleGit } from "./git";
 import {
@@ -249,7 +250,7 @@ module.exports = class ServerlessPlugin {
         }
 
         if (config.mergeStepFunctionsAndLambdaTraces) {
-          mergeStepFunctionsAndLambdaTraces(resources)
+          mergeStepFunctionsAndLambdaTraces(resources, this.serverless);
           this.serverless.cli.log("Merging");
         }
       }
