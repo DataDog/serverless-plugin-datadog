@@ -84,7 +84,7 @@ describe("ServerlessPlugin", () => {
       };
 
       const plugin = new ServerlessPlugin(serverless, {});
-      await plugin.hooks["after:package:initialize"]();
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
       expect(serverless).toMatchObject({
         service: {
           functions: {
@@ -134,7 +134,7 @@ describe("ServerlessPlugin", () => {
       };
 
       const plugin = new ServerlessPlugin(serverless, {});
-      await plugin.hooks["after:package:initialize"]();
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
       expect(serverless).toMatchObject({
         service: {
           functions: {
@@ -181,7 +181,7 @@ describe("ServerlessPlugin", () => {
       };
 
       const plugin = new ServerlessPlugin(serverless, {});
-      await plugin.hooks["after:package:initialize"]();
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
       expect(serverless).toMatchObject({
         service: {
           functions: {
@@ -230,7 +230,7 @@ describe("ServerlessPlugin", () => {
       };
 
       const plugin = new ServerlessPlugin(serverless, {});
-      await plugin.hooks["after:package:initialize"]();
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
       expect(serverless).toMatchObject({
         service: {
           functions: {
@@ -275,7 +275,7 @@ describe("ServerlessPlugin", () => {
       };
 
       const plugin = new ServerlessPlugin(serverless, {});
-      await plugin.hooks["after:package:initialize"]();
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
       expect(serverless).toMatchObject({
         service: {
           functions: {
@@ -321,7 +321,7 @@ describe("ServerlessPlugin", () => {
       };
 
       const plugin = new ServerlessPlugin(serverless, {});
-      await plugin.hooks["after:package:initialize"]();
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
       expect(serverless).toMatchObject({
         service: {
           functions: {
@@ -374,7 +374,7 @@ describe("ServerlessPlugin", () => {
     };
 
     const plugin = new ServerlessPlugin(serverless, {});
-    await plugin.hooks["after:package:initialize"]();
+    await plugin.hooks["before:package:createDeploymentArtifacts"]();
     expect(serverless).toMatchObject({
       service: {
         functions: {
@@ -422,7 +422,7 @@ describe("ServerlessPlugin", () => {
     };
 
     const plugin = new ServerlessPlugin(serverless, {});
-    await plugin.hooks["after:package:initialize"]();
+    await plugin.hooks["before:package:createDeploymentArtifacts"]();
     expect(serverless).toMatchObject({
       service: {
         functions: {
@@ -470,7 +470,7 @@ describe("ServerlessPlugin", () => {
     };
 
     const plugin = new ServerlessPlugin(serverless, {});
-    await plugin.hooks["after:package:initialize"]();
+    await plugin.hooks["before:package:createDeploymentArtifacts"]();
     expect(serverless).toMatchObject({
       service: {
         functions: {
@@ -518,7 +518,7 @@ describe("ServerlessPlugin", () => {
     };
 
     const plugin = new ServerlessPlugin(serverless, {});
-    await plugin.hooks["after:package:initialize"]();
+    await plugin.hooks["before:package:createDeploymentArtifacts"]();
     expect(serverless).toMatchObject({
       service: {
         functions: {
@@ -578,7 +578,7 @@ describe("ServerlessPlugin", () => {
       let threwError: boolean = false;
       let thrownErrorMessage: string | undefined;
       try {
-        await plugin.hooks["after:package:initialize"]();
+        await plugin.hooks["before:package:createDeploymentArtifacts"]();
       } catch (e) {
         threwError = true;
         if (e instanceof Error) {
@@ -620,7 +620,7 @@ describe("ServerlessPlugin", () => {
       let threwError: boolean = false;
       let thrownErrorMessage: string | undefined;
       try {
-        await plugin.hooks["after:package:initialize"]();
+        await plugin.hooks["before:package:createDeploymentArtifacts"]();
       } catch (e) {
         threwError = true;
         if (e instanceof Error) {
@@ -660,7 +660,7 @@ describe("ServerlessPlugin", () => {
       let threwError: boolean = false;
       let thrownErrorMessage: string | undefined;
       try {
-        await plugin.hooks["after:package:initialize"]();
+        await plugin.hooks["before:package:createDeploymentArtifacts"]();
       } catch (e) {
         threwError = true;
         if (e instanceof Error) {
@@ -700,7 +700,7 @@ describe("ServerlessPlugin", () => {
       let threwError: boolean = false;
       let thrownErrorMessage: string | undefined;
       try {
-        await plugin.hooks["after:package:initialize"]();
+        await plugin.hooks["before:package:createDeploymentArtifacts"]();
       } catch (e) {
         threwError = true;
         if (e instanceof Error) {
@@ -739,7 +739,7 @@ describe("ServerlessPlugin", () => {
       let threwError: boolean = false;
       let thrownErrorMessage: string | undefined;
       try {
-        await plugin.hooks["after:package:initialize"]();
+        await plugin.hooks["before:package:createDeploymentArtifacts"]();
       } catch (e) {
         threwError = true;
         if (e instanceof Error) {
@@ -783,7 +783,7 @@ describe("ServerlessPlugin", () => {
       const plugin = new ServerlessPlugin(serverless, {});
       let threwError: boolean = false;
       try {
-        await plugin.hooks["after:package:initialize"]();
+        await plugin.hooks["before:package:createDeploymentArtifacts"]();
       } catch (e) {
         threwError = true;
         if (e instanceof Error) {
@@ -822,7 +822,7 @@ describe("ServerlessPlugin", () => {
       let threwError: boolean = false;
       let thrownErrorMessage: string | undefined;
       try {
-        await plugin.hooks["after:package:initialize"]();
+        await plugin.hooks["before:package:createDeploymentArtifacts"]();
       } catch (e) {
         threwError = true;
         if (e instanceof Error) {
@@ -869,7 +869,7 @@ describe("ServerlessPlugin", () => {
     const plugin = new ServerlessPlugin(serverless, {});
     let threwError: boolean = false;
     try {
-      await plugin.hooks["after:package:initialize"]();
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
     } catch (e) {
       threwError = true;
     }
@@ -909,7 +909,7 @@ describe("ServerlessPlugin", () => {
     const plugin = new ServerlessPlugin(serverless, {});
     let threwError: boolean = false;
     try {
-      await plugin.hooks["after:package:initialize"]();
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
     } catch (e) {
       threwError = true;
     }
@@ -947,7 +947,7 @@ describe("ServerlessPlugin", () => {
     let threwError: boolean = false;
     let thrownErrorMessage: string | undefined;
     try {
-      await plugin.hooks["after:package:initialize"]();
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
     } catch (e) {
       threwError = true;
       if (e instanceof Error) {
