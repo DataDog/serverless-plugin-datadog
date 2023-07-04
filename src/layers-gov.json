@@ -2,16 +2,16 @@
   "regions": {
     "us-gov-west-1": {
       "nodejs12.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node12-x:88",
-      "nodejs14.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node14-x:91",
-      "nodejs16.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node16-x:91",
-      "nodejs18.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node18-x:91",
-      "python3.7": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python37:73",
-      "python3.8": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python38:73",
-      "python3.8-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python38-ARM:73",
-      "python3.9": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python39:73",
-      "python3.9-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python39-ARM:73",
-      "python3.10": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python310:73",
-      "python3.10-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python310-ARM:73",
+      "nodejs14.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node14-x:93",
+      "nodejs16.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node16-x:93",
+      "nodejs18.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node18-x:93",
+      "python3.7": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python37:75",
+      "python3.8": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python38:75",
+      "python3.8-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python38-ARM:75",
+      "python3.9": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python39:75",
+      "python3.9-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python39-ARM:75",
+      "python3.10": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python310:75",
+      "python3.10-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python310-ARM:75",
       "ruby2.7": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Ruby2-7:19",
       "ruby2.7-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Ruby2-7-ARM:19",
       "ruby3.2": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Ruby3-2:19",
@@ -20,20 +20,20 @@
       "extension-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Extension-ARM:44",
       "dotnet": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:dd-trace-dotnet:8",
       "dotnet-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:dd-trace-dotnet-ARM:8",
-      "java": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:dd-trace-java:10"
+      "java": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:dd-trace-java:11"
     },
     "us-gov-east-1": {
       "nodejs12.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node12-x:88",
-      "nodejs14.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node14-x:91",
-      "nodejs16.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node16-x:91",
-      "nodejs18.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node18-x:91",
-      "python3.7": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python37:73",
-      "python3.8": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python38:73",
-      "python3.8-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python38-ARM:73",
-      "python3.9": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python39:73",
-      "python3.9-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python39-ARM:73",
-      "python3.10": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python310:73",
-      "python3.10-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python310-ARM:73",
+      "nodejs14.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node14-x:93",
+      "nodejs16.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node16-x:93",
+      "nodejs18.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node18-x:93",
+      "python3.7": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python37:75",
+      "python3.8": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python38:75",
+      "python3.8-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python38-ARM:75",
+      "python3.9": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python39:75",
+      "python3.9-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python39-ARM:75",
+      "python3.10": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python310:75",
+      "python3.10-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python310-ARM:75",
       "ruby2.7": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Ruby2-7:19",
       "ruby2.7-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Ruby2-7-ARM:19",
       "ruby3.2": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Ruby3-2:19",
@@ -42,7 +42,7 @@
       "extension-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Extension-ARM:44",
       "dotnet": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:dd-trace-dotnet:8",
       "dotnet-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:dd-trace-dotnet-ARM:8",
-      "java": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:dd-trace-java:10"
+      "java": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:dd-trace-java:11"
     }
   }
 }
