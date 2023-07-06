@@ -177,18 +177,13 @@ export function mergeStepFunctionsAndLambdaTraces(
                 continue;
               }
               if (typeof step.Parameters === "object") {
-                if (step.Parameters.hasOwnProperty("Payload.$")) {
-                  if (step.Parameters["Payload.$"] === "$") {
-                    step.Parameters["Payload.$"] = "States.JsonMerge($$, $, false)";
-                    serverless.cli.log(
-                      `JsonMerge Step Functions context object with payload in step: ${stepName} of state machine: ${resourceName}.`,
-                    );
-                  }
-                } else {
+                if (safeToModifyStepFunctionsDefinition(step.Parameters)) {
                   step.Parameters["Payload.$"] = "States.JsonMerge($$, $, false)";
                   serverless.cli.log(
                     `JsonMerge Step Functions context object with payload in step: ${stepName} of state machine: ${resourceName}.`,
                   );
+                } else {
+                  serverless.cli.log(`[Warn] Parameters.Payload has been set. Merging traces failed for step: ${stepName} of state machine: ${resourceName}`);
                 }
               }
             }
@@ -202,6 +197,22 @@ export function mergeStepFunctionsAndLambdaTraces(
       }
     }
   }
+}
+
+function safeToModifyStepFunctionsDefinition(parameters: any): boolean{
+  if (typeof parameters !== "object") {
+    return false
+  }
+  if (!parameters.hasOwnProperty("Payload.$")){
+    return true;
+  }
+  else {
+    if (parameters["Payload.$"] === "$") {  // $ % is the default original unchanged payload
+      return true;
+    }
+  }
+
+  return false;
 }
 
 export async function addStepFunctionLogGroupSubscription(
