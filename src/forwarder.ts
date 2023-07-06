@@ -161,49 +161,59 @@ export function mergeStepFunctionsAndLambdaTraces(
       const resourceObj: GeneralResource = resources[resourceName];
       if (resourceObj.Type === "AWS::StepFunctions::StateMachine") {
         const definitionString = resourceObj.Properties?.DefinitionString;
-        if (
-          typeof definitionString === "object" &&
-          "Fn::Sub" in definitionString &&
-          definitionString["Fn::Sub"].length > 0
-        ) {
-          const unparsedDefinition = definitionString["Fn::Sub"][0];
-          const definitionObj: StateMachineDefinition = JSON.parse(unparsedDefinition as string);
-
-          const states = definitionObj.States;
-          for (const stepName in states) {
-            if (states.hasOwnProperty(stepName)) {
-              const step: StateMachineStep = states[stepName];
-              if (!isDefaultLambdaApiStep(step.Resource)) {  // only default lambda api allows context injection
-                continue;
-              }
-              if (typeof step.Parameters === "object") {
-                if (safeToModifyStepFunctionsDefinition(step.Parameters)) {
-                  step.Parameters["Payload.$"] = "States.JsonMerge($$, $, false)";
-                  serverless.cli.log(
-                    `JsonMerge Step Functions context object with payload in step: ${stepName} of state machine: ${resourceName}.`,
-                  );
-                } else {
-                  serverless.cli.log(`[Warn] Parameters.Payload has been set. Merging traces failed for step: ${stepName} of state machine: ${resourceName}`);
-                }
-              }
-            }
-          }
-          definitionString["Fn::Sub"][0] = JSON.stringify(definitionObj); // writing back to the original JSON created by Serverless framework
-        }
+        updateDefinitionString(definitionString, serverless, resourceName);
       }
     }
   }
 }
 
-function safeToModifyStepFunctionsDefinition(parameters: any): boolean{
+export function updateDefinitionString(
+  definitionString: { "Fn::Sub": any[] } | undefined,
+  serverless: Serverless,
+  resourceName: string,
+): void {
+  if (
+    !(typeof definitionString === "object" && "Fn::Sub" in definitionString && definitionString["Fn::Sub"].length > 0)
+  ) {
+    return;
+  }
+  const unparsedDefinition = definitionString["Fn::Sub"][0];
+  const definitionObj: StateMachineDefinition = JSON.parse(unparsedDefinition as string);
+
+  const states = definitionObj.States;
+  for (const stepName in states) {
+    if (states.hasOwnProperty(stepName)) {
+      const step: StateMachineStep = states[stepName];
+      if (!isDefaultLambdaApiStep(step.Resource)) {
+        // only default lambda api allows context injection
+        continue;
+      }
+      if (typeof step.Parameters === "object") {
+        if (isSafeToModifyStepFunctionsDefinition(step.Parameters)) {
+          step.Parameters["Payload.$"] = "States.JsonMerge($$, $, false)";
+          serverless.cli.log(
+            `JsonMerge Step Functions context object with payload in step: ${stepName} of state machine: ${resourceName}.`,
+          );
+        } else {
+          serverless.cli.log(
+            `[Warn] Parameters.Payload has been set. Merging traces failed for step: ${stepName} of state machine: ${resourceName}`,
+          );
+        }
+      }
+    }
+  }
+  definitionString["Fn::Sub"][0] = JSON.stringify(definitionObj); // writing back to the original JSON created by Serverless framework
+}
+
+export function isSafeToModifyStepFunctionsDefinition(parameters: any): boolean {
   if (typeof parameters !== "object") {
-    return false
+    return false;
   }
-  if (!parameters.hasOwnProperty("Payload.$")){
+  if (!parameters.hasOwnProperty("Payload.$")) {
     return true;
-  }
-  else {
-    if (parameters["Payload.$"] === "$") {  // $ % is the default original unchanged payload
+  } else {
+    if (parameters["Payload.$"] === "$") {
+      // $ % is the default original unchanged payload
       return true;
     }
   }
@@ -549,7 +559,7 @@ interface GeneralResource {
   Type: string;
   Properties?: {
     DefinitionString?: {
-      "Fn::Sub": [string | object];
+      "Fn::Sub": any[];
     };
   };
 }
@@ -568,7 +578,7 @@ interface StateMachineStep {
   End?: boolean;
 }
 
-function isDefaultLambdaApiStep(resource: string): boolean {
+export function isDefaultLambdaApiStep(resource: string | null): boolean {
   // default means not legacy lambda api
   if (resource == null) {
     return false;

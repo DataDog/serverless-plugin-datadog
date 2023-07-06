@@ -7,10 +7,15 @@ import {
   CloudFormationObjectArn,
   canSubscribeLogGroup,
   isLogsConfig,
+  isSafeToModifyStepFunctionsDefinition,
+  isDefaultLambdaApiStep,
+  mergeStepFunctionsAndLambdaTraces,
 } from "./forwarder";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
 import { FunctionInfo, RuntimeType } from "./layer";
 import { version } from "../package.json";
+import {anything} from 'ts-mockito';
+// import Serverless from "serverless";
 
 function serviceWithResources(resources?: Record<string, any>, serviceName = "my-service"): Service {
   const service = {
@@ -64,10 +69,10 @@ function awsMock(existingSubs: { [key: string]: any }, stackName?: string, doesA
         return Promise.reject("Not found.");
       }
       const logGroupName = params.logGroupName;
-      if (method == "getFunction") {
+      if (method === "getFunction") {
         return Promise.resolve();
       }
-      if (method == "describeSubscriptionFilters") {
+      if (method === "describeSubscriptionFilters") {
         if (existingSubs[logGroupName]) {
           return Promise.resolve({ subscriptionFilters: existingSubs[logGroupName] });
         }
@@ -1410,5 +1415,107 @@ describe("addStepFunctionLogGroupSubscription", () => {
         },
       }
     `);
+  });
+});
+
+
+
+describe("mergeStepFunctionsAndLambdaTraces option related tests", () => {
+  let forwarderModule: any;
+  beforeAll(() => {
+      forwarderModule = require('./forwarder')
+    })
+    beforeEach(() => {
+      forwarderModule.updateDefinitionString = jest.fn().mockImplementation()
+    });
+
+  describe("test mergeStepFunctionsAndLambdaTraces", () => {
+    // beforeAll(() => {
+    //   forwarderModule = require('./forwarder')
+    // })
+    // beforeEach(() => {
+    //   forwarderModule.updateDefinitionString = jest.fn().mockImplementation()
+    // });
+    // afterEach(() => jest.restoreAllMocks())
+
+    it("test1123", async () => {
+      const resources = {
+        "unit-test-state-machine": {
+          Type: "AWS::StepFunctions::StateMachine",
+          Properties: {
+            "DefinitionString": {
+              "Fn::Sub": [
+                "real-definition-string",
+                {}
+              ],
+            },
+          },
+        },
+        "another-resource": {
+          Type: "AWS::Lambda::Function",
+        },
+      };
+      // jest.spyOn(forwarderModule, 'updateDefinitionString').mockImplementation(()=> {});
+      // (updateDefinitionString as any).mockImplementation(() => null)
+      // const mockedUpdateDefinitionString = jest.spyOn('./forwarder.ts', updateDefinitionString());
+      // const mockedServerless = mock(Serverless);
+      mergeStepFunctionsAndLambdaTraces(resources, anything());
+      // expect(mockedUpdateDefinitionString).toBeCalledTimes(1)
+    });
+  });
+
+  describe("test updateDefinitionString", () => {
+    it("test1", async () => {
+      // mergeStepFunctionsAndLambdaTraces({}, );
+    });
+  });
+
+  describe("test isSafeToModifyStepFunctionsDefinition", () => {
+    it("Payload field not set in parameters", async () => {
+      const parameters = { FunctionName: "bla" };
+      expect(isSafeToModifyStepFunctionsDefinition(parameters)).toBeTruthy();
+    });
+
+    it("Payload field empty", async () => {
+      const parameters = { FunctionName: "bla", "Payload.$": {} };
+      expect(isSafeToModifyStepFunctionsDefinition(parameters)).toBeFalsy();
+    });
+
+    it("Payload field default to $", async () => {
+      const parameters = { FunctionName: "bla", "Payload.$": "$" };
+      expect(isSafeToModifyStepFunctionsDefinition(parameters)).toBeTruthy();
+    });
+
+    it("Payload field default to $", async () => {
+      const parameters = { FunctionName: "bla", "Payload.$": "something customer has already set and not empty" };
+      expect(isSafeToModifyStepFunctionsDefinition(parameters)).toBeFalsy();
+    });
+  });
+
+  describe("test isDefaultLambdaApiStep", () => {
+    it("resource is default lambda", async () => {
+      const resource = "arn:aws:states:::lambda:invoke";
+      expect(isDefaultLambdaApiStep(resource)).toBeTruthy();
+    });
+
+    it("resource is lambda arn for legacy lambda api", async () => {
+      const resource = "arn:aws:lambda:sa-east-1:601427271234:function:hello-function";
+      expect(isDefaultLambdaApiStep(resource)).toBeFalsy();
+    });
+
+    it("resource of dynamodb", async () => {
+      const resource = "arn:aws:states:::dynamodb:updateItem";
+      expect(isDefaultLambdaApiStep(resource)).toBeFalsy();
+    });
+
+    it("resource of empty string", async () => {
+      const resource = "";
+      expect(isDefaultLambdaApiStep(resource)).toBeFalsy();
+    });
+
+    it("resource of null", async () => {
+      const resource = null;
+      expect(isDefaultLambdaApiStep(resource)).toBeFalsy();
+    });
   });
 });
