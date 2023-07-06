@@ -173,7 +173,7 @@ export function mergeStepFunctionsAndLambdaTraces(
           for (const stepName in states) {
             if (states.hasOwnProperty(stepName)) {
               const step: StateMachineStep = states[stepName];
-              if (!isDefaultLambdaApiStep(step.Resource)) {
+              if (!isDefaultLambdaApiStep(step.Resource)) {  // only default lambda api allows context injection
                 continue;
               }
               if (typeof step.Parameters === "object") {
