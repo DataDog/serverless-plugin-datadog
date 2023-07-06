@@ -189,10 +189,6 @@ export function mergeStepFunctionsAndLambdaTraces(
             }
           }
           definitionString["Fn::Sub"][0] = JSON.stringify(definitionObj); // writing back to the original JSON created by Serverless framework
-        } else {
-          serverless.cli.log(
-            `Step function definition not found in the first element of Properties.DefinitionString.Fn::Sub array of state machine: ${resourceName}.`,
-          );
         }
       }
     }
