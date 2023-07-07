@@ -161,7 +161,7 @@ export function mergeStepFunctionsAndLambdaTraces(
     if (resources.hasOwnProperty(resourceName)) {
       const resourceObj: GeneralResource = resources[resourceName];
       if (resourceObj.Type === "AWS::StepFunctions::StateMachine") {
-        const definitionString = resourceObj.Properties?.DefinitionString;
+        const definitionString = resourceObj.Properties?.DefinitionString!;
         updateDefinitionString(definitionString, serverless, resourceName);
       }
     }

@@ -33,7 +33,7 @@ export function updateDefinitionString(
       }
       if (typeof step.Parameters === "object") {
         if (isSafeToModifyStepFunctionsDefinition(step.Parameters)) {
-          step.Parameters["Payload.$"] = "States.JsonMerge($$, $, false)";
+          step.Parameters!["Payload.$"] = "States.JsonMerge($$, $, false)";
           serverless.cli.log(
             `JsonMerge Step Functions context object with payload in step: ${stepName} of state machine: ${stateMachineName}.`,
           );
