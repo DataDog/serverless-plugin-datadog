@@ -153,7 +153,7 @@ export function addDdSlsPluginTag(stateMachineObj: any) {
   });
 }
 
-export function mergeStepFunctionsAndLambdaTraces(
+export function mergeStepFunctionAndLambdaTraces(
   resources: { [key: string]: GeneralResource },
   serverless: Serverless,
 ) {

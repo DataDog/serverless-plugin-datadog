@@ -30,7 +30,7 @@ import {
   addExecutionLogGroupsAndSubscriptions,
   addStepFunctionLogGroup,
   addStepFunctionLogGroupSubscription,
-  mergeStepFunctionsAndLambdaTraces,
+  mergeStepFunctionAndLambdaTraces,
 } from "./forwarder";
 import { newSimpleGit } from "./git";
 import {
@@ -249,11 +249,11 @@ module.exports = class ServerlessPlugin {
           }
         }
 
-        if (config.mergeStepFunctionsAndLambdaTraces) {
+        if (config.mergeStepFunctionAndLambdaTraces) {
           this.serverless.cli.log(
-            `mergeStepFunctionsAndLambdaTraces is true, trying to modify Step Functions' definitions to merge traces.`,
+            `mergeStepFunctionAndLambdaTraces is true, trying to modify Step Functions' definitions to merge traces.`,
           );
-          mergeStepFunctionsAndLambdaTraces(resources, this.serverless);
+          mergeStepFunctionAndLambdaTraces(resources, this.serverless);
         }
       }
       for (const error of errors) {

@@ -14,7 +14,7 @@ import {
   isLogsConfig,
   isSafeToModifyStepFunctionsDefinition,
   isDefaultLambdaApiStep,
-  mergeStepFunctionsAndLambdaTraces,
+  mergeStepFunctionAndLambdaTraces,
 } from "./forwarder";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
 import { FunctionInfo, RuntimeType } from "./layer";
@@ -1424,17 +1424,9 @@ describe("addStepFunctionLogGroupSubscription", () => {
 
 
 
-describe("mergeStepFunctionsAndLambdaTraces option related tests", () => {
-  // let forwarderModule: any;
-  // beforeAll(() => {
-  //     forwarderModule = require('./forwarder')
-  //     },
-  //   )
-  // beforeEach(() => {
-  //   forwarderModule.updateDefinitionString = jest.fn().mockImplementation()
-  // });
+describe("mergeStepFunctionAndLambdaTraces option related tests", () => {
 
-  describe("test mergeStepFunctionsAndLambdaTraces", () => {
+  describe("test mergeStepFunctionAndLambdaTraces", () => {
 
     it("have no state machine in the resources", async () => {
       const resources = {
@@ -1444,7 +1436,7 @@ describe("mergeStepFunctionsAndLambdaTraces option related tests", () => {
       };
       const service = serviceWithResources();
       const serverless: Serverless = service.serverless;
-      mergeStepFunctionsAndLambdaTraces(resources, serverless);
+      mergeStepFunctionAndLambdaTraces(resources, serverless);
       expect(stepFunctionsHelper.updateDefinitionString).toBeCalledTimes(0)
     });
 
@@ -1467,7 +1459,7 @@ describe("mergeStepFunctionsAndLambdaTraces option related tests", () => {
       };
       const service = serviceWithResources();
       const serverless: Serverless = service.serverless;
-      mergeStepFunctionsAndLambdaTraces(resources, serverless);
+      mergeStepFunctionAndLambdaTraces(resources, serverless);
       expect(stepFunctionsHelper.updateDefinitionString).toBeCalledTimes(1)
     });
 
@@ -1501,14 +1493,8 @@ describe("mergeStepFunctionsAndLambdaTraces option related tests", () => {
       };
       const service = serviceWithResources();
       const serverless: Serverless = service.serverless;
-      mergeStepFunctionsAndLambdaTraces(resources, serverless);
+      mergeStepFunctionAndLambdaTraces(resources, serverless);
       expect(stepFunctionsHelper.updateDefinitionString).toBeCalledTimes(2)
-    });
-  });
-
-  describe("test updateDefinitionString", () => {
-    it("test1", async () => {
-      // mergeStepFunctionsAndLambdaTraces({}, );
     });
   });
 
