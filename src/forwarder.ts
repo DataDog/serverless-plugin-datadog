@@ -3,6 +3,7 @@ import { FunctionInfo } from "./layer";
 import { version } from "../package.json";
 import Serverless from "serverless";
 import Aws = require("serverless/plugins/aws/provider/awsProvider");
+import {updateDefinitionString} from './step-functions-helper';
 
 const logGroupKey = "AWS::Logs::LogGroup";
 const logGroupSubscriptionKey = "AWS::Logs::SubscriptionFilter";
@@ -165,44 +166,6 @@ export function mergeStepFunctionsAndLambdaTraces(
       }
     }
   }
-}
-
-export function updateDefinitionString(
-  definitionString: { "Fn::Sub": any[] } | undefined,
-  serverless: Serverless,
-  resourceName: string,
-): void {
-  if (
-    !(typeof definitionString === "object" && "Fn::Sub" in definitionString && definitionString["Fn::Sub"].length > 0)
-  ) {
-    return;
-  }
-  const unparsedDefinition = definitionString["Fn::Sub"][0];
-  const definitionObj: StateMachineDefinition = JSON.parse(unparsedDefinition as string);
-
-  const states = definitionObj.States;
-  for (const stepName in states) {
-    if (states.hasOwnProperty(stepName)) {
-      const step: StateMachineStep = states[stepName];
-      if (!isDefaultLambdaApiStep(step.Resource)) {
-        // only default lambda api allows context injection
-        continue;
-      }
-      if (typeof step.Parameters === "object") {
-        if (isSafeToModifyStepFunctionsDefinition(step.Parameters)) {
-          step.Parameters["Payload.$"] = "States.JsonMerge($$, $, false)";
-          serverless.cli.log(
-            `JsonMerge Step Functions context object with payload in step: ${stepName} of state machine: ${resourceName}.`,
-          );
-        } else {
-          serverless.cli.log(
-            `[Warn] Parameters.Payload has been set. Merging traces failed for step: ${stepName} of state machine: ${resourceName}`,
-          );
-        }
-      }
-    }
-  }
-  definitionString["Fn::Sub"][0] = JSON.stringify(definitionObj); // writing back to the original JSON created by Serverless framework
 }
 
 export function isSafeToModifyStepFunctionsDefinition(parameters: any): boolean {
@@ -555,7 +518,7 @@ function normalizeResourceName(resourceName: string) {
   return resourceName.replace(/[^0-9a-z]/gi, "");
 }
 
-interface GeneralResource {
+export interface GeneralResource {
   Type: string;
   Properties?: {
     DefinitionString?: {
@@ -564,11 +527,11 @@ interface GeneralResource {
   };
 }
 
-interface StateMachineDefinition {
+export interface StateMachineDefinition {
   States: { [key: string]: StateMachineStep };
 }
 
-interface StateMachineStep {
+export interface StateMachineStep {
   Resource: string;
   Parameters?: {
     FunctionName?: string;

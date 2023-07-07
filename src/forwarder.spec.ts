@@ -1,4 +1,9 @@
 import Service from "serverless/classes/Service";
+
+// tslint:disable-next-line:no-var-requires
+const stepFunctionsHelper = require('./step-functions-helper')
+stepFunctionsHelper.updateDefinitionString = jest.fn().mockImplementation()
+
 import {
   addCloudWatchForwarderSubscriptions,
   addDdSlsPluginTag,
@@ -14,8 +19,7 @@ import {
 import Aws from "serverless/plugins/aws/provider/awsProvider";
 import { FunctionInfo, RuntimeType } from "./layer";
 import { version } from "../package.json";
-import {anything} from 'ts-mockito';
-// import Serverless from "serverless";
+import Serverless from "serverless";
 
 function serviceWithResources(resources?: Record<string, any>, serviceName = "my-service"): Service {
   const service = {
@@ -1421,24 +1425,30 @@ describe("addStepFunctionLogGroupSubscription", () => {
 
 
 describe("mergeStepFunctionsAndLambdaTraces option related tests", () => {
-  let forwarderModule: any;
-  beforeAll(() => {
-      forwarderModule = require('./forwarder')
-    })
-    beforeEach(() => {
-      forwarderModule.updateDefinitionString = jest.fn().mockImplementation()
-    });
+  // let forwarderModule: any;
+  // beforeAll(() => {
+  //     forwarderModule = require('./forwarder')
+  //     },
+  //   )
+  // beforeEach(() => {
+  //   forwarderModule.updateDefinitionString = jest.fn().mockImplementation()
+  // });
 
   describe("test mergeStepFunctionsAndLambdaTraces", () => {
-    // beforeAll(() => {
-    //   forwarderModule = require('./forwarder')
-    // })
-    // beforeEach(() => {
-    //   forwarderModule.updateDefinitionString = jest.fn().mockImplementation()
-    // });
-    // afterEach(() => jest.restoreAllMocks())
 
-    it("test1123", async () => {
+    it("have no state machine in the resources", async () => {
+      const resources = {
+        "a-lambda-resource": {
+          Type: "AWS::Lambda::Function",
+        },
+      };
+      const service = serviceWithResources();
+      const serverless: Serverless = service.serverless;
+      mergeStepFunctionsAndLambdaTraces(resources, serverless);
+      expect(stepFunctionsHelper.updateDefinitionString).toBeCalledTimes(0)
+    });
+
+    it("have one state machine in the resources", async () => {
       const resources = {
         "unit-test-state-machine": {
           Type: "AWS::StepFunctions::StateMachine",
@@ -1455,12 +1465,44 @@ describe("mergeStepFunctionsAndLambdaTraces option related tests", () => {
           Type: "AWS::Lambda::Function",
         },
       };
-      // jest.spyOn(forwarderModule, 'updateDefinitionString').mockImplementation(()=> {});
-      // (updateDefinitionString as any).mockImplementation(() => null)
-      // const mockedUpdateDefinitionString = jest.spyOn('./forwarder.ts', updateDefinitionString());
-      // const mockedServerless = mock(Serverless);
-      mergeStepFunctionsAndLambdaTraces(resources, anything());
-      // expect(mockedUpdateDefinitionString).toBeCalledTimes(1)
+      const service = serviceWithResources();
+      const serverless: Serverless = service.serverless;
+      mergeStepFunctionsAndLambdaTraces(resources, serverless);
+      expect(stepFunctionsHelper.updateDefinitionString).toBeCalledTimes(1)
+    });
+
+    it("have two state machine in the resources", async () => {
+      const resources = {
+        "unit-test-state-machine": {
+          Type: "AWS::StepFunctions::StateMachine",
+          Properties: {
+            "DefinitionString": {
+              "Fn::Sub": [
+                "real-definition-string",
+                {}
+              ],
+            },
+          },
+        },
+        "unit-test-state-machine2": {
+          Type: "AWS::StepFunctions::StateMachine",
+          Properties: {
+            "DefinitionString": {
+              "Fn::Sub": [
+                "real-definition-string",
+                {}
+              ],
+            },
+          },
+        },
+        "another-resource": {
+          Type: "AWS::Lambda::Function",
+        },
+      };
+      const service = serviceWithResources();
+      const serverless: Serverless = service.serverless;
+      mergeStepFunctionsAndLambdaTraces(resources, serverless);
+      expect(stepFunctionsHelper.updateDefinitionString).toBeCalledTimes(2)
     });
   });
 
