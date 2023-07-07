@@ -2,9 +2,9 @@ import Serverless from "serverless";
 import {
   isDefaultLambdaApiStep,
   isSafeToModifyStepFunctionsDefinition,
-  StateMachineDefinition, StateMachineStep
+  StateMachineDefinition,
+  StateMachineStep,
 } from "./forwarder";
-
 
 export function updateDefinitionString(
   definitionString: { "Fn::Sub": (string | object)[] },
@@ -16,12 +16,11 @@ export function updateDefinitionString(
   ) {
     return;
   }
-  const unparsedDefinition = definitionString["Fn::Sub"]?definitionString["Fn::Sub"][0]:"";  // index 0 should always be a string of step functions definition
+  const unparsedDefinition = definitionString["Fn::Sub"] ? definitionString["Fn::Sub"][0] : ""; // index 0 should always be a string of step functions definition
   if (unparsedDefinition === "") {
     return;
   }
   const definitionObj: StateMachineDefinition = JSON.parse(unparsedDefinition as string);
-
 
   const states = definitionObj.States;
   for (const stepName in states) {

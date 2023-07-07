@@ -3,7 +3,7 @@ import { FunctionInfo } from "./layer";
 import { version } from "../package.json";
 import Serverless from "serverless";
 import Aws = require("serverless/plugins/aws/provider/awsProvider");
-import {updateDefinitionString} from './step-functions-helper';
+import { updateDefinitionString } from "./step-functions-helper";
 
 const logGroupKey = "AWS::Logs::LogGroup";
 const logGroupSubscriptionKey = "AWS::Logs::SubscriptionFilter";

@@ -1,8 +1,8 @@
 import Service from "serverless/classes/Service";
 
 // tslint:disable-next-line:no-var-requires
-const stepFunctionsHelper = require('./step-functions-helper')
-stepFunctionsHelper.updateDefinitionString = jest.fn().mockImplementation()
+const stepFunctionsHelper = require("./step-functions-helper");
+stepFunctionsHelper.updateDefinitionString = jest.fn().mockImplementation();
 
 import {
   addCloudWatchForwarderSubscriptions,
@@ -1422,12 +1422,8 @@ describe("addStepFunctionLogGroupSubscription", () => {
   });
 });
 
-
-
 describe("mergeStepFunctionAndLambdaTraces option related tests", () => {
-
   describe("test mergeStepFunctionAndLambdaTraces", () => {
-
     it("have no state machine in the resources", async () => {
       const resources = {
         "a-lambda-resource": {
@@ -1437,7 +1433,7 @@ describe("mergeStepFunctionAndLambdaTraces option related tests", () => {
       const service = serviceWithResources();
       const serverless: Serverless = service.serverless;
       mergeStepFunctionAndLambdaTraces(resources, serverless);
-      expect(stepFunctionsHelper.updateDefinitionString).toBeCalledTimes(0)
+      expect(stepFunctionsHelper.updateDefinitionString).toBeCalledTimes(0);
     });
 
     it("have one state machine in the resources", async () => {
@@ -1445,11 +1441,8 @@ describe("mergeStepFunctionAndLambdaTraces option related tests", () => {
         "unit-test-state-machine": {
           Type: "AWS::StepFunctions::StateMachine",
           Properties: {
-            "DefinitionString": {
-              "Fn::Sub": [
-                "real-definition-string",
-                {}
-              ],
+            DefinitionString: {
+              "Fn::Sub": ["real-definition-string", {}],
             },
           },
         },
@@ -1460,7 +1453,7 @@ describe("mergeStepFunctionAndLambdaTraces option related tests", () => {
       const service = serviceWithResources();
       const serverless: Serverless = service.serverless;
       mergeStepFunctionAndLambdaTraces(resources, serverless);
-      expect(stepFunctionsHelper.updateDefinitionString).toBeCalledTimes(1)
+      expect(stepFunctionsHelper.updateDefinitionString).toBeCalledTimes(1);
     });
 
     it("have two state machine in the resources", async () => {
@@ -1468,22 +1461,16 @@ describe("mergeStepFunctionAndLambdaTraces option related tests", () => {
         "unit-test-state-machine": {
           Type: "AWS::StepFunctions::StateMachine",
           Properties: {
-            "DefinitionString": {
-              "Fn::Sub": [
-                "real-definition-string",
-                {}
-              ],
+            DefinitionString: {
+              "Fn::Sub": ["real-definition-string", {}],
             },
           },
         },
         "unit-test-state-machine2": {
           Type: "AWS::StepFunctions::StateMachine",
           Properties: {
-            "DefinitionString": {
-              "Fn::Sub": [
-                "real-definition-string",
-                {}
-              ],
+            DefinitionString: {
+              "Fn::Sub": ["real-definition-string", {}],
             },
           },
         },
@@ -1494,7 +1481,7 @@ describe("mergeStepFunctionAndLambdaTraces option related tests", () => {
       const service = serviceWithResources();
       const serverless: Serverless = service.serverless;
       mergeStepFunctionAndLambdaTraces(resources, serverless);
-      expect(stepFunctionsHelper.updateDefinitionString).toBeCalledTimes(2)
+      expect(stepFunctionsHelper.updateDefinitionString).toBeCalledTimes(2);
     });
   });
 
