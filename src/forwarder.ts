@@ -1,9 +1,7 @@
 import Service from "serverless/classes/Service";
 import { FunctionInfo } from "./layer";
 import { version } from "../package.json";
-import Serverless from "serverless";
 import Aws = require("serverless/plugins/aws/provider/awsProvider");
-import { updateDefinitionString } from "./step-functions-helper";
 
 const logGroupKey = "AWS::Logs::LogGroup";
 const logGroupSubscriptionKey = "AWS::Logs::SubscriptionFilter";
@@ -151,37 +149,6 @@ export function addDdSlsPluginTag(stateMachineObj: any) {
     Key: "dd_sls_plugin",
     Value: `v${version}`,
   });
-}
-
-export function mergeStepFunctionAndLambdaTraces(
-  resources: { [key: string]: GeneralResource },
-  serverless: Serverless,
-) {
-  for (const resourceName in resources) {
-    if (resources.hasOwnProperty(resourceName)) {
-      const resourceObj: GeneralResource = resources[resourceName];
-      if (resourceObj.Type === "AWS::StepFunctions::StateMachine") {
-        const definitionString = resourceObj.Properties?.DefinitionString!;
-        updateDefinitionString(definitionString, serverless, resourceName);
-      }
-    }
-  }
-}
-
-export function isSafeToModifyStepFunctionsDefinition(parameters: any): boolean {
-  if (typeof parameters !== "object") {
-    return false;
-  }
-  if (!parameters.hasOwnProperty("Payload.$")) {
-    return true;
-  } else {
-    if (parameters["Payload.$"] === "$") {
-      // $ % is the default original unchanged payload
-      return true;
-    }
-  }
-
-  return false;
 }
 
 export async function addStepFunctionLogGroupSubscription(
@@ -516,39 +483,4 @@ function getLogGroupLogicalId(functionName: string): string {
 // Resource names in CloudFormation Templates can only have alphanumeric characters
 function normalizeResourceName(resourceName: string) {
   return resourceName.replace(/[^0-9a-z]/gi, "");
-}
-
-export interface GeneralResource {
-  Type: string;
-  Properties?: {
-    DefinitionString?: {
-      "Fn::Sub": any[];
-    };
-  };
-}
-
-export interface StateMachineDefinition {
-  States: { [key: string]: StateMachineStep };
-}
-
-export interface StateMachineStep {
-  Resource: string;
-  Parameters?: {
-    FunctionName?: string;
-    "Payload.$"?: string;
-  };
-  Next?: string;
-  End?: boolean;
-}
-
-export function isDefaultLambdaApiStep(resource: string | null): boolean {
-  // default means not legacy lambda api
-  if (resource == null) {
-    return false;
-  }
-  if (resource === "arn:aws:states:::lambda:invoke") {
-    // Legacy Lambda API resource.startsWith("arn:aws:lambda"), but it cannot inject context obj.
-    return true;
-  }
-  return false;
 }

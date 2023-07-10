@@ -1,10 +1,55 @@
 import Serverless from "serverless";
-import {
-  isDefaultLambdaApiStep,
-  isSafeToModifyStepFunctionsDefinition,
-  StateMachineDefinition,
-  StateMachineStep,
-} from "./forwarder";
+
+export function isSafeToModifyStepFunctionsDefinition(parameters: any): boolean {
+  if (typeof parameters !== "object") {
+    return false;
+  }
+  if (!parameters.hasOwnProperty("Payload.$")) {
+    return true;
+  } else {
+    if (parameters["Payload.$"] === "$") {
+      // $ % is the default original unchanged payload
+      return true;
+    }
+  }
+
+  return false;
+}
+
+export interface GeneralResource {
+  Type: string;
+  Properties?: {
+    DefinitionString?: {
+      "Fn::Sub": any[];
+    };
+  };
+}
+
+export interface StateMachineDefinition {
+  States: { [key: string]: StateMachineStep };
+}
+
+export interface StateMachineStep {
+  Resource: string;
+  Parameters?: {
+    FunctionName?: string;
+    "Payload.$"?: string;
+  };
+  Next?: string;
+  End?: boolean;
+}
+
+export function isDefaultLambdaApiStep(resource: string | null): boolean {
+  // default means not legacy lambda api
+  if (resource == null) {
+    return false;
+  }
+  if (resource === "arn:aws:states:::lambda:invoke") {
+    // Legacy Lambda API resource.startsWith("arn:aws:lambda"), but it cannot inject context obj.
+    return true;
+  }
+  return false;
+}
 
 export function updateDefinitionString(
   definitionString: { "Fn::Sub": (string | object)[] },

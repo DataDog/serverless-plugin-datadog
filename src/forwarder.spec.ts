@@ -1,9 +1,5 @@
 import Service from "serverless/classes/Service";
 
-// tslint:disable-next-line:no-var-requires
-const stepFunctionsHelper = require("./step-functions-helper");
-stepFunctionsHelper.updateDefinitionString = jest.fn().mockImplementation();
-
 import {
   addCloudWatchForwarderSubscriptions,
   addDdSlsPluginTag,
@@ -12,14 +8,10 @@ import {
   CloudFormationObjectArn,
   canSubscribeLogGroup,
   isLogsConfig,
-  isSafeToModifyStepFunctionsDefinition,
-  isDefaultLambdaApiStep,
-  mergeStepFunctionAndLambdaTraces,
 } from "./forwarder";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
 import { FunctionInfo, RuntimeType } from "./layer";
 import { version } from "../package.json";
-import Serverless from "serverless";
 
 function serviceWithResources(resources?: Record<string, any>, serviceName = "my-service"): Service {
   const service = {
@@ -1419,118 +1411,5 @@ describe("addStepFunctionLogGroupSubscription", () => {
         },
       }
     `);
-  });
-});
-
-describe("mergeStepFunctionAndLambdaTraces option related tests", () => {
-  describe("test mergeStepFunctionAndLambdaTraces", () => {
-    it("have no state machine in the resources", async () => {
-      const resources = {
-        "a-lambda-resource": {
-          Type: "AWS::Lambda::Function",
-        },
-      };
-      const service = serviceWithResources();
-      const serverless: Serverless = service.serverless;
-      mergeStepFunctionAndLambdaTraces(resources, serverless);
-      expect(stepFunctionsHelper.updateDefinitionString).toBeCalledTimes(0);
-    });
-
-    it("have one state machine in the resources", async () => {
-      const resources = {
-        "unit-test-state-machine": {
-          Type: "AWS::StepFunctions::StateMachine",
-          Properties: {
-            DefinitionString: {
-              "Fn::Sub": ["real-definition-string", {}],
-            },
-          },
-        },
-        "another-resource": {
-          Type: "AWS::Lambda::Function",
-        },
-      };
-      const service = serviceWithResources();
-      const serverless: Serverless = service.serverless;
-      mergeStepFunctionAndLambdaTraces(resources, serverless);
-      expect(stepFunctionsHelper.updateDefinitionString).toBeCalledTimes(1);
-    });
-
-    it("have two state machine in the resources", async () => {
-      const resources = {
-        "unit-test-state-machine": {
-          Type: "AWS::StepFunctions::StateMachine",
-          Properties: {
-            DefinitionString: {
-              "Fn::Sub": ["real-definition-string", {}],
-            },
-          },
-        },
-        "unit-test-state-machine2": {
-          Type: "AWS::StepFunctions::StateMachine",
-          Properties: {
-            DefinitionString: {
-              "Fn::Sub": ["real-definition-string", {}],
-            },
-          },
-        },
-        "another-resource": {
-          Type: "AWS::Lambda::Function",
-        },
-      };
-      const service = serviceWithResources();
-      const serverless: Serverless = service.serverless;
-      mergeStepFunctionAndLambdaTraces(resources, serverless);
-      expect(stepFunctionsHelper.updateDefinitionString).toBeCalledTimes(2);
-    });
-  });
-
-  describe("test isSafeToModifyStepFunctionsDefinition", () => {
-    it("Payload field not set in parameters", async () => {
-      const parameters = { FunctionName: "bla" };
-      expect(isSafeToModifyStepFunctionsDefinition(parameters)).toBeTruthy();
-    });
-
-    it("Payload field empty", async () => {
-      const parameters = { FunctionName: "bla", "Payload.$": {} };
-      expect(isSafeToModifyStepFunctionsDefinition(parameters)).toBeFalsy();
-    });
-
-    it("Payload field default to $", async () => {
-      const parameters = { FunctionName: "bla", "Payload.$": "$" };
-      expect(isSafeToModifyStepFunctionsDefinition(parameters)).toBeTruthy();
-    });
-
-    it("Payload field default to $", async () => {
-      const parameters = { FunctionName: "bla", "Payload.$": "something customer has already set and not empty" };
-      expect(isSafeToModifyStepFunctionsDefinition(parameters)).toBeFalsy();
-    });
-  });
-
-  describe("test isDefaultLambdaApiStep", () => {
-    it("resource is default lambda", async () => {
-      const resource = "arn:aws:states:::lambda:invoke";
-      expect(isDefaultLambdaApiStep(resource)).toBeTruthy();
-    });
-
-    it("resource is lambda arn for legacy lambda api", async () => {
-      const resource = "arn:aws:lambda:sa-east-1:601427271234:function:hello-function";
-      expect(isDefaultLambdaApiStep(resource)).toBeFalsy();
-    });
-
-    it("resource of dynamodb", async () => {
-      const resource = "arn:aws:states:::dynamodb:updateItem";
-      expect(isDefaultLambdaApiStep(resource)).toBeFalsy();
-    });
-
-    it("resource of empty string", async () => {
-      const resource = "";
-      expect(isDefaultLambdaApiStep(resource)).toBeFalsy();
-    });
-
-    it("resource of null", async () => {
-      const resource = null;
-      expect(isDefaultLambdaApiStep(resource)).toBeFalsy();
-    });
   });
 });

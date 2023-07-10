@@ -30,13 +30,12 @@ import {
   addExecutionLogGroupsAndSubscriptions,
   addStepFunctionLogGroup,
   addStepFunctionLogGroupSubscription,
-  mergeStepFunctionAndLambdaTraces,
 } from "./forwarder";
 import { newSimpleGit } from "./git";
 import {
   applyExtensionLayer,
-  applyTracingLayer,
   applyLambdaLibraryLayers,
+  applyTracingLayer,
   findHandlers,
   FunctionInfo,
   RuntimeType,
@@ -48,6 +47,7 @@ import { setMonitors } from "./monitors";
 import { addOutputLinks, printOutputs } from "./output";
 import { enableTracing, TracingMode } from "./tracing";
 import { redirectHandlers } from "./wrapper";
+import { GeneralResource, updateDefinitionString } from "./step-functions-helper";
 
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
 export interface ExtendedFunctionDefinition extends FunctionDefinition {
@@ -572,5 +572,20 @@ function checkForMultipleApiKeys(config: Configuration) {
 
   if (multipleApiKeysMessage) {
     throw new Error(`${multipleApiKeysMessage} should not be set at the same time.`);
+  }
+}
+
+export function mergeStepFunctionAndLambdaTraces(
+  resources: { [key: string]: GeneralResource },
+  serverless: Serverless,
+) {
+  for (const resourceName in resources) {
+    if (resources.hasOwnProperty(resourceName)) {
+      const resourceObj: GeneralResource = resources[resourceName];
+      if (resourceObj.Type === "AWS::StepFunctions::StateMachine") {
+        const definitionString = resourceObj.Properties?.DefinitionString!;
+        updateDefinitionString(definitionString, serverless, resourceName);
+      }
+    }
   }
 }

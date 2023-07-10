@@ -1,18 +1,11 @@
-// const forwarderSpec = require ('./forwarder.spec')
-// forwarderSpec.serviceWithResources = jest.fn().mockImplementation(() => {
-//   return {
-//     serverless: {
-//       cli: {
-//         log: () => "",
-//       },
-//     },
-//   }
-// })
+import {
+  isDefaultLambdaApiStep,
+  isSafeToModifyStepFunctionsDefinition,
+  StateMachineDefinition,
+  updateDefinitionString,
+} from "./step-functions-helper";
 
-import { updateDefinitionString } from "./step-functions-helper";
-// import {serviceWithResources} from "./forwarder.spec";
 import Service from "serverless/classes/Service";
-import { StateMachineDefinition } from "./forwarder";
 
 function serviceWithResources(resources?: Record<string, any>, serviceName = "my-service"): Service {
   const service = {
@@ -138,5 +131,54 @@ describe("test updateDefinitionString", () => {
     updateDefinitionString(definitionString, serverless, stateMachineName);
 
     expect(definitionString["Fn::Sub"].length).toBe(0);
+  });
+});
+
+describe("test isSafeToModifyStepFunctionsDefinition", () => {
+  it("Payload field not set in parameters", async () => {
+    const parameters = { FunctionName: "bla" };
+    expect(isSafeToModifyStepFunctionsDefinition(parameters)).toBeTruthy();
+  });
+
+  it("Payload field empty", async () => {
+    const parameters = { FunctionName: "bla", "Payload.$": {} };
+    expect(isSafeToModifyStepFunctionsDefinition(parameters)).toBeFalsy();
+  });
+
+  it("Payload field default to $", async () => {
+    const parameters = { FunctionName: "bla", "Payload.$": "$" };
+    expect(isSafeToModifyStepFunctionsDefinition(parameters)).toBeTruthy();
+  });
+
+  it("Payload field default to $", async () => {
+    const parameters = { FunctionName: "bla", "Payload.$": "something customer has already set and not empty" };
+    expect(isSafeToModifyStepFunctionsDefinition(parameters)).toBeFalsy();
+  });
+});
+
+describe("test isDefaultLambdaApiStep", () => {
+  it("resource is default lambda", async () => {
+    const resource = "arn:aws:states:::lambda:invoke";
+    expect(isDefaultLambdaApiStep(resource)).toBeTruthy();
+  });
+
+  it("resource is lambda arn for legacy lambda api", async () => {
+    const resource = "arn:aws:lambda:sa-east-1:601427271234:function:hello-function";
+    expect(isDefaultLambdaApiStep(resource)).toBeFalsy();
+  });
+
+  it("resource of dynamodb", async () => {
+    const resource = "arn:aws:states:::dynamodb:updateItem";
+    expect(isDefaultLambdaApiStep(resource)).toBeFalsy();
+  });
+
+  it("resource of empty string", async () => {
+    const resource = "";
+    expect(isDefaultLambdaApiStep(resource)).toBeFalsy();
+  });
+
+  it("resource of null", async () => {
+    const resource = null;
+    expect(isDefaultLambdaApiStep(resource)).toBeFalsy();
   });
 });
