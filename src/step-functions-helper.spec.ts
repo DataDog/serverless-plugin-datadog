@@ -107,4 +107,36 @@ describe("test updateDefinitionString", () => {
       Type: "Task",
     });
   });
+
+  it("test legacy lambda api do nothing", async () => {
+    const definitionString = {
+      "Fn::Sub": [
+        '{"Comment":"fake comment","StartAt":"InvokeLambda","States":{"InvokeLambda":{"Type":"Task","Parameters":{"FunctionName":"fake-function-name","Payload.$":"$"},"Resource":"arn:aws:lambda:sa-east-1:601427271234:function:unit-test-function-name","End":true}}}',
+        {},
+      ],
+    };
+    const stateMachineName = "fake-state-machine-name";
+    updateDefinitionString(definitionString, serverless, stateMachineName);
+
+    const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
+    expect(definitionAfterUpdate.States?.InvokeLambda).toStrictEqual({
+      End: true,
+      Parameters: {
+        FunctionName: "fake-function-name",
+        "Payload.$": "$",
+      },
+      Resource: "arn:aws:lambda:sa-east-1:601427271234:function:unit-test-function-name",
+      Type: "Task",
+    });
+  });
+
+  it("test empty Fn::Sub", async () => {
+    const definitionString = {
+      "Fn::Sub": [],
+    };
+    const stateMachineName = "fake-state-machine-name";
+    updateDefinitionString(definitionString, serverless, stateMachineName);
+
+    expect(definitionString["Fn::Sub"].length).toBe(0);
+  });
 });
