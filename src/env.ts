@@ -109,6 +109,9 @@ export interface Configuration {
 
   // Whether the plugin should look for Datadog Lambda layers in the given AWS account to use
   useLayersFromAccount?: string;
+
+  // Step Functions Tracing
+  mergeStepFunctionAndLambdaTraces?: boolean;
 }
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
@@ -164,6 +167,7 @@ export const defaultConfiguration: Configuration = {
   captureLambdaPayload: false,
   failOnError: false,
   skipCloudformationOutputs: false,
+  mergeStepFunctionAndLambdaTraces: false,
 };
 
 export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]) {

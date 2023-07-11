@@ -5,6 +5,7 @@
  * This product includes software developed at Datadog (https://www.datadoghq.com/).
  * Copyright 2021 Datadog, Inc.
  */
+
 jest.mock("./monitors.ts", () => {
   return {
     setMonitors: async (shouldThrow: Boolean) => {
@@ -15,7 +16,9 @@ jest.mock("./monitors.ts", () => {
     },
   };
 });
+
 const ServerlessPlugin = require("./index");
+
 import mock from "mock-fs";
 import { FunctionDefinition } from "serverless";
 import Aws from "serverless/plugins/aws/provider/awsProvider";

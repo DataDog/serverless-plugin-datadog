@@ -1,4 +1,5 @@
 import Service from "serverless/classes/Service";
+
 import {
   addCloudWatchForwarderSubscriptions,
   addDdSlsPluginTag,
@@ -64,10 +65,10 @@ function awsMock(existingSubs: { [key: string]: any }, stackName?: string, doesA
         return Promise.reject("Not found.");
       }
       const logGroupName = params.logGroupName;
-      if (method == "getFunction") {
+      if (method === "getFunction") {
         return Promise.resolve();
       }
-      if (method == "describeSubscriptionFilters") {
+      if (method === "describeSubscriptionFilters") {
         if (existingSubs[logGroupName]) {
           return Promise.resolve({ subscriptionFilters: existingSubs[logGroupName] });
         }

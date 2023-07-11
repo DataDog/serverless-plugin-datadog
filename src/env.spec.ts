@@ -197,6 +197,7 @@ describe("getConfig", () => {
       uploadGitMetadata: true,
       failOnError: false,
       skipCloudformationOutputs: false,
+      mergeStepFunctionAndLambdaTraces: false,
     });
   });
 
@@ -234,6 +235,7 @@ describe("getConfig", () => {
       uploadGitMetadata: true,
       failOnError: false,
       skipCloudformationOutputs: false,
+      mergeStepFunctionAndLambdaTraces: false,
     });
   });
 
@@ -272,6 +274,7 @@ describe("getConfig", () => {
       uploadGitMetadata: true,
       failOnError: false,
       skipCloudformationOutputs: false,
+      mergeStepFunctionAndLambdaTraces: false,
     });
   });
 });
@@ -310,6 +313,7 @@ it("disable source code integration", () => {
     uploadGitMetadata: true,
     failOnError: false,
     skipCloudformationOutputs: false,
+    mergeStepFunctionAndLambdaTraces: false,
   });
 });
 
@@ -347,6 +351,7 @@ it("disable git metadata upload", () => {
     uploadGitMetadata: false,
     failOnError: false,
     skipCloudformationOutputs: false,
+    mergeStepFunctionAndLambdaTraces: false,
   });
 });
 

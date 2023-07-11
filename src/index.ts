@@ -34,8 +34,8 @@ import {
 import { newSimpleGit } from "./git";
 import {
   applyExtensionLayer,
-  applyTracingLayer,
   applyLambdaLibraryLayers,
+  applyTracingLayer,
   findHandlers,
   FunctionInfo,
   RuntimeType,
@@ -47,6 +47,7 @@ import { setMonitors } from "./monitors";
 import { addOutputLinks, printOutputs } from "./output";
 import { enableTracing, TracingMode } from "./tracing";
 import { redirectHandlers } from "./wrapper";
+import { mergeStepFunctionAndLambdaTraces } from "./span-link";
 
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
 export interface ExtendedFunctionDefinition extends FunctionDefinition {
@@ -246,6 +247,13 @@ module.exports = class ServerlessPlugin {
             // subscribe step function log group to datadog forwarder regardless of how the log group was created
             await addStepFunctionLogGroupSubscription(resources, stepFunction, datadogForwarderArn);
           }
+        }
+
+        if (config.mergeStepFunctionAndLambdaTraces) {
+          this.serverless.cli.log(
+            `mergeStepFunctionAndLambdaTraces is true, trying to modify Step Functions' definitions to merge traces.`,
+          );
+          mergeStepFunctionAndLambdaTraces(resources, this.serverless);
         }
       }
       for (const error of errors) {
