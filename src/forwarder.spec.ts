@@ -7,7 +7,7 @@ import {
   addStepFunctionLogGroupSubscription,
   CloudFormationObjectArn,
   canSubscribeLogGroup,
-  isLogsConfig,
+  isLogsConfig, addDdTraceEnabledTag,
 } from "./forwarder";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
 import { FunctionInfo, RuntimeType } from "./layer";
@@ -1311,14 +1311,37 @@ describe("test addDdSlsPluginTag", () => {
       Type: "AWS::StepFunctions::StateMachine",
       Properties: {
         StateMachineName: "Unit-test-step-function",
+        Tags: [],
       },
     };
     addDdSlsPluginTag(stateMachineObj);
-    expect(stateMachineObj.Properties.hasOwnProperty("Tags")).toBeTruthy();
-    // @ts-ignore
-    expect(stateMachineObj.Properties.Tags[0].Key).toBe("dd_sls_plugin");
-    // @ts-ignore
-    expect(stateMachineObj.Properties.Tags[0].Value).toBe(`v${version}`);
+    expect(stateMachineObj.Properties.Tags).toStrictEqual([{Key: "dd_sls_plugin", Value: `v${version}`}]);
+  });
+});
+
+describe("test addDdTraceEnabledTag", () => {
+  it("addDdTraceEnabledTag true, DD_TRACE_ENABLED is added", () => {
+    const stateMachineObj = {
+      Type: "AWS::StepFunctions::StateMachine",
+      Properties: {
+        StateMachineName: "Unit-test-step-function",
+        Tags: [],
+      },
+    };
+    addDdTraceEnabledTag(stateMachineObj, true);
+    expect(stateMachineObj.Properties.Tags).toStrictEqual([{Key: "DD_TRACE_ENABLED", Value: `true`}]);
+  });
+
+  it("addDdTraceEnabledTag true, DD_TRACE_ENABLED is not added", () => {
+    const stateMachineObj = {
+      Type: "AWS::StepFunctions::StateMachine",
+      Properties: {
+        StateMachineName: "Unit-test-step-function",
+        Tags: [],
+      },
+    };
+    addDdTraceEnabledTag(stateMachineObj, false);
+    expect(stateMachineObj.Properties.Tags).toStrictEqual([]);
   });
 });
 
