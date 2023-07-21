@@ -26,7 +26,7 @@ import {
 } from "./env";
 import {
   addCloudWatchForwarderSubscriptions,
-  addDdSlsPluginTag,
+  addDdSlsPluginTag, addDdTraceEnabledTag,
   addExecutionLogGroupsAndSubscriptions,
   addStepFunctionLogGroup,
   addStepFunctionLogGroupSubscription,
@@ -176,10 +176,15 @@ module.exports = class ServerlessPlugin {
     // hook. So we are updating Properties.Tag at this hook
 
     const resources = this.serverless.service.provider.compiledCloudFormationTemplate?.Resources;
+    const config = getConfig(this.serverless.service);
 
-    for (const [_, obj] of Object.entries(resources)) {
-      if (obj.Type && obj.Type === "AWS::StepFunctions::StateMachine") {
-        addDdSlsPluginTag(obj); // obj is a state machine object
+    for (const [_, stateMachineObj] of Object.entries(resources)) {
+      if (stateMachineObj.Type && stateMachineObj.Type === "AWS::StepFunctions::StateMachine") {
+        if (stateMachineObj && stateMachineObj.Properties && !stateMachineObj.Properties.Tags) {
+          stateMachineObj.Properties.Tags = [];
+        }
+        addDdSlsPluginTag(stateMachineObj); // obj is a state machine object
+        addDdTraceEnabledTag(stateMachineObj, config.enableStepFunctionsTrace)
       }
     }
   }
@@ -216,7 +221,7 @@ module.exports = class ServerlessPlugin {
         await addExecutionLogGroupsAndSubscriptions(this.serverless.service, aws, datadogForwarderArn);
       }
 
-      if (config.subscribeToStepFunctionLogs) {
+      if (config.enableStepFunctionsTrace || config.subscribeToStepFunctionLogs) {
         const resources = this.serverless.service.provider.compiledCloudFormationTemplate?.Resources;
         const stepFunctions = Object.values((this.serverless.service as any).stepFunctions.stateMachines);
         if (stepFunctions.length === 0) {

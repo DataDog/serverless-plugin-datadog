@@ -30,7 +30,7 @@ export interface StateMachineDefinition {
 }
 
 export interface StateMachineStep {
-  Resource: string;
+  Resource?: string;
   Parameters?: {
     FunctionName?: string;
     "Payload.$"?: string;
@@ -39,9 +39,9 @@ export interface StateMachineStep {
   End?: boolean;
 }
 
-export function isDefaultLambdaApiStep(resource: string | null): boolean {
+export function isDefaultLambdaApiStep(resource: string | undefined): boolean {
   // default means not legacy lambda api
-  if (resource == null) {
+  if (resource === undefined) {
     return false;
   }
   if (resource === "arn:aws:states:::lambda:invoke") {
@@ -71,7 +71,7 @@ export function updateDefinitionString(
   for (const stepName in states) {
     if (states.hasOwnProperty(stepName)) {
       const step: StateMachineStep = states[stepName];
-      if (!isDefaultLambdaApiStep(step.Resource)) {
+      if (!isDefaultLambdaApiStep(step?.Resource)) {
         // only default lambda api allows context injection
         continue;
       }

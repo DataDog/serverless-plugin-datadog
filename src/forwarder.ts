@@ -142,12 +142,19 @@ export async function addStepFunctionLogGroup(aws: Aws, resources: any, stepFunc
 }
 
 export function addDdSlsPluginTag(stateMachineObj: any) {
-  if (stateMachineObj && stateMachineObj.Properties && !stateMachineObj.Properties.Tags) {
-    stateMachineObj.Properties.Tags = [];
-  }
   stateMachineObj.Properties?.Tags?.push({
     Key: "dd_sls_plugin",
     Value: `v${version}`,
+  });
+}
+
+export function addDdTraceEnabledTag(stateMachineObj: any, enableStepFunctionsTrace: undefined | boolean) {
+  if (!enableStepFunctionsTrace) {
+    return;
+  }
+  stateMachineObj.Properties?.Tags?.push({
+    Key: "DD_TRACE_ENABLED",
+    Value: `true`,
   });
 }
 

@@ -111,6 +111,7 @@ export interface Configuration {
   useLayersFromAccount?: string;
 
   // Step Functions Tracing
+  enableStepFunctionsTrace?: boolean;
   mergeStepFunctionAndLambdaTraces?: boolean;
 }
 const webpackPluginName = "serverless-webpack";
@@ -168,6 +169,7 @@ export const defaultConfiguration: Configuration = {
   failOnError: false,
   skipCloudformationOutputs: false,
   mergeStepFunctionAndLambdaTraces: false,
+  enableStepFunctionsTrace: false,
 };
 
 export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]) {
