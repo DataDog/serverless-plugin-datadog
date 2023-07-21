@@ -26,7 +26,8 @@ import {
 } from "./env";
 import {
   addCloudWatchForwarderSubscriptions,
-  addDdSlsPluginTag, addDdTraceEnabledTag,
+  addDdSlsPluginTag,
+  addDdTraceEnabledTag,
   addExecutionLogGroupsAndSubscriptions,
   addStepFunctionLogGroup,
   addStepFunctionLogGroupSubscription,
@@ -184,7 +185,7 @@ module.exports = class ServerlessPlugin {
           stateMachineObj.Properties.Tags = [];
         }
         addDdSlsPluginTag(stateMachineObj); // obj is a state machine object
-        addDdTraceEnabledTag(stateMachineObj, config.enableStepFunctionsTrace)
+        addDdTraceEnabledTag(stateMachineObj, config.enableStepFunctionsTrace);
       }
     }
   }
