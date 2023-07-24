@@ -83,7 +83,7 @@ export interface Configuration {
   // API Gateway Execution logging - handles rest and websocket. Http not supported as of Sept.21
   subscribeToExecutionLogs: boolean;
   // Step Function logging
-  subscribeToStepFunctionLogs: boolean;
+  subscribeToStepFunctionLogs: boolean;  // deprecated in favor of enableStepFunctionsTrace
   // Skip populating the Cloudformation Outputs
   skipCloudformationOutputs: boolean;
 
