@@ -49,6 +49,7 @@ import { addOutputLinks, printOutputs } from "./output";
 import { enableTracing, TracingMode } from "./tracing";
 import { redirectHandlers } from "./wrapper";
 import { mergeStepFunctionAndLambdaTraces } from "./span-link";
+import { inspectAndRecommendStepFunctionsInstrumentation } from "./step-functions-helper";
 
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
 export interface ExtendedFunctionDefinition extends FunctionDefinition {
@@ -261,7 +262,17 @@ module.exports = class ServerlessPlugin {
           );
           mergeStepFunctionAndLambdaTraces(resources, this.serverless);
         }
+      } else {
+        // Recommend Step Functions instrumentation for customers who do not set enableStepFunctionsTracing to true
+        try {
+          inspectAndRecommendStepFunctionsInstrumentation(this.serverless);
+        } catch (error) {
+          this.serverless.cli.log(
+            `Error raise when inspecting if there are any uninstrumented Step Functions state machines. Error: ${error}`,
+          );
+        }
       }
+
       for (const error of errors) {
         this.serverless.cli.log(error);
       }
