@@ -223,51 +223,43 @@ module.exports = class ServerlessPlugin {
       }
 
       if (config.enableStepFunctionsTrace || config.subscribeToStepFunctionLogs) {
-        try {
-          const resources = this.serverless.service.provider.compiledCloudFormationTemplate?.Resources;
-          const stepFunctions = Object.values((this.serverless.service as any).stepFunctions.stateMachines);
-          if (stepFunctions.length === 0) {
-            this.serverless.cli.log("subscribeToStepFunctionLogs is set to true but no step functions were found.");
-          } else {
-            this.serverless.cli.log("Subscribing step function log groups to Datadog Forwarder");
-            for (const stepFunction of stepFunctions as any[]) {
-              if (!stepFunction.hasOwnProperty("loggingConfig")) {
+        const resources = this.serverless.service.provider.compiledCloudFormationTemplate?.Resources;
+        const stepFunctions = Object.values((this.serverless.service as any).stepFunctions.stateMachines);
+        if (stepFunctions.length === 0) {
+          this.serverless.cli.log("subscribeToStepFunctionLogs is set to true but no step functions were found.");
+        } else {
+          this.serverless.cli.log("Subscribing step function log groups to Datadog Forwarder");
+          for (const stepFunction of stepFunctions as any[]) {
+            if (!stepFunction.hasOwnProperty("loggingConfig")) {
+              this.serverless.cli.log(`Creating log group for ${stepFunction.name} and logging to it with level ALL.`);
+              await addStepFunctionLogGroup(aws, resources, stepFunction);
+            } else {
+              this.serverless.cli.log(`Found logging config for step function ${stepFunction.name}`);
+              const loggingConfig = stepFunction.loggingConfig;
+
+              if (loggingConfig.level !== "ALL") {
+                loggingConfig.level = "ALL";
                 this.serverless.cli.log(
-                  `Creating log group for ${stepFunction.name} and logging to it with level ALL.`,
+                  `Warning: Setting log level to ALL for step function ${stepFunction.name} so traces can be generated.`,
                 );
-                await addStepFunctionLogGroup(aws, resources, stepFunction);
-              } else {
-                this.serverless.cli.log(`Found logging config for step function ${stepFunction.name}`);
-                const loggingConfig = stepFunction.loggingConfig;
-
-                if (loggingConfig.level !== "ALL") {
-                  loggingConfig.level = "ALL";
-                  this.serverless.cli.log(
-                    `Warning: Setting log level to ALL for step function ${stepFunction.name} so traces can be generated.`,
-                  );
-                }
-                if (loggingConfig.includeExecutionData !== true) {
-                  loggingConfig.includeExecutionData = true;
-                  this.serverless.cli.log(
-                    `Warning: Setting includeExecutionData to true for step function ${stepFunction.name} so traces can be generated.`,
-                  );
-                }
               }
-              // subscribe step function log group to datadog forwarder regardless of how the log group was created
-              await addStepFunctionLogGroupSubscription(resources, stepFunction, datadogForwarderArn);
+              if (loggingConfig.includeExecutionData !== true) {
+                loggingConfig.includeExecutionData = true;
+                this.serverless.cli.log(
+                  `Warning: Setting includeExecutionData to true for step function ${stepFunction.name} so traces can be generated.`,
+                );
+              }
             }
+            // subscribe step function log group to datadog forwarder regardless of how the log group was created
+            await addStepFunctionLogGroupSubscription(resources, stepFunction, datadogForwarderArn);
           }
+        }
 
-          if (config.mergeStepFunctionAndLambdaTraces) {
-            this.serverless.cli.log(
-              `mergeStepFunctionAndLambdaTraces is true, trying to modify Step Functions' definitions to merge traces.`,
-            );
-            mergeStepFunctionAndLambdaTraces(resources, this.serverless);
-          }
-        } catch (error) {
+        if (config.mergeStepFunctionAndLambdaTraces) {
           this.serverless.cli.log(
-            `error when enabling Step Function trace or merging Step Function and Lambda traces. Error: ${error}`,
+            `mergeStepFunctionAndLambdaTraces is true, trying to modify Step Functions' definitions to merge traces.`,
           );
+          mergeStepFunctionAndLambdaTraces(resources, this.serverless);
         }
       }
       for (const error of errors) {

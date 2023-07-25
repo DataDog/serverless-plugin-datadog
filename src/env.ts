@@ -169,7 +169,7 @@ export const defaultConfiguration: Configuration = {
   failOnError: false,
   skipCloudformationOutputs: false,
   mergeStepFunctionAndLambdaTraces: false,
-  enableStepFunctionsTrace: true,
+  enableStepFunctionsTrace: false,
 };
 
 export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]) {

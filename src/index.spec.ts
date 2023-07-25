@@ -1683,7 +1683,7 @@ describe("ServerlessPlugin", () => {
       );
     });
 
-    it("Step Function log group subscription created if enableStepFunctionsTrace is true by default", async () => {
+    it("Does not attempt to add Step Function log group subscription if subscribeToStepFunctionLogs is false", async () => {
       const serverless = {
         cli: { log: () => {} },
         getProvider: (_name: string) => awsMock(),
@@ -1715,7 +1715,7 @@ describe("ServerlessPlugin", () => {
       };
       const plugin = new ServerlessPlugin(serverless, {});
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
-      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).toHaveProperty(
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).not.toHaveProperty(
         "testStepFunctionLogGroupSubscription",
       );
     });
