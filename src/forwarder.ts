@@ -148,8 +148,8 @@ export function addDdSlsPluginTag(stateMachineObj: any) {
   });
 }
 
-export function addDdTraceEnabledTag(stateMachineObj: any, enableStepFunctionsTrace: undefined | boolean) {
-  if (!enableStepFunctionsTrace) {
+export function addDdTraceEnabledTag(stateMachineObj: any, enableStepFunctionsTracing: undefined | boolean) {
+  if (!enableStepFunctionsTracing) {
     return;
   }
   stateMachineObj.Properties?.Tags?.push({

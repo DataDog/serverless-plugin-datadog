@@ -185,7 +185,7 @@ module.exports = class ServerlessPlugin {
           stateMachineObj.Properties.Tags = [];
         }
         addDdSlsPluginTag(stateMachineObj); // obj is a state machine object
-        addDdTraceEnabledTag(stateMachineObj, config.enableStepFunctionsTrace);
+        addDdTraceEnabledTag(stateMachineObj, config.enableStepFunctionsTracing);
       }
     }
   }
@@ -222,7 +222,7 @@ module.exports = class ServerlessPlugin {
         await addExecutionLogGroupsAndSubscriptions(this.serverless.service, aws, datadogForwarderArn);
       }
 
-      if (config.enableStepFunctionsTrace || config.subscribeToStepFunctionLogs) {
+      if (config.enableStepFunctionsTracing || config.subscribeToStepFunctionLogs) {
         const resources = this.serverless.service.provider.compiledCloudFormationTemplate?.Resources;
         const stepFunctions = Object.values((this.serverless.service as any).stepFunctions.stateMachines);
         if (stepFunctions.length === 0) {
