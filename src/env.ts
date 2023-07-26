@@ -83,7 +83,7 @@ export interface Configuration {
   // API Gateway Execution logging - handles rest and websocket. Http not supported as of Sept.21
   subscribeToExecutionLogs: boolean;
   // Step Function logging
-  subscribeToStepFunctionLogs: boolean;
+  subscribeToStepFunctionLogs: boolean; // deprecated in favor of enableStepFunctionsTracing
   // Skip populating the Cloudformation Outputs
   skipCloudformationOutputs: boolean;
 
@@ -111,6 +111,7 @@ export interface Configuration {
   useLayersFromAccount?: string;
 
   // Step Functions Tracing
+  enableStepFunctionsTracing?: boolean;
   mergeStepFunctionAndLambdaTraces?: boolean;
 }
 const webpackPluginName = "serverless-webpack";
@@ -168,6 +169,7 @@ export const defaultConfiguration: Configuration = {
   failOnError: false,
   skipCloudformationOutputs: false,
   mergeStepFunctionAndLambdaTraces: false,
+  enableStepFunctionsTracing: false,
 };
 
 export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]) {

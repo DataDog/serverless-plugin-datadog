@@ -82,6 +82,20 @@ describe("test updateDefinitionString", () => {
     expect(definitionAfterUpdate.States?.InvokeLambda?.Parameters?.["Payload.$"]).toBe("something-customized");
   });
 
+  it("test lambda basic legacy integration do nothing", async () => {
+    const definitionString = {
+      "Fn::Sub": [
+        '{"Comment":"fake comment","StartAt":"InvokeLambda","States":{"InvokeLambda":{"Type":"Task","Resource":"arn:aws:lambda:sa-east-1:601427271234:function:unit-test-function-name","End":true}}}',
+        {},
+      ],
+    };
+    const stateMachineName = "fake-state-machine-name";
+    updateDefinitionString(definitionString, serverless, stateMachineName);
+
+    const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
+    expect(definitionAfterUpdate.States?.InvokeLambda?.Parameters?.["Payload.$"]).toBe(undefined);
+  });
+
   it("test non-lambda steps do nothing", async () => {
     const definitionString = {
       "Fn::Sub": [
@@ -177,8 +191,8 @@ describe("test isDefaultLambdaApiStep", () => {
     expect(isDefaultLambdaApiStep(resource)).toBeFalsy();
   });
 
-  it("resource of null", async () => {
-    const resource = null;
+  it("resource of undefined", async () => {
+    const resource = undefined;
     expect(isDefaultLambdaApiStep(resource)).toBeFalsy();
   });
 });

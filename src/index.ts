@@ -27,6 +27,7 @@ import {
 import {
   addCloudWatchForwarderSubscriptions,
   addDdSlsPluginTag,
+  addDdTraceEnabledTag,
   addExecutionLogGroupsAndSubscriptions,
   addStepFunctionLogGroup,
   addStepFunctionLogGroupSubscription,
@@ -48,6 +49,7 @@ import { addOutputLinks, printOutputs } from "./output";
 import { enableTracing, TracingMode } from "./tracing";
 import { redirectHandlers } from "./wrapper";
 import { mergeStepFunctionAndLambdaTraces } from "./span-link";
+import { inspectAndRecommendStepFunctionsInstrumentation } from "./step-functions-helper";
 
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
 export interface ExtendedFunctionDefinition extends FunctionDefinition {
@@ -176,10 +178,15 @@ module.exports = class ServerlessPlugin {
     // hook. So we are updating Properties.Tag at this hook
 
     const resources = this.serverless.service.provider.compiledCloudFormationTemplate?.Resources;
+    const config = getConfig(this.serverless.service);
 
-    for (const [_, obj] of Object.entries(resources)) {
-      if (obj.Type && obj.Type === "AWS::StepFunctions::StateMachine") {
-        addDdSlsPluginTag(obj); // obj is a state machine object
+    for (const [_, stateMachineObj] of Object.entries(resources)) {
+      if (stateMachineObj.Type && stateMachineObj.Type === "AWS::StepFunctions::StateMachine") {
+        if (stateMachineObj && stateMachineObj.Properties && !stateMachineObj.Properties.Tags) {
+          stateMachineObj.Properties.Tags = [];
+        }
+        addDdSlsPluginTag(stateMachineObj); // obj is a state machine object
+        addDdTraceEnabledTag(stateMachineObj, config.enableStepFunctionsTracing);
       }
     }
   }
@@ -202,7 +209,7 @@ module.exports = class ServerlessPlugin {
     const handlers = findHandlers(this.serverless.service, config.exclude, defaultRuntime);
 
     let datadogForwarderArn;
-    datadogForwarderArn = this.setDatadogForwarder(config);
+    datadogForwarderArn = this.extractDatadogForwarder(config);
     if (datadogForwarderArn) {
       const aws = this.serverless.getProvider("aws");
       const errors = await addCloudWatchForwarderSubscriptions(
@@ -216,7 +223,7 @@ module.exports = class ServerlessPlugin {
         await addExecutionLogGroupsAndSubscriptions(this.serverless.service, aws, datadogForwarderArn);
       }
 
-      if (config.subscribeToStepFunctionLogs) {
+      if (config.enableStepFunctionsTracing || config.subscribeToStepFunctionLogs) {
         const resources = this.serverless.service.provider.compiledCloudFormationTemplate?.Resources;
         const stepFunctions = Object.values((this.serverless.service as any).stepFunctions.stateMachines);
         if (stepFunctions.length === 0) {
@@ -255,7 +262,17 @@ module.exports = class ServerlessPlugin {
           );
           mergeStepFunctionAndLambdaTraces(resources, this.serverless);
         }
+      } else {
+        // Recommend Step Functions instrumentation for customers who do not set enableStepFunctionsTracing to true
+        try {
+          inspectAndRecommendStepFunctionsInstrumentation(this.serverless);
+        } catch (error) {
+          this.serverless.cli.log(
+            `Error raise when inspecting if there are any uninstrumented Step Functions state machines. Error: ${error}`,
+          );
+        }
       }
+
       for (const error of errors) {
         this.serverless.cli.log(error);
       }
@@ -476,7 +493,7 @@ module.exports = class ServerlessPlugin {
     });
   }
 
-  private setDatadogForwarder(config: Configuration) {
+  private extractDatadogForwarder(config: Configuration) {
     const forwarderArn: string | undefined = config.forwarderArn;
     const forwarder: string | undefined = config.forwarder;
     if (forwarderArn && forwarder) {

@@ -30,7 +30,7 @@ export interface StateMachineDefinition {
 }
 
 export interface StateMachineStep {
-  Resource: string;
+  Resource?: string;
   Parameters?: {
     FunctionName?: string;
     "Payload.$"?: string;
@@ -39,9 +39,9 @@ export interface StateMachineStep {
   End?: boolean;
 }
 
-export function isDefaultLambdaApiStep(resource: string | null): boolean {
+export function isDefaultLambdaApiStep(resource: string | undefined): boolean {
   // default means not legacy lambda api
-  if (resource == null) {
+  if (resource === undefined) {
     return false;
   }
   if (resource === "arn:aws:states:::lambda:invoke") {
@@ -71,7 +71,7 @@ export function updateDefinitionString(
   for (const stepName in states) {
     if (states.hasOwnProperty(stepName)) {
       const step: StateMachineStep = states[stepName];
-      if (!isDefaultLambdaApiStep(step.Resource)) {
+      if (!isDefaultLambdaApiStep(step?.Resource)) {
         // only default lambda api allows context injection
         continue;
       }
@@ -90,4 +90,13 @@ export function updateDefinitionString(
     }
   }
   definitionString["Fn::Sub"][0] = JSON.stringify(definitionObj); // writing back to the original JSON created by Serverless framework
+}
+
+export function inspectAndRecommendStepFunctionsInstrumentation(serverless: Serverless) {
+  const stepFunctions = Object.values((serverless.service as any).stepFunctions.stateMachines);
+  if (stepFunctions.length !== 0) {
+    serverless.cli.log(
+      `Uninstrumented Step Functions detected in your serverless.yml file. If you would like to see Step Functions traces, please see details of 'enableStepFunctionsTracing' and 'mergeStepFunctionAndLambdaTraces' variables in the README (https://github.com/DataDog/serverless-plugin-datadog/)`,
+    );
+  }
 }
