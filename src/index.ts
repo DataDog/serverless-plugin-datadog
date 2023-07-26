@@ -209,7 +209,7 @@ module.exports = class ServerlessPlugin {
     const handlers = findHandlers(this.serverless.service, config.exclude, defaultRuntime);
 
     let datadogForwarderArn;
-    datadogForwarderArn = this.setDatadogForwarder(config);
+    datadogForwarderArn = this.extraceDatadogForwarder(config);
     if (datadogForwarderArn) {
       const aws = this.serverless.getProvider("aws");
       const errors = await addCloudWatchForwarderSubscriptions(
@@ -493,7 +493,7 @@ module.exports = class ServerlessPlugin {
     });
   }
 
-  private setDatadogForwarder(config: Configuration) {
+  private extraceDatadogForwarder(config: Configuration) {
     const forwarderArn: string | undefined = config.forwarderArn;
     const forwarder: string | undefined = config.forwarder;
     if (forwarderArn && forwarder) {
