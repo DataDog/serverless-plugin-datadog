@@ -13,8 +13,8 @@
 
 set -e
 
-LAYER_NAMES=("Datadog-Node12-x" "Datadog-Node14-x" "Datadog-Node16-x" "Datadog-Node18-x" "Datadog-Python37" "Datadog-Python38" "Datadog-Python38-ARM" "Datadog-Python39" "Datadog-Python39-ARM" "Datadog-Python310" "Datadog-Python310-ARM" "Datadog-Ruby2-7" "Datadog-Ruby2-7-ARM" "Datadog-Ruby3-2" "Datadog-Ruby3-2-ARM" "Datadog-Extension" "Datadog-Extension-ARM" "dd-trace-dotnet" "dd-trace-dotnet-ARM" "dd-trace-java")
-JSON_LAYER_NAMES=("nodejs12.x" "nodejs14.x" "nodejs16.x" "nodejs18.x" "python3.7" "python3.8" "python3.8-arm" "python3.9" "python3.9-arm" "python3.10" "python3.10-arm" "ruby2.7" "ruby2.7-arm" "ruby3.2" "ruby3.2-arm" "extension" "extension-arm" "dotnet" "dotnet-arm" "java")
+LAYER_NAMES=("Datadog-Node12-x" "Datadog-Node14-x" "Datadog-Node16-x" "Datadog-Node18-x" "Datadog-Python37" "Datadog-Python38" "Datadog-Python38-ARM" "Datadog-Python39" "Datadog-Python39-ARM" "Datadog-Python310" "Datadog-Python310-ARM" "Datadog-Python311" "Datadog-Python311-ARM" "Datadog-Ruby2-7" "Datadog-Ruby2-7-ARM" "Datadog-Ruby3-2" "Datadog-Ruby3-2-ARM" "Datadog-Extension" "Datadog-Extension-ARM" "dd-trace-dotnet" "dd-trace-dotnet-ARM" "dd-trace-java")
+JSON_LAYER_NAMES=("nodejs12.x" "nodejs14.x" "nodejs16.x" "nodejs18.x" "python3.7" "python3.8" "python3.8-arm" "python3.9" "python3.9-arm" "python3.10" "python3.10-arm" "python3.11" "python3.11-arm" "ruby2.7" "ruby2.7-arm" "ruby3.2" "ruby3.2-arm" "extension" "extension-arm" "dotnet" "dotnet-arm" "java")
 AVAILABLE_REGIONS=$(aws ec2 describe-regions | jq -r '.[] | .[] | .RegionName')
 
 FILE_NAME="src/layers.json"
