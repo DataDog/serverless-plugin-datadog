@@ -18,13 +18,11 @@ custom:
     addExtension: true
     forwarderArn: arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder
     enableSourceCodeIntegration: false
+    testingMode: true
     integrationTesting: true
     logLevel: "info"
 
 functions:
-  PythonHello36:
-    handler: py_handler.hello
-    runtime: python3.6
   PythonHello37:
     handler: py_handler.hello
     runtime: python3.7
@@ -77,3 +75,9 @@ functions:
   providedHello:
     handler: provided_handler.hello
     runtime: provided
+  RubyHello27:
+    handler: rb_handler.hello
+    runtime: ruby2.7
+  RubyHello32:
+    handler: rb_handler.hello
+    runtime: ruby3.2

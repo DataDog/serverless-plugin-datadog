@@ -188,13 +188,17 @@ describe("getConfig", () => {
       enableTags: true,
       injectLogContext: true,
       exclude: [],
+      testingMode: false,
       integrationTesting: false,
       subscribeToAccessLogs: true,
       subscribeToExecutionLogs: false,
+      subscribeToStepFunctionLogs: false,
       enableSourceCodeIntegration: true,
       uploadGitMetadata: true,
       failOnError: false,
       skipCloudformationOutputs: false,
+      mergeStepFunctionAndLambdaTraces: false,
+      enableStepFunctionsTracing: false,
     });
   });
 
@@ -223,13 +227,17 @@ describe("getConfig", () => {
       enableTags: true,
       injectLogContext: true,
       exclude: [],
+      testingMode: false,
       integrationTesting: false,
       subscribeToAccessLogs: true,
       subscribeToExecutionLogs: false,
+      subscribeToStepFunctionLogs: false,
       enableSourceCodeIntegration: true,
       uploadGitMetadata: true,
       failOnError: false,
       skipCloudformationOutputs: false,
+      mergeStepFunctionAndLambdaTraces: false,
+      enableStepFunctionsTracing: false,
     });
   });
 
@@ -258,14 +266,18 @@ describe("getConfig", () => {
       enableTags: true,
       injectLogContext: true,
       exclude: [],
+      testingMode: false,
       integrationTesting: false,
       subscribeToAccessLogs: true,
       subscribeToExecutionLogs: false,
+      subscribeToStepFunctionLogs: false,
       customHandler: "/src/custom-handler.handler",
       enableSourceCodeIntegration: true,
       uploadGitMetadata: true,
       failOnError: false,
       skipCloudformationOutputs: false,
+      mergeStepFunctionAndLambdaTraces: false,
+      enableStepFunctionsTracing: false,
     });
   });
 });
@@ -295,13 +307,17 @@ it("disable source code integration", () => {
     enableTags: true,
     injectLogContext: true,
     exclude: [],
+    testingMode: false,
     integrationTesting: false,
     subscribeToAccessLogs: true,
     subscribeToExecutionLogs: false,
+    subscribeToStepFunctionLogs: false,
     enableSourceCodeIntegration: false,
     uploadGitMetadata: true,
     failOnError: false,
     skipCloudformationOutputs: false,
+    mergeStepFunctionAndLambdaTraces: false,
+    enableStepFunctionsTracing: false,
   });
 });
 
@@ -330,13 +346,17 @@ it("disable git metadata upload", () => {
     enableTags: true,
     injectLogContext: true,
     exclude: [],
+    testingMode: false,
     integrationTesting: false,
     subscribeToAccessLogs: true,
     subscribeToExecutionLogs: false,
+    subscribeToStepFunctionLogs: false,
     enableSourceCodeIntegration: true,
     uploadGitMetadata: false,
     failOnError: false,
     skipCloudformationOutputs: false,
+    mergeStepFunctionAndLambdaTraces: false,
+    enableStepFunctionsTracing: false,
   });
 });
 
@@ -473,6 +493,7 @@ describe("setEnvConfiguration", () => {
         injectLogContext: false,
         subscribeToAccessLogs: true,
         subscribeToExecutionLogs: false,
+        subscribeToStepFunctionLogs: false,
         exclude: ["dd-excluded-function"],
         enableSourceCodeIntegration: true,
         uploadGitMetadata: false,
@@ -614,6 +635,7 @@ describe("setEnvConfiguration", () => {
         injectLogContext: true,
         subscribeToAccessLogs: true,
         subscribeToExecutionLogs: false,
+        subscribeToStepFunctionLogs: false,
         exclude: [],
         enableSourceCodeIntegration: true,
         uploadGitMetadata: false,
@@ -698,6 +720,7 @@ describe("setEnvConfiguration", () => {
         injectLogContext: true,
         subscribeToAccessLogs: true,
         subscribeToExecutionLogs: false,
+        subscribeToStepFunctionLogs: false,
         exclude: [],
         enableSourceCodeIntegration: true,
         uploadGitMetadata: false,
@@ -752,6 +775,7 @@ describe("setEnvConfiguration", () => {
         enableDDLogs: true,
         subscribeToAccessLogs: true,
         subscribeToExecutionLogs: false,
+        subscribeToStepFunctionLogs: false,
         addExtension: true,
         enableTags: true,
         injectLogContext: false,
@@ -763,6 +787,66 @@ describe("setEnvConfiguration", () => {
       },
       handlers,
     );
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_KMS_API_KEY: "5678",
+            DD_LOGS_INJECTION: false,
+            DD_LOG_LEVEL: "debug",
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_MERGE_XRAY_TRACES: true,
+          },
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ]);
+  });
+
+  it("sets `DD_LOGS_INJECTION` to false when `addExtension` is true", () => {
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
+
+    setEnvConfiguration(
+      {
+        addLayers: false,
+        apiKey: "1234",
+        apiKMSKey: "5678",
+        site: "datadoghq.eu",
+        subdomain: "app",
+        logLevel: "debug",
+        flushMetricsToLogs: true,
+        enableXrayTracing: true,
+        enableDDTracing: true,
+        enableDDLogs: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
+        subscribeToStepFunctionLogs: false,
+        addExtension: true,
+        enableTags: true,
+        injectLogContext: false,
+        exclude: ["dd-excluded-function"],
+        enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
+        failOnError: false,
+        skipCloudformationOutputs: false,
+      },
+      handlers,
+    );
+
     expect(handlers).toEqual([
       {
         handler: {
@@ -809,6 +893,7 @@ describe("setEnvConfiguration", () => {
         enableDDLogs: true,
         subscribeToAccessLogs: true,
         subscribeToExecutionLogs: false,
+        subscribeToStepFunctionLogs: false,
         addExtension: true,
         enableTags: true,
         injectLogContext: false,
@@ -865,6 +950,7 @@ describe("setEnvConfiguration", () => {
         enableDDLogs: true,
         subscribeToAccessLogs: true,
         subscribeToExecutionLogs: false,
+        subscribeToStepFunctionLogs: false,
         addExtension: true,
         enableTags: true,
         injectLogContext: false,
@@ -924,6 +1010,7 @@ describe("setEnvConfiguration", () => {
           enableDDLogs: true,
           subscribeToAccessLogs: true,
           subscribeToExecutionLogs: false,
+          subscribeToStepFunctionLogs: false,
           addExtension: false,
           enableTags: true,
           injectLogContext: false,
@@ -938,5 +1025,473 @@ describe("setEnvConfiguration", () => {
     }).toThrowError(
       "apiKeySecretArn` is not supported for Node runtimes when using Synchronous Metrics. Set DATADOG_API_KEY in your environment, or use `apiKmsKey` in the configuration.",
     );
+  });
+  it("defines `DD_COLD_START_TRACING` when enableColdStartTracing is set", () => {
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
+    setEnvConfiguration(
+      {
+        addLayers: false,
+        apiKey: "1234",
+        apiKMSKey: "5678",
+        site: "datadoghq.eu",
+        subdomain: "app",
+        logLevel: "info",
+        flushMetricsToLogs: true,
+        enableXrayTracing: true,
+        enableDDTracing: true,
+        enableDDLogs: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
+        subscribeToStepFunctionLogs: false,
+        addExtension: true,
+        enableTags: true,
+        injectLogContext: false,
+        exclude: ["dd-excluded-function"],
+        enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
+        failOnError: false,
+        skipCloudformationOutputs: false,
+        enableColdStartTracing: false,
+      },
+      handlers,
+    );
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_KMS_API_KEY: "5678",
+            DD_LOGS_INJECTION: false,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_LOG_LEVEL: "info",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_MERGE_XRAY_TRACES: true,
+            DD_COLD_START_TRACING: false,
+          },
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ]);
+  });
+  it("defines `DD_COLD_START_TRACING_SKIP_LIBS` when coldStartTracingSkipLibs is set", () => {
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
+    setEnvConfiguration(
+      {
+        addLayers: false,
+        apiKey: "1234",
+        apiKMSKey: "5678",
+        site: "datadoghq.eu",
+        subdomain: "app",
+        logLevel: "info",
+        flushMetricsToLogs: true,
+        enableXrayTracing: true,
+        enableDDTracing: true,
+        enableDDLogs: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
+        subscribeToStepFunctionLogs: false,
+        addExtension: true,
+        enableTags: true,
+        injectLogContext: false,
+        exclude: ["dd-excluded-function"],
+        enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
+        failOnError: false,
+        skipCloudformationOutputs: false,
+        coldStartTraceSkipLibs: "my-dep,your-dep",
+      },
+      handlers,
+    );
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_KMS_API_KEY: "5678",
+            DD_LOGS_INJECTION: false,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_LOG_LEVEL: "info",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_MERGE_XRAY_TRACES: true,
+            DD_COLD_START_TRACE_SKIP_LIB: "my-dep,your-dep",
+          },
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ]);
+  });
+  it("defines `DD_MIN_COLD_START_DURATION` when minColdStartTraceDuration is set", () => {
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
+    setEnvConfiguration(
+      {
+        addLayers: false,
+        apiKey: "1234",
+        apiKMSKey: "5678",
+        site: "datadoghq.eu",
+        subdomain: "app",
+        logLevel: "info",
+        flushMetricsToLogs: true,
+        enableXrayTracing: true,
+        enableDDTracing: true,
+        enableDDLogs: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
+        subscribeToStepFunctionLogs: false,
+        addExtension: true,
+        enableTags: true,
+        injectLogContext: false,
+        exclude: ["dd-excluded-function"],
+        enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
+        failOnError: false,
+        skipCloudformationOutputs: false,
+        minColdStartTraceDuration: 50,
+      },
+      handlers,
+    );
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_KMS_API_KEY: "5678",
+            DD_LOGS_INJECTION: false,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_LOG_LEVEL: "info",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_MERGE_XRAY_TRACES: true,
+            DD_MIN_COLD_START_DURATION: 50,
+          },
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ]);
+  });
+  it("defines `DD_PROFILING_ENABLED` when enableProfiling is set", () => {
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
+    setEnvConfiguration(
+      {
+        addLayers: false,
+        apiKey: "1234",
+        apiKMSKey: "5678",
+        site: "datadoghq.eu",
+        subdomain: "app",
+        logLevel: "info",
+        flushMetricsToLogs: true,
+        enableXrayTracing: true,
+        enableDDTracing: true,
+        enableDDLogs: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
+        subscribeToStepFunctionLogs: false,
+        addExtension: true,
+        enableTags: true,
+        injectLogContext: false,
+        exclude: ["dd-excluded-function"],
+        enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
+        failOnError: false,
+        skipCloudformationOutputs: false,
+        enableProfiling: true,
+      },
+      handlers,
+    );
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_KMS_API_KEY: "5678",
+            DD_LOGS_INJECTION: false,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_LOG_LEVEL: "info",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_MERGE_XRAY_TRACES: true,
+            DD_PROFILING_ENABLED: true,
+          },
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ]);
+  });
+  it("defines `DD_ENCODE_AUTHORIZER_CONTEXT` when encodeAuthorizerContext is set", () => {
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
+    setEnvConfiguration(
+      {
+        addLayers: false,
+        apiKey: "1234",
+        apiKMSKey: "5678",
+        site: "datadoghq.eu",
+        subdomain: "app",
+        logLevel: "info",
+        flushMetricsToLogs: true,
+        enableXrayTracing: true,
+        enableDDTracing: true,
+        enableDDLogs: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
+        subscribeToStepFunctionLogs: false,
+        addExtension: true,
+        enableTags: true,
+        injectLogContext: false,
+        exclude: ["dd-excluded-function"],
+        enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
+        failOnError: false,
+        skipCloudformationOutputs: false,
+        encodeAuthorizerContext: true,
+      },
+      handlers,
+    );
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_KMS_API_KEY: "5678",
+            DD_LOGS_INJECTION: false,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_LOG_LEVEL: "info",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_MERGE_XRAY_TRACES: true,
+            DD_ENCODE_AUTHORIZER_CONTEXT: true,
+          },
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ]);
+  });
+  it("defines `DD_DECODE_AUTHORIZER_CONTEXT` when decodeAuthorizerContext is set", () => {
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
+    setEnvConfiguration(
+      {
+        addLayers: false,
+        apiKey: "1234",
+        apiKMSKey: "5678",
+        site: "datadoghq.eu",
+        subdomain: "app",
+        logLevel: "info",
+        flushMetricsToLogs: true,
+        enableXrayTracing: true,
+        enableDDTracing: true,
+        enableDDLogs: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
+        subscribeToStepFunctionLogs: false,
+        addExtension: true,
+        enableTags: true,
+        injectLogContext: false,
+        exclude: ["dd-excluded-function"],
+        enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
+        failOnError: false,
+        skipCloudformationOutputs: false,
+        decodeAuthorizerContext: true,
+      },
+      handlers,
+    );
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_KMS_API_KEY: "5678",
+            DD_LOGS_INJECTION: false,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_LOG_LEVEL: "info",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_MERGE_XRAY_TRACES: true,
+            DD_DECODE_AUTHORIZER_CONTEXT: true,
+          },
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ]);
+  });
+
+  describe("defines `DD_APM_FLUSH_DEADLINE_MILLISECONDS` when `apmFlushDeadline` is set", () => {
+    let handlers: FunctionInfo[] = [];
+    beforeEach(() => {
+      handlers = [
+        {
+          handler: {
+            environment: {},
+            events: [],
+          },
+          name: "function",
+          type: RuntimeType.NODE,
+        },
+      ];
+    });
+
+    it("setting the value as a number", () => {
+      setEnvConfiguration(
+        {
+          addLayers: false,
+          apiKey: "1234",
+          site: "datadoghq.com",
+          subdomain: "app",
+          logLevel: "info",
+          flushMetricsToLogs: true,
+          enableXrayTracing: true,
+          enableDDTracing: true,
+          enableDDLogs: true,
+          subscribeToAccessLogs: true,
+          subscribeToStepFunctionLogs: false,
+          subscribeToExecutionLogs: false,
+          addExtension: true,
+          enableTags: true,
+          injectLogContext: false,
+          exclude: ["dd-excluded-function"],
+          enableSourceCodeIntegration: true,
+          uploadGitMetadata: false,
+          failOnError: false,
+          skipCloudformationOutputs: false,
+          // `DD_APM_FLUSH_DEADLINE_MILLISECONDS` = 50
+          apmFlushDeadline: 50.0,
+        },
+        handlers,
+      );
+      expect(handlers).toEqual([
+        {
+          handler: {
+            environment: {
+              DD_API_KEY: "1234",
+              DD_LOGS_INJECTION: false,
+              DD_SERVERLESS_LOGS_ENABLED: true,
+              DD_LOG_LEVEL: "info",
+              DD_SITE: "datadoghq.com",
+              DD_TRACE_ENABLED: true,
+              DD_MERGE_XRAY_TRACES: true,
+              DD_APM_FLUSH_DEADLINE_MILLISECONDS: 50,
+            },
+            events: [],
+          },
+          name: "function",
+          type: RuntimeType.NODE,
+        },
+      ]);
+    });
+
+    it("setting the value as a string", () => {
+      setEnvConfiguration(
+        {
+          addLayers: false,
+          apiKey: "1234",
+          site: "datadoghq.com",
+          subdomain: "app",
+          logLevel: "info",
+          flushMetricsToLogs: true,
+          enableXrayTracing: true,
+          enableDDTracing: true,
+          enableDDLogs: true,
+          subscribeToAccessLogs: true,
+          subscribeToStepFunctionLogs: false,
+          subscribeToExecutionLogs: false,
+          addExtension: true,
+          enableTags: true,
+          injectLogContext: false,
+          exclude: ["dd-excluded-function"],
+          enableSourceCodeIntegration: true,
+          uploadGitMetadata: false,
+          failOnError: false,
+          skipCloudformationOutputs: false,
+          // `DD_APM_FLUSH_DEADLINE_MILLISECONDS` = 50
+          apmFlushDeadline: "50",
+        },
+        handlers,
+      );
+      expect(handlers).toEqual([
+        {
+          handler: {
+            environment: {
+              DD_API_KEY: "1234",
+              DD_LOGS_INJECTION: false,
+              DD_SERVERLESS_LOGS_ENABLED: true,
+              DD_LOG_LEVEL: "info",
+              DD_SITE: "datadoghq.com",
+              DD_TRACE_ENABLED: true,
+              DD_MERGE_XRAY_TRACES: true,
+              DD_APM_FLUSH_DEADLINE_MILLISECONDS: "50",
+            },
+            events: [],
+          },
+          name: "function",
+          type: RuntimeType.NODE,
+        },
+      ]);
+    });
   });
 });

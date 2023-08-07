@@ -1,12 +1,19 @@
 import Service from "serverless/classes/Service";
+
 import {
   addCloudWatchForwarderSubscriptions,
+  addDdSlsPluginTag,
+  addStepFunctionLogGroup,
+  addStepFunctionLogGroupSubscription,
   CloudFormationObjectArn,
   canSubscribeLogGroup,
   isLogsConfig,
+  addDdTraceEnabledTag,
 } from "./forwarder";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
 import { FunctionInfo, RuntimeType } from "./layer";
+import { version } from "../package.json";
+
 function serviceWithResources(resources?: Record<string, any>, serviceName = "my-service"): Service {
   const service = {
     getServiceName: () => serviceName,
@@ -59,10 +66,10 @@ function awsMock(existingSubs: { [key: string]: any }, stackName?: string, doesA
         return Promise.reject("Not found.");
       }
       const logGroupName = params.logGroupName;
-      if (method == "getFunction") {
+      if (method === "getFunction") {
         return Promise.resolve();
       }
-      if (method == "describeSubscriptionFilters") {
+      if (method === "describeSubscriptionFilters") {
         if (existingSubs[logGroupName]) {
           return Promise.resolve({ subscriptionFilters: existingSubs[logGroupName] });
         }
@@ -185,6 +192,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const forwarderConfigs = {
       AddExtension: false,
+      TestingMode: false,
       IntegrationTesting: false,
       SubToAccessLogGroups: true,
       SubToExecutionLogGroups: true,
@@ -266,6 +274,16 @@ describe("addCloudWatchForwarderSubscriptions", () => {
           },
           "Type": "AWS::Logs::LogGroup",
         },
+        "NonLambdaGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "my-func",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Ref": "NonLambdaGroup",
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
+        },
         "SecondLogGroup": Object {
           "Properties": Object {
             "LogGroupName": "/aws/lambda/second",
@@ -301,6 +319,50 @@ describe("addCloudWatchForwarderSubscriptions", () => {
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
+        },
+      }
+    `);
+  });
+
+  it("does not add a subscription for a step function log group", async () => {
+    const service = serviceWithResources({
+      StepFunctionLogGroup: {
+        Type: "AWS::Logs::LogGroup",
+        Properties: {
+          LogGroupName: "/aws/vendedlogs/states/StepFunction-Logs",
+        },
+      },
+    });
+
+    const aws = awsMock({});
+
+    const forwarderConfigs = {
+      AddExtension: false,
+      TestingMode: false,
+      IntegrationTesting: false,
+      SubToAccessLogGroups: true,
+      SubToExecutionLogGroups: true,
+    };
+
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "first",
+        type: RuntimeType.NODE,
+      },
+    ];
+
+    await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs, handlers);
+    expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
+      Object {
+        "StepFunctionLogGroup": Object {
+          "Properties": Object {
+            "LogGroupName": "/aws/vendedlogs/states/StepFunction-Logs",
+          },
+          "Type": "AWS::Logs::LogGroup",
         },
       }
     `);
@@ -354,6 +416,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const forwarderConfigs = {
       AddExtension: false,
+      TestingMode: false,
       IntegrationTesting: false,
       SubToAccessLogGroups: true,
       SubToExecutionLogGroups: false,
@@ -387,6 +450,16 @@ describe("addCloudWatchForwarderSubscriptions", () => {
           },
           "Type": "AWS::Logs::LogGroup",
         },
+        "ApiGatewayGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "my-func",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Ref": "ApiGatewayGroup",
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
+        },
         "FirstLogGroup": Object {
           "Properties": Object {
             "LogGroupName": "/aws/lambda/first",
@@ -409,11 +482,31 @@ describe("addCloudWatchForwarderSubscriptions", () => {
           },
           "Type": "AWS::Logs::LogGroup",
         },
+        "HttpApiGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "my-func",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Ref": "HttpApiGroup",
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
+        },
         "NonLambdaGroup": Object {
           "Properties": Object {
             "LogGroupName": "/aws/apigateway/second-group",
           },
           "Type": "AWS::Logs::LogGroup",
+        },
+        "NonLambdaGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "my-func",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Ref": "NonLambdaGroup",
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
         },
         "SecondLogGroup": Object {
           "Properties": Object {
@@ -504,6 +597,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const forwarderConfigs = {
       AddExtension: true,
       ApiKey: 1234,
+      TestingMode: false,
       IntegrationTesting: false,
       SubToAccessLogGroups: true,
       SubToExecutionLogGroups: true,
@@ -621,6 +715,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const forwarderConfigs = {
       AddExtension: false,
+      TestingMode: false,
       IntegrationTesting: false,
       SubToAccessLogGroups: true,
       SubToExecutionLogGroups: false,
@@ -657,6 +752,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const forwarderConfigs = {
       AddExtension: false,
+      TestingMode: false,
       IntegrationTesting: false,
       SubToAccessLogGroups: true,
       SubToExecutionLogGroups: false,
@@ -706,6 +802,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const forwarderConfigs = {
       AddExtension: false,
+      TestingMode: false,
       IntegrationTesting: false,
       SubToAccessLogGroups: true,
 
@@ -766,6 +863,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const forwarderConfigs = {
       AddExtension: false,
+      TestingMode: false,
       IntegrationTesting: false,
       SubToAccessLogGroups: true,
 
@@ -844,6 +942,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const forwarderConfigs = {
       AddExtension: false,
+      TestingMode: false,
       IntegrationTesting: false,
       SubToAccessLogGroups: true,
 
@@ -891,6 +990,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const forwarderConfigs = {
       AddExtension: false,
+      TestingMode: false,
       IntegrationTesting: false,
       SubToAccessLogGroups: true,
 
@@ -922,7 +1022,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     ).toBe(true);
   });
 
-  it("skips validating the forwarder when `integrationTesting` is true", async () => {
+  it("skips validating the forwarder when `testingMode` is true", async () => {
     const service = serviceWithResources({});
     const aws = awsMock(
       {
@@ -936,7 +1036,8 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const functionArn: string = "forwarderArn";
     const forwarderConfigs = {
       AddExtension: false,
-      IntegrationTesting: true,
+      TestingMode: true,
+      IntegrationTesting: false,
       SubToAccessLogGroups: true,
 
       SubToExecutionLogGroups: false,
@@ -959,7 +1060,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       forwarderConfigs,
       handlers,
     );
-    expect(errors.includes("Skipping forwarder ARN validation because 'integrationTesting' is set to true")).toBe(true);
+    expect(errors.includes("Skipping forwarder ARN validation because 'testingMode' is set to true")).toBe(true);
   });
 
   it("skips creating a forwarder for the SecondLogGroup when the function Second is not in the list of handlers", async () => {
@@ -982,6 +1083,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const forwarderConfigs = {
       AddExtension: false,
+      TestingMode: false,
       IntegrationTesting: false,
       SubToAccessLogGroups: true,
 
@@ -1042,6 +1144,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     const forwarderConfigs = {
       AddExtension: false,
+      TestingMode: false,
       IntegrationTesting: false,
       SubToAccessLogGroups: true,
 
@@ -1104,5 +1207,233 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     const provider = "some string";
     const val = isLogsConfig(provider);
     expect(val).toEqual(false);
+  });
+});
+
+describe("addStepFunctionLogGroup", () => {
+  it("adds log group with correct name and a logging config which references the created log group", async () => {
+    const service = serviceWithResources({});
+    const aws = awsMock({});
+    const stepFunction = {
+      name: "testStepFunction",
+    };
+    await addStepFunctionLogGroup(aws, service.provider.compiledCloudFormationTemplate.Resources, stepFunction);
+    expect(
+      service.provider.compiledCloudFormationTemplate.Resources.testStepFunctionLogGroup.Properties.LogGroupName,
+    ).toBe("/aws/vendedlogs/states/testStepFunction-Logs-dev");
+    expect(
+      service.provider.compiledCloudFormationTemplate.Resources.testStepFunctionLogGroup.Properties.Tags[0].Key,
+    ).toBe("dd_sls_plugin");
+    expect(
+      service.provider.compiledCloudFormationTemplate.Resources.testStepFunctionLogGroup.Properties.Tags[0].Value,
+    ).toBe(`v${version}`);
+    expect(stepFunction).toMatchInlineSnapshot(`
+      Object {
+        "loggingConfig": Object {
+          "destinations": Array [
+            Object {
+              "Fn::GetAtt": Array [
+                "testStepFunctionLogGroup",
+                "Arn",
+              ],
+            },
+          ],
+          "includeExecutionData": true,
+          "level": "ALL",
+        },
+        "name": "testStepFunction",
+      }
+    `);
+  });
+
+  it("adds log group with a normalized alphanumeric resource name and a logging config which references the created log group", async () => {
+    const service = serviceWithResources({});
+    const aws = awsMock({});
+    const stepFunction = {
+      name: "test-StepFunction",
+    };
+    await addStepFunctionLogGroup(aws, service.provider.compiledCloudFormationTemplate.Resources, stepFunction);
+
+    expect(
+      service.provider.compiledCloudFormationTemplate.Resources.testStepFunctionLogGroup.Properties.LogGroupName,
+    ).toBe("/aws/vendedlogs/states/test-StepFunction-Logs-dev");
+    expect(
+      service.provider.compiledCloudFormationTemplate.Resources.testStepFunctionLogGroup.Properties.Tags[0].Key,
+    ).toBe("dd_sls_plugin");
+    expect(
+      service.provider.compiledCloudFormationTemplate.Resources.testStepFunctionLogGroup.Properties.Tags[0].Value,
+    ).toBe(`v${version}`);
+    expect(stepFunction).toMatchInlineSnapshot(`
+      Object {
+        "loggingConfig": Object {
+          "destinations": Array [
+            Object {
+              "Fn::GetAtt": Array [
+                "testStepFunctionLogGroup",
+                "Arn",
+              ],
+            },
+          ],
+          "includeExecutionData": true,
+          "level": "ALL",
+        },
+        "name": "test-StepFunction",
+      }
+    `);
+  });
+});
+
+describe("test addDdSlsPluginTag", () => {
+  it("test adding dd_sls_plugin tag to state machine with existing tags", async () => {
+    const stateMachineObj = {
+      Type: "AWS::StepFunctions::StateMachine",
+      Properties: {
+        Tags: [
+          {
+            Key: "service",
+            Value: "test-service",
+          },
+        ],
+        StateMachineName: "Unit-test-step-function",
+      },
+    };
+
+    addDdSlsPluginTag(stateMachineObj);
+    expect(stateMachineObj.Properties.Tags[0]).toStrictEqual({
+      Key: "service",
+      Value: "test-service",
+    });
+    expect(stateMachineObj.Properties.Tags[1].Key).toBe("dd_sls_plugin");
+    expect(stateMachineObj.Properties.Tags[1].Value.startsWith("v")).toBeTruthy();
+  });
+
+  it("test adding dd_sls_plugin tag to state machine without any tags", () => {
+    const stateMachineObj = {
+      Type: "AWS::StepFunctions::StateMachine",
+      Properties: {
+        StateMachineName: "Unit-test-step-function",
+        Tags: [],
+      },
+    };
+    addDdSlsPluginTag(stateMachineObj);
+    expect(stateMachineObj.Properties.Tags).toStrictEqual([{ Key: "dd_sls_plugin", Value: `v${version}` }]);
+  });
+});
+
+describe("test addDdTraceEnabledTag", () => {
+  it("addDdTraceEnabledTag true, DD_TRACE_ENABLED is added", () => {
+    const stateMachineObj = {
+      Type: "AWS::StepFunctions::StateMachine",
+      Properties: {
+        StateMachineName: "Unit-test-step-function",
+        Tags: [],
+      },
+    };
+    addDdTraceEnabledTag(stateMachineObj, true);
+    expect(stateMachineObj.Properties.Tags).toStrictEqual([{ Key: "DD_TRACE_ENABLED", Value: `true` }]);
+  });
+
+  it("addDdTraceEnabledTag true, DD_TRACE_ENABLED is not added", () => {
+    const stateMachineObj = {
+      Type: "AWS::StepFunctions::StateMachine",
+      Properties: {
+        StateMachineName: "Unit-test-step-function",
+        Tags: [],
+      },
+    };
+    addDdTraceEnabledTag(stateMachineObj, false);
+    expect(stateMachineObj.Properties.Tags).toStrictEqual([]);
+  });
+});
+
+describe("addStepFunctionLogGroupSubscription", () => {
+  it("adds a subscription to the log group in the step function logging config", async () => {
+    const service = serviceWithResources({});
+    const stepFunction = {
+      name: "testStepFunction",
+      loggingConfig: {
+        level: "ALL",
+        includeExecutionData: true,
+        destinations: [{ "Fn::GetAtt": ["logGroupResourceName", "Arn"] }],
+      },
+    };
+    const functionArn: string = "forwarderArn";
+    await addStepFunctionLogGroupSubscription(
+      service.provider.compiledCloudFormationTemplate.Resources,
+      stepFunction,
+      functionArn,
+    );
+    expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
+      Object {
+        "testStepFunctionLogGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "forwarderArn",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Fn::Select": Array [
+                6,
+                Object {
+                  "Fn::Split": Array [
+                    ":",
+                    Object {
+                      "Fn::GetAtt": Array [
+                        "logGroupResourceName",
+                        "Arn",
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
+        },
+      }
+    `);
+  });
+
+  it("adds a subscription with a normalized alphanumeric resource name to the log group in the step function logging config", async () => {
+    const service = serviceWithResources({});
+    const stepFunction = {
+      name: "test-StepFunction",
+      loggingConfig: {
+        level: "ALL",
+        includeExecutionData: true,
+        destinations: [{ "Fn::GetAtt": ["logGroupResourceName", "Arn"] }],
+      },
+    };
+    const functionArn: string = "forwarderArn";
+    await addStepFunctionLogGroupSubscription(
+      service.provider.compiledCloudFormationTemplate.Resources,
+      stepFunction,
+      functionArn,
+    );
+    expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
+      Object {
+        "testStepFunctionLogGroupSubscription": Object {
+          "Properties": Object {
+            "DestinationArn": "forwarderArn",
+            "FilterPattern": "",
+            "LogGroupName": Object {
+              "Fn::Select": Array [
+                6,
+                Object {
+                  "Fn::Split": Array [
+                    ":",
+                    Object {
+                      "Fn::GetAtt": Array [
+                        "logGroupResourceName",
+                        "Arn",
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+          "Type": "AWS::Logs::SubscriptionFilter",
+        },
+      }
+    `);
   });
 });

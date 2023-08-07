@@ -12,6 +12,7 @@ import {
   RuntimeType,
   applyLambdaLibraryLayers,
   applyExtensionLayer,
+  applyTracingLayer,
   findHandlers,
   pushLayerARN,
 } from "./layer";
@@ -46,10 +47,20 @@ describe("findHandlers", () => {
       "node14-function": { handler: "myfile.handler", runtime: "nodejs14.x" },
       "node16-function": { handler: "myfile.handler", runtime: "nodejs16.x" },
       "node18-function": { handler: "myfile.handler", runtime: "nodejs18.x" },
-      "python36-function": { handler: "myfile.handler", runtime: "python3.6" },
       "python37-function": { handler: "myfile.handler", runtime: "python3.7" },
       "python38-function": { handler: "myfile.handler", runtime: "python3.8" },
       "python39-function": { handler: "myfile.handler", runtime: "python3.9" },
+      "python310-function": { handler: "myfile.handler", runtime: "python3.10" },
+      "python311-function": { handler: "myfile.handler", runtime: "python3.11" },
+      "ruby27-function": { handler: "myfile.handler", runtime: "ruby2.7" },
+      "ruby32-function": { handler: "myfile.handler", runtime: "ruby3.2" },
+      "java8-function": { handler: "myfile.handler", runtime: "java8" },
+      "java8.al2-function": { handler: "myfile.handler", runtime: "java8.al2" },
+      "java11-function": { handler: "myfile.handler", runtime: "java11" },
+      "java17-function": { handler: "myfile.handler", runtime: "java17" },
+      "dotnet6-function": { handler: "myfile.handler", runtime: "dotnet6" },
+      "dotnetcore3.1-function": { handler: "myfile.handler", runtime: "dotnetcore3.1" },
+      "provided-function": { handler: "myfile.handler", runtime: "provided" },
     });
 
     const result = findHandlers(mockService, []);
@@ -85,12 +96,6 @@ describe("findHandlers", () => {
         runtime: "nodejs18.x",
       },
       {
-        name: "python36-function",
-        handler: { handler: "myfile.handler", runtime: "python3.6" },
-        type: RuntimeType.PYTHON,
-        runtime: "python3.6",
-      },
-      {
         name: "python37-function",
         handler: { handler: "myfile.handler", runtime: "python3.7" },
         type: RuntimeType.PYTHON,
@@ -107,6 +112,72 @@ describe("findHandlers", () => {
         handler: { handler: "myfile.handler", runtime: "python3.9" },
         type: RuntimeType.PYTHON,
         runtime: "python3.9",
+      },
+      {
+        name: "python310-function",
+        handler: { handler: "myfile.handler", runtime: "python3.10" },
+        type: RuntimeType.PYTHON,
+        runtime: "python3.10",
+      },
+      {
+        name: "python311-function",
+        handler: { handler: "myfile.handler", runtime: "python3.11" },
+        type: RuntimeType.PYTHON,
+        runtime: "python3.11",
+      },
+      {
+        name: "ruby27-function",
+        handler: { handler: "myfile.handler", runtime: "ruby2.7" },
+        type: RuntimeType.RUBY,
+        runtime: "ruby2.7",
+      },
+      {
+        name: "ruby32-function",
+        handler: { handler: "myfile.handler", runtime: "ruby3.2" },
+        type: RuntimeType.RUBY,
+        runtime: "ruby3.2",
+      },
+      {
+        name: "java8-function",
+        handler: { handler: "myfile.handler", runtime: "java8" },
+        type: RuntimeType.JAVA,
+        runtime: "java8",
+      },
+      {
+        name: "java8.al2-function",
+        handler: { handler: "myfile.handler", runtime: "java8.al2" },
+        type: RuntimeType.JAVA,
+        runtime: "java8.al2",
+      },
+      {
+        name: "java11-function",
+        handler: { handler: "myfile.handler", runtime: "java11" },
+        type: RuntimeType.JAVA,
+        runtime: "java11",
+      },
+      {
+        name: "java17-function",
+        handler: { handler: "myfile.handler", runtime: "java17" },
+        type: RuntimeType.JAVA,
+        runtime: "java17",
+      },
+      {
+        name: "dotnet6-function",
+        handler: { handler: "myfile.handler", runtime: "dotnet6" },
+        type: RuntimeType.DOTNET,
+        runtime: "dotnet6",
+      },
+      {
+        name: "dotnetcore3.1-function",
+        handler: { handler: "myfile.handler", runtime: "dotnetcore3.1" },
+        type: RuntimeType.DOTNET,
+        runtime: "dotnetcore3.1",
+      },
+      {
+        name: "provided-function",
+        handler: { handler: "myfile.handler", runtime: "provided" },
+        type: RuntimeType.CUSTOM,
+        runtime: "provided",
       },
     ]);
   });
@@ -618,6 +689,132 @@ describe("applyLambdaLibraryLayers", () => {
     expect(handler.handler).toEqual({
       runtime: "python3.9",
       layers: ["python-arm:3.9", "extension-arm:11"],
+    });
+  });
+
+  it("adds a Lambda layer from the local AWS account of the same name", () => {
+    const handler = {
+      handler: { runtime: "nodejs18.x" },
+      type: RuntimeType.NODE,
+      runtime: "nodejs18.x",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: { "sa-east-1": { "nodejs18.x": "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node18-x:1" } },
+    };
+    const mockService = createMockService("sa-east-1", {
+      "node-function": { handler: "myfile.handler", runtime: "nodejs18.x" },
+    });
+    const mockAccountId = "123456789012";
+    const localLambdaLayerARN = "arn:aws:lambda:sa-east-1:123456789012:layer:Datadog-Node18-x:1";
+    applyLambdaLibraryLayers(mockService, [handler], layers, mockAccountId);
+    expect(handler.handler).toEqual({
+      runtime: "nodejs18.x",
+      layers: [localLambdaLayerARN],
+    });
+  });
+
+  it("adds a Lambda layer from the local AWS account regardless of whether we've published to that region", () => {
+    const handler = {
+      handler: { runtime: "nodejs18.x" },
+      type: RuntimeType.NODE,
+      runtime: "nodejs18.x",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: { "us-east-1": { "nodejs18.x": "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Node18-x:1" } },
+    };
+    const mockService = createMockService("cn-north-1", {
+      "node-function": { handler: "myfile.handler", runtime: "nodejs18.x" },
+    });
+    const mockAccountId = "123456789012";
+    const localLambdaLayerARN = "arn:aws-cn:lambda:cn-north-1:123456789012:layer:Datadog-Node18-x:1";
+    applyLambdaLibraryLayers(mockService, [handler], layers, mockAccountId);
+    expect(handler.handler).toEqual({
+      runtime: "nodejs18.x",
+      layers: [localLambdaLayerARN],
+    });
+  });
+
+  it("adds an Extension layer from the local AWS account of the same name", () => {
+    const handler = {
+      handler: { runtime: "nodejs18.x" },
+      type: RuntimeType.NODE,
+      runtime: "nodejs18.x",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: { "us-east-1": { extension: "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:1" } },
+    };
+    const mockService = createMockService("sa-east-1", {
+      "node-function": { handler: "myfile.handler", runtime: "nodejs18.x" },
+    });
+    const mockAccountId = "123456789012";
+    const localExtensionARN = "arn:aws:lambda:sa-east-1:123456789012:layer:Datadog-Extension:1";
+    applyExtensionLayer(mockService, [handler], layers, mockAccountId);
+    expect(handler.handler).toEqual({
+      runtime: "nodejs18.x",
+      layers: [localExtensionARN],
+    });
+  });
+
+  it("adds an Extension layer from the local AWS account regardless of whether we've published to that region", () => {
+    const handler = {
+      handler: { runtime: "nodejs18.x" },
+      type: RuntimeType.NODE,
+      runtime: "nodejs18.x",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: { "us-east-1": { extension: "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:1" } },
+    };
+    const mockService = createMockService("cn-northwest-1", {
+      "node-function": { handler: "myfile.handler", runtime: "nodejs18.x" },
+    });
+    const mockAccountId = "123456789012";
+    const localExtensionARN = "arn:aws-cn:lambda:cn-northwest-1:123456789012:layer:Datadog-Extension:1";
+    applyExtensionLayer(mockService, [handler], layers, mockAccountId);
+    expect(handler.handler).toEqual({
+      runtime: "nodejs18.x",
+      layers: [localExtensionARN],
+    });
+  });
+
+  it("adds a tracing layer from the local AWS account of the same name", () => {
+    const handler = {
+      handler: { runtime: "java11" },
+      type: RuntimeType.JAVA,
+      runtime: "java11",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: { "us-east-1": { java: "arn:aws:lambda:us-east-1:464622532012:layer:dd-trace-java:1" } },
+    };
+    const mockService = createMockService("sa-east-1", {
+      "java-function": { handler: "myfile.handler", runtime: "java11" },
+    });
+    const mockAccountId = "123456789012";
+    const localTraceLayerARN = "arn:aws:lambda:sa-east-1:123456789012:layer:dd-trace-java:1";
+    applyTracingLayer(mockService, handler, layers, RuntimeType.JAVA, mockAccountId);
+    expect(handler.handler).toEqual({
+      runtime: "java11",
+      layers: [localTraceLayerARN],
+    });
+  });
+
+  it("adds a tracing layer from the local AWS account regardless of whether we've published to that region", () => {
+    const handler = {
+      handler: { runtime: "java11" },
+      type: RuntimeType.JAVA,
+      runtime: "java11",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: { "us-east-1": { java: "arn:aws:lambda:us-east-1:464622532012:layer:dd-trace-java:1" } },
+    };
+    const mockService = createMockService("cn-northwest-1", {
+      "java-function": { handler: "myfile.handler", runtime: "java11" },
+    });
+    const mockAccountId = "123456789012";
+    const localTraceLayerARN = "arn:aws-cn:lambda:cn-northwest-1:123456789012:layer:dd-trace-java:1";
+    applyTracingLayer(mockService, handler, layers, RuntimeType.JAVA, mockAccountId);
+    expect(handler.handler).toEqual({
+      runtime: "java11",
+      layers: [localTraceLayerARN],
     });
   });
 });

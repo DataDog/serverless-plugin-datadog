@@ -24,13 +24,19 @@ import {
   setEnvConfiguration,
   setSourceCodeIntegrationEnvVar,
 } from "./env";
-import { addCloudWatchForwarderSubscriptions, addExecutionLogGroupsAndSubscriptions } from "./forwarder";
+import {
+  addCloudWatchForwarderSubscriptions,
+  addDdSlsPluginTag,
+  addDdTraceEnabledTag,
+  addExecutionLogGroupsAndSubscriptions,
+  addStepFunctionLogGroup,
+  addStepFunctionLogGroupSubscription,
+} from "./forwarder";
 import { newSimpleGit } from "./git";
 import {
   applyExtensionLayer,
-  applyDotnetTracingLayer,
-  applyJavaTracingLayer,
   applyLambdaLibraryLayers,
+  applyTracingLayer,
   findHandlers,
   FunctionInfo,
   RuntimeType,
@@ -42,6 +48,8 @@ import { setMonitors } from "./monitors";
 import { addOutputLinks, printOutputs } from "./output";
 import { enableTracing, TracingMode } from "./tracing";
 import { redirectHandlers } from "./wrapper";
+import { mergeStepFunctionAndLambdaTraces } from "./span-link";
+import { inspectAndRecommendStepFunctionsInstrumentation } from "./step-functions-helper";
 
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
 export interface ExtendedFunctionDefinition extends FunctionDefinition {
@@ -63,7 +71,8 @@ module.exports = class ServerlessPlugin {
     "after:datadog:generate:init": this.beforePackageFunction.bind(this),
     "after:deploy:function:packageFunction": this.afterPackageFunction.bind(this),
     "after:package:createDeploymentArtifacts": this.afterPackageFunction.bind(this),
-    "after:package:initialize": this.beforePackageFunction.bind(this),
+    "before:package:createDeploymentArtifacts": this.beforePackageFunction.bind(this),
+    "after:package:compileFunctions": this.afterPackageCompileFunctions.bind(this),
     "before:deploy:function:packageFunction": this.beforePackageFunction.bind(this),
     "before:offline:start:init": this.beforePackageFunction.bind(this),
     "before:step-functions-offline:start": this.beforePackageFunction.bind(this),
@@ -115,10 +124,11 @@ module.exports = class ServerlessPlugin {
     setEnvConfiguration(config, handlers);
 
     const allLayers = { regions: { ...layers.regions, ...govLayers.regions } };
+    const accountId = config.useLayersFromAccount;
     if (config.addLayers) {
       this.serverless.cli.log("Adding Lambda Library Layers to functions");
       this.debugLogHandlers(handlers);
-      applyLambdaLibraryLayers(this.serverless.service, handlers, allLayers);
+      applyLambdaLibraryLayers(this.serverless.service, handlers, allLayers, accountId);
       if (hasWebpackPlugin(this.serverless.service)) {
         forceExcludeDepsFromWebpack(this.serverless.service);
       }
@@ -129,16 +139,16 @@ module.exports = class ServerlessPlugin {
     if (config.addExtension) {
       this.serverless.cli.log("Adding Datadog Lambda Extension Layer to functions");
       this.debugLogHandlers(handlers);
-      applyExtensionLayer(this.serverless.service, handlers, allLayers);
+      applyExtensionLayer(this.serverless.service, handlers, allLayers, accountId);
       handlers.forEach((functionInfo) => {
-        if (functionInfo.type === RuntimeType.DOTNET) {
-          this.serverless.cli.log("Adding .NET Tracing Layer to functions");
+        if (functionInfo.type === RuntimeType.DOTNET || functionInfo.type === RuntimeType.JAVA) {
+          const runtimeNameToReadable: { [key in RuntimeType.DOTNET | RuntimeType.JAVA]: string } = {
+            [RuntimeType.DOTNET]: ".NET",
+            [RuntimeType.JAVA]: "Java",
+          };
+          this.serverless.cli.log(`Adding ${runtimeNameToReadable[functionInfo.type]} Tracing Layer to functions`);
           this.debugLogHandlers(handlers);
-          applyDotnetTracingLayer(this.serverless.service, functionInfo, allLayers);
-        } else if (functionInfo.type === RuntimeType.JAVA) {
-          this.serverless.cli.log("Adding Java Tracing Layer to functions");
-          this.debugLogHandlers(handlers);
-          applyJavaTracingLayer(this.serverless.service, functionInfo, allLayers);
+          applyTracingLayer(this.serverless.service, functionInfo, allLayers, functionInfo.type, accountId);
         }
       });
     } else {
@@ -163,6 +173,24 @@ module.exports = class ServerlessPlugin {
     enableTracing(this.serverless.service, tracingMode, handlers);
   }
 
+  private async afterPackageCompileFunctions() {
+    // State machines' "Properties" field will not be added until "after:package:compileFunctions"
+    // hook. So we are updating Properties.Tag at this hook
+
+    const resources = this.serverless.service.provider.compiledCloudFormationTemplate?.Resources;
+    const config = getConfig(this.serverless.service);
+
+    for (const [_, stateMachineObj] of Object.entries(resources)) {
+      if (stateMachineObj.Type && stateMachineObj.Type === "AWS::StepFunctions::StateMachine") {
+        if (stateMachineObj && stateMachineObj.Properties && !stateMachineObj.Properties.Tags) {
+          stateMachineObj.Properties.Tags = [];
+        }
+        addDdSlsPluginTag(stateMachineObj); // obj is a state machine object
+        addDdTraceEnabledTag(stateMachineObj, config.enableStepFunctionsTracing);
+      }
+    }
+  }
+
   private async afterPackageFunction() {
     const config = getConfig(this.serverless.service);
     if (config.enabled === false) return;
@@ -170,16 +198,18 @@ module.exports = class ServerlessPlugin {
     // Create an object that contains some of our booleans for the forwarder
     const forwarderConfigs = {
       AddExtension: config.addExtension,
+      TestingMode: config.testingMode,
       IntegrationTesting: config.integrationTesting,
       SubToAccessLogGroups: config.subscribeToAccessLogs,
       SubToExecutionLogGroups: config.subscribeToExecutionLogs,
+      SubToStepFunctionLogGroups: config.subscribeToStepFunctionLogs,
     };
 
     const defaultRuntime = this.serverless.service.provider.runtime;
     const handlers = findHandlers(this.serverless.service, config.exclude, defaultRuntime);
 
     let datadogForwarderArn;
-    datadogForwarderArn = this.setDatadogForwarder(config);
+    datadogForwarderArn = this.extractDatadogForwarder(config);
     if (datadogForwarderArn) {
       const aws = this.serverless.getProvider("aws");
       const errors = await addCloudWatchForwarderSubscriptions(
@@ -192,6 +222,57 @@ module.exports = class ServerlessPlugin {
       if (config.subscribeToExecutionLogs) {
         await addExecutionLogGroupsAndSubscriptions(this.serverless.service, aws, datadogForwarderArn);
       }
+
+      if (config.enableStepFunctionsTracing || config.subscribeToStepFunctionLogs) {
+        const resources = this.serverless.service.provider.compiledCloudFormationTemplate?.Resources;
+        const stepFunctions = Object.values((this.serverless.service as any).stepFunctions.stateMachines);
+        if (stepFunctions.length === 0) {
+          this.serverless.cli.log("subscribeToStepFunctionLogs is set to true but no step functions were found.");
+        } else {
+          this.serverless.cli.log("Subscribing step function log groups to Datadog Forwarder");
+          for (const stepFunction of stepFunctions as any[]) {
+            if (!stepFunction.hasOwnProperty("loggingConfig")) {
+              this.serverless.cli.log(`Creating log group for ${stepFunction.name} and logging to it with level ALL.`);
+              await addStepFunctionLogGroup(aws, resources, stepFunction);
+            } else {
+              this.serverless.cli.log(`Found logging config for step function ${stepFunction.name}`);
+              const loggingConfig = stepFunction.loggingConfig;
+
+              if (loggingConfig.level !== "ALL") {
+                loggingConfig.level = "ALL";
+                this.serverless.cli.log(
+                  `Warning: Setting log level to ALL for step function ${stepFunction.name} so traces can be generated.`,
+                );
+              }
+              if (loggingConfig.includeExecutionData !== true) {
+                loggingConfig.includeExecutionData = true;
+                this.serverless.cli.log(
+                  `Warning: Setting includeExecutionData to true for step function ${stepFunction.name} so traces can be generated.`,
+                );
+              }
+            }
+            // subscribe step function log group to datadog forwarder regardless of how the log group was created
+            await addStepFunctionLogGroupSubscription(resources, stepFunction, datadogForwarderArn);
+          }
+        }
+
+        if (config.mergeStepFunctionAndLambdaTraces) {
+          this.serverless.cli.log(
+            `mergeStepFunctionAndLambdaTraces is true, trying to modify Step Functions' definitions to merge traces.`,
+          );
+          mergeStepFunctionAndLambdaTraces(resources, this.serverless);
+        }
+      } else {
+        // Recommend Step Functions instrumentation for customers who do not set enableStepFunctionsTracing to true
+        try {
+          inspectAndRecommendStepFunctionsInstrumentation(this.serverless);
+        } catch (error) {
+          this.serverless.cli.log(
+            `Error raise when inspecting if there are any uninstrumented Step Functions state machines. Error: ${error}`,
+          );
+        }
+      }
+
       for (const error of errors) {
         this.serverless.cli.log(error);
       }
@@ -199,7 +280,9 @@ module.exports = class ServerlessPlugin {
 
     if (datadogForwarderArn && config.addExtension) {
       this.serverless.cli.log(
-        "Warning: Datadog Lambda Extension and forwarder are both enabled. Only APIGateway log groups will be subscribed to the forwarder.",
+        `Warning: Datadog Lambda Extension and forwarder are both enabled. Only APIGateway ${
+          config.subscribeToStepFunctionLogs ? "and Step Function " : ""
+        }log groups will be subscribed to the forwarder.`,
       );
     }
 
@@ -237,7 +320,10 @@ module.exports = class ServerlessPlugin {
     }
 
     redirectHandlers(handlers, config.addLayers, config.customHandler);
-    if (config.integrationTesting === false && config.skipCloudformationOutputs === false) {
+    if (
+      (config.testingMode === false || config.integrationTesting === false) &&
+      config.skipCloudformationOutputs === false
+    ) {
       await addOutputLinks(this.serverless, config.site, config.subdomain, handlers);
     } else {
       this.serverless.cli.log("Skipped adding output links");
@@ -407,7 +493,7 @@ module.exports = class ServerlessPlugin {
     });
   }
 
-  private setDatadogForwarder(config: Configuration) {
+  private extractDatadogForwarder(config: Configuration) {
     const forwarderArn: string | undefined = config.forwarderArn;
     const forwarder: string | undefined = config.forwarder;
     if (forwarderArn && forwarder) {
@@ -455,11 +541,12 @@ function validateConfiguration(config: Configuration) {
     "datadoghq.eu",
     "us3.datadoghq.com",
     "us5.datadoghq.com",
+    "ap1.datadoghq.com",
     "ddog-gov.com",
   ];
-  if (config.site !== undefined && !siteList.includes(config.site.toLowerCase())) {
+  if (!config.testingMode && config.site !== undefined && !siteList.includes(config.site.toLowerCase())) {
     throw new Error(
-      "Warning: Invalid site URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, us5.datadoghq.com, or ddog-gov.com.",
+      "Warning: Invalid site URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, us5.datadoghq.com, ap1.datadoghq.com, or ddog-gov.com.",
     );
   }
   if (config.addExtension) {
@@ -479,7 +566,7 @@ function validateConfiguration(config: Configuration) {
       (process.env.DATADOG_API_KEY === undefined || process.env.DATADOG_APP_KEY === undefined) &&
       // Support deprecated monitorsApiKey and monitorsAppKey
       (config.apiKey === undefined || config.appKey === undefined) &&
-      config.integrationTesting === false
+      (config.testingMode === false || config.integrationTesting === false)
     ) {
       throw new Error(
         "When `monitors` is enabled, `DATADOG_API_KEY` and `DATADOG_APP_KEY` environment variables must be set.",

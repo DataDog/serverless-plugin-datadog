@@ -3,6 +3,7 @@ frameworkVersion: "3"
 
 plugins:
   - ../dist/src
+  - serverless-step-functions
 
 provider:
   name: aws
@@ -17,18 +18,17 @@ provider:
 custom:
   datadog:
     forwarderArn: arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder
+    testingMode: true
     integrationTesting: true
     logLevel: "info"
     subscribeToExecutionLogs: true
+    subscribeToStepFunctionLogs: true
     addExtension: false
     exclude:
       - ExcludeThis
       - Exclude-This
 
 functions:
-  PythonHello36:
-    handler: py_handler.hello
-    runtime: python3.6
   PythonHello37:
     handler: py_handler.hello
     runtime: python3.7
@@ -87,3 +87,69 @@ functions:
   providedHello:
     handler: provided_handler.hello
     runtime: provided
+  RubyHello27:
+    handler: rb_handler.hello
+    runtime: ruby2.7
+  RubyHello32:
+    handler: rb_handler.hello
+    runtime: ruby3.2
+
+resources:
+  Resources:
+    stepFunction2LogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: /aws/vendedlogs/states/stepFunctionLoggingConfigDynamicArn-Logs-dev
+    stepFunction3LogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: /aws/vendedlogs/states/stepFunctionNoLoggingConfigStaticArn-Logs-dev
+
+stepFunctions:
+  stateMachines:
+    stepfunction1:
+      name: stepFunctionNoLoggingConfig
+      definition:
+        StartAt: State1
+        States:
+          State1:
+            Type: Task
+            Parameters:
+              FunctionName:
+                Fn::GetAtt: [JavascriptHello18-x, Arn]
+            Resource: arn:aws:states:::lambda:invoke
+            End: true
+    stepfunction2:
+      name: stepFunctionLoggingConfigDynamicArn
+      loggingConfig:
+        level: ALL
+        includeExecutionData: true
+        destinations:
+          - Fn::GetAtt: [stepFunction2LogGroup, Arn]
+      definition:
+        StartAt: State1
+        States:
+          State1:
+            Type: Task
+            Parameters:
+              FunctionName:
+                Fn::GetAtt: [JavascriptHello18-x, Arn]
+            Resource: arn:aws:states:::lambda:invoke
+            End: true
+    stepfunction3:
+      name: stepFunctionNoLoggingConfigStaticArn
+      loggingConfig:
+        level: ALL
+        includeExecutionData: true
+        destinations:
+          - arn:aws:logs:sa-east-1:425362996713:log-group:/aws/vendedlogs/states/stepFunctionNoLoggingConfigStaticArn-Logs-dev:*
+      definition:
+        StartAt: State1
+        States:
+          State1:
+            Type: Task
+            Parameters:
+              FunctionName:
+                Fn::GetAtt: [JavascriptHello18-x, Arn]
+            Resource: arn:aws:states:::lambda:invoke
+            End: true

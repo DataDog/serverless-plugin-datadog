@@ -28,7 +28,7 @@ export interface Configuration {
   apiKMSKey?: string;
   // Whether to capture and store the payload and response of a lambda invocation
   captureLambdaPayload?: boolean;
-  // Which Site to send to, (should be datadoghq.com or datadoghq.eu)
+  // Which Datadog site to send to (for example, datadoghq.com or datadoghq.eu)
   site: string;
   // The subdomain to use for app url links that are printed to output. Defaults to app
   subdomain: string;
@@ -42,6 +42,8 @@ export interface Configuration {
   enableDDTracing: boolean;
   // Enable forwarding Logs
   enableDDLogs: boolean;
+  // Enable profiling
+  enableProfiling?: boolean;
   // Whether to add the Datadog Lambda Extension to send data without the need of the Datadog Forwarder.
   addExtension: boolean;
 
@@ -49,8 +51,12 @@ export interface Configuration {
   forwarderArn?: string;
   forwarder?: string;
 
-  // Set this to true when you are running the Serverless Plugin's integration tests. This prevents the
-  // plugin from validating the Forwarder ARN and adding Datadog Monitor output links. Defaults to false.
+  // Set this to true when you are running the Serverless Plugin's integration tests or want to bypass
+  // site check during manual testing. This prevents the plugin from validating the Forwarder ARN, prevents
+  // the plugin from adding Datadog Monitor output links, and bypasses the site check. Defaults to false.
+  testingMode?: boolean;
+
+  // Deprecated: renamed to testingMode
   integrationTesting?: boolean;
 
   // When set, the plugin will try to automatically tag customers' lambda functions with service and env,
@@ -76,12 +82,37 @@ export interface Configuration {
   subscribeToAccessLogs: boolean;
   // API Gateway Execution logging - handles rest and websocket. Http not supported as of Sept.21
   subscribeToExecutionLogs: boolean;
-
+  // Step Function logging
+  subscribeToStepFunctionLogs: boolean; // deprecated in favor of enableStepFunctionsTracing
   // Skip populating the Cloudformation Outputs
   skipCloudformationOutputs: boolean;
 
   // When set, this plugin will configure the specified handler for the functions
   customHandler?: string;
+
+  // Cold Start Tracing is enabled by default
+  enableColdStartTracing?: boolean;
+  // minimum duration to trace a module load span
+  minColdStartTraceDuration?: number;
+  // User specified list of libraries for Cold Start Tracing to ignore
+  coldStartTraceSkipLibs?: string;
+
+  // Whether to encode the tracing context in the lambda authorizer's reponse data. Default true
+  encodeAuthorizerContext?: boolean;
+  // Whether to parse and use the encoded tracing context from lambda authorizers. Default true
+  decodeAuthorizerContext?: boolean;
+
+  // Determine when to submit spans before a timeout occurs.
+  // When the remaining time in a Lambda invocation is less than `apmFlushDeadline`, the tracer will
+  // attempt to submit the current active spans and all finished spans.
+  apmFlushDeadline?: string | number;
+
+  // Whether the plugin should look for Datadog Lambda layers in the given AWS account to use
+  useLayersFromAccount?: string;
+
+  // Step Functions Tracing
+  enableStepFunctionsTracing?: boolean;
+  mergeStepFunctionAndLambdaTraces?: boolean;
 }
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
@@ -95,6 +126,14 @@ const ddMergeXrayTracesEnvVar = "DD_MERGE_XRAY_TRACES";
 const logInjectionEnvVar = "DD_LOGS_INJECTION";
 const ddLogsEnabledEnvVar = "DD_SERVERLESS_LOGS_ENABLED";
 const ddCaptureLambdaPayloadEnvVar = "DD_CAPTURE_LAMBDA_PAYLOAD";
+const ddColdStartTracingEnabledEnvVar = "DD_COLD_START_TRACING";
+const ddMinColdStartDurationEnvVar = "DD_MIN_COLD_START_DURATION";
+const ddColdStartTracingSkipLibsEnvVar = "DD_COLD_START_TRACE_SKIP_LIB";
+const ddProfilingEnabledEnvVar = "DD_PROFILING_ENABLED";
+const ddEncodeAuthorizerContextEnvVar = "DD_ENCODE_AUTHORIZER_CONTEXT";
+const ddDecodeAuthorizerContextEnvVar = "DD_DECODE_AUTHORIZER_CONTEXT";
+const ddApmFlushDeadlineMillisecondsEnvVar = "DD_APM_FLUSH_DEADLINE_MILLISECONDS";
+const ddUseLayersFromAccount = "DD_USE_LAYERS_FROM_ACCOUNT";
 
 export const ddServiceEnvVar = "DD_SERVICE";
 export const ddEnvEnvVar = "DD_ENV";
@@ -120,13 +159,17 @@ export const defaultConfiguration: Configuration = {
   enableSourceCodeIntegration: true,
   uploadGitMetadata: true,
   exclude: [],
+  testingMode: false,
   integrationTesting: false,
   subscribeToAccessLogs: true,
   subscribeToExecutionLogs: false,
+  subscribeToStepFunctionLogs: false,
   enableDDLogs: true,
   captureLambdaPayload: false,
   failOnError: false,
   skipCloudformationOutputs: false,
+  mergeStepFunctionAndLambdaTraces: false,
+  enableStepFunctionsTracing: false,
 };
 
 export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]) {
@@ -178,7 +221,9 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     if (config.enableXrayTracing !== undefined && environment[ddMergeXrayTracesEnvVar] === undefined) {
       environment[ddMergeXrayTracesEnvVar] = config.enableXrayTracing;
     }
-    if (config.injectLogContext !== undefined && environment[logInjectionEnvVar] === undefined) {
+    if (config.addExtension) {
+      environment[logInjectionEnvVar] = false;
+    } else if (config.injectLogContext !== undefined && environment[logInjectionEnvVar] === undefined) {
       environment[logInjectionEnvVar] = config.injectLogContext;
     }
     if (config.enableDDLogs !== undefined && environment[ddLogsEnabledEnvVar] === undefined) {
@@ -186,6 +231,30 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     }
     if (environment[ddCaptureLambdaPayloadEnvVar] === undefined) {
       environment[ddCaptureLambdaPayloadEnvVar] = config.captureLambdaPayload;
+    }
+    if (config.enableColdStartTracing !== undefined && environment[ddColdStartTracingEnabledEnvVar] === undefined) {
+      environment[ddColdStartTracingEnabledEnvVar] = config.enableColdStartTracing;
+    }
+    if (config.minColdStartTraceDuration !== undefined && environment[ddMinColdStartDurationEnvVar] === undefined) {
+      environment[ddMinColdStartDurationEnvVar] = config.minColdStartTraceDuration;
+    }
+    if (config.coldStartTraceSkipLibs !== undefined && environment[ddColdStartTracingSkipLibsEnvVar] === undefined) {
+      environment[ddColdStartTracingSkipLibsEnvVar] = config.coldStartTraceSkipLibs;
+    }
+    if (config.enableProfiling !== undefined && environment[ddProfilingEnabledEnvVar] === undefined) {
+      environment[ddProfilingEnabledEnvVar] = config.enableProfiling;
+    }
+    if (config.encodeAuthorizerContext !== undefined && environment[ddEncodeAuthorizerContextEnvVar] === undefined) {
+      environment[ddEncodeAuthorizerContextEnvVar] = config.encodeAuthorizerContext;
+    }
+    if (config.decodeAuthorizerContext !== undefined && environment[ddDecodeAuthorizerContextEnvVar] === undefined) {
+      environment[ddDecodeAuthorizerContextEnvVar] = config.decodeAuthorizerContext;
+    }
+    if (config.apmFlushDeadline !== undefined && environment[ddApmFlushDeadlineMillisecondsEnvVar] === undefined) {
+      environment[ddApmFlushDeadlineMillisecondsEnvVar] = config.apmFlushDeadline;
+    }
+    if (config.useLayersFromAccount !== undefined && environment[ddUseLayersFromAccount] === undefined) {
+      environment[ddUseLayersFromAccount] = config.useLayersFromAccount;
     }
     if (type === RuntimeType.DOTNET || type === RuntimeType.JAVA) {
       if (environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] === undefined) {

@@ -5,6 +5,7 @@
  * This product includes software developed at Datadog (https://www.datadoghq.com/).
  * Copyright 2021 Datadog, Inc.
  */
+
 jest.mock("./monitors.ts", () => {
   return {
     setMonitors: async (shouldThrow: Boolean) => {
@@ -15,7 +16,9 @@ jest.mock("./monitors.ts", () => {
     },
   };
 });
+
 const ServerlessPlugin = require("./index");
+
 import mock from "mock-fs";
 import { FunctionDefinition } from "serverless";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
@@ -84,7 +87,7 @@ describe("ServerlessPlugin", () => {
       };
 
       const plugin = new ServerlessPlugin(serverless, {});
-      await plugin.hooks["after:package:initialize"]();
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
       expect(serverless).toMatchObject({
         service: {
           functions: {
@@ -134,7 +137,7 @@ describe("ServerlessPlugin", () => {
       };
 
       const plugin = new ServerlessPlugin(serverless, {});
-      await plugin.hooks["after:package:initialize"]();
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
       expect(serverless).toMatchObject({
         service: {
           functions: {
@@ -181,7 +184,7 @@ describe("ServerlessPlugin", () => {
       };
 
       const plugin = new ServerlessPlugin(serverless, {});
-      await plugin.hooks["after:package:initialize"]();
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
       expect(serverless).toMatchObject({
         service: {
           functions: {
@@ -230,7 +233,7 @@ describe("ServerlessPlugin", () => {
       };
 
       const plugin = new ServerlessPlugin(serverless, {});
-      await plugin.hooks["after:package:initialize"]();
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
       expect(serverless).toMatchObject({
         service: {
           functions: {
@@ -275,7 +278,7 @@ describe("ServerlessPlugin", () => {
       };
 
       const plugin = new ServerlessPlugin(serverless, {});
-      await plugin.hooks["after:package:initialize"]();
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
       expect(serverless).toMatchObject({
         service: {
           functions: {
@@ -321,7 +324,7 @@ describe("ServerlessPlugin", () => {
       };
 
       const plugin = new ServerlessPlugin(serverless, {});
-      await plugin.hooks["after:package:initialize"]();
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
       expect(serverless).toMatchObject({
         service: {
           functions: {
@@ -374,7 +377,7 @@ describe("ServerlessPlugin", () => {
     };
 
     const plugin = new ServerlessPlugin(serverless, {});
-    await plugin.hooks["after:package:initialize"]();
+    await plugin.hooks["before:package:createDeploymentArtifacts"]();
     expect(serverless).toMatchObject({
       service: {
         functions: {
@@ -422,7 +425,7 @@ describe("ServerlessPlugin", () => {
     };
 
     const plugin = new ServerlessPlugin(serverless, {});
-    await plugin.hooks["after:package:initialize"]();
+    await plugin.hooks["before:package:createDeploymentArtifacts"]();
     expect(serverless).toMatchObject({
       service: {
         functions: {
@@ -470,7 +473,7 @@ describe("ServerlessPlugin", () => {
     };
 
     const plugin = new ServerlessPlugin(serverless, {});
-    await plugin.hooks["after:package:initialize"]();
+    await plugin.hooks["before:package:createDeploymentArtifacts"]();
     expect(serverless).toMatchObject({
       service: {
         functions: {
@@ -518,7 +521,7 @@ describe("ServerlessPlugin", () => {
     };
 
     const plugin = new ServerlessPlugin(serverless, {});
-    await plugin.hooks["after:package:initialize"]();
+    await plugin.hooks["before:package:createDeploymentArtifacts"]();
     expect(serverless).toMatchObject({
       service: {
         functions: {
@@ -578,7 +581,7 @@ describe("ServerlessPlugin", () => {
       let threwError: boolean = false;
       let thrownErrorMessage: string | undefined;
       try {
-        await plugin.hooks["after:package:initialize"]();
+        await plugin.hooks["before:package:createDeploymentArtifacts"]();
       } catch (e) {
         threwError = true;
         if (e instanceof Error) {
@@ -620,7 +623,7 @@ describe("ServerlessPlugin", () => {
       let threwError: boolean = false;
       let thrownErrorMessage: string | undefined;
       try {
-        await plugin.hooks["after:package:initialize"]();
+        await plugin.hooks["before:package:createDeploymentArtifacts"]();
       } catch (e) {
         threwError = true;
         if (e instanceof Error) {
@@ -660,7 +663,7 @@ describe("ServerlessPlugin", () => {
       let threwError: boolean = false;
       let thrownErrorMessage: string | undefined;
       try {
-        await plugin.hooks["after:package:initialize"]();
+        await plugin.hooks["before:package:createDeploymentArtifacts"]();
       } catch (e) {
         threwError = true;
         if (e instanceof Error) {
@@ -700,7 +703,7 @@ describe("ServerlessPlugin", () => {
       let threwError: boolean = false;
       let thrownErrorMessage: string | undefined;
       try {
-        await plugin.hooks["after:package:initialize"]();
+        await plugin.hooks["before:package:createDeploymentArtifacts"]();
       } catch (e) {
         threwError = true;
         if (e instanceof Error) {
@@ -739,7 +742,7 @@ describe("ServerlessPlugin", () => {
       let threwError: boolean = false;
       let thrownErrorMessage: string | undefined;
       try {
-        await plugin.hooks["after:package:initialize"]();
+        await plugin.hooks["before:package:createDeploymentArtifacts"]();
       } catch (e) {
         threwError = true;
         if (e instanceof Error) {
@@ -748,8 +751,49 @@ describe("ServerlessPlugin", () => {
       }
       expect(threwError).toBe(true);
       expect(thrownErrorMessage).toEqual(
-        "Warning: Invalid site URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, us5.datadoghq.com, or ddog-gov.com.",
+        "Warning: Invalid site URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, us5.datadoghq.com, ap1.datadoghq.com, or ddog-gov.com.",
       );
+    });
+
+    it("does not throw an invalid site error when testingMode is true", async () => {
+      mock({});
+      const serverless = {
+        cli: {
+          log: () => {},
+        },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          provider: {
+            region: "us-east-1",
+          },
+          functions: {
+            node1: {
+              handler: "my-func.ev",
+              runtime: "nodejs14.x",
+            },
+          },
+          custom: {
+            datadog: {
+              site: "datadogehq.com",
+              testingMode: true,
+              apiKey: "1234",
+            },
+          },
+        },
+      };
+
+      const plugin = new ServerlessPlugin(serverless, {});
+      let threwError: boolean = false;
+      try {
+        await plugin.hooks["before:package:createDeploymentArtifacts"]();
+      } catch (e) {
+        threwError = true;
+        if (e instanceof Error) {
+          console.log(e.message);
+        }
+      }
+      expect(threwError).toBe(false);
     });
 
     it("throws error when addExtension is true and both API key and KMS API key are undefined", async () => {
@@ -781,7 +825,7 @@ describe("ServerlessPlugin", () => {
       let threwError: boolean = false;
       let thrownErrorMessage: string | undefined;
       try {
-        await plugin.hooks["after:package:initialize"]();
+        await plugin.hooks["before:package:createDeploymentArtifacts"]();
       } catch (e) {
         threwError = true;
         if (e instanceof Error) {
@@ -828,7 +872,7 @@ describe("ServerlessPlugin", () => {
     const plugin = new ServerlessPlugin(serverless, {});
     let threwError: boolean = false;
     try {
-      await plugin.hooks["after:package:initialize"]();
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
     } catch (e) {
       threwError = true;
     }
@@ -868,7 +912,7 @@ describe("ServerlessPlugin", () => {
     const plugin = new ServerlessPlugin(serverless, {});
     let threwError: boolean = false;
     try {
-      await plugin.hooks["after:package:initialize"]();
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
     } catch (e) {
       threwError = true;
     }
@@ -906,7 +950,7 @@ describe("ServerlessPlugin", () => {
     let threwError: boolean = false;
     let thrownErrorMessage: string | undefined;
     try {
-      await plugin.hooks["after:package:initialize"]();
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
     } catch (e) {
       threwError = true;
       if (e instanceof Error) {
@@ -1599,6 +1643,232 @@ describe("ServerlessPlugin", () => {
       await plugin.hooks["after:package:createDeploymentArtifacts"]();
       expect(logs).toContain(
         "Skipping enabling source code integration because encrypted credentials through KMS/Secrets Manager is not supported for this integration. Please set either DATADOG_API_KEY in your environment, or set the apiKey parameter in Serverless.",
+      );
+    });
+
+    it("Does attempt to add Step Function log group subscription if subscribeToStepFunctionLogs is true", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            compiledCloudFormationTemplate: {
+              Resources: {},
+            },
+          },
+          functions: {
+            function1: {},
+          },
+          stepFunctions: {
+            stateMachines: {
+              stepfunction1: {
+                name: "testStepFunction",
+              },
+            },
+          },
+          custom: {
+            datadog: {
+              forwarderArn: "some-arn",
+              subscribeToStepFunctionLogs: true,
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).toHaveProperty(
+        "testStepFunctionLogGroupSubscription",
+      );
+    });
+
+    it("Does not attempt to add Step Function log group subscription if subscribeToStepFunctionLogs is false", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            compiledCloudFormationTemplate: {
+              Resources: {},
+            },
+          },
+          functions: {
+            function1: {},
+          },
+          stepFunctions: {
+            stateMachines: {
+              stepfunction1: {
+                name: "testStepFunction",
+              },
+            },
+          },
+          custom: {
+            datadog: {
+              forwarderArn: "some-arn",
+              subscribeToStepFunctionLogs: false,
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).not.toHaveProperty(
+        "testStepFunctionLogGroupSubscription",
+      );
+    });
+
+    it("Does add Step Function log group and subscription if no log group is already configured", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            compiledCloudFormationTemplate: {
+              Resources: {},
+            },
+          },
+          functions: {
+            function1: {},
+          },
+          stepFunctions: {
+            stateMachines: {
+              stepfunction1: {
+                name: "testStepFunction",
+              },
+            },
+          },
+          custom: {
+            datadog: {
+              forwarderArn: "some-arn",
+              subscribeToStepFunctionLogs: true,
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).toHaveProperty(
+        "testStepFunctionLogGroup",
+      );
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).toHaveProperty(
+        "testStepFunctionLogGroupSubscription",
+      );
+    });
+
+    it("Does add Step Function log group subscription if a log group is already configured", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            compiledCloudFormationTemplate: {
+              Resources: {},
+            },
+          },
+          functions: {
+            function1: {},
+          },
+          resources: {
+            Resources: {
+              someOtherStepFunctionLogGroup: {
+                Type: "AWS::Logs::LogGroup",
+                Properties: {
+                  LogGroupName: "/aws/vendedlogs/states/preconfigured-log-group",
+                },
+              },
+            },
+          },
+          stepFunctions: {
+            stateMachines: {
+              stepfunction1: {
+                name: "testStepFunction",
+                loggingConfig: {
+                  level: "ALL",
+                  includeExecutionData: true,
+                  destinations: [
+                    "arn:aws:logs:sa-east-1:425362996713:log-group:/aws/vendedlogs/states/preconfigured-log-group:*",
+                  ],
+                },
+              },
+            },
+          },
+          custom: {
+            datadog: {
+              forwarderArn: "some-arn",
+              subscribeToStepFunctionLogs: true,
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).not.toHaveProperty(
+        "someOtherStepFunctionLogGroup",
+      );
+      expect(serverless.service.provider.compiledCloudFormationTemplate.Resources).toHaveProperty(
+        "testStepFunctionLogGroupSubscription",
+      );
+    });
+
+    it("Does update Step Function logging config if level or includeExecutionData is not configured for tracing", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            compiledCloudFormationTemplate: {
+              Resources: {},
+            },
+          },
+          functions: {
+            function1: {},
+          },
+          resources: {
+            Resources: {
+              someOtherStepFunctionLogGroup: {
+                Type: "AWS::Logs::LogGroup",
+                Properties: {
+                  LogGroupName: "/aws/vendedlogs/states/preconfigured-log-group",
+                },
+              },
+            },
+          },
+          stepFunctions: {
+            stateMachines: {
+              stepfunction1: {
+                name: "testStepFunction",
+                loggingConfig: {
+                  level: "Error",
+                  includeExecutionData: false,
+                  destinations: [
+                    "arn:aws:logs:sa-east-1:425362996713:log-group:/aws/vendedlogs/states/preconfigured-log-group:*",
+                  ],
+                },
+              },
+            },
+          },
+          custom: {
+            datadog: {
+              forwarderArn: "some-arn",
+              subscribeToStepFunctionLogs: true,
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(serverless.service.stepFunctions.stateMachines.stepfunction1.loggingConfig.level).toEqual("ALL");
+      expect(serverless.service.stepFunctions.stateMachines.stepfunction1.loggingConfig.includeExecutionData).toEqual(
+        true,
       );
     });
   });

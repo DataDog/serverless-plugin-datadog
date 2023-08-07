@@ -7,15 +7,16 @@
  */
 import { FunctionDefinition, FunctionDefinitionHandler } from "serverless";
 import Service from "serverless/classes/Service";
+
 export enum RuntimeType {
-  NODE,
-  PYTHON,
-  DOTNET,
-  CUSTOM,
-  JAVA,
-  RUBY,
-  GO,
-  UNSUPPORTED,
+  NODE = "node",
+  PYTHON = "python",
+  DOTNET = "dotnet",
+  CUSTOM = "custom",
+  JAVA = "java",
+  RUBY = "ruby",
+  GO = "go",
+  UNSUPPORTED = "unsupported",
 }
 
 export interface FunctionInfo {
@@ -25,9 +26,11 @@ export interface FunctionInfo {
   runtime?: string;
 }
 
-export const X86_64_ARCHITECTURE = "x86_64";
-export const ARM64_ARCHITECTURE = "arm64";
-export const DEFAULT_ARCHITECTURE = X86_64_ARCHITECTURE;
+const X86_64_ARCHITECTURE = "x86_64";
+const ARM64_ARCHITECTURE = "arm64";
+const DEFAULT_ARCHITECTURE = X86_64_ARCHITECTURE;
+
+const DEFAULT_REGION = "us-east-1";
 
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
 export interface ExtendedFunctionDefinition extends FunctionDefinition {
@@ -49,30 +52,34 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
   "nodejs14.x": RuntimeType.NODE,
   "nodejs16.x": RuntimeType.NODE,
   "nodejs18.x": RuntimeType.NODE,
-  "python3.6": RuntimeType.PYTHON,
   "python3.7": RuntimeType.PYTHON,
   "python3.8": RuntimeType.PYTHON,
   "python3.9": RuntimeType.PYTHON,
+  "python3.10": RuntimeType.PYTHON,
+  "python3.11": RuntimeType.PYTHON,
   "dotnetcore3.1": RuntimeType.DOTNET,
   dotnet6: RuntimeType.DOTNET,
   java11: RuntimeType.JAVA,
+  java17: RuntimeType.JAVA,
   "java8.al2": RuntimeType.JAVA,
   java8: RuntimeType.JAVA,
   "provided.al2": RuntimeType.CUSTOM,
   provided: RuntimeType.CUSTOM,
   "ruby2.7": RuntimeType.RUBY,
+  "ruby3.2": RuntimeType.RUBY,
   "go1.x": RuntimeType.GO,
 };
 
 export const armRuntimeKeys: { [key: string]: string } = {
   "python3.8": "python3.8-arm",
   "python3.9": "python3.9-arm",
+  "python3.10": "python3.10-arm",
+  "python3.11": "python3.11-arm",
+  "ruby2.7": "ruby2.7-arm",
+  "ruby3.2": "ruby3.2-arm",
   extension: "extension-arm",
   dotnet6: "dd-trace-dotnet-ARM",
 };
-
-const dotnetTraceLayerKey: string = "dotnet";
-const javaTraceLayerKey: string = "java";
 
 export function findHandlers(service: Service, exclude: string[], defaultRuntime?: string): FunctionInfo[] {
   return Object.entries(service.functions)
@@ -92,9 +99,16 @@ export function findHandlers(service: Service, exclude: string[], defaultRuntime
     ) as FunctionInfo[];
 }
 
-export function applyLambdaLibraryLayers(service: Service, handlers: FunctionInfo[], layers: LayerJSON) {
+export function applyLambdaLibraryLayers(
+  service: Service,
+  handlers: FunctionInfo[],
+  layers: LayerJSON,
+  accountId?: string,
+) {
   const { region } = service.provider;
-  const regionRuntimes = layers.regions[region];
+  // It's possible a local account layer is being used in a region we have not published to so we use a default region's ARNs
+  const shouldUseDefaultRegion = layers.regions[region] === undefined && accountId !== undefined;
+  const regionRuntimes = shouldUseDefaultRegion ? layers.regions[DEFAULT_REGION] : layers.regions[region];
   if (regionRuntimes === undefined) {
     return;
   }
@@ -105,24 +119,39 @@ export function applyLambdaLibraryLayers(service: Service, handlers: FunctionInf
     }
 
     const { runtime } = handler;
-    const architecture =
-      (handler.handler as any).architecture ?? (service.provider as any).architecture ?? DEFAULT_ARCHITECTURE;
-    let runtimeKey: string | undefined = runtime;
-    if (architecture === ARM64_ARCHITECTURE && runtime && runtime in armRuntimeKeys) {
-      runtimeKey = armRuntimeKeys[runtime];
-      removePreviousLayer(service, handler, regionRuntimes[runtime]);
+    if (runtime === undefined) {
+      continue;
     }
 
-    const lambdaLayerARN = runtimeKey !== undefined ? regionRuntimes[runtimeKey] : undefined;
-    if (lambdaLayerARN) {
-      addLayer(service, handler, lambdaLayerARN);
+    let runtimeKey = runtime;
+    const architecture =
+      handler.handler?.architecture ?? (service.provider as any).architecture ?? DEFAULT_ARCHITECTURE;
+    const isArm64 = architecture === ARM64_ARCHITECTURE;
+    if (isArm64 && runtime in armRuntimeKeys) {
+      runtimeKey = armRuntimeKeys[runtime];
+      const prevLayerARN =
+        accountId !== undefined
+          ? buildLocalLambdaLayerARN(regionRuntimes[runtime], accountId, region)
+          : regionRuntimes[runtime];
+      removePreviousLayer(service, handler, prevLayerARN);
+    }
+
+    let layerARN = regionRuntimes[runtimeKey];
+    if (accountId && layerARN) {
+      layerARN = buildLocalLambdaLayerARN(layerARN, accountId, region);
+    }
+
+    if (layerARN) {
+      addLayer(service, handler, layerARN);
     }
   }
 }
 
-export function applyExtensionLayer(service: Service, handlers: FunctionInfo[], layers: LayerJSON) {
+export function applyExtensionLayer(service: Service, handlers: FunctionInfo[], layers: LayerJSON, accountId?: string) {
   const { region } = service.provider;
-  const regionRuntimes = layers.regions[region];
+  // It's possible a local account layer is being used in a region we have not published to so we use a default region's ARNs
+  const shouldUseDefaultRegion = layers.regions[region] === undefined && accountId !== undefined;
+  const regionRuntimes = shouldUseDefaultRegion ? layers.regions[DEFAULT_REGION] : layers.regions[region];
   if (regionRuntimes === undefined) {
     return;
   }
@@ -133,43 +162,47 @@ export function applyExtensionLayer(service: Service, handlers: FunctionInfo[], 
     }
     const architecture =
       (handler.handler as any).architecture ?? (service.provider as any).architecture ?? DEFAULT_ARCHITECTURE;
-    let extensionLayerARN: string | undefined;
     let extensionLayerKey: string = "extension";
 
     if (architecture === ARM64_ARCHITECTURE) {
-      removePreviousLayer(service, handler, regionRuntimes[extensionLayerKey]);
+      const prevExtensionARN =
+        accountId !== undefined
+          ? buildLocalLambdaLayerARN(regionRuntimes[extensionLayerKey], accountId, region)
+          : regionRuntimes[extensionLayerKey];
+      removePreviousLayer(service, handler, prevExtensionARN);
       extensionLayerKey = armRuntimeKeys[extensionLayerKey];
     }
 
-    extensionLayerARN = regionRuntimes[extensionLayerKey];
-    if (extensionLayerARN) {
-      addLayer(service, handler, extensionLayerARN);
+    let extensionARN = regionRuntimes[extensionLayerKey];
+    if (accountId && extensionARN) {
+      extensionARN = buildLocalLambdaLayerARN(extensionARN, accountId, region);
+    }
+
+    if (extensionARN) {
+      addLayer(service, handler, extensionARN);
     }
   }
 }
 
-export function applyDotnetTracingLayer(service: Service, handler: FunctionInfo, layers: LayerJSON) {
+export function applyTracingLayer(
+  service: Service,
+  handler: FunctionInfo,
+  layers: LayerJSON,
+  runtimeKey: string,
+  accountId?: string,
+) {
   const { region } = service.provider;
-  const regionRuntimes = layers.regions[region];
+  // It's possible a local account layer is being used in a region we have not published to so we use a default region's ARNs
+  const shouldUseDefaultRegion = layers.regions[region] === undefined && accountId !== undefined;
+  const regionRuntimes = shouldUseDefaultRegion ? layers.regions[DEFAULT_REGION] : layers.regions[region];
   if (regionRuntimes === undefined) {
     return;
   }
 
-  const traceLayerARN: string | undefined = regionRuntimes[dotnetTraceLayerKey];
-
-  if (traceLayerARN) {
-    addLayer(service, handler, traceLayerARN);
+  let traceLayerARN: string | undefined = regionRuntimes[runtimeKey];
+  if (accountId && traceLayerARN) {
+    traceLayerARN = buildLocalLambdaLayerARN(traceLayerARN, accountId, region);
   }
-}
-
-export function applyJavaTracingLayer(service: Service, handler: FunctionInfo, layers: LayerJSON) {
-  const { region } = service.provider;
-  const regionRuntimes = layers.regions[region];
-  if (regionRuntimes === undefined) {
-    return;
-  }
-
-  const traceLayerARN: string | undefined = regionRuntimes[javaTraceLayerKey];
 
   if (traceLayerARN) {
     addLayer(service, handler, traceLayerARN);
@@ -215,4 +248,25 @@ function removePreviousLayer(service: Service, handler: FunctionInfo, previousLa
 
 function setLayers(handler: FunctionInfo, layers: string[]) {
   (handler.handler as any).layers = layers;
+}
+
+function buildLocalLambdaLayerARN(layerARN: string | undefined, accountId: string, region: string) {
+  if (layerARN === undefined) {
+    return;
+  }
+  // Rebuild the layer ARN to use the given account's region and partition
+  const [layerName, layerVersion] = layerARN.split(":").slice(6, 8);
+  const partition = getAwsPartitionByRegion(region);
+  const localLayerARN = `arn:${partition}:lambda:${region}:${accountId}:layer:${layerName}:${layerVersion}`;
+  return localLayerARN;
+}
+
+function getAwsPartitionByRegion(region: string) {
+  if (region.startsWith("us-gov-")) {
+    return "aws-us-gov";
+  }
+  if (region.startsWith("cn-")) {
+    return "aws-cn";
+  }
+  return "aws";
 }
