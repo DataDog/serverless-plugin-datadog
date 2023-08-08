@@ -108,7 +108,7 @@ async function deleteRemovedMonitors(
   for (const pluginMonitorId of Object.keys(existingMonitors)) {
     if (!currentMonitorIds.includes(pluginMonitorId)) {
       const response = await deleteMonitor(site, existingMonitors[pluginMonitorId], monitorsApiKey, monitorsAppKey);
-      const successfullyDeleted = handleMonitorsApiResponse(response, pluginMonitorId);
+      const successfullyDeleted = handleMonitorsApiResponse(response, pluginMonitorId, site);
       if (successfullyDeleted) {
         successfullyDeletedMonitors.push(` ${pluginMonitorId}`);
       }
@@ -120,12 +120,14 @@ async function deleteRemovedMonitors(
  * Handles the Monitor API response and logs the appropriate error
  * @param response Monitor API Response
  * @param serverlessMonitorId Serverless Monitor ID
+ * @param subdomain 
+ * @param site
  */
-export function handleMonitorsApiResponse(response: Response, serverlessMonitorId?: string) {
+export function handleMonitorsApiResponse(response: Response, serverlessMonitorId?: string, subdomain?: string, site?: string, ) {
   if (response.status === 200) {
     return true;
   } else if (response.status === 400) {
-    throw new Error(`400 Bad Request: This could be due to incorrect syntax for ${serverlessMonitorId}`);
+    throw new Error(`400 Bad Request: This could be due to incorrect syntax for ${serverlessMonitorId} or a missing required tag. Have you looked at your monitor tag policies? https://${subdomain}.${site}/monitors/settings/policies`);
   } else {
     throw new Error(`${response.status} ${response.statusText}`);
   }
@@ -142,6 +144,7 @@ export function handleMonitorsApiResponse(response: Response, serverlessMonitorI
  * @returns monitors that have been successfully created, updated, and deleted according to the configuration defined in the plugin
  */
 export async function setMonitors(
+  subdomain: string,
   site: string,
   monitors: Monitor[],
   monitorsApiKey: string,
@@ -167,13 +170,13 @@ export async function setMonitors(
 
     if (monitorExists) {
       const response = await updateMonitor(site, monitorIdNumber, monitorParams, monitorsApiKey, monitorsAppKey);
-      const successfullyCreated = handleMonitorsApiResponse(response, serverlessMonitorId);
+      const successfullyCreated = handleMonitorsApiResponse(response, serverlessMonitorId, subdomain, site);
       if (successfullyCreated) {
         successfullyUpdatedMonitors.push(` ${serverlessMonitorId}`);
       }
     } else {
       const response = await createMonitor(site, monitorParams, monitorsApiKey, monitorsAppKey);
-      const successfullyUpdated = handleMonitorsApiResponse(response, serverlessMonitorId);
+      const successfullyUpdated = handleMonitorsApiResponse(response, serverlessMonitorId, subdomain, site);
       if (successfullyUpdated) {
         successfullyCreatedMonitors.push(` ${serverlessMonitorId}`);
       }
