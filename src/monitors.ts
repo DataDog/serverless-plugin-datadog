@@ -120,14 +120,21 @@ async function deleteRemovedMonitors(
  * Handles the Monitor API response and logs the appropriate error
  * @param response Monitor API Response
  * @param serverlessMonitorId Serverless Monitor ID
- * @param subdomain 
+ * @param subdomain
  * @param site
  */
-export function handleMonitorsApiResponse(response: Response, serverlessMonitorId?: string, subdomain?: string, site?: string, ) {
+export function handleMonitorsApiResponse(
+  response: Response,
+  serverlessMonitorId?: string,
+  subdomain?: string,
+  site?: string,
+) {
   if (response.status === 200) {
     return true;
   } else if (response.status === 400) {
-    throw new Error(`400 Bad Request: This could be due to incorrect syntax or a missing required tag for ${serverlessMonitorId}. Have you looked at your monitor tag policies? https://${subdomain}.${site}/monitors/settings/policies`);
+    throw new Error(
+      `400 Bad Request: This could be due to incorrect syntax or a missing required tag for ${serverlessMonitorId}. Have you looked at your monitor tag policies? https://${subdomain}.${site}/monitors/settings/policies`,
+    );
   } else {
     throw new Error(`${response.status} ${response.statusText}`);
   }
