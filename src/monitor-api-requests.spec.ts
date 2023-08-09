@@ -67,7 +67,7 @@ describe("createMonitor", () => {
     (fetch as unknown as jest.Mock).mockReturnValue({ status: 400 });
     const response = await createMonitor("datadoghq.com", invalidMonitorParams, "apikey", "appkey");
     expect(() => handleMonitorsApiResponse(response, "high_error_rate")).toThrowError(
-      "400 Bad Request: This could be due to incorrect syntax for high_error_rate",
+      "400 Bad Request: This could be due to incorrect syntax or a missing required tag for high_error_rate. Have you looked at your monitor tag policies? https://undefined.undefined/monitors/settings/policies",
     );
     expect(response.status).toBe(400);
     expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
@@ -115,7 +115,7 @@ describe("updateMonitor", () => {
     (fetch as unknown as jest.Mock).mockReturnValue({ status: 400 });
     const response = await updateMonitor("datadoghq.com", 12345, invalidMonitorParams, "apikey", "appkey");
     expect(() => handleMonitorsApiResponse(response, "high_error_rate")).toThrowError(
-      "400 Bad Request: This could be due to incorrect syntax for high_error_rate",
+      "400 Bad Request: This could be due to incorrect syntax or a missing required tag for high_error_rate. Have you looked at your monitor tag policies? https://undefined.undefined/monitors/settings/policies",
     );
     expect(response.status).toBe(400);
     expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(

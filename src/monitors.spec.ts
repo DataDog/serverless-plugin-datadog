@@ -199,6 +199,7 @@ describe("setMonitors", () => {
     (getExistingMonitors as unknown as jest.Mock).mockReturnValue({});
     (createMonitor as unknown as jest.Mock).mockReturnValue({ status: 200 });
     const logStatements = await setMonitors(
+      "app",
       "datadoghq.com",
       [CUSTOM_MONITOR_1],
       "apikey",
@@ -220,6 +221,7 @@ describe("setMonitors", () => {
     (createMonitor as unknown as jest.Mock).mockReturnValue({ status: 200 });
     (updateMonitor as unknown as jest.Mock).mockReturnValue({ status: 200 });
     const logStatements = await setMonitors(
+      "app",
       "datadoghq.com",
       MONITOR_SET_1,
       "apikey",
@@ -255,6 +257,7 @@ describe("setMonitors", () => {
     (updateMonitor as unknown as jest.Mock).mockReturnValue({ status: 200 });
     (deleteMonitor as unknown as jest.Mock).mockReturnValue({ status: 200 });
     const logStatements = await setMonitors(
+      "app",
       "datadoghq.com",
       MONITOR_SET_2,
       "apikey",
@@ -300,6 +303,7 @@ describe("setMonitors", () => {
     (updateMonitor as unknown as jest.Mock).mockReturnValue({ status: 200 });
     (deleteMonitor as unknown as jest.Mock).mockReturnValue({ status: 200 });
     const logStatements = await setMonitors(
+      "app",
       "datadoghq.com",
       MONITOR_SET_3,
       "apikey",
