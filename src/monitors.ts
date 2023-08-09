@@ -108,7 +108,7 @@ async function deleteRemovedMonitors(
   for (const pluginMonitorId of Object.keys(existingMonitors)) {
     if (!currentMonitorIds.includes(pluginMonitorId)) {
       const response = await deleteMonitor(site, existingMonitors[pluginMonitorId], monitorsApiKey, monitorsAppKey);
-      const successfullyDeleted = handleMonitorsApiResponse(response, pluginMonitorId, site);
+      const successfullyDeleted = handleMonitorsApiResponse(response, pluginMonitorId);
       if (successfullyDeleted) {
         successfullyDeletedMonitors.push(` ${pluginMonitorId}`);
       }
@@ -127,7 +127,7 @@ export function handleMonitorsApiResponse(response: Response, serverlessMonitorI
   if (response.status === 200) {
     return true;
   } else if (response.status === 400) {
-    throw new Error(`400 Bad Request: This could be due to incorrect syntax for ${serverlessMonitorId} or a missing required tag. Have you looked at your monitor tag policies? https://${subdomain}.${site}/monitors/settings/policies`);
+    throw new Error(`400 Bad Request: This could be due to incorrect syntax or a missing required tag for ${serverlessMonitorId}. Have you looked at your monitor tag policies? https://${subdomain}.${site}/monitors/settings/policies`);
   } else {
     throw new Error(`${response.status} ${response.statusText}`);
   }
