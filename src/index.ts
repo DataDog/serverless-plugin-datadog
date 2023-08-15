@@ -345,6 +345,7 @@ module.exports = class ServerlessPlugin {
       const cloudFormationStackId = await getCloudFormationStackId(this.serverless);
       try {
         const logStatements = await setMonitors(
+          config.subdomain,
           config.site,
           config.monitors,
           (config.apiKey ?? process.env.DATADOG_API_KEY)!,
