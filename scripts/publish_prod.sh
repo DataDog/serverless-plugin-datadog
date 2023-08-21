@@ -75,13 +75,13 @@ if [ "$UPDATE_LAYERS" != "false" ]; then
     # Verify AWS access before running the time-consuming generate_layers_json.sh
     ddsaml2aws login -a govcloud-us1-fed-human-engineering
     AWS_PROFILE=govcloud-us1-fed-human-engineering aws sts get-caller-identity
-    aws-vault exec prod-engineering -- aws sts get-caller-identity
+    aws-vault exec sso-prod-engineering -- aws sts get-caller-identity
 
     echo "Updating layer versions for GovCloud AWS accounts"
     AWS_PROFILE=govcloud-us1-fed-human-engineering ./scripts/generate_layers_json.sh -g
 
     echo "Updating layer versions for commercial AWS accounts"
-    aws-vault exec prod-engineering -- ./scripts/generate_layers_json.sh
+    aws-vault exec sso-prod-engineering -- ./scripts/generate_layers_json.sh
 
     # Commit layer updates if needed
     if [[ $(git status --porcelain) == *"src/layers"* ]]; then
