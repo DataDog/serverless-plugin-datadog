@@ -6,6 +6,7 @@ We love pull requests. Here's a quick guide.
     ```bash
     git clone git@github.com:<your-username>/serverless-plugin-datadog.git
     git checkout -b <my-branch>
+    yarn install
     ```
 1. Make your changes.
 1. Test your changes against your own testing application with the help of [`yarn link`](https://classic.yarnpkg.com/en/docs/cli/link/):
@@ -14,7 +15,7 @@ We love pull requests. Here's a quick guide.
     yarn build
     cd dist
     yarn link
-    
+
     # From the root of your own serverless application
     yarn link "serverless-plugin-datadog"
     sls deploy

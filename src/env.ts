@@ -40,6 +40,8 @@ export interface Configuration {
   enableXrayTracing: boolean;
   // Enable tracing on Lambda function using dd-trace, datadog's APM library.
   enableDDTracing: boolean;
+  // Enable ASM on Lambda functions
+  enableASM?: boolean;
   // Enable forwarding Logs
   enableDDLogs: boolean;
   // Enable profiling
@@ -122,6 +124,7 @@ const siteURLEnvVar = "DD_SITE";
 const logLevelEnvVar = "DD_LOG_LEVEL";
 const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
 const ddTracingEnabledEnvVar = "DD_TRACE_ENABLED";
+const ddASMEnabledEnvVar = "DD_SERVERLESS_APPSEC_ENABLED";
 const ddMergeXrayTracesEnvVar = "DD_MERGE_XRAY_TRACES";
 const logInjectionEnvVar = "DD_LOGS_INJECTION";
 const ddLogsEnabledEnvVar = "DD_SERVERLESS_LOGS_ENABLED";
@@ -217,6 +220,13 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     }
     if (config.enableDDTracing !== undefined && environment[ddTracingEnabledEnvVar] === undefined) {
       environment[ddTracingEnabledEnvVar] = config.enableDDTracing;
+    }
+    if (config.enableASM !== undefined) {
+      if (config.enableASM && (!config.addExtension || !config.enableDDTracing)) {
+        throw new Error("`enableASM` requires `addExtension` and `enableDDTracing` to be enabled");
+      }
+      environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] ??= AWS_LAMBDA_EXEC_WRAPPER;
+      environment[ddASMEnabledEnvVar] ??= config.enableASM;
     }
     if (config.enableXrayTracing !== undefined && environment[ddMergeXrayTracesEnvVar] === undefined) {
       environment[ddMergeXrayTracesEnvVar] = config.enableXrayTracing;

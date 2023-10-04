@@ -7,6 +7,7 @@
  */
 
 import {
+  Configuration,
   ddTagsEnvVar,
   defaultConfiguration,
   forceExcludeDepsFromWebpack,
@@ -1491,6 +1492,60 @@ describe("setEnvConfiguration", () => {
           name: "function",
           type: RuntimeType.NODE,
         },
+      ]);
+    });
+  });
+
+  describe("enabling `enableASM`", () => {
+    let handlers: FunctionInfo[] = [];
+    beforeEach(() => {
+      handlers = [
+        {
+          handler: {
+            environment: {},
+            events: [],
+          },
+          name: "function",
+          type: RuntimeType.NODE,
+        },
+      ];
+    });
+
+    const config: Configuration = {
+      ...defaultConfiguration,
+      apiKey: '1234',
+      enableASM: true,
+    };
+
+    it("fails when `enableDDTracing` is false", () => {
+      expect(() => setEnvConfiguration({...config, enableDDTracing: false }, handlers)).toThrow("`enableASM` requires `addExtension` and `enableDDTracing` to be enabled");
+    });
+
+    it("fails when `addExtension` is false", () => {
+      expect(() => setEnvConfiguration({...config, addExtension: false }, handlers)).toThrow("`enableASM` requires `addExtension` and `enableDDTracing` to be enabled");
+    });
+
+    it("defines `DD_SERVERLESS_APPSEC_ENABLED` and `AWS_LAMBDA_EXEC_WRAPPER`", () => {
+      setEnvConfiguration(config, handlers);
+      expect(handlers).toEqual([
+        {
+          handler: {
+            environment: {
+              AWS_LAMBDA_EXEC_WRAPPER: "/opt/datadog_wrapper",
+              DD_API_KEY: "1234",
+              DD_CAPTURE_LAMBDA_PAYLOAD: false,
+              DD_LOGS_INJECTION: false,
+              DD_MERGE_XRAY_TRACES: false,
+              DD_SERVERLESS_APPSEC_ENABLED: true,
+              DD_SERVERLESS_LOGS_ENABLED: true,
+              DD_SITE: "datadoghq.com",
+              DD_TRACE_ENABLED: true,
+            },
+            events: [],
+          },
+          name: "function",
+          type: RuntimeType.NODE,
+        }
       ]);
     });
   });
