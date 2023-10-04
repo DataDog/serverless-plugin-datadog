@@ -1513,16 +1513,20 @@ describe("setEnvConfiguration", () => {
 
     const config: Configuration = {
       ...defaultConfiguration,
-      apiKey: '1234',
+      apiKey: "1234",
       enableASM: true,
     };
 
     it("fails when `enableDDTracing` is false", () => {
-      expect(() => setEnvConfiguration({...config, enableDDTracing: false }, handlers)).toThrow("`enableASM` requires `addExtension` and `enableDDTracing` to be enabled");
+      expect(() => setEnvConfiguration({ ...config, enableDDTracing: false }, handlers)).toThrow(
+        "`enableASM` requires `addExtension` and `enableDDTracing` to be enabled",
+      );
     });
 
     it("fails when `addExtension` is false", () => {
-      expect(() => setEnvConfiguration({...config, addExtension: false }, handlers)).toThrow("`enableASM` requires `addExtension` and `enableDDTracing` to be enabled");
+      expect(() => setEnvConfiguration({ ...config, addExtension: false }, handlers)).toThrow(
+        "`enableASM` requires `addExtension` and `enableDDTracing` to be enabled",
+      );
     });
 
     it("defines `DD_SERVERLESS_APPSEC_ENABLED` and `AWS_LAMBDA_EXEC_WRAPPER`", () => {
@@ -1545,7 +1549,7 @@ describe("setEnvConfiguration", () => {
           },
           name: "function",
           type: RuntimeType.NODE,
-        }
+        },
       ]);
     });
   });
