@@ -1519,13 +1519,7 @@ describe("setEnvConfiguration", () => {
 
     it("fails when `enableDDTracing` is false", () => {
       expect(() => setEnvConfiguration({ ...config, enableDDTracing: false }, handlers)).toThrow(
-        "`enableASM` requires `addExtension` and `enableDDTracing` to be enabled",
-      );
-    });
-
-    it("fails when `addExtension` is false", () => {
-      expect(() => setEnvConfiguration({ ...config, addExtension: false }, handlers)).toThrow(
-        "`enableASM` requires `addExtension` and `enableDDTracing` to be enabled",
+        "`enableASM` requires the extension to be present, and `enableDDTracing` to be enabled",
       );
     });
 
