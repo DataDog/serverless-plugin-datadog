@@ -238,31 +238,6 @@ export function applyExtensionLayer(service: Service, handlers: FunctionInfo[], 
   }
 }
 
-export function applyTracingLayer(
-  service: Service,
-  handler: FunctionInfo,
-  layers: LayerJSON,
-  runtimeKey: string,
-  accountId?: string,
-) {
-  const { region } = service.provider;
-  // It's possible a local account layer is being used in a region we have not published to so we use a default region's ARNs
-  const shouldUseDefaultRegion = layers.regions[region] === undefined && accountId !== undefined;
-  const regionRuntimes = shouldUseDefaultRegion ? layers.regions[DEFAULT_REGION] : layers.regions[region];
-  if (regionRuntimes === undefined) {
-    return;
-  }
-
-  let traceLayerARN: string | undefined = regionRuntimes[runtimeKey];
-  if (accountId && traceLayerARN) {
-    traceLayerARN = buildLocalLambdaLayerARN(traceLayerARN, accountId, region);
-  }
-
-  if (traceLayerARN) {
-    addLayer(service, handler, traceLayerARN);
-  }
-}
-
 export function pushLayerARN(layerARN: string, currentLayers: string[]): string[] {
   const layerSet = new Set(currentLayers);
   layerSet.add(layerARN);
