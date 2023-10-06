@@ -12,7 +12,6 @@ import {
   RuntimeType,
   applyLambdaLibraryLayers,
   applyExtensionLayer,
-  applyTracingLayer,
   findHandlers,
   pushLayerARN,
 } from "./layer";
@@ -578,8 +577,8 @@ describe("applyLambdaLibraryLayers", () => {
     const layers: LayerJSON = {
       regions: {
         "us-east-1": {
-          "dd-trace-dotnet": "dd-trace-dotnet:6",
-          "dd-trace-dotnet-ARM": "dd-trace-dotnet-ARM:6",
+          dotnet: "dd-trace-dotnet:6",
+          "dotnet-arm": "dd-trace-dotnet-ARM:6",
           extension: "extension:11",
           "extension-arm": "extension-arm:11",
         },
@@ -790,7 +789,8 @@ describe("applyLambdaLibraryLayers", () => {
     });
     const mockAccountId = "123456789012";
     const localTraceLayerARN = "arn:aws:lambda:sa-east-1:123456789012:layer:dd-trace-java:1";
-    applyTracingLayer(mockService, handler, layers, RuntimeType.JAVA, mockAccountId);
+
+    applyLambdaLibraryLayers(mockService, [handler], layers, mockAccountId);
     expect(handler.handler).toEqual({
       runtime: "java11",
       layers: [localTraceLayerARN],
@@ -811,7 +811,8 @@ describe("applyLambdaLibraryLayers", () => {
     });
     const mockAccountId = "123456789012";
     const localTraceLayerARN = "arn:aws-cn:lambda:cn-northwest-1:123456789012:layer:dd-trace-java:1";
-    applyTracingLayer(mockService, handler, layers, RuntimeType.JAVA, mockAccountId);
+
+    applyLambdaLibraryLayers(mockService, [handler], layers, mockAccountId);
     expect(handler.handler).toEqual({
       runtime: "java11",
       layers: [localTraceLayerARN],

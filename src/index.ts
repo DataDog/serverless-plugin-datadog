@@ -36,7 +36,7 @@ import { newSimpleGit } from "./git";
 import {
   applyExtensionLayer,
   applyLambdaLibraryLayers,
-  applyTracingLayer,
+  // applyTracingLayer,
   findHandlers,
   FunctionInfo,
   RuntimeType,
@@ -140,17 +140,6 @@ module.exports = class ServerlessPlugin {
       this.serverless.cli.log("Adding Datadog Lambda Extension Layer to functions");
       this.debugLogHandlers(handlers);
       applyExtensionLayer(this.serverless.service, handlers, allLayers, accountId);
-      handlers.forEach((functionInfo) => {
-        if (functionInfo.type === RuntimeType.DOTNET || functionInfo.type === RuntimeType.JAVA) {
-          const runtimeNameToReadable: { [key in RuntimeType.DOTNET | RuntimeType.JAVA]: string } = {
-            [RuntimeType.DOTNET]: ".NET",
-            [RuntimeType.JAVA]: "Java",
-          };
-          this.serverless.cli.log(`Adding ${runtimeNameToReadable[functionInfo.type]} Tracing Layer to functions`);
-          this.debugLogHandlers(handlers);
-          applyTracingLayer(this.serverless.service, functionInfo, allLayers, functionInfo.type, accountId);
-        }
-      });
     } else {
       this.serverless.cli.log("Skipping adding Lambda Extension Layer");
     }
