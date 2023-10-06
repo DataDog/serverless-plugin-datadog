@@ -186,16 +186,14 @@ export function applyLambdaLibraryLayers(
       layerARN = buildLocalLambdaLayerARN(layerARN, accountId, region);
     }
 
-    if (isArm64 && layerARN !== undefined) {
+    if (isArm64 && layerARN !== undefined && x86LayerArn !== undefined) {
       // Remove the x86 layer if the customer is using ARM
       removePreviousLayer(service, handler, x86LayerArn);
     }
-    if (!isArm64 && layerARN !== undefined) {
+    if (!isArm64 && layerARN !== undefined && armLayerArn !== undefined) {
       // Remove the ARM layer if the customer is using x86
       removePreviousLayer(service, handler, armLayerArn);
     }
-
-    // console.log({ runtime, layers, x86RuntimeKey, layerARN, architecture, isArm64 });
 
     if (layerARN) {
       addLayer(service, handler, layerARN);
