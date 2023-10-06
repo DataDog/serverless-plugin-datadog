@@ -384,8 +384,8 @@ describe("ServerlessPlugin", () => {
           node1: {
             handler: "my-func.ev",
             layers: [
-              expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:Datadog-Extension\:.*/),
               expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:dd-trace-dotnet\:.*/),
+              expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:Datadog-Extension\:.*/),
             ],
             runtime: "dotnet6",
           },
@@ -432,8 +432,8 @@ describe("ServerlessPlugin", () => {
           node1: {
             handler: "my-func.ev",
             layers: [
-              expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:Datadog-Extension\:.*/),
               expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:dd-trace-java\:.*/),
+              expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:Datadog-Extension\:.*/),
             ],
             runtime: "java11",
           },
@@ -480,8 +480,8 @@ describe("ServerlessPlugin", () => {
           node1: {
             handler: "my-func.ev",
             layers: [
-              expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:Datadog-Extension\:.*/),
               expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:dd-trace-java\:.*/),
+              expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:Datadog-Extension\:.*/),
             ],
             runtime: "java8.al2",
           },
@@ -528,8 +528,8 @@ describe("ServerlessPlugin", () => {
           node1: {
             handler: "my-func.ev",
             layers: [
-              expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:Datadog-Extension\:.*/),
               expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:dd-trace-java\:.*/),
+              expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:Datadog-Extension\:.*/),
             ],
             runtime: "java8",
           },
