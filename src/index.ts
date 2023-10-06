@@ -33,14 +33,7 @@ import {
   addStepFunctionLogGroupSubscription,
 } from "./forwarder";
 import { newSimpleGit } from "./git";
-import {
-  applyExtensionLayer,
-  applyLambdaLibraryLayers,
-  // applyTracingLayer,
-  findHandlers,
-  FunctionInfo,
-  RuntimeType,
-} from "./layer";
+import { applyExtensionLayer, applyLambdaLibraryLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
 import * as govLayers from "./layers-gov.json";
 import * as layers from "./layers.json";
 import { getCloudFormationStackId } from "./monitor-api-requests";
