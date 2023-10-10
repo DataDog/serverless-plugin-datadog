@@ -121,7 +121,7 @@ module.exports = class ServerlessPlugin {
     if (config.addLayers) {
       this.serverless.cli.log("Adding Lambda Library Layers to functions");
       this.debugLogHandlers(handlers);
-      applyLambdaLibraryLayers(this.serverless.service, handlers, allLayers, accountId);
+      applyLambdaLibraryLayers(this.serverless.service, handlers, allLayers, accountId, config.addExtension);
       if (hasWebpackPlugin(this.serverless.service)) {
         forceExcludeDepsFromWebpack(this.serverless.service);
       }

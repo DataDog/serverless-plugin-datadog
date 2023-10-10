@@ -19,6 +19,9 @@ export enum RuntimeType {
   UNSUPPORTED = "unsupported",
 }
 
+// .NET can only be used with the extension
+const FORWARDER_UNSUPPORTED_RUNTIME_TYPES = [RuntimeType.DOTNET];
+
 export interface FunctionInfo {
   name: string;
   type: RuntimeType;
@@ -138,6 +141,7 @@ export function applyLambdaLibraryLayers(
   handlers: FunctionInfo[],
   layers: LayerJSON,
   accountId?: string,
+  isUsingExtension = true,
 ) {
   const { region } = service.provider;
   // It's possible a local account layer is being used in a region we have not published to so we use a default region's ARNs
@@ -154,6 +158,10 @@ export function applyLambdaLibraryLayers(
 
     const { runtime } = handler;
     if (runtime === undefined) {
+      continue;
+    }
+
+    if (!isUsingExtension && FORWARDER_UNSUPPORTED_RUNTIME_TYPES.includes(handler.type)) {
       continue;
     }
 

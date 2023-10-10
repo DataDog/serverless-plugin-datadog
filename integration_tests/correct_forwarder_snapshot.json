@@ -205,7 +205,8 @@
                   "Effect": "Allow",
                   "Action": [
                     "logs:CreateLogStream",
-                    "logs:CreateLogGroup"
+                    "logs:CreateLogGroup",
+                    "logs:TagResource"
                   ],
                   "Resource": [
                     {
@@ -980,7 +981,10 @@
             "IamRoleLambdaExecution",
             "Arn"
           ]
-        }
+        },
+        "Layers": [
+          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-dotnet:XXX"
+        ]
       },
       "DependsOn": [
         "DotnetHello6LogGroup"
@@ -1032,7 +1036,10 @@
             "IamRoleLambdaExecution",
             "Arn"
           ]
-        }
+        },
+        "Layers": [
+          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-dotnet:XXX"
+        ]
       },
       "DependsOn": [
         "DotnetcoreHello31LogGroup"
@@ -1084,7 +1091,10 @@
             "IamRoleLambdaExecution",
             "Arn"
           ]
-        }
+        },
+        "Layers": [
+          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-java:XXX"
+        ]
       },
       "DependsOn": [
         "JavaHello8LogGroup"
@@ -1136,7 +1146,10 @@
             "IamRoleLambdaExecution",
             "Arn"
           ]
-        }
+        },
+        "Layers": [
+          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-java:XXX"
+        ]
       },
       "DependsOn": [
         "JavaHello11LogGroup"

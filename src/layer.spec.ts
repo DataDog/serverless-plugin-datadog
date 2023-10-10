@@ -819,10 +819,10 @@ describe("applyLambdaLibraryLayers", () => {
     });
   });
 
-  it("adds the dotnet ARM layer and ARM extension", () => {
+  it("adds the .NET ARM layer and ARM extension", () => {
     const handler = {
       handler: { runtime: "dotnet6" },
-      type: RuntimeType.JAVA,
+      type: RuntimeType.DOTNET,
       runtime: "dotnet6",
     } as FunctionInfo;
     const layers: LayerJSON = {
@@ -853,10 +853,10 @@ describe("applyLambdaLibraryLayers", () => {
     });
   });
 
-  it("adds the dotnet ARM layer and extension with account ID specified", () => {
+  it("adds the .NET ARM layer and extension with account ID specified", () => {
     const handler = {
       handler: { runtime: "dotnet6" },
-      type: RuntimeType.JAVA,
+      type: RuntimeType.DOTNET,
       runtime: "dotnet6",
     } as FunctionInfo;
     const layers: LayerJSON = {
@@ -886,6 +886,35 @@ describe("applyLambdaLibraryLayers", () => {
         "arn:aws:lambda:us-east-1:123456789012:layer:dd-trace-dotnet-ARM:9",
         "arn:aws:lambda:us-east-1:123456789012:layer:Datadog-Extension-ARM:47",
       ],
+    });
+  });
+
+  it("does not add the .NET ARM layer without extension", () => {
+    const handler = {
+      handler: { runtime: "dotnet6" },
+      type: RuntimeType.DOTNET,
+      runtime: "dotnet6",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: {
+        "us-east-1": {
+          dotnet: "arn:aws:lambda:us-east-1:464622532012:layer:dd-trace-dotnet:9",
+          "dotnet-arm": "arn:aws:lambda:us-east-1:464622532012:layer:dd-trace-dotnet-ARM:9",
+          extension: "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:47",
+          "extension-arm": "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension-ARM:47",
+        },
+      },
+    };
+    const mockService = createMockService(
+      "us-east-1",
+      {
+        "dotnet-function": { handler: "AwsDotnetCsharp::AwsDotnetCsharp.Handler::HelloWorld", runtime: "dotnet6" },
+      },
+      "arm64",
+    );
+    applyLambdaLibraryLayers(mockService, [handler], layers, undefined, false);
+    expect(handler.handler).toEqual({
+      runtime: "dotnet6",
     });
   });
 });
