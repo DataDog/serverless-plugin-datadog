@@ -19,8 +19,8 @@
       "ruby3.2-arm": "arn:aws:lambda:ap-south-2:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:ap-south-2:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:ap-south-2:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:ap-south-2:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:ap-south-2:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:ap-south-2:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:ap-south-2:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:ap-south-2:464622532012:layer:dd-trace-java:9"
     },
     "ap-south-1": {
@@ -43,8 +43,8 @@
       "ruby3.2-arm": "arn:aws:lambda:ap-south-1:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:ap-south-1:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:ap-south-1:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:ap-south-1:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:ap-south-1:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:ap-south-1:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:ap-south-1:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:ap-south-1:464622532012:layer:dd-trace-java:11"
     },
     "eu-south-1": {
@@ -67,8 +67,8 @@
       "ruby3.2-arm": "arn:aws:lambda:eu-south-1:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:eu-south-1:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:eu-south-1:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:eu-south-1:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:eu-south-1:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:eu-south-1:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:eu-south-1:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:eu-south-1:464622532012:layer:dd-trace-java:11"
     },
     "eu-south-2": {
@@ -90,8 +90,8 @@
       "ruby3.2-arm": "arn:aws:lambda:eu-south-2:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:eu-south-2:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:eu-south-2:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:eu-south-2:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:eu-south-2:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:eu-south-2:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:eu-south-2:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:eu-south-2:464622532012:layer:dd-trace-java:11"
     },
     "me-central-1": {
@@ -114,8 +114,8 @@
       "ruby3.2-arm": "arn:aws:lambda:me-central-1:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:me-central-1:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:me-central-1:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:me-central-1:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:me-central-1:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:me-central-1:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:me-central-1:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:me-central-1:464622532012:layer:dd-trace-java:11"
     },
     "ca-central-1": {
@@ -138,8 +138,8 @@
       "ruby3.2-arm": "arn:aws:lambda:ca-central-1:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:ca-central-1:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:ca-central-1:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:ca-central-1:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:ca-central-1:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:ca-central-1:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:ca-central-1:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:ca-central-1:464622532012:layer:dd-trace-java:11"
     },
     "eu-central-1": {
@@ -162,8 +162,8 @@
       "ruby3.2-arm": "arn:aws:lambda:eu-central-1:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:eu-central-1:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:eu-central-1:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:eu-central-1:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:eu-central-1:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:eu-central-1:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:eu-central-1:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:eu-central-1:464622532012:layer:dd-trace-java:11"
     },
     "eu-central-2": {
@@ -185,8 +185,8 @@
       "ruby3.2-arm": "arn:aws:lambda:eu-central-2:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:eu-central-2:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:eu-central-2:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:eu-central-2:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:eu-central-2:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:eu-central-2:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:eu-central-2:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:eu-central-2:464622532012:layer:dd-trace-java:11"
     },
     "us-west-1": {
@@ -209,8 +209,8 @@
       "ruby3.2-arm": "arn:aws:lambda:us-west-1:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:us-west-1:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:us-west-1:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:us-west-1:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:us-west-1:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:us-west-1:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:us-west-1:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:us-west-1:464622532012:layer:dd-trace-java:11"
     },
     "us-west-2": {
@@ -233,8 +233,8 @@
       "ruby3.2-arm": "arn:aws:lambda:us-west-2:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:us-west-2:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:us-west-2:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:us-west-2:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:us-west-2:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:us-west-2:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:us-west-2:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:us-west-2:464622532012:layer:dd-trace-java:11"
     },
     "af-south-1": {
@@ -257,8 +257,8 @@
       "ruby3.2-arm": "arn:aws:lambda:af-south-1:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:af-south-1:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:af-south-1:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:af-south-1:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:af-south-1:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:af-south-1:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:af-south-1:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:af-south-1:464622532012:layer:dd-trace-java:11"
     },
     "eu-north-1": {
@@ -281,8 +281,8 @@
       "ruby3.2-arm": "arn:aws:lambda:eu-north-1:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:eu-north-1:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:eu-north-1:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:eu-north-1:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:eu-north-1:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:eu-north-1:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:eu-north-1:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:eu-north-1:464622532012:layer:dd-trace-java:11"
     },
     "eu-west-3": {
@@ -305,8 +305,8 @@
       "ruby3.2-arm": "arn:aws:lambda:eu-west-3:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:eu-west-3:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:eu-west-3:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:eu-west-3:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:eu-west-3:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:eu-west-3:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:eu-west-3:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:eu-west-3:464622532012:layer:dd-trace-java:11"
     },
     "eu-west-2": {
@@ -329,8 +329,8 @@
       "ruby3.2-arm": "arn:aws:lambda:eu-west-2:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:eu-west-2:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:eu-west-2:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:eu-west-2:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:eu-west-2:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:eu-west-2:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:eu-west-2:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:eu-west-2:464622532012:layer:dd-trace-java:11"
     },
     "eu-west-1": {
@@ -353,8 +353,8 @@
       "ruby3.2-arm": "arn:aws:lambda:eu-west-1:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:eu-west-1:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:eu-west-1:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:eu-west-1:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:eu-west-1:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:eu-west-1:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:eu-west-1:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:eu-west-1:464622532012:layer:dd-trace-java:11"
     },
     "ap-northeast-3": {
@@ -377,8 +377,8 @@
       "ruby3.2-arm": "arn:aws:lambda:ap-northeast-3:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:ap-northeast-3:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:ap-northeast-3:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:ap-northeast-3:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:ap-northeast-3:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:ap-northeast-3:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:ap-northeast-3:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:ap-northeast-3:464622532012:layer:dd-trace-java:11"
     },
     "ap-northeast-2": {
@@ -401,8 +401,8 @@
       "ruby3.2-arm": "arn:aws:lambda:ap-northeast-2:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:ap-northeast-2:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:ap-northeast-2:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:ap-northeast-2:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:ap-northeast-2:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:ap-northeast-2:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:ap-northeast-2:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:ap-northeast-2:464622532012:layer:dd-trace-java:11"
     },
     "me-south-1": {
@@ -425,8 +425,8 @@
       "ruby3.2-arm": "arn:aws:lambda:me-south-1:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:me-south-1:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:me-south-1:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:me-south-1:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:me-south-1:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:me-south-1:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:me-south-1:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:me-south-1:464622532012:layer:dd-trace-java:11"
     },
     "ap-northeast-1": {
@@ -449,8 +449,8 @@
       "ruby3.2-arm": "arn:aws:lambda:ap-northeast-1:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:ap-northeast-1:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:ap-northeast-1:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:ap-northeast-1:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:ap-northeast-1:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:ap-northeast-1:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:ap-northeast-1:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:ap-northeast-1:464622532012:layer:dd-trace-java:11"
     },
     "sa-east-1": {
@@ -473,8 +473,8 @@
       "ruby3.2-arm": "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-java:11"
     },
     "ap-east-1": {
@@ -497,8 +497,8 @@
       "ruby3.2-arm": "arn:aws:lambda:ap-east-1:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:ap-east-1:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:ap-east-1:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:ap-east-1:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:ap-east-1:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:ap-east-1:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:ap-east-1:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:ap-east-1:464622532012:layer:dd-trace-java:11"
     },
     "ap-southeast-1": {
@@ -521,8 +521,8 @@
       "ruby3.2-arm": "arn:aws:lambda:ap-southeast-1:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:ap-southeast-1:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:ap-southeast-1:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:ap-southeast-1:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:ap-southeast-1:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:ap-southeast-1:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:ap-southeast-1:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:ap-southeast-1:464622532012:layer:dd-trace-java:11"
     },
     "ap-southeast-2": {
@@ -545,8 +545,8 @@
       "ruby3.2-arm": "arn:aws:lambda:ap-southeast-2:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:ap-southeast-2:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:ap-southeast-2:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:ap-southeast-2:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:ap-southeast-2:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:ap-southeast-2:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:ap-southeast-2:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:ap-southeast-2:464622532012:layer:dd-trace-java:11"
     },
     "ap-southeast-3": {
@@ -569,8 +569,8 @@
       "ruby3.2-arm": "arn:aws:lambda:ap-southeast-3:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:ap-southeast-3:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:ap-southeast-3:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:ap-southeast-3:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:ap-southeast-3:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:ap-southeast-3:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:ap-southeast-3:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:ap-southeast-3:464622532012:layer:dd-trace-java:11"
     },
     "ap-southeast-4": {
@@ -592,8 +592,8 @@
       "ruby3.2-arm": "arn:aws:lambda:ap-southeast-4:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:ap-southeast-4:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:ap-southeast-4:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:ap-southeast-4:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:ap-southeast-4:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:ap-southeast-4:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:ap-southeast-4:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:ap-southeast-4:464622532012:layer:dd-trace-java:5"
     },
     "us-east-1": {
@@ -616,8 +616,8 @@
       "ruby3.2-arm": "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:us-east-1:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:us-east-1:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:us-east-1:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:us-east-1:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:us-east-1:464622532012:layer:dd-trace-java:11"
     },
     "us-east-2": {
@@ -640,8 +640,8 @@
       "ruby3.2-arm": "arn:aws:lambda:us-east-2:464622532012:layer:Datadog-Ruby3-2-ARM:20",
       "extension": "arn:aws:lambda:us-east-2:464622532012:layer:Datadog-Extension:49",
       "extension-arm": "arn:aws:lambda:us-east-2:464622532012:layer:Datadog-Extension-ARM:49",
-      "dotnet": "arn:aws:lambda:us-east-2:464622532012:layer:dd-trace-dotnet:9",
-      "dotnet-arm": "arn:aws:lambda:us-east-2:464622532012:layer:dd-trace-dotnet-ARM:9",
+      "dotnet": "arn:aws:lambda:us-east-2:464622532012:layer:dd-trace-dotnet:10",
+      "dotnet-arm": "arn:aws:lambda:us-east-2:464622532012:layer:dd-trace-dotnet-ARM:10",
       "java": "arn:aws:lambda:us-east-2:464622532012:layer:dd-trace-java:11"
     }
   }
