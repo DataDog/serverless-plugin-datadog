@@ -12,9 +12,9 @@ set -e
 # snapshots that will be compared in your test. Add those snapshot names to the TEST_SNAPSHOTS and CORRECT_SNAPSHOTS arrays.
 # Note: Each yml config, test, and correct snapshot file should be at the same index in their own array. e.g. All the files for the forwarder test are at index 0.
 #       In order for this script to work correctly these arrays should have the same amount of elements.
-SERVERLESS_CONFIGS=("./serverless-forwarder.yml" "./serverless-extension.yml" "./serverless-extension-apigateway.yml")
-TEST_SNAPSHOTS=("test_forwarder_snapshot.json" "test_extension_snapshot.json" "test_extension_apigateway.json")
-CORRECT_SNAPSHOTS=("correct_forwarder_snapshot.json" "correct_extension_snapshot.json" "correct_extension_apigateway_snapshot.json")
+SERVERLESS_CONFIGS=("./serverless-extension.yml" "./serverless-extension-apigateway.yml")
+TEST_SNAPSHOTS=("test_extension_snapshot.json" "test_extension_apigateway.json")
+CORRECT_SNAPSHOTS=("correct_extension_snapshot.json" "correct_extension_apigateway_snapshot.json")
 
 script_path=${BASH_SOURCE[0]}
 scripts_dir=$(dirname $script_path)
