@@ -70,22 +70,30 @@ export async function deleteMonitor(site: string, monitorId: number, monitorsApi
 }
 
 export async function searchMonitors(site: string, queryTag: string, monitorsApiKey: string, monitorsAppKey: string) {
-  const query = `tag:"${queryTag}"`;
-  const response: Response = await fetch(`https://api.${site}/api/v1/monitor/search?query=${query}`, {
-    method: "GET",
-    headers: {
-      "DD-API-KEY": monitorsApiKey,
-      "DD-APPLICATION-KEY": monitorsAppKey,
-      "Content-Type": "application/json",
-    },
-  });
+  let monitors: QueriedMonitor[] = [];
+  let page = 0;
+  let page_count = 1;
+  do {
+    const query = `tag:"${queryTag}"`;
+    const response: Response = await fetch(`https://api.${site}/api/v1/monitor/search?query=${query}&page=${page}`, {
+      method: "GET",
+      headers: {
+        "DD-API-KEY": monitorsApiKey,
+        "DD-APPLICATION-KEY": monitorsAppKey,
+        "Content-Type": "application/json",
+      },
+    });
 
-  if (response.status !== 200) {
-    throw new Error(`Can't fetch monitors. Status code: ${response.status}. Message: ${response.statusText}`);
-  }
+    if (response.status !== 200) {
+      throw new Error(`Can't fetch monitors. Status code: ${response.status}. Message: ${response.statusText}`);
+    }
 
-  const json = await response.json();
-  const monitors: QueriedMonitor[] = json.monitors;
+    const json = await response.json();
+    monitors = monitors.concat(json.monitors);
+
+    page_count = json.metadata.page_count;
+    page += 1;
+  } while (page < page_count);
 
   return monitors;
 }
