@@ -4514,9 +4514,9 @@ jwt-decode@^3.1.2:
   integrity sha512-UfpWE/VZn0iP50d8cz9NrZLM9lSWhcJ+0Gt/nm4by88UL+J1SiKN8/5dkjMmbEzwL2CAe+67GsegCbIKtbp75A==
 
 keyv@^4.0.0:
-  version "4.5.3"
-  resolved "https://registry.yarnpkg.com/keyv/-/keyv-4.5.3.tgz#00873d2b046df737963157bd04f294ca818c9c25"
-  integrity sha512-QCiSav9WaX1PgETJ+SpNnx2PRRapJ/oRSXM4VO5OGYGSjrxbKPVFVhB3l2OCbLCk329N8qyAtsJjSjvVBWzEug==
+  version "4.5.4"
+  resolved "https://registry.yarnpkg.com/keyv/-/keyv-4.5.4.tgz#a879a99e29452f942439f2a405e3af8b31d4de93"
+  integrity sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==
   dependencies:
     json-buffer "3.0.1"
 
@@ -5593,10 +5593,10 @@ semver@^6.0.0, semver@^6.3.0:
   resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.1.tgz#556d2ef8689146e46dcea4bfdd095f3434dffcb4"
   integrity sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==
 
-serverless-step-functions@^3.16.0:
-  version "3.16.0"
-  resolved "https://registry.yarnpkg.com/serverless-step-functions/-/serverless-step-functions-3.16.0.tgz#eeda6bca4ffd9cbfce8f48c30563b14294dc83e8"
-  integrity sha512-rRInY8whbLsbyn4Pct4fOYgcEeQ5kHjA8n/X7TuV2LHTmpHmQuvTGT4GnPHZhmonTv7ctud3N8KP/pJSmhuLZg==
+serverless-step-functions@^3.17.0:
+  version "3.17.0"
+  resolved "https://registry.yarnpkg.com/serverless-step-functions/-/serverless-step-functions-3.17.0.tgz#58e71d11c75133ec271639146f84affeaad13ead"
+  integrity sha512-/d/++IbzzjP1ES/niWjjwZwQl20O0mCnaY9kENi8RUFDqbFoqthJYAL34zZ78JcmZm3thrlq2iYZ4zJyx8P3jw==
   dependencies:
     "@serverless/utils" "^6.7.0"
     asl-validator "^3.8.0"

@@ -33,6 +33,9 @@ fi
 yarn
 yarn build
 
+echo "Serverless Framework version:"
+serverless --version
+
 cd $integration_tests_dir
 RAW_CFN_TEMPLATE=".serverless/cloudformation-template-update-stack.json"
 for ((i = 0; i < ${#SERVERLESS_CONFIGS[@]}; i++)); do
@@ -66,7 +69,7 @@ for ((i = 0; i < ${#SERVERLESS_CONFIGS[@]}; i++)); do
     cd ..
     echo "Test snapshot:"
     cat $integration_tests_dir/${TEST_SNAPSHOTS[i]}
-    echo "----------"
+    echo "==================================="
     python $scripts_dir/compare_snapshots.py $integration_tests_dir/${TEST_SNAPSHOTS[i]} $integration_tests_dir/${CORRECT_SNAPSHOTS[i]}
     return_code=$?
     set -e
