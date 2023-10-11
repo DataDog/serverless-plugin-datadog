@@ -33,6 +33,9 @@ fi
 yarn
 yarn build
 
+echo "Serverless Framework version:"
+serverless --version
+
 cd $integration_tests_dir
 RAW_CFN_TEMPLATE=".serverless/cloudformation-template-update-stack.json"
 for ((i = 0; i < ${#SERVERLESS_CONFIGS[@]}; i++)); do
