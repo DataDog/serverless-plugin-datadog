@@ -62,6 +62,7 @@ def do_values_match(a, b, file_name_a, file_name_b, level=0):
         if len(a) != len(b):
             log.warning(
                 "Mismatch at level %s: Arrays have different lengths (%s vs %s)",
+                level,
                 len(a),
                 len(b),
             )
