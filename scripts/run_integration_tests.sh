@@ -64,6 +64,9 @@ for ((i = 0; i < ${#SERVERLESS_CONFIGS[@]}; i++)); do
     echo "Performing diff of ${TEST_SNAPSHOTS[i]} against ${CORRECT_SNAPSHOTS[i]}"
     set +e # Dont exit right away if there is a diff in snapshots
     cd ..
+    echo "Test snapshot:"
+    cat $integration_tests_dir/${TEST_SNAPSHOTS[i]}
+    echo "----------"
     python $scripts_dir/compare_snapshots.py $integration_tests_dir/${TEST_SNAPSHOTS[i]} $integration_tests_dir/${CORRECT_SNAPSHOTS[i]}
     return_code=$?
     set -e
