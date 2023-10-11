@@ -19,8 +19,9 @@ export enum RuntimeType {
   UNSUPPORTED = "unsupported",
 }
 
-// .NET can only be used with the extension
-const FORWARDER_UNSUPPORTED_RUNTIME_TYPES = [RuntimeType.DOTNET];
+// .NET can only be used with the extension and Java requires
+// some code changes
+const RUNTIMES_TO_ADD_FOR_EXTENSION_ONLY = [RuntimeType.DOTNET, RuntimeType.JAVA];
 
 export interface FunctionInfo {
   name: string;
@@ -161,7 +162,7 @@ export function applyLambdaLibraryLayers(
       continue;
     }
 
-    if (!isUsingExtension && FORWARDER_UNSUPPORTED_RUNTIME_TYPES.includes(handler.type)) {
+    if (!isUsingExtension && RUNTIMES_TO_ADD_FOR_EXTENSION_ONLY.includes(handler.type)) {
       continue;
     }
 
