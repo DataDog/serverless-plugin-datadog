@@ -2,7 +2,6 @@ import json
 import sys
 import logging
 
-DEBUG = True
 
 log = logging.getLogger(__name__)
 
@@ -13,7 +12,7 @@ def do_values_match(a, b, file_name_a, file_name_b, level=0):
     bType = type(b)
     if aType != bType:
         log.warning(
-            "Mismatch at level %s: Values have different types: %s vs %s",
+            "Mismatch level %s: Values have different types: %s vs %s",
             level,
             aType,
             bType,
@@ -23,7 +22,7 @@ def do_values_match(a, b, file_name_a, file_name_b, level=0):
     if aType == dict:
         if len(a) != len(b):
             log.warning(
-                "Mismatch at level %s: Dicts have different lengths (%s vs %s). a_keys=%s vs b_keys=%s",
+                "Mismatch level %s: Dicts have different lengths (%s vs %s). a_keys=%s vs b_keys=%s",
                 level,
                 len(a),
                 len(b),
@@ -37,7 +36,7 @@ def do_values_match(a, b, file_name_a, file_name_b, level=0):
 
             if b_value is None:
                 log.warning(
-                    "Mismatch at level %s: Key %s present in %s but missing from %s dict with keys %s",
+                    "Mismatch level %s: Key %s present in %s but missing from %s dict with keys %s",
                     level,
                     key,
                     file_name_a,
@@ -50,7 +49,7 @@ def do_values_match(a, b, file_name_a, file_name_b, level=0):
                 a_value, b_value, file_name_a, file_name_b, level + 1
             ):
                 log.warning(
-                    "Mismatch at level %s: Dict values at key %s do not match",
+                    "Mismatch level %s: Dict values at key %s do not match",
                     level,
                     key,
                 )
@@ -61,14 +60,13 @@ def do_values_match(a, b, file_name_a, file_name_b, level=0):
     if aType == list:
         if len(a) != len(b):
             log.warning(
-                "Mismatch at level %s: Arrays have different lengths (%s vs %s)",
+                "Mismatch level %s: Arrays have different lengths (%s vs %s):",
                 level,
                 len(a),
                 len(b),
             )
-            if DEBUG:
-                log.warning("Array A: %s", a)
-                log.warning("Array B: %s", b)
+            log.warning("  %s: %s", file_name_a, a)
+            log.warning("  %s: %s", file_name_b, b)
 
             return False
 
@@ -80,7 +78,7 @@ def do_values_match(a, b, file_name_a, file_name_b, level=0):
                 aListItem, bListItem, file_name_a, file_name_b, level + 1
             ):
                 log.warning(
-                    "Mismatch at level %s: Array items at position %s do not match",
+                    "Mismatch level %s: Array items at position %s do not match",
                     level,
                     i,
                 )
@@ -90,7 +88,7 @@ def do_values_match(a, b, file_name_a, file_name_b, level=0):
 
     are_values_equal = a == b
     if not are_values_equal:
-        log.warning("Mismatch at level %s: Values %s and %s do not match", level, a, b)
+        log.warning("Mismatch level %s: Values %s and %s do not match", level, a, b)
     return are_values_equal
 
 
