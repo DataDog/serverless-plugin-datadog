@@ -199,7 +199,8 @@
                   "Effect": "Allow",
                   "Action": [
                     "logs:CreateLogStream",
-                    "logs:CreateLogGroup"
+                    "logs:CreateLogGroup",
+                    "logs:TagResource"
                   ],
                   "Resource": [
                     {
@@ -1024,16 +1025,6 @@
         "RubyHello32LogGroup"
       ]
     },
-    "JavascriptHello12DashxLambdaVersionXXXX": {
-      "Type": "AWS::Lambda::Version",
-      "DeletionPolicy": "Retain",
-      "Properties": {
-        "FunctionName": {
-          "Ref": "JavascriptHello12DashxLambdaFunction"
-        },
-        "CodeSha256": "XXXX"
-      }
-    },
     "PythonHello37LambdaVersionXXXX": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
@@ -1173,6 +1164,16 @@
         },
         "CodeSha256": "XXXX"
       }
+    },
+    "JavascriptHello12DashxLambdaVersionXXXX": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "JavascriptHello12DashxLambdaFunction"
+        },
+        "CodeSha256": "XXXX"
+      }
     }
   },
   "Outputs": {
@@ -1228,15 +1229,6 @@
       "Value": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/FunctionLevelLayer.zip",
       "Export": {
         "Name": "sls-dd-sls-plugin-integration-test-dev-FunctionLevelLayerLambdaLayerS3Key"
-      }
-    },
-    "JavascriptHello12DashxLambdaFunctionQualifiedArn": {
-      "Description": "Current Lambda function version",
-      "Value": {
-        "Ref": "JavascriptHello12DashxLambdaVersionXXXX"
-      },
-      "Export": {
-        "Name": "sls-dd-sls-plugin-integration-test-dev-JavascriptHello12DashxLambdaFunctionQualifiedArn"
       }
     },
     "PythonHello37LambdaFunctionQualifiedArn": {
@@ -1363,6 +1355,15 @@
       },
       "Export": {
         "Name": "sls-dd-sls-plugin-integration-test-dev-RubyHello32LambdaFunctionQualifiedArn"
+      }
+    },
+    "JavascriptHello12DashxLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "JavascriptHello12DashxLambdaVersionXXXX"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-JavascriptHello12DashxLambdaFunctionQualifiedArn"
       }
     }
   }
