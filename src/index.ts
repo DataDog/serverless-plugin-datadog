@@ -33,14 +33,7 @@ import {
   addStepFunctionLogGroupSubscription,
 } from "./forwarder";
 import { newSimpleGit } from "./git";
-import {
-  applyExtensionLayer,
-  applyLambdaLibraryLayers,
-  applyTracingLayer,
-  findHandlers,
-  FunctionInfo,
-  RuntimeType,
-} from "./layer";
+import { applyExtensionLayer, applyLambdaLibraryLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
 import * as govLayers from "./layers-gov.json";
 import * as layers from "./layers.json";
 import { getCloudFormationStackId } from "./monitor-api-requests";
@@ -128,7 +121,7 @@ module.exports = class ServerlessPlugin {
     if (config.addLayers) {
       this.serverless.cli.log("Adding Lambda Library Layers to functions");
       this.debugLogHandlers(handlers);
-      applyLambdaLibraryLayers(this.serverless.service, handlers, allLayers, accountId);
+      applyLambdaLibraryLayers(this.serverless.service, handlers, allLayers, accountId, config.addExtension);
       if (hasWebpackPlugin(this.serverless.service)) {
         forceExcludeDepsFromWebpack(this.serverless.service);
       }
@@ -140,17 +133,6 @@ module.exports = class ServerlessPlugin {
       this.serverless.cli.log("Adding Datadog Lambda Extension Layer to functions");
       this.debugLogHandlers(handlers);
       applyExtensionLayer(this.serverless.service, handlers, allLayers, accountId);
-      handlers.forEach((functionInfo) => {
-        if (functionInfo.type === RuntimeType.DOTNET || functionInfo.type === RuntimeType.JAVA) {
-          const runtimeNameToReadable: { [key in RuntimeType.DOTNET | RuntimeType.JAVA]: string } = {
-            [RuntimeType.DOTNET]: ".NET",
-            [RuntimeType.JAVA]: "Java",
-          };
-          this.serverless.cli.log(`Adding ${runtimeNameToReadable[functionInfo.type]} Tracing Layer to functions`);
-          this.debugLogHandlers(handlers);
-          applyTracingLayer(this.serverless.service, functionInfo, allLayers, functionInfo.type, accountId);
-        }
-      });
     } else {
       this.serverless.cli.log("Skipping adding Lambda Extension Layer");
     }

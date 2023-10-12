@@ -636,8 +636,8 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX",
-          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-dotnet:XXX"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-dotnet:XXX",
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
       },
       "DependsOn": [
@@ -686,8 +686,8 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX",
-          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-dotnet:XXX"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-dotnet:XXX",
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
       },
       "DependsOn": [
@@ -736,8 +736,8 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX",
-          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-java:XXX"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-java:XXX",
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
       },
       "DependsOn": [
@@ -786,8 +786,8 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX",
-          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-java:XXX"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-java:XXX",
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
       },
       "DependsOn": [

@@ -131,6 +131,12 @@
         "LogGroupName": "/aws/lambda/dd-sls-plugin-integration-test-dev-DotnetcoreHello31"
       }
     },
+    "DotnetArmHello6LogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/dd-sls-plugin-integration-test-dev-DotnetArmHello6"
+      }
+    },
     "JavaHello8LogGroup": {
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
@@ -709,8 +715,8 @@
           {
             "Ref": "ProviderLevelLayerLambdaLayer"
           },
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX",
-          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-dotnet:XXX"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-dotnet:XXX",
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
       },
       "DependsOn": [
@@ -761,12 +767,67 @@
           {
             "Ref": "ProviderLevelLayerLambdaLayer"
           },
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX",
-          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-dotnet:XXX"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-dotnet:XXX",
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
       },
       "DependsOn": [
         "DotnetcoreHello31LogGroup"
+      ]
+    },
+    "DotnetArmHello6LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/dd-sls-plugin-integration-test.zip"
+        },
+        "Handler": "dotnet_handler.hello",
+        "Runtime": "dotnet6",
+        "FunctionName": "dd-sls-plugin-integration-test-dev-DotnetArmHello6",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Architectures": [
+          "arm64"
+        ],
+        "Tags": [
+          {
+            "Key": "dd_sls_plugin",
+            "Value": "vX.XX.X"
+          }
+        ],
+        "Environment": {
+          "Variables": {
+            "DD_API_KEY": 1234,
+            "DD_SITE": "datadoghq.com",
+            "DD_TRACE_ENABLED": true,
+            "DD_MERGE_XRAY_TRACES": false,
+            "DD_LOGS_INJECTION": false,
+            "DD_SERVERLESS_LOGS_ENABLED": true,
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "AWS_LAMBDA_EXEC_WRAPPER": "/opt/datadog_wrapper",
+            "DD_SERVICE": "dd-sls-plugin-integration-test",
+            "DD_ENV": "dev"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Layers": [
+          {
+            "Ref": "ProviderLevelLayerLambdaLayer"
+          },
+          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-dotnet-ARM:10",
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension-ARM:49"
+        ]
+      },
+      "DependsOn": [
+        "DotnetArmHello6LogGroup"
       ]
     },
     "JavaHello8LambdaFunction": {
@@ -813,8 +874,8 @@
           {
             "Ref": "ProviderLevelLayerLambdaLayer"
           },
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX",
-          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-java:XXX"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-java:XXX",
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
       },
       "DependsOn": [
@@ -865,8 +926,8 @@
           {
             "Ref": "ProviderLevelLayerLambdaLayer"
           },
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX",
-          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-java:XXX"
+          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-java:XXX",
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
         ]
       },
       "DependsOn": [
@@ -1115,6 +1176,16 @@
         "CodeSha256": "XXXX"
       }
     },
+    "DotnetArmHello6LambdaVersionXXXX": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "DotnetArmHello6LambdaFunction"
+        },
+        "CodeSha256": "XXXX"
+      }
+    },
     "JavaHello8LambdaVersionXXXX": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
@@ -1310,6 +1381,15 @@
       },
       "Export": {
         "Name": "sls-dd-sls-plugin-integration-test-dev-DotnetcoreHello31LambdaFunctionQualifiedArn"
+      }
+    },
+    "DotnetArmHello6LambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "DotnetArmHello6LambdaVersionXXXX"
+      },
+      "Export": {
+        "Name": "sls-dd-sls-plugin-integration-test-dev-DotnetArmHello6LambdaFunctionQualifiedArn"
       }
     },
     "JavaHello8LambdaFunctionQualifiedArn": {
