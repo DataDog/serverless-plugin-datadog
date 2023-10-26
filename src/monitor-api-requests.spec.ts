@@ -170,37 +170,39 @@ describe("searchMonitor", () => {
       status: 200,
       json: () => ({
         metadata: { total_count: 3, page: 0, per_page: 30, page_count: 1 },
-        monitors: [{
-          status: "No Data",
-          scopes: ["aws_cloudformation_stack-id:cloudformation_stack_id"],
-          classification: "metric",
-          creator: {
-            handle: "datadog@datadoghq.com",
+        monitors: [
+          {
+            status: "No Data",
+            scopes: ["aws_cloudformation_stack-id:cloudformation_stack_id"],
+            classification: "metric",
+            creator: {
+              handle: "datadog@datadoghq.com",
+              id: 1234567,
+              name: "H Jiang",
+            },
+            metrics: ["aws.lambda.enhanced.estimated_cost"],
+            notifications: [],
+            muted_until_ts: null,
+            query:
+              "pct_change(avg(last_5m),last_5m):avg:aws.lambda.enhanced.estimated_cost{aws_cloudformation_stack-id:cloudformation_stack_id} > 20",
             id: 1234567,
-            name: "H Jiang",
+            last_triggered_ts: null,
+            name: "Increased Cost",
+            tags: [
+              "service:plugin-demo-ts",
+              "created_by:dd_sls_plugin",
+              "serverless_monitor_type:single_function",
+              "aws_cloudformation_stack-id:cloudformation_stack_id",
+              "serverless_monitor_id:increased_cost",
+              "env:dev",
+            ],
+            org_id: 1234567,
+            priority: null,
+            overall_state_modified: 1234567,
+            restricted_roles: [],
+            type: "query alert",
           },
-          metrics: ["aws.lambda.enhanced.estimated_cost"],
-          notifications: [],
-          muted_until_ts: null,
-          query:
-            "pct_change(avg(last_5m),last_5m):avg:aws.lambda.enhanced.estimated_cost{aws_cloudformation_stack-id:cloudformation_stack_id} > 20",
-          id: 1234567,
-          last_triggered_ts: null,
-          name: "Increased Cost",
-          tags: [
-            "service:plugin-demo-ts",
-            "created_by:dd_sls_plugin",
-            "serverless_monitor_type:single_function",
-            "aws_cloudformation_stack-id:cloudformation_stack_id",
-            "serverless_monitor_id:increased_cost",
-            "env:dev",
-          ],
-          org_id: 1234567,
-          priority: null,
-          overall_state_modified: 1234567,
-          restricted_roles: [],
-          type: "query alert",
-        }],
+        ],
       }),
     });
     const response = await searchMonitors("datadoghq.com", "queryTag", "apikey", "appkey");
@@ -237,79 +239,84 @@ describe("searchMonitor", () => {
     });
   });
   it("returns multiple pages of monitor data", async () => {
-    const fetchMock = (fetch as unknown as jest.Mock).mockReturnValueOnce({
-      status: 200,
-      json: () => ({
-        metadata: { total_count: 2, page: 0, per_page: 1, page_count: 2 },
-        monitors: [{
-          status: "No Data",
-          scopes: ["aws_cloudformation_stack-id:cloudformation_stack_id"],
-          classification: "metric",
-          creator: {
-            handle: "datadog@datadoghq.com",
-            id: 1234567,
-            name: "H Jiang",
-          },
-          metrics: ["aws.lambda.enhanced.estimated_cost"],
-          notifications: [],
-          muted_until_ts: null,
-          query:
-            "pct_change(avg(last_5m),last_5m):avg:aws.lambda.enhanced.estimated_cost{aws_cloudformation_stack-id:cloudformation_stack_id} > 20",
-          id: 1234567,
-          last_triggered_ts: null,
-          name: "Increased Cost",
-          tags: [
-            "service:plugin-demo-ts",
-            "created_by:dd_sls_plugin",
-            "serverless_monitor_type:single_function",
-            "aws_cloudformation_stack-id:cloudformation_stack_id",
-            "serverless_monitor_id:increased_cost",
-            "env:dev",
+    const fetchMock = (fetch as unknown as jest.Mock)
+      .mockReturnValueOnce({
+        status: 200,
+        json: () => ({
+          metadata: { total_count: 2, page: 0, per_page: 1, page_count: 2 },
+          monitors: [
+            {
+              status: "No Data",
+              scopes: ["aws_cloudformation_stack-id:cloudformation_stack_id"],
+              classification: "metric",
+              creator: {
+                handle: "datadog@datadoghq.com",
+                id: 1234567,
+                name: "H Jiang",
+              },
+              metrics: ["aws.lambda.enhanced.estimated_cost"],
+              notifications: [],
+              muted_until_ts: null,
+              query:
+                "pct_change(avg(last_5m),last_5m):avg:aws.lambda.enhanced.estimated_cost{aws_cloudformation_stack-id:cloudformation_stack_id} > 20",
+              id: 1234567,
+              last_triggered_ts: null,
+              name: "Increased Cost",
+              tags: [
+                "service:plugin-demo-ts",
+                "created_by:dd_sls_plugin",
+                "serverless_monitor_type:single_function",
+                "aws_cloudformation_stack-id:cloudformation_stack_id",
+                "serverless_monitor_id:increased_cost",
+                "env:dev",
+              ],
+              org_id: 1234567,
+              priority: null,
+              overall_state_modified: 1234567,
+              restricted_roles: [],
+              type: "query alert",
+            },
           ],
-          org_id: 1234567,
-          priority: null,
-          overall_state_modified: 1234567,
-          restricted_roles: [],
-          type: "query alert",
-        }],
-      }),
-    }).mockReturnValue({
-      status: 200,
-      json: () => ({
-        metadata: { total_count: 2, page: 1, per_page: 1, page_count: 2 },
-        monitors: [{
-          status: "No Data",
-          scopes: ["aws_cloudformation_stack-id:cloudformation_stack_id"],
-          classification: "metric",
-          creator: {
-            handle: "datadog@datadoghq.com",
-            id: 1234567,
-            name: "H Jiang",
-          },
-          metrics: ["aws.lambda.errors"],
-          notifications: [],
-          muted_until_ts: null,
-          query:
-            "sum(last_5m):sum:aws.lambda.errors{functionname:myFunction}.as_count() > 0.20",
-          id: 1234568,
-          last_triggered_ts: null,
-          name: "myFunction High Errors",
-          tags: [
-            "service:plugin-demo-ts",
-            "created_by:dd_sls_plugin",
-            "serverless_monitor_type:single_function",
-            "aws_cloudformation_stack-id:cloudformation_stack_id",
-            "serverless_monitor_id:myFunction_high_errors",
-            "env:dev",
+        }),
+      })
+      .mockReturnValue({
+        status: 200,
+        json: () => ({
+          metadata: { total_count: 2, page: 1, per_page: 1, page_count: 2 },
+          monitors: [
+            {
+              status: "No Data",
+              scopes: ["aws_cloudformation_stack-id:cloudformation_stack_id"],
+              classification: "metric",
+              creator: {
+                handle: "datadog@datadoghq.com",
+                id: 1234567,
+                name: "H Jiang",
+              },
+              metrics: ["aws.lambda.errors"],
+              notifications: [],
+              muted_until_ts: null,
+              query: "sum(last_5m):sum:aws.lambda.errors{functionname:myFunction}.as_count() > 0.20",
+              id: 1234568,
+              last_triggered_ts: null,
+              name: "myFunction High Errors",
+              tags: [
+                "service:plugin-demo-ts",
+                "created_by:dd_sls_plugin",
+                "serverless_monitor_type:single_function",
+                "aws_cloudformation_stack-id:cloudformation_stack_id",
+                "serverless_monitor_id:myFunction_high_errors",
+                "env:dev",
+              ],
+              org_id: 1234567,
+              priority: null,
+              overall_state_modified: 1234567,
+              restricted_roles: [],
+              type: "query alert",
+            },
           ],
-          org_id: 1234567,
-          priority: null,
-          overall_state_modified: 1234567,
-          restricted_roles: [],
-          type: "query alert",
-        }],
-      }),
-    });
+        }),
+      });
     const response = await searchMonitors("datadoghq.com", "queryTag", "apikey", "appkey");
     expect(fetchMock.mock.calls).toHaveLength(2);
     expect(response[0]).toEqual({
@@ -355,8 +362,7 @@ describe("searchMonitor", () => {
       metrics: ["aws.lambda.errors"],
       notifications: [],
       muted_until_ts: null,
-      query:
-        "sum(last_5m):sum:aws.lambda.errors{functionname:myFunction}.as_count() > 0.20",
+      query: "sum(last_5m):sum:aws.lambda.errors{functionname:myFunction}.as_count() > 0.20",
       id: 1234568,
       last_triggered_ts: null,
       name: "myFunction High Errors",

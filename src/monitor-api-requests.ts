@@ -72,7 +72,7 @@ export async function deleteMonitor(site: string, monitorId: number, monitorsApi
 export async function searchMonitors(site: string, queryTag: string, monitorsApiKey: string, monitorsAppKey: string) {
   let monitors: QueriedMonitor[] = [];
   let page = 0;
-  let page_count = 1;
+  let pageCount = 1;
   do {
     const query = `tag:"${queryTag}"`;
     const response: Response = await fetch(`https://api.${site}/api/v1/monitor/search?query=${query}&page=${page}`, {
@@ -91,9 +91,9 @@ export async function searchMonitors(site: string, queryTag: string, monitorsApi
     const json = await response.json();
     monitors = monitors.concat(json.monitors);
 
-    page_count = json.metadata.page_count;
+    pageCount = json.metadata.page_count;
     page += 1;
-  } while (page < page_count);
+  } while (page < pageCount);
 
   return monitors;
 }
