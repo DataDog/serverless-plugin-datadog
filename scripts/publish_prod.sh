@@ -13,14 +13,14 @@
 
 set -e
 
-# Ensure on master, and pull the latest
+# Ensure on main, and pull the latest
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
-if [ $BRANCH != "master" ]; then
-    echo "Not on master, aborting"
+if [ $BRANCH != "main" ]; then
+    echo "Not on main, aborting"
     exit 1
 else
-    echo "Updating master"
-    git pull origin master
+    echo "Updating main branch"
+    git pull origin main
 fi
 
 # Ensure no uncommitted changes
@@ -30,9 +30,9 @@ if [ -n "$(git status --porcelain)" ]; then
 fi
 
 # Check we have merged our changes
-echo "Checking changes have been merged to master"
+echo "Checking changes have been merged to main branch"
 LAST_MERGED_COMMIT="$(git log --oneline -1)"
-read -p "The most recent commit to master was ${LAST_MERGED_COMMIT}. Was this your most recent change? (y/n): " CONT
+read -p "The most recent commit to the main branch was ${LAST_MERGED_COMMIT}. Was this your most recent change? (y/n): " CONT
 if [ "$CONT" != "y" ]; then
     echo "Please merge your changes before finishing the release!"
     echo "Exiting"
@@ -102,7 +102,7 @@ yarn publish --new-version "$VERSION"
 
 echo
 echo 'Pushing updates to GitHub'
-git push origin master
+git push origin main
 git push origin "refs/tags/v$VERSION"
 
 echo
