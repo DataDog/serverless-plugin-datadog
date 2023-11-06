@@ -1,5 +1,11 @@
-import { SERVERLESS_MONITORS } from "./serverless_monitors";
-import { updateMonitor, createMonitor, deleteMonitor, getExistingMonitors } from "./monitor-api-requests";
+// import { SERVERLESS_MONITORS } from "./serverless_monitors";
+import {
+  updateMonitor,
+  createMonitor,
+  deleteMonitor,
+  getExistingMonitors,
+  getRecommendedMonitors,
+} from "./monitor-api-requests";
 import { Response } from "node-fetch";
 
 export interface MonitorParams {
@@ -9,6 +15,17 @@ export interface Monitor {
   [key: string]: MonitorParams;
 }
 
+export interface ServerlessMonitor {
+  name: string;
+  threshold: number;
+  query: (cloudFormationStackId: string) => string;
+  message: string;
+  type?: string;
+}
+
+interface RecommendedMonitors {
+  [key: string]: ServerlessMonitor;
+}
 /**
  * Adds the appropriate tags and required parameters that will be passed as part of the request body for creating and updating monitors
  * @param monitor - the Monitor object that is defined in the serverless.yml file
@@ -17,7 +34,13 @@ export interface Monitor {
  * @param env  - the Environment
  * @returns valid monitor parameters
  */
-export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: string, service: string, env: string) {
+export function buildMonitorParams(
+  monitor: Monitor,
+  cloudFormationStackId: string,
+  service: string,
+  env: string,
+  recommendedMonitors: RecommendedMonitors,
+) {
   const serverlessMonitorId = Object.keys(monitor)[0];
 
   if (!monitor[serverlessMonitorId]) {
@@ -46,8 +69,8 @@ export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: stri
     `service:${service}`,
   ];
 
-  if (checkIfRecommendedMonitor(serverlessMonitorId)) {
-    let criticalThreshold = SERVERLESS_MONITORS[serverlessMonitorId].threshold;
+  if (checkIfRecommendedMonitor(serverlessMonitorId, recommendedMonitors)) {
+    let criticalThreshold = recommendedMonitors[serverlessMonitorId].threshold;
     if (monitorParams.options) {
       if (monitorParams.options.thresholds) {
         if (monitorParams.options.thresholds.critical) {
@@ -56,14 +79,16 @@ export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: stri
       }
     }
 
-    monitorParams.query = SERVERLESS_MONITORS[serverlessMonitorId].query(cloudFormationStackId, criticalThreshold);
+    monitorParams.options.thresholds.critical = criticalThreshold; 
+    monitorParams.query = recommendedMonitors[serverlessMonitorId].query(cloudFormationStackId);
 
     if (!monitorParams.message) {
-      monitorParams.message = SERVERLESS_MONITORS[serverlessMonitorId].message;
+      monitorParams.message = recommendedMonitors[serverlessMonitorId].message;
     }
     if (!monitorParams.name) {
-      monitorParams.name = SERVERLESS_MONITORS[serverlessMonitorId].name;
+      monitorParams.name = recommendedMonitors[serverlessMonitorId].name;
     }
+
   }
   return monitorParams;
 }
@@ -73,8 +98,8 @@ export function buildMonitorParams(monitor: Monitor, cloudFormationStackId: stri
  * @param serverlessMonitorId - Unique ID string defined for each monitor
  * @returns true if a given monitor is a serverless recommended monitor
  */
-function checkIfRecommendedMonitor(serverlessMonitorId: string) {
-  return Object.keys(SERVERLESS_MONITORS).includes(serverlessMonitorId);
+function checkIfRecommendedMonitor(serverlessMonitorId: string, recommendedMonitors: RecommendedMonitors) {
+  return Object.keys(recommendedMonitors).includes(serverlessMonitorId);
 }
 
 /**
@@ -160,6 +185,7 @@ export async function setMonitors(
   service: string,
   env: string,
 ) {
+  const recommendedMonitors = await getRecommendedMonitors(site, monitorsApiKey, monitorsAppKey);
   const serverlessMonitorIdByMonitorId = await getExistingMonitors(
     site,
     cloudFormationStackId,
@@ -172,7 +198,7 @@ export async function setMonitors(
   for (const monitor of monitors) {
     const serverlessMonitorId = Object.keys(monitor)[0];
     const monitorIdNumber = serverlessMonitorIdByMonitorId[serverlessMonitorId];
-    const monitorParams = buildMonitorParams(monitor, cloudFormationStackId, service, env);
+    const monitorParams = buildMonitorParams(monitor, cloudFormationStackId, service, env, recommendedMonitors);
     const monitorExists = await doesMonitorExist(serverlessMonitorId, serverlessMonitorIdByMonitorId);
 
     if (monitorExists) {

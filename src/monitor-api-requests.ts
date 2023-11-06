@@ -1,6 +1,6 @@
 import fetch, { Response } from "node-fetch";
 import * as Serverless from "serverless";
-import { MonitorParams } from "./monitors";
+import { MonitorParams, ServerlessMonitor } from "./monitors";
 
 export class InvalidAuthenticationError extends Error {
   constructor(message: string) {
@@ -15,6 +15,20 @@ interface QueriedMonitor {
   id: number;
   name: string;
   tags: string[];
+}
+
+interface RecommendedMonitorParams {
+  id: string;
+  attributes: {
+    query: string;
+    message: string;
+    description: string;
+    type: string;
+    options: {
+      thresholds: { critical: number };
+    };
+    name: string;
+  };
 }
 
 export async function createMonitor(
@@ -33,6 +47,7 @@ export async function createMonitor(
     body: JSON.stringify(monitorParams),
   });
 
+  console.log(response);
   return response;
 }
 
@@ -90,7 +105,6 @@ export async function searchMonitors(site: string, queryTag: string, monitorsApi
 
     const json = await response.json();
     monitors = monitors.concat(json.monitors);
-
     pageCount = json.metadata.page_count;
     page += 1;
   } while (page < pageCount);
@@ -137,4 +151,43 @@ export async function getExistingMonitors(
     }
   }
   return serverlessMonitorIdByMonitorId;
+}
+
+export async function getRecommendedMonitors(site: string, monitorsApiKey: string, monitorsAppKey: string) {
+  let recommendedMonitors: { [key: string]: ServerlessMonitor } = {};
+  const endpoint = `https://api.${site}/api/v2/monitor/recommended?count=50&start=0&search=tag%3A%22product%3Aserverless%22`;
+  const response: Response = await fetch(endpoint, {
+    method: "GET",
+    headers: {
+      "DD-API-KEY": monitorsApiKey,
+      "DD-APPLICATION-KEY": monitorsAppKey,
+      "Content-Type": "application/json",
+    },
+  });
+  if (response.status !== 200) {
+    throw new Error(`Can't fetch monitor params. Status code: ${response.status}. Message: ${response.statusText}`);
+  }
+
+  let json = await response.json();
+  const recommendedMonitorsData = json.data;
+  recommendedMonitorsData.forEach((recommendedMonitorParam: RecommendedMonitorParams) => {
+    const recommendedMonitor: ServerlessMonitor = {
+      name: recommendedMonitorParam.attributes.name,
+      threshold: recommendedMonitorParam.attributes.options.thresholds.critical,
+      message: recommendedMonitorParam.attributes.message,
+      type: recommendedMonitorParam.attributes.type,
+      query: (cloudFormationStackId: string) => {
+        let query = recommendedMonitorParam.attributes.query;
+        // need to change target lib or use a regex pattern
+        query = query.replace(/aws_account,functionname,region/g, `aws_coudformation_stack-id:${cloudFormationStackId}`);
+        console.log(query);
+        return query;
+      },
+    };
+    const recommendedMonitorId = recommendedMonitorParam.id.replace('serverless_', '');
+    recommendedMonitors[recommendedMonitorId] = recommendedMonitor;
+  });
+
+  console.log(recommendedMonitors);
+  return recommendedMonitors;
 }
