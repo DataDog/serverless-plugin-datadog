@@ -18,12 +18,12 @@ export interface Monitor {
 export interface ServerlessMonitor {
   name: string;
   threshold: number;
-  query: (cloudFormationStackId: string) => string;
+  query: (cloudFormationStackId: string, shouldReplaceCriticalThreshold: boolean, criticalThreshold: number) => string;
   message: string;
   type?: string;
 }
 
-interface RecommendedMonitors {
+export interface RecommendedMonitors {
   [key: string]: ServerlessMonitor;
 }
 /**
@@ -71,16 +71,27 @@ export function buildMonitorParams(
 
   if (checkIfRecommendedMonitor(serverlessMonitorId, recommendedMonitors)) {
     let criticalThreshold = recommendedMonitors[serverlessMonitorId].threshold;
+    let shouldReplaceCriticalThreshold = false;
     if (monitorParams.options) {
       if (monitorParams.options.thresholds) {
+        console.log("options set");
         if (monitorParams.options.thresholds.critical) {
+          console.log("critical threshold set");
           criticalThreshold = monitorParams.options.thresholds.critical;
+          shouldReplaceCriticalThreshold = true;
+          monitorParams.query = recommendedMonitors[serverlessMonitorId].query(
+            cloudFormationStackId,
+            shouldReplaceCriticalThreshold,
+            criticalThreshold,
+          );
+          console.log(monitorParams.query);
         }
       }
     }
 
-    monitorParams.options.thresholds.critical = criticalThreshold; 
-    monitorParams.query = recommendedMonitors[serverlessMonitorId].query(cloudFormationStackId);
+    // monitorParams.options.thresholds.critical = criticalThreshold;
+
+    // monitorParams.query = recommendedMonitors[serverlessMonitorId].query(cloudFormationStackId, replaceCriticalThreshold, criticalThreshold);
 
     if (!monitorParams.message) {
       monitorParams.message = recommendedMonitors[serverlessMonitorId].message;
@@ -88,7 +99,6 @@ export function buildMonitorParams(
     if (!monitorParams.name) {
       monitorParams.name = recommendedMonitors[serverlessMonitorId].name;
     }
-
   }
   return monitorParams;
 }
@@ -233,4 +243,15 @@ export async function setMonitors(
     logStatements.push(`Successfully deleted${successfullyDeletedMonitors}`);
   }
   return logStatements;
+}
+
+/** Helper function that replaces the default threshold included in the query string with the new critical threshold configured by the customer
+ * @param query - the query string
+ * @param criticalThreshold = new critical threshold as defined by the customer
+ */
+export function replaceCriticalThreshold(query: string, criticalThreshold: number) {
+  const thresholdComparison = /(>=|>)(.*)$/;
+  const newQuery = query.replace(thresholdComparison, `$1 ${criticalThreshold}`);
+
+  return newQuery;
 }
