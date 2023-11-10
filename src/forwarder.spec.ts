@@ -219,102 +219,102 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs, handlers);
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
-      Object {
-        "ApiGatewayGroup": Object {
-          "Properties": Object {
+      {
+        "ApiGatewayGroup": {
+          "Properties": {
             "LogGroupName": "/aws/api-gateway/gateway-group",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "ApiGatewayGroupSubscription": Object {
-          "Properties": Object {
+        "ApiGatewayGroupSubscription": {
+          "Properties": {
             "DestinationArn": "my-func",
             "FilterPattern": "",
-            "LogGroupName": Object {
+            "LogGroupName": {
               "Ref": "ApiGatewayGroup",
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
         },
-        "FirstLogGroup": Object {
-          "Properties": Object {
+        "FirstLogGroup": {
+          "Properties": {
             "LogGroupName": "/aws/lambda/first",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "FirstLogGroupSubscription": Object {
-          "Properties": Object {
+        "FirstLogGroupSubscription": {
+          "Properties": {
             "DestinationArn": "my-func",
             "FilterPattern": "",
-            "LogGroupName": Object {
+            "LogGroupName": {
               "Ref": "FirstLogGroup",
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
         },
-        "HttpApiGroup": Object {
-          "Properties": Object {
+        "HttpApiGroup": {
+          "Properties": {
             "LogGroupName": "/aws/http-api/http-group",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "HttpApiGroupSubscription": Object {
-          "Properties": Object {
+        "HttpApiGroupSubscription": {
+          "Properties": {
             "DestinationArn": "my-func",
             "FilterPattern": "",
-            "LogGroupName": Object {
+            "LogGroupName": {
               "Ref": "HttpApiGroup",
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
         },
-        "NonLambdaGroup": Object {
-          "Properties": Object {
+        "NonLambdaGroup": {
+          "Properties": {
             "LogGroupName": "/aws/apigateway/second-group",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "NonLambdaGroupSubscription": Object {
-          "Properties": Object {
+        "NonLambdaGroupSubscription": {
+          "Properties": {
             "DestinationArn": "my-func",
             "FilterPattern": "",
-            "LogGroupName": Object {
+            "LogGroupName": {
               "Ref": "NonLambdaGroup",
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
         },
-        "SecondLogGroup": Object {
-          "Properties": Object {
+        "SecondLogGroup": {
+          "Properties": {
             "LogGroupName": "/aws/lambda/second",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "SecondLogGroupSubscription": Object {
-          "Properties": Object {
+        "SecondLogGroupSubscription": {
+          "Properties": {
             "DestinationArn": "my-func",
             "FilterPattern": "",
-            "LogGroupName": Object {
+            "LogGroupName": {
               "Ref": "SecondLogGroup",
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
         },
-        "UnrelatedResource": Object {
-          "Properties": Object {},
+        "UnrelatedResource": {
+          "Properties": {},
           "Type": "AWS::AnotherResourceType",
         },
-        "WebsocketGroup": Object {
-          "Properties": Object {
+        "WebsocketGroup": {
+          "Properties": {
             "LogGroupName": "/aws/websocket/websocket-group",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "WebsocketGroupSubscription": Object {
-          "Properties": Object {
+        "WebsocketGroupSubscription": {
+          "Properties": {
             "DestinationArn": "my-func",
             "FilterPattern": "",
-            "LogGroupName": Object {
+            "LogGroupName": {
               "Ref": "WebsocketGroup",
             },
           },
@@ -357,9 +357,9 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs, handlers);
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
-      Object {
-        "StepFunctionLogGroup": Object {
-          "Properties": Object {
+      {
+        "StepFunctionLogGroup": {
+          "Properties": {
             "LogGroupName": "/aws/vendedlogs/states/StepFunction-Logs",
           },
           "Type": "AWS::Logs::LogGroup",
@@ -443,102 +443,102 @@ describe("addCloudWatchForwarderSubscriptions", () => {
     service.provider;
     await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs, handlers);
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
-      Object {
-        "ApiGatewayGroup": Object {
-          "Properties": Object {
+      {
+        "ApiGatewayGroup": {
+          "Properties": {
             "LogGroupName": "/aws/api-gateway/gateway-group",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "ApiGatewayGroupSubscription": Object {
-          "Properties": Object {
+        "ApiGatewayGroupSubscription": {
+          "Properties": {
             "DestinationArn": "my-func",
             "FilterPattern": "",
-            "LogGroupName": Object {
+            "LogGroupName": {
               "Ref": "ApiGatewayGroup",
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
         },
-        "FirstLogGroup": Object {
-          "Properties": Object {
+        "FirstLogGroup": {
+          "Properties": {
             "LogGroupName": "/aws/lambda/first",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "FirstLogGroupSubscription": Object {
-          "Properties": Object {
+        "FirstLogGroupSubscription": {
+          "Properties": {
             "DestinationArn": "my-func",
             "FilterPattern": "",
-            "LogGroupName": Object {
+            "LogGroupName": {
               "Ref": "FirstLogGroup",
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
         },
-        "HttpApiGroup": Object {
-          "Properties": Object {
+        "HttpApiGroup": {
+          "Properties": {
             "LogGroupName": "/aws/http-api/http-group",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "HttpApiGroupSubscription": Object {
-          "Properties": Object {
+        "HttpApiGroupSubscription": {
+          "Properties": {
             "DestinationArn": "my-func",
             "FilterPattern": "",
-            "LogGroupName": Object {
+            "LogGroupName": {
               "Ref": "HttpApiGroup",
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
         },
-        "NonLambdaGroup": Object {
-          "Properties": Object {
+        "NonLambdaGroup": {
+          "Properties": {
             "LogGroupName": "/aws/apigateway/second-group",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "NonLambdaGroupSubscription": Object {
-          "Properties": Object {
+        "NonLambdaGroupSubscription": {
+          "Properties": {
             "DestinationArn": "my-func",
             "FilterPattern": "",
-            "LogGroupName": Object {
+            "LogGroupName": {
               "Ref": "NonLambdaGroup",
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
         },
-        "SecondLogGroup": Object {
-          "Properties": Object {
+        "SecondLogGroup": {
+          "Properties": {
             "LogGroupName": "/aws/lambda/second",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "SecondLogGroupSubscription": Object {
-          "Properties": Object {
+        "SecondLogGroupSubscription": {
+          "Properties": {
             "DestinationArn": "my-func",
             "FilterPattern": "",
-            "LogGroupName": Object {
+            "LogGroupName": {
               "Ref": "SecondLogGroup",
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
         },
-        "UnrelatedResource": Object {
-          "Properties": Object {},
+        "UnrelatedResource": {
+          "Properties": {},
           "Type": "AWS::AnotherResourceType",
         },
-        "WebsocketGroup": Object {
-          "Properties": Object {
+        "WebsocketGroup": {
+          "Properties": {
             "LogGroupName": "/aws/websocket/websocket-group",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "WebsocketGroupSubscription": Object {
-          "Properties": Object {
+        "WebsocketGroupSubscription": {
+          "Properties": {
             "DestinationArn": "my-func",
             "FilterPattern": "",
-            "LogGroupName": Object {
+            "LogGroupName": {
               "Ref": "WebsocketGroup",
             },
           },
@@ -624,72 +624,72 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs, handlers);
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
-      Object {
-        "ApiGatewayGroup": Object {
-          "Properties": Object {
+      {
+        "ApiGatewayGroup": {
+          "Properties": {
             "LogGroupName": "/aws/api-gateway/gateway-group",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "ApiGatewayGroupSubscription": Object {
-          "Properties": Object {
+        "ApiGatewayGroupSubscription": {
+          "Properties": {
             "DestinationArn": "my-func",
             "FilterPattern": "",
-            "LogGroupName": Object {
+            "LogGroupName": {
               "Ref": "ApiGatewayGroup",
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
         },
-        "FirstLogGroup": Object {
-          "Properties": Object {
+        "FirstLogGroup": {
+          "Properties": {
             "LogGroupName": "/aws/lambda/first",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "HttpApiGroup": Object {
-          "Properties": Object {
+        "HttpApiGroup": {
+          "Properties": {
             "LogGroupName": "/aws/http-api/http-group",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "HttpApiGroupSubscription": Object {
-          "Properties": Object {
+        "HttpApiGroupSubscription": {
+          "Properties": {
             "DestinationArn": "my-func",
             "FilterPattern": "",
-            "LogGroupName": Object {
+            "LogGroupName": {
               "Ref": "HttpApiGroup",
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
         },
-        "NonLambdaGroup": Object {
-          "Properties": Object {
+        "NonLambdaGroup": {
+          "Properties": {
             "LogGroupName": "/aws/apigateway/second-group",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "SecondLogGroup": Object {
-          "Properties": Object {
+        "SecondLogGroup": {
+          "Properties": {
             "LogGroupName": "/aws/lambda/second",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "UnrelatedResource": Object {
-          "Properties": Object {},
+        "UnrelatedResource": {
+          "Properties": {},
           "Type": "AWS::AnotherResourceType",
         },
-        "WebsocketGroup": Object {
-          "Properties": Object {
+        "WebsocketGroup": {
+          "Properties": {
             "LogGroupName": "/aws/websocket/websocket-group",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "WebsocketGroupSubscription": Object {
-          "Properties": Object {
+        "WebsocketGroupSubscription": {
+          "Properties": {
             "DestinationArn": "my-func",
             "FilterPattern": "",
-            "LogGroupName": Object {
+            "LogGroupName": {
               "Ref": "WebsocketGroup",
             },
           },
@@ -734,9 +734,9 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs, handlers);
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
-      Object {
-        "FirstLogGroup": Object {
-          "Properties": Object {
+      {
+        "FirstLogGroup": {
+          "Properties": {
             "LogGroupName": "/aws/lambda/first",
           },
           "Type": "AWS::Logs::LogGroup",
@@ -777,7 +777,7 @@ describe("addCloudWatchForwarderSubscriptions", () => {
       handlers,
     );
     expect(errors).toMatchInlineSnapshot(`
-      Array [
+      [
         "No cloudformation stack available. Skipping subscribing Datadog forwarder.",
       ]
     `);
@@ -822,18 +822,18 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs, handlers);
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
-      Object {
-        "FirstLogGroup": Object {
-          "Properties": Object {
+      {
+        "FirstLogGroup": {
+          "Properties": {
             "LogGroupName": "/aws/lambda/first",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "FirstLogGroupSubscription": Object {
-          "Properties": Object {
+        "FirstLogGroupSubscription": {
+          "Properties": {
             "DestinationArn": "my-func",
             "FilterPattern": "",
-            "LogGroupName": Object {
+            "LogGroupName": {
               "Ref": "FirstLogGroup",
             },
           },
@@ -883,18 +883,18 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs, handlers);
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
-      Object {
-        "FirstLogGroup": Object {
-          "Properties": Object {
+      {
+        "FirstLogGroup": {
+          "Properties": {
             "LogGroupName": "/aws/lambda/first",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "FirstLogGroupSubscription": Object {
-          "Properties": Object {
+        "FirstLogGroupSubscription": {
+          "Properties": {
             "DestinationArn": "my-func",
             "FilterPattern": "",
-            "LogGroupName": Object {
+            "LogGroupName": {
               "Ref": "FirstLogGroup",
             },
           },
@@ -1103,25 +1103,25 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs, handlers);
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
-      Object {
-        "FirstLogGroup": Object {
-          "Properties": Object {
+      {
+        "FirstLogGroup": {
+          "Properties": {
             "LogGroupName": "/aws/lambda/first",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "FirstLogGroupSubscription": Object {
-          "Properties": Object {
+        "FirstLogGroupSubscription": {
+          "Properties": {
             "DestinationArn": "my-func",
             "FilterPattern": "",
-            "LogGroupName": Object {
+            "LogGroupName": {
               "Ref": "FirstLogGroup",
             },
           },
           "Type": "AWS::Logs::SubscriptionFilter",
         },
-        "SecondLogGroup": Object {
-          "Properties": Object {
+        "SecondLogGroup": {
+          "Properties": {
             "LogGroupName": "/aws/lambda/second",
           },
           "Type": "AWS::Logs::LogGroup",
@@ -1164,18 +1164,18 @@ describe("addCloudWatchForwarderSubscriptions", () => {
 
     await addCloudWatchForwarderSubscriptions(service as Service, aws, "my-func", forwarderConfigs, handlers);
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
-      Object {
-        "FirstDashtestLogGroup": Object {
-          "Properties": Object {
+      {
+        "FirstDashtestLogGroup": {
+          "Properties": {
             "LogGroupName": "/aws/lambda/first-test",
           },
           "Type": "AWS::Logs::LogGroup",
         },
-        "FirstDashtestLogGroupSubscription": Object {
-          "Properties": Object {
+        "FirstDashtestLogGroupSubscription": {
+          "Properties": {
             "DestinationArn": "my-func",
             "FilterPattern": "",
-            "LogGroupName": Object {
+            "LogGroupName": {
               "Ref": "FirstDashtestLogGroup",
             },
           },
@@ -1228,11 +1228,11 @@ describe("addStepFunctionLogGroup", () => {
       service.provider.compiledCloudFormationTemplate.Resources.testStepFunctionLogGroup.Properties.Tags[0].Value,
     ).toBe(`v${version}`);
     expect(stepFunction).toMatchInlineSnapshot(`
-      Object {
-        "loggingConfig": Object {
-          "destinations": Array [
-            Object {
-              "Fn::GetAtt": Array [
+      {
+        "loggingConfig": {
+          "destinations": [
+            {
+              "Fn::GetAtt": [
                 "testStepFunctionLogGroup",
                 "Arn",
               ],
@@ -1264,11 +1264,11 @@ describe("addStepFunctionLogGroup", () => {
       service.provider.compiledCloudFormationTemplate.Resources.testStepFunctionLogGroup.Properties.Tags[0].Value,
     ).toBe(`v${version}`);
     expect(stepFunction).toMatchInlineSnapshot(`
-      Object {
-        "loggingConfig": Object {
-          "destinations": Array [
-            Object {
-              "Fn::GetAtt": Array [
+      {
+        "loggingConfig": {
+          "destinations": [
+            {
+              "Fn::GetAtt": [
                 "testStepFunctionLogGroup",
                 "Arn",
               ],
@@ -1364,19 +1364,19 @@ describe("addStepFunctionLogGroupSubscription", () => {
       functionArn,
     );
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
-      Object {
-        "testStepFunctionLogGroupSubscription": Object {
-          "Properties": Object {
+      {
+        "testStepFunctionLogGroupSubscription": {
+          "Properties": {
             "DestinationArn": "forwarderArn",
             "FilterPattern": "",
-            "LogGroupName": Object {
-              "Fn::Select": Array [
+            "LogGroupName": {
+              "Fn::Select": [
                 6,
-                Object {
-                  "Fn::Split": Array [
+                {
+                  "Fn::Split": [
                     ":",
-                    Object {
-                      "Fn::GetAtt": Array [
+                    {
+                      "Fn::GetAtt": [
                         "logGroupResourceName",
                         "Arn",
                       ],
@@ -1409,19 +1409,19 @@ describe("addStepFunctionLogGroupSubscription", () => {
       functionArn,
     );
     expect(service.provider.compiledCloudFormationTemplate.Resources).toMatchInlineSnapshot(`
-      Object {
-        "testStepFunctionLogGroupSubscription": Object {
-          "Properties": Object {
+      {
+        "testStepFunctionLogGroupSubscription": {
+          "Properties": {
             "DestinationArn": "forwarderArn",
             "FilterPattern": "",
-            "LogGroupName": Object {
-              "Fn::Select": Array [
+            "LogGroupName": {
+              "Fn::Select": [
                 6,
-                Object {
-                  "Fn::Split": Array [
+                {
+                  "Fn::Split": [
                     ":",
-                    Object {
-                      "Fn::GetAtt": Array [
+                    {
+                      "Fn::GetAtt": [
                         "logGroupResourceName",
                         "Arn",
                       ],
