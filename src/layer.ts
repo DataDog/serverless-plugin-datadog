@@ -19,6 +19,10 @@ export enum RuntimeType {
   UNSUPPORTED = "unsupported",
 }
 
+// .NET can only be used with the extension and Java requires
+// some code changes
+const RUNTIMES_TO_ADD_FOR_EXTENSION_ONLY = [RuntimeType.DOTNET, RuntimeType.JAVA];
+
 export interface FunctionInfo {
   name: string;
   type: RuntimeType;
@@ -70,7 +74,8 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
   "go1.x": RuntimeType.GO,
 };
 
-export const armRuntimeKeys: { [key: string]: string } = {
+// Map from x86 runtime keys in layers.json to the corresponding ARM runtime keys
+export const ARM_RUNTIME_KEYS: { [key: string]: string } = {
   "python3.8": "python3.8-arm",
   "python3.9": "python3.9-arm",
   "python3.10": "python3.10-arm",
@@ -78,7 +83,14 @@ export const armRuntimeKeys: { [key: string]: string } = {
   "ruby2.7": "ruby2.7-arm",
   "ruby3.2": "ruby3.2-arm",
   extension: "extension-arm",
-  dotnet6: "dd-trace-dotnet-ARM",
+  dotnet: "dotnet-arm",
+  // The same Node layers work for both x86 and ARM
+  "nodejs12.x": "nodejs12.x",
+  "nodejs14.x": "nodejs14.x",
+  "nodejs16.x": "nodejs16.x",
+  "nodejs18.x": "nodejs18.x",
+  // The same Java layer works for both x86 and ARM
+  java: "java",
 };
 
 export function findHandlers(service: Service, exclude: string[], defaultRuntime?: string): FunctionInfo[] {
@@ -99,11 +111,38 @@ export function findHandlers(service: Service, exclude: string[], defaultRuntime
     ) as FunctionInfo[];
 }
 
+/**
+ * Normalize the runtime in the yml to match our layers.json keys
+ * For most runtimes the key in layers.json is the same as the string set in the
+ * serverless.yml, but for dotnet and java they are not
+ *
+ * @param runtimeSetting string set in serverless.yml ex: "dotnet6", "nodejs18.x"
+ */
+export function normalizeRuntimeKey(runtimeSetting: string) {
+  if (runtimeSetting.startsWith("dotnet")) {
+    return "dotnet";
+  }
+  if (runtimeSetting.startsWith("java")) {
+    return "java";
+  }
+  return runtimeSetting;
+}
+
+/**
+ * Add library layers for the given runtime and architecture
+ *
+ * @param service SLS framework service
+ * @param handlers Lambda functions to add layers to
+ * @param layers layers.json file read into an object
+ * @param accountId optional account ID that the layers live in - undefined
+ *        unless the customer sets a value for useLayersFromAccount in yaml
+ */
 export function applyLambdaLibraryLayers(
   service: Service,
   handlers: FunctionInfo[],
   layers: LayerJSON,
   accountId?: string,
+  isUsingExtension = true,
 ) {
   const { region } = service.provider;
   // It's possible a local account layer is being used in a region we have not published to so we use a default region's ARNs
@@ -123,22 +162,46 @@ export function applyLambdaLibraryLayers(
       continue;
     }
 
-    let runtimeKey = runtime;
+    if (!isUsingExtension && RUNTIMES_TO_ADD_FOR_EXTENSION_ONLY.includes(handler.type)) {
+      continue;
+    }
+
+    const x86RuntimeKey = normalizeRuntimeKey(runtime);
+    const armRuntimeKey = ARM_RUNTIME_KEYS[x86RuntimeKey];
+
+    let x86LayerArn = regionRuntimes[x86RuntimeKey];
+    let armLayerArn = regionRuntimes[armRuntimeKey];
+
+    if (accountId && x86LayerArn) {
+      x86LayerArn = buildLocalLambdaLayerARN(x86LayerArn, accountId, region);
+    }
+    if (accountId && armLayerArn) {
+      armLayerArn = buildLocalLambdaLayerARN(armLayerArn, accountId, region);
+    }
+
     const architecture =
       handler.handler?.architecture ?? (service.provider as any).architecture ?? DEFAULT_ARCHITECTURE;
     const isArm64 = architecture === ARM64_ARCHITECTURE;
-    if (isArm64 && runtime in armRuntimeKeys) {
-      runtimeKey = armRuntimeKeys[runtime];
-      const prevLayerARN =
-        accountId !== undefined
-          ? buildLocalLambdaLayerARN(regionRuntimes[runtime], accountId, region)
-          : regionRuntimes[runtime];
-      removePreviousLayer(service, handler, prevLayerARN);
+
+    // Use the ARM layer if customer's handler is using ARM
+    let layerARN = isArm64 ? armLayerArn : x86LayerArn;
+
+    // Fall back to the x86 layer if no ARM layer is available
+    if (isArm64 && layerARN === undefined) {
+      layerARN = x86LayerArn;
     }
 
-    let layerARN = regionRuntimes[runtimeKey];
     if (accountId && layerARN) {
       layerARN = buildLocalLambdaLayerARN(layerARN, accountId, region);
+    }
+
+    if (isArm64 && layerARN !== undefined && x86LayerArn !== undefined) {
+      // Remove the x86 layer if the customer is using ARM
+      removePreviousLayer(service, handler, x86LayerArn);
+    }
+    if (!isArm64 && layerARN !== undefined && armLayerArn !== undefined) {
+      // Remove the ARM layer if the customer is using x86
+      removePreviousLayer(service, handler, armLayerArn);
     }
 
     if (layerARN) {
@@ -170,7 +233,7 @@ export function applyExtensionLayer(service: Service, handlers: FunctionInfo[], 
           ? buildLocalLambdaLayerARN(regionRuntimes[extensionLayerKey], accountId, region)
           : regionRuntimes[extensionLayerKey];
       removePreviousLayer(service, handler, prevExtensionARN);
-      extensionLayerKey = armRuntimeKeys[extensionLayerKey];
+      extensionLayerKey = ARM_RUNTIME_KEYS[extensionLayerKey];
     }
 
     let extensionARN = regionRuntimes[extensionLayerKey];
@@ -181,31 +244,6 @@ export function applyExtensionLayer(service: Service, handlers: FunctionInfo[], 
     if (extensionARN) {
       addLayer(service, handler, extensionARN);
     }
-  }
-}
-
-export function applyTracingLayer(
-  service: Service,
-  handler: FunctionInfo,
-  layers: LayerJSON,
-  runtimeKey: string,
-  accountId?: string,
-) {
-  const { region } = service.provider;
-  // It's possible a local account layer is being used in a region we have not published to so we use a default region's ARNs
-  const shouldUseDefaultRegion = layers.regions[region] === undefined && accountId !== undefined;
-  const regionRuntimes = shouldUseDefaultRegion ? layers.regions[DEFAULT_REGION] : layers.regions[region];
-  if (regionRuntimes === undefined) {
-    return;
-  }
-
-  let traceLayerARN: string | undefined = regionRuntimes[runtimeKey];
-  if (accountId && traceLayerARN) {
-    traceLayerARN = buildLocalLambdaLayerARN(traceLayerARN, accountId, region);
-  }
-
-  if (traceLayerARN) {
-    addLayer(service, handler, traceLayerARN);
   }
 }
 

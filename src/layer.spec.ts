@@ -12,7 +12,6 @@ import {
   RuntimeType,
   applyLambdaLibraryLayers,
   applyExtensionLayer,
-  applyTracingLayer,
   findHandlers,
   pushLayerARN,
 } from "./layer";
@@ -578,8 +577,8 @@ describe("applyLambdaLibraryLayers", () => {
     const layers: LayerJSON = {
       regions: {
         "us-east-1": {
-          "dd-trace-dotnet": "dd-trace-dotnet:6",
-          "dd-trace-dotnet-ARM": "dd-trace-dotnet-ARM:6",
+          dotnet: "dd-trace-dotnet:6",
+          "dotnet-arm": "dd-trace-dotnet-ARM:6",
           extension: "extension:11",
           "extension-arm": "extension-arm:11",
         },
@@ -790,7 +789,8 @@ describe("applyLambdaLibraryLayers", () => {
     });
     const mockAccountId = "123456789012";
     const localTraceLayerARN = "arn:aws:lambda:sa-east-1:123456789012:layer:dd-trace-java:1";
-    applyTracingLayer(mockService, handler, layers, RuntimeType.JAVA, mockAccountId);
+
+    applyLambdaLibraryLayers(mockService, [handler], layers, mockAccountId);
     expect(handler.handler).toEqual({
       runtime: "java11",
       layers: [localTraceLayerARN],
@@ -811,10 +811,110 @@ describe("applyLambdaLibraryLayers", () => {
     });
     const mockAccountId = "123456789012";
     const localTraceLayerARN = "arn:aws-cn:lambda:cn-northwest-1:123456789012:layer:dd-trace-java:1";
-    applyTracingLayer(mockService, handler, layers, RuntimeType.JAVA, mockAccountId);
+
+    applyLambdaLibraryLayers(mockService, [handler], layers, mockAccountId);
     expect(handler.handler).toEqual({
       runtime: "java11",
       layers: [localTraceLayerARN],
+    });
+  });
+
+  it("adds the .NET ARM layer and ARM extension", () => {
+    const handler = {
+      handler: { runtime: "dotnet6" },
+      type: RuntimeType.DOTNET,
+      runtime: "dotnet6",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: {
+        "us-east-1": {
+          dotnet: "arn:aws:lambda:us-east-1:464622532012:layer:dd-trace-dotnet:9",
+          "dotnet-arm": "arn:aws:lambda:us-east-1:464622532012:layer:dd-trace-dotnet-ARM:9",
+          extension: "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:47",
+          "extension-arm": "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension-ARM:47",
+        },
+      },
+    };
+    const mockService = createMockService(
+      "us-east-1",
+      {
+        "dotnet-function": { handler: "AwsDotnetCsharp::AwsDotnetCsharp.Handler::HelloWorld", runtime: "dotnet6" },
+      },
+      "arm64",
+    );
+    applyLambdaLibraryLayers(mockService, [handler], layers);
+    applyExtensionLayer(mockService, [handler], layers);
+    expect(handler.handler).toEqual({
+      runtime: "dotnet6",
+      layers: [
+        "arn:aws:lambda:us-east-1:464622532012:layer:dd-trace-dotnet-ARM:9",
+        "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension-ARM:47",
+      ],
+    });
+  });
+
+  it("adds the .NET ARM layer and extension with account ID specified", () => {
+    const handler = {
+      handler: { runtime: "dotnet6" },
+      type: RuntimeType.DOTNET,
+      runtime: "dotnet6",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: {
+        "us-east-1": {
+          dotnet: "arn:aws:lambda:us-east-1:464622532012:layer:dd-trace-dotnet:9",
+          "dotnet-arm": "arn:aws:lambda:us-east-1:464622532012:layer:dd-trace-dotnet-ARM:9",
+          extension: "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:47",
+          "extension-arm": "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension-ARM:47",
+        },
+      },
+    };
+    const mockService = createMockService(
+      "us-east-1",
+      {
+        "dotnet-function": { handler: "AwsDotnetCsharp::AwsDotnetCsharp.Handler::HelloWorld", runtime: "dotnet6" },
+      },
+      "arm64",
+    );
+    const mockAccountId = "123456789012";
+    applyLambdaLibraryLayers(mockService, [handler], layers, mockAccountId);
+    applyExtensionLayer(mockService, [handler], layers, mockAccountId);
+
+    expect(handler.handler).toEqual({
+      runtime: "dotnet6",
+      layers: [
+        "arn:aws:lambda:us-east-1:123456789012:layer:dd-trace-dotnet-ARM:9",
+        "arn:aws:lambda:us-east-1:123456789012:layer:Datadog-Extension-ARM:47",
+      ],
+    });
+  });
+
+  it("does not add the .NET ARM layer without extension", () => {
+    const handler = {
+      handler: { runtime: "dotnet6" },
+      type: RuntimeType.DOTNET,
+      runtime: "dotnet6",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: {
+        "us-east-1": {
+          dotnet: "arn:aws:lambda:us-east-1:464622532012:layer:dd-trace-dotnet:9",
+          "dotnet-arm": "arn:aws:lambda:us-east-1:464622532012:layer:dd-trace-dotnet-ARM:9",
+          extension: "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:47",
+          "extension-arm": "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension-ARM:47",
+        },
+      },
+    };
+    const mockService = createMockService(
+      "us-east-1",
+      {
+        "dotnet-function": { handler: "AwsDotnetCsharp::AwsDotnetCsharp.Handler::HelloWorld", runtime: "dotnet6" },
+      },
+      "arm64",
+    );
+    applyLambdaLibraryLayers(mockService, [handler], layers, undefined, false);
+    expect(handler.handler).toEqual({
+      runtime: "dotnet6",
     });
   });
 });
