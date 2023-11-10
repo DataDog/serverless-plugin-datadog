@@ -51,7 +51,7 @@ for ((i = 0; i < ${#SERVERLESS_CONFIGS[@]}; i++)); do
     # Normalize dd_sls_plugin version tag value
     perl -p -i -e 's/(v\d+.\d+.\d+)/vX.XX.X/g' ${RAW_CFN_TEMPLATE}
     # Normalize Datadog Layer Arn versions
-    perl -p -i -e 's/(arn:aws:lambda:sa-east-1:464622532012:layer:(Datadog-(Python37|Python38|Python39|Ruby2-7|Ruby3-2|Node12-x|Node14-x|Node16-x|Node18-x|Extension)|dd-trace-(dotnet|java)):\d+)/arn:aws:lambda:sa-east-1:464622532012:layer:\2:XXX/g' ${RAW_CFN_TEMPLATE}
+    perl -p -i -e 's/(arn:aws:lambda:sa-east-1:464622532012:layer:(Datadog-(Python37|Python38|Python39|Ruby2-7|Ruby3-2|Node12-x|Node14-x|Node16-x|Node18-x|Extension)|dd-trace-(dotnet|java)):(-ARM)?\d+)/arn:aws:lambda:sa-east-1:464622532012:layer:\2:XXX/g' ${RAW_CFN_TEMPLATE}
     # Normalize API Gateway timestamps
     perl -p -i -e 's/("ApiGatewayDeployment.*")/"ApiGatewayDeploymentxxxx"/g' ${RAW_CFN_TEMPLATE}
     # Normalize layer timestamps
@@ -67,7 +67,7 @@ for ((i = 0; i < ${#SERVERLESS_CONFIGS[@]}; i++)); do
     echo "Performing diff of ${TEST_SNAPSHOTS[i]} against ${CORRECT_SNAPSHOTS[i]}"
     set +e # Dont exit right away if there is a diff in snapshots
     cd ..
-    
+
     python $scripts_dir/compare_snapshots.py $integration_tests_dir/${TEST_SNAPSHOTS[i]} $integration_tests_dir/${CORRECT_SNAPSHOTS[i]}
     return_code=$?
     set -e
