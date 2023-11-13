@@ -18,7 +18,7 @@ export interface Monitor {
 export interface ServerlessMonitor {
   name: string;
   threshold: number;
-  query: (cloudFormationStackId: string, shouldReplaceCriticalThreshold: boolean, criticalThreshold: number) => string;
+  query: (cloudFormationStackId: string, criticalThreshold: number) => string;
   message: string;
   type?: string;
 }
@@ -41,6 +41,7 @@ export function buildMonitorParams(
   env: string,
   recommendedMonitors: RecommendedMonitors,
 ) {
+  // console.log({recommendedMonitors});
   const serverlessMonitorId = Object.keys(monitor)[0];
 
   if (!monitor[serverlessMonitorId]) {
@@ -69,29 +70,29 @@ export function buildMonitorParams(
     `service:${service}`,
   ];
 
+  // let shouldReplaceCriticalThreshold = false;
   if (checkIfRecommendedMonitor(serverlessMonitorId, recommendedMonitors)) {
+    // console.log(`${serverlessMonitorId} is a recommended monitor`);
     let criticalThreshold = recommendedMonitors[serverlessMonitorId].threshold;
-    let shouldReplaceCriticalThreshold = false;
+    
     if (monitorParams.options) {
       if (monitorParams.options.thresholds) {
-        console.log("options set");
         if (monitorParams.options.thresholds.critical) {
-          console.log("critical threshold set");
           criticalThreshold = monitorParams.options.thresholds.critical;
-          shouldReplaceCriticalThreshold = true;
-          monitorParams.query = recommendedMonitors[serverlessMonitorId].query(
-            cloudFormationStackId,
-            shouldReplaceCriticalThreshold,
-            criticalThreshold,
-          );
-          console.log(monitorParams.query);
+          // shouldReplaceCriticalThreshold = true;
+          // need to modify this
+          // monitorParams.query = recommendedMonitors[serverlessMonitorId].query(
+          //   cloudFormationStackId,
+          //   // shouldReplaceCriticalThreshold,
+          //   criticalThreshold,
+          // );
         }
       }
-    }
 
-    // monitorParams.options.thresholds.critical = criticalThreshold;
+      monitorParams.query = recommendedMonitors[serverlessMonitorId].query(cloudFormationStackId, criticalThreshold);
 
-    // monitorParams.query = recommendedMonitors[serverlessMonitorId].query(cloudFormationStackId, replaceCriticalThreshold, criticalThreshold);
+    } 
+
 
     if (!monitorParams.message) {
       monitorParams.message = recommendedMonitors[serverlessMonitorId].message;

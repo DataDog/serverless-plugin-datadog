@@ -391,7 +391,7 @@ describe("searchMonitor", () => {
 
 describe("getRecommendedMonitors", () => {
   const validRequestBody = {
-    headers: { "Content-Type": "application/json", "DD-API-KEY": "apikey", "DD-APPLICATION-KEY": "appkey" },
+    headers: { "Content-Type": "application/json", "DD-API-KEY": "apiKey", "DD-APPLICATION-KEY": "appKey" },
     method: "GET",
   };
   afterEach(() => {
@@ -657,38 +657,58 @@ describe("getRecommendedMonitors", () => {
       }),
     });
     const response = await getRecommendedMonitors("datadoghq.com", "apiKey", "appKey")
-    expect(response).toEqual({
+    expect(JSON.stringify(response)).toEqual(JSON.stringify({
         high_cold_start_rate: {
           name: 'High Cold Start Rate on $functionName in $regionName for $awsAccount',
           threshold: 0.2,
           message: 'More than 20% of the function’s invocations were cold starts in the selected time range. Datadog’s [enhanced metrics](https://docs.datadoghq.com/serverless/enhanced_lambda_metrics) and [distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing) can help you understand the impact of cold starts on your applications today. {{#is_alert}} Resolution: Cold starts occur when your serverless applications receive sudden increases in traffic, and can occur when the function was previously inactive or when it was receiving a relatively constant number of requests. Users may perceive cold starts as slow response times or lag. To get ahead of cold starts, consider enabling [provisioned concurrency](https://www.datadoghq.com/blog/monitor-aws-lambda-provisioned-concurrency/) on your impacted Lambda functions. Note that this could affect your AWS bill. {{/is_alert}}',
           type: 'query alert',
-          query: [Function query],
+          query: (cloudFormationStackId: string, shouldReplaceCriticalThreshold: boolean, criticalThreshold: number) => {      
+            if (shouldReplaceCriticalThreshold) {
+              return `sum(last_15m):sum:aws.lambda.enhanced.invocations{cold_start:true,${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() / sum:aws.lambda.enhanced.invocations{${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() >= 0.2`;
+            } 
+            return `sum(last_15m):sum:aws.lambda.enhanced.invocations{cold_start:true,${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() / sum:aws.lambda.enhanced.invocations{${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() >= ${criticalThreshold}`;
+          },
         },
         high_error_rate: {
           name: 'High Error Rate on $functionName in $regionName for $awsAccount',
           threshold: 0.1,
           message: 'More than 10% of the function’s invocations were errors in the selected time range. {{#is_alert}} Resolution: Examine the function’s logs, check for recent code or configuration changes with [Deployment Tracking](https://docs.datadoghq.com/serverless/deployment_tracking), or look for failures across microservices with [distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing).{{/is_alert}}',
           type: 'query alert',
-          query: [Function query],
+          query: (cloudFormationStackId: string, shouldReplaceCriticalThreshold: boolean, criticalThreshold: number) => {      
+            if (shouldReplaceCriticalThreshold) {
+              return `avg(last_15m):sum:aws.lambda.errors{${cloudFormationStackId}} by {functionname,region,aws_account}.as_count() / sum:aws.lambda.invocations${cloudFormationStackId}} by {functionname,region,aws_account}.as_count() >= ${criticalThreshold}`
+            } 
+            return `avg(last_15m):sum:aws.lambda.errors{${cloudFormationStackId} by {functionname,region,aws_account}.as_count() / sum:aws.lambda.invocations${cloudFormationStackId}} by {functionname,region,aws_account}.as_count() >= 0.1`
+          },
         },
         high_iterator_age: {
           name: 'High Iterator Age on $functionName in $regionName for $awsAccount',
           threshold: 86400,
           message: 'The function’s iterator was older than 24 hours. Iterator age measures the age of the last record for each batch of records processed from a stream. When this value increases, it means your function cannot process data fast enough. {{#is_alert}} Resolution: Enable [distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing) to isolate why your function has so much data being streamed to it. You can also consider increasing the shard count and batch size of the stream your function reads from. {{/is_alert}}',
           type: 'query alert',
-          query: [Function query],
+          query: (cloudFormationStackId: string, shouldReplaceCriticalThreshold: boolean, criticalThreshold: number) => {      
+            if (shouldReplaceCriticalThreshold) {
+              return `avg(last_15m):min:aws.lambda.iterator_age.maximum${cloudFormationStackId}} by {aws_account,region,functionname} >= ${criticalThreshold}`
+            } 
+            return `avg(last_15m):min:aws.lambda.iterator_age.maximum{${cloudFormationStackId}} by {aws_account,region,functionname} >= 86400`
+          }
         },
         high_throttles: {
           name: 'High Throttles on $functionName in $regionName for $awsAccount',
           threshold: 0.2,
           message: 'More than 10% of invocations in the selected time range were throttled. Throttling occurs when your serverless Lambda applications receive high levels of traffic without adequate [concurrency](https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html). {{#is_alert}} Resolution: Check your [Lambda concurrency metrics](https://docs.datadoghq.com/integrations/amazon_lambda/#metrics) and confirm if `aws.lambda.concurrent_executions.maximum` is approaching your AWS account concurrency level. If so, consider configuring reserved concurrency, or request a service quota increase from AWS. Note that this may affect your AWS bill. {{/is_alert}}',
           type: 'query alert',
-          query: [Function query],
+          query: (cloudFormationStackId: string, shouldReplaceCriticalThreshold: boolean, criticalThreshold: number) => {      
+            if (shouldReplaceCriticalThreshold) {
+              return `sum(last_15m):sum:aws.lambda.throttles {${cloudFormationStackId}} by {aws_account,region,functionname}.as_count() / ( sum:aws.lambda.throttles {$scope} by {aws_account,region,functionname}.as_count() + sum:aws.lambda.invocations{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,region,functionname}.as_count()) >= ${criticalThreshold}`
+            } 
+            return `sum(last_15m):sum:aws.lambda.throttles {${cloudFormationStackId}} by {aws_account,region,functionname}.as_count() / ( sum:aws.lambda.throttles {$scope} by {aws_account,region,functionname}.as_count() + sum:aws.lambda.invocations{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,region,functionname}.as_count()) >= 0.2`
+          },
         },
-    })
+    }));
     expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
-      "https://api.${site}/api/v2/monitor/recommended?count=50&start=0&search=tag%3A%22product%3Aserverless%22",
+      "https://api.datadoghq.com/api/v2/monitor/recommended?count=50&start=0&search=tag%3A%22product%3Aserverless%22",
       validRequestBody,
     );
   });

@@ -46,7 +46,7 @@ export async function createMonitor(
     },
     body: JSON.stringify(monitorParams),
   });
-  console.log(JSON.stringify(monitorParams));
+  // console.log(JSON.stringify(monitorParams));
   // console.log(response);
   return response;
 }
@@ -176,18 +176,16 @@ export async function getRecommendedMonitors(site: string, monitorsApiKey: strin
       threshold: recommendedMonitorParam.attributes.options.thresholds.critical,
       message: recommendedMonitorParam.attributes.message,
       type: recommendedMonitorParam.attributes.type,
-      query: (cloudFormationStackId: string, shouldReplaceCriticalThreshold: boolean, criticalThreshold: number) => {
+      query: (cloudFormationStackId: string, criticalThreshold: number) => {
         let query = recommendedMonitorParam.attributes.query;
         query = query.replace(/\$scope*/g, `aws_coudformation_stack-id:${cloudFormationStackId}`);
-        if (shouldReplaceCriticalThreshold) {
-          console.log('hello world');
+        if (criticalThreshold !== recommendedMonitorParam.attributes.options.thresholds.critical) {
           query = replaceCriticalThreshold(query, criticalThreshold);
         }
-        console.log(`query: ${query}`);
         return query;
       },
     };
-    // console.log(recommendedMonitor.query("CLOUDFORMATION_STACK_ID"));
+
     // recommended monitor params have an id that includes a serverless_ prefix that we have to remove to match the monitor ids we use in the plugin
     const recommendedMonitorId = recommendedMonitorParam.id.replace("serverless_", "");
     recommendedMonitors[recommendedMonitorId] = recommendedMonitor;
