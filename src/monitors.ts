@@ -68,7 +68,7 @@ export function buildMonitorParams(
     `service:${service}`,
   ];
 
-  if (checkIfRecommendedMonitor(serverlessMonitorId, recommendedMonitors)) {
+  if (isRecommendedMonitor(serverlessMonitorId, recommendedMonitors)) {
     let criticalThreshold = recommendedMonitors[serverlessMonitorId].threshold;
     
     if (monitorParams.options) {
@@ -96,7 +96,7 @@ export function buildMonitorParams(
  * @param serverlessMonitorId - Unique ID string defined for each monitor
  * @returns true if a given monitor is a serverless recommended monitor
  */
-function checkIfRecommendedMonitor(serverlessMonitorId: string, recommendedMonitors: RecommendedMonitors) {
+function isRecommendedMonitor(serverlessMonitorId: string, recommendedMonitors: RecommendedMonitors) {
   return Object.keys(recommendedMonitors).includes(serverlessMonitorId);
 }
 
