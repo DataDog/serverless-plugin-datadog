@@ -41,7 +41,6 @@ export function buildMonitorParams(
   env: string,
   recommendedMonitors: RecommendedMonitors,
 ) {
-  // console.log({recommendedMonitors});
   const serverlessMonitorId = Object.keys(monitor)[0];
 
   if (!monitor[serverlessMonitorId]) {
@@ -70,29 +69,18 @@ export function buildMonitorParams(
     `service:${service}`,
   ];
 
-  // let shouldReplaceCriticalThreshold = false;
   if (checkIfRecommendedMonitor(serverlessMonitorId, recommendedMonitors)) {
-    // console.log(`${serverlessMonitorId} is a recommended monitor`);
     let criticalThreshold = recommendedMonitors[serverlessMonitorId].threshold;
     
     if (monitorParams.options) {
       if (monitorParams.options.thresholds) {
         if (monitorParams.options.thresholds.critical) {
           criticalThreshold = monitorParams.options.thresholds.critical;
-          // shouldReplaceCriticalThreshold = true;
-          // need to modify this
-          // monitorParams.query = recommendedMonitors[serverlessMonitorId].query(
-          //   cloudFormationStackId,
-          //   // shouldReplaceCriticalThreshold,
-          //   criticalThreshold,
-          // );
         }
       }
 
-      monitorParams.query = recommendedMonitors[serverlessMonitorId].query(cloudFormationStackId, criticalThreshold);
-
     } 
-
+    monitorParams.query = recommendedMonitors[serverlessMonitorId].query(cloudFormationStackId, criticalThreshold);
 
     if (!monitorParams.message) {
       monitorParams.message = recommendedMonitors[serverlessMonitorId].message;
@@ -211,7 +199,6 @@ export async function setMonitors(
     const monitorIdNumber = serverlessMonitorIdByMonitorId[serverlessMonitorId];
     const monitorParams = buildMonitorParams(monitor, cloudFormationStackId, service, env, recommendedMonitors);
     const monitorExists = await doesMonitorExist(serverlessMonitorId, serverlessMonitorIdByMonitorId);
-
     if (monitorExists) {
       const response = await updateMonitor(site, monitorIdNumber, monitorParams, monitorsApiKey, monitorsAppKey);
       const successfullyCreated = handleMonitorsApiResponse(response, serverlessMonitorId, subdomain, site);

@@ -25,7 +25,7 @@ interface RecommendedMonitorParams {
     description: string;
     type: string;
     options: {
-      thresholds: { critical: number };
+      thresholds: { [key: string]: any; };
     };
     name: string;
   };
@@ -46,8 +46,7 @@ export async function createMonitor(
     },
     body: JSON.stringify(monitorParams),
   });
-  // console.log(JSON.stringify(monitorParams));
-  // console.log(response);
+
   return response;
 }
 
