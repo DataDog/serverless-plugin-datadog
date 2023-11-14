@@ -1,4 +1,3 @@
-// import { SERVERLESS_MONITORS } from "./serverless_monitors";
 import {
   updateMonitor,
   createMonitor,
