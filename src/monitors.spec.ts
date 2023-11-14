@@ -200,8 +200,6 @@ describe("buildMonitorParams", () => {
     expect(monitorParams).toEqual(UPDATED_CUSTOM_MONITOR_2_PARAMS);
   });
   it("returns valid monitor params for Increased Cost monitor", async () => {
-    // const monitorParams = buildMonitorParams(INCREASED_COST_MONITOR, "cloud_formation_id", "service", "env", RECOMMENDED_MONITORS);
-    // expect(monitorParams).toEqual(INCREASED_COST_MONITOR_PARAMS);
   });
   it("returns valid monitor params for the Timeout monitor", async () => {
     const monitorParams = buildMonitorParams(TIMEOUT_MONITOR, "cloud_formation_id", "service", "env", RECOMMENDED_MONITORS);
