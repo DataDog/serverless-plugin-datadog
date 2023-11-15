@@ -1,4 +1,10 @@
-import { createMonitor, deleteMonitor, getExistingMonitors, updateMonitor, getRecommendedMonitors } from "./monitor-api-requests";
+import {
+  createMonitor,
+  deleteMonitor,
+  getExistingMonitors,
+  updateMonitor,
+  getRecommendedMonitors,
+} from "./monitor-api-requests";
 import { Monitor, RecommendedMonitors, setMonitors, buildMonitorParams } from "./monitors";
 
 jest.mock("./monitor-api-requests", () => ({
@@ -164,23 +170,24 @@ const TIMEOUT_MONITOR_PARAMS = {
 
 const RECOMMENDED_MONITORS: RecommendedMonitors = {
   increased_cost: {
-    name: "Increased Cost on $functionName in $regionName for $awsAccount", 
+    name: "Increased Cost on $functionName in $regionName for $awsAccount",
     threshold: 0.2,
     message: "Estimated cost of invocations have increased more than 20%",
-    query: (cloudFormationStackId: string,  criticalThreshold: number) => {      
+    query: (cloudFormationStackId: string, criticalThreshold: number) => {
       return `pct_change(avg(last_5m),last_5m):avg:aws.lambda.enhanced.estimated_cost{aws_cloudformation_stack-id:${cloudFormationStackId}} > ${criticalThreshold}`;
     },
   },
   timeout: {
-    name: "Timeout on $functionName in $regionName for $awsAccount", 
+    name: "Timeout on $functionName in $regionName for $awsAccount",
     threshold: 1,
-    message: "At least one invocation in the selected time range timed out. This occurs when your function runs for longer than the configured timeout or the global Lambda timeout. Resolution: [Distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing) can help you pinpoint slow requests to APIs and other microservices. You can also consider increasing the timeout of your function. Note that this could affect your AWS bill.",
-    type: 'query alert',
-    query: (cloudFormationStackId: string,  criticalThreshold: number) => {      
+    message:
+      "At least one invocation in the selected time range timed out. This occurs when your function runs for longer than the configured timeout or the global Lambda timeout. Resolution: [Distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing) can help you pinpoint slow requests to APIs and other microservices. You can also consider increasing the timeout of your function. Note that this could affect your AWS bill.",
+    type: "query alert",
+    query: (cloudFormationStackId: string, criticalThreshold: number) => {
       return `avg(last_15m):sum:aws.lambda.duration.maximum{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() / (sum:aws.lambda.timeout{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() * 1000) >= ${criticalThreshold}`;
     },
-  }
-}
+  },
+};
 
 const MONITOR_SET_1 = [CUSTOM_MONITOR_1, CUSTOM_MONITOR_2, INCREASED_COST_MONITOR];
 const MONITOR_SET_2 = [CUSTOM_MONITOR_1, UPDATED_CUSTOM_MONITOR_2, TIMEOUT_MONITOR];
@@ -188,21 +195,44 @@ const MONITOR_SET_3 = [CUSTOM_MONITOR_1, INCREASED_COST_MONITOR];
 
 describe("buildMonitorParams", () => {
   it("returns valid monitor params for a custom monitor", async () => {
-    const monitorParams = buildMonitorParams(CUSTOM_MONITOR_1, "cloud_formation_id", "service", "env", RECOMMENDED_MONITORS);
+    const monitorParams = buildMonitorParams(
+      CUSTOM_MONITOR_1,
+      "cloud_formation_id",
+      "service",
+      "env",
+      RECOMMENDED_MONITORS,
+    );
     expect(monitorParams).toEqual(CUSTOM_MONITOR_1_PARAMS);
   });
   it("returns valid monitor params for a custom monitor", async () => {
-    const monitorParams = buildMonitorParams(CUSTOM_MONITOR_2, "cloud_formation_id", "service", "env", RECOMMENDED_MONITORS);
+    const monitorParams = buildMonitorParams(
+      CUSTOM_MONITOR_2,
+      "cloud_formation_id",
+      "service",
+      "env",
+      RECOMMENDED_MONITORS,
+    );
     expect(monitorParams).toEqual(CUSTOM_MONITOR_2_PARAMS);
   });
   it("returns valid monitor params for an updated custom monitor", async () => {
-    const monitorParams = buildMonitorParams(UPDATED_CUSTOM_MONITOR_2, "cloud_formation_id", "service", "env", RECOMMENDED_MONITORS);
+    const monitorParams = buildMonitorParams(
+      UPDATED_CUSTOM_MONITOR_2,
+      "cloud_formation_id",
+      "service",
+      "env",
+      RECOMMENDED_MONITORS,
+    );
     expect(monitorParams).toEqual(UPDATED_CUSTOM_MONITOR_2_PARAMS);
   });
-  it("returns valid monitor params for Increased Cost monitor", async () => {
-  });
+  it("returns valid monitor params for Increased Cost monitor", async () => {});
   it("returns valid monitor params for the Timeout monitor", async () => {
-    const monitorParams = buildMonitorParams(TIMEOUT_MONITOR, "cloud_formation_id", "service", "env", RECOMMENDED_MONITORS);
+    const monitorParams = buildMonitorParams(
+      TIMEOUT_MONITOR,
+      "cloud_formation_id",
+      "service",
+      "env",
+      RECOMMENDED_MONITORS,
+    );
     expect(monitorParams).toEqual(TIMEOUT_MONITOR_PARAMS);
   });
 });
@@ -213,7 +243,7 @@ describe("setMonitors", () => {
     (updateMonitor as unknown as jest.Mock).mockRestore();
     (deleteMonitor as unknown as jest.Mock).mockRestore();
     (getExistingMonitors as unknown as jest.Mock).mockRestore();
-    (getRecommendedMonitors as unknown as jest.Mock).mockRestore(); 
+    (getRecommendedMonitors as unknown as jest.Mock).mockRestore();
   });
 
   it("returns 'Successfully created custom_monitor_1'", async () => {

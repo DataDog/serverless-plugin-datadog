@@ -70,15 +70,14 @@ export function buildMonitorParams(
 
   if (isRecommendedMonitor(serverlessMonitorId, recommendedMonitors)) {
     let criticalThreshold = recommendedMonitors[serverlessMonitorId].threshold;
-    
+
     if (monitorParams.options) {
       if (monitorParams.options.thresholds) {
         if (monitorParams.options.thresholds.critical) {
           criticalThreshold = monitorParams.options.thresholds.critical;
         }
       }
-
-    } 
+    }
     monitorParams.query = recommendedMonitors[serverlessMonitorId].query(cloudFormationStackId, criticalThreshold);
 
     if (!monitorParams.message) {
