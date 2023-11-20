@@ -96,7 +96,7 @@ describe("findHandlers", () => {
         runtime: "nodejs18.x",
       },
       {
-        name: "node18-function",
+        name: "node20-function",
         handler: { handler: "myfile.handler", runtime: "nodejs20.x" },
         type: RuntimeType.NODE,
         runtime: "nodejs20.x",
