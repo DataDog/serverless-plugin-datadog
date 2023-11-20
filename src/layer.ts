@@ -56,6 +56,7 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
   "nodejs14.x": RuntimeType.NODE,
   "nodejs16.x": RuntimeType.NODE,
   "nodejs18.x": RuntimeType.NODE,
+  "nodejs20.x": RuntimeType.NODE,
   "python3.7": RuntimeType.PYTHON,
   "python3.8": RuntimeType.PYTHON,
   "python3.9": RuntimeType.PYTHON,
@@ -89,6 +90,7 @@ export const ARM_RUNTIME_KEYS: { [key: string]: string } = {
   "nodejs14.x": "nodejs14.x",
   "nodejs16.x": "nodejs16.x",
   "nodejs18.x": "nodejs18.x",
+  "nodejs20.x": "nodejs20.x",
   // The same Java layer works for both x86 and ARM
   java: "java",
 };
