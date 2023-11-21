@@ -60,6 +60,9 @@ functions:
   JavascriptHello18-x:
     handler: js_handler.hello
     runtime: nodejs18.x
+  JavascriptHello20-x:
+    handler: js_handler.hello
+    runtime: nodejs20.x
   DotnetHello6:
     handler: dotnet_handler.hello
     runtime: dotnet6

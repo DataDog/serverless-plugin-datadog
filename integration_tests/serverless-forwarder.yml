@@ -66,6 +66,9 @@ functions:
   JavascriptHello18-x:
     handler: js_handler.hello
     runtime: nodejs18.x
+  JavascriptHello20-x:
+    handler: js_handler.hello
+    runtime: nodejs20.x
   ExcludeThis:
     handler: js_handler.hello
     runtime: nodejs14.x
