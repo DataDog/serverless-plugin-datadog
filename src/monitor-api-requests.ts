@@ -46,7 +46,7 @@ export async function createMonitor(
     },
     body: JSON.stringify(monitorParams),
   });
-
+  console.log(JSON.stringify(monitorParams));
   return response;
 }
 
@@ -143,7 +143,7 @@ export async function getExistingMonitors(
   const serverlessMonitorIdByMonitorId: { [key: string]: number } = {};
   for (const existingMonitor of existingMonitors) {
     for (const tag of existingMonitor.tags) {
-      if (tag.startsWith("serverless_monitor_id:")) {
+      if (tag.startsWith("serverless_monitor_id:") || tag.startsWith("serverless_id:")) {
         const serverlessMonitorId = tag.substring(tag.indexOf(":") + 1);
         serverlessMonitorIdByMonitorId[serverlessMonitorId] = existingMonitor.id;
       }
@@ -153,7 +153,7 @@ export async function getExistingMonitors(
 }
 
 export async function getRecommendedMonitors(site: string, monitorsApiKey: string, monitorsAppKey: string) {
-  let recommendedMonitors: { [key: string]: ServerlessMonitor } = {};
+  const recommendedMonitors: { [key: string]: ServerlessMonitor } = {};
   const endpoint = `https://api.${site}/api/v2/monitor/recommended?count=50&start=0&search=tag%3A%22product%3Aserverless%22`;
   const response: Response = await fetch(endpoint, {
     method: "GET",
@@ -167,7 +167,7 @@ export async function getRecommendedMonitors(site: string, monitorsApiKey: strin
     throw new Error(`Can't fetch monitor params. Status code: ${response.status}. Message: ${response.statusText}`);
   }
 
-  let json = await response.json();
+  const json = await response.json();
   const recommendedMonitorsData = json.data;
   recommendedMonitorsData.forEach((recommendedMonitorParam: RecommendedMonitorParams) => {
     const recommendedMonitor: ServerlessMonitor = {
