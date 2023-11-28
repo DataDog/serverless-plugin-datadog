@@ -46,7 +46,6 @@ export async function createMonitor(
     },
     body: JSON.stringify(monitorParams),
   });
-  console.log(JSON.stringify(monitorParams));
   return response;
 }
 
