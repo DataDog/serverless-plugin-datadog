@@ -66,6 +66,7 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
   dotnet6: RuntimeType.DOTNET,
   java11: RuntimeType.JAVA,
   java17: RuntimeType.JAVA,
+  java21: RuntimeType.JAVA,
   "java8.al2": RuntimeType.JAVA,
   java8: RuntimeType.JAVA,
   "provided.al2": RuntimeType.CUSTOM,
