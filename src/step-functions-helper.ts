@@ -93,7 +93,7 @@ export function updateDefinitionString(
 }
 
 export function inspectAndRecommendStepFunctionsInstrumentation(serverless: Serverless) {
-  const stepFunctions = Object.values((serverless.service as any).stepFunctions.stateMachines);
+  const stepFunctions = Object.values((serverless.service as any).stepFunctions?.stateMachines || {});
   if (stepFunctions.length !== 0) {
     serverless.cli.log(
       `Uninstrumented Step Functions detected in your serverless.yml file. If you would like to see Step Functions traces, please see details of 'enableStepFunctionsTracing' and 'mergeStepFunctionAndLambdaTraces' variables in the README (https://github.com/DataDog/serverless-plugin-datadog/)`,

@@ -250,7 +250,7 @@ module.exports = class ServerlessPlugin {
           inspectAndRecommendStepFunctionsInstrumentation(this.serverless);
         } catch (error) {
           this.serverless.cli.log(
-            `Error raise when inspecting if there are any uninstrumented Step Functions state machines. Error: ${error}`,
+            `Error raised when inspecting if there are any uninstrumented Step Functions state machines. Error: ${error}`,
           );
         }
       }
