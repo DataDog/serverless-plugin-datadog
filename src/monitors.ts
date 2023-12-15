@@ -73,13 +73,10 @@ export function buildMonitorParams(
   if (isRecommendedMonitor(serverlessMonitorId, recommendedMonitors)) {
     let criticalThreshold = recommendedMonitors[serverlessMonitorId].threshold;
 
-    if (monitorParams.options) {
-      if (monitorParams.options.thresholds) {
-        if (monitorParams.options.thresholds.critical) {
+    if (monitorParams.options?.thresholds?.critical !== undefined) { 
           criticalThreshold = monitorParams.options.thresholds.critical;
-        }
-      }
     }
+    
     monitorParams.query = recommendedMonitors[serverlessMonitorId].query(cloudFormationStackId, criticalThreshold);
     console.log(monitorParams.query);
     if (!monitorParams.message) {
@@ -102,7 +99,7 @@ export function buildMonitorParams(
  * @returns true if a given monitor is a serverless recommended monitor
  */
 function isRecommendedMonitor(serverlessMonitorId: string, recommendedMonitors: RecommendedMonitors) {
-  return Object.keys(recommendedMonitors).includes(serverlessMonitorId);
+  return recommendedMonitors[serverlessMonitorId] !== undefined;
 }
 
 /**
