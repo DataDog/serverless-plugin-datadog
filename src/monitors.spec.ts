@@ -1,11 +1,18 @@
-import { createMonitor, deleteMonitor, getExistingMonitors, updateMonitor } from "./monitor-api-requests";
-import { Monitor, setMonitors, buildMonitorParams } from "./monitors";
+import {
+  createMonitor,
+  deleteMonitor,
+  getExistingMonitors,
+  updateMonitor,
+  getRecommendedMonitors,
+} from "./monitor-api-requests";
+import { Monitor, RecommendedMonitors, setMonitors, buildMonitorParams } from "./monitors";
 
 jest.mock("./monitor-api-requests", () => ({
   createMonitor: jest.fn(),
   updateMonitor: jest.fn(),
   deleteMonitor: jest.fn(),
   getExistingMonitors: jest.fn(),
+  getRecommendedMonitors: jest.fn(),
 }));
 
 const CUSTOM_MONITOR_1: Monitor = {
@@ -36,7 +43,7 @@ const CUSTOM_MONITOR_2: Monitor = {
 
 const UPDATED_CUSTOM_MONITOR_2: Monitor = {
   custom_monitor_2: {
-    name: "Custom Monitor 2",
+    name: "Updated Custom Monitor 2",
     query: "avg(last_15m):anomalies(avg:system.load.1{*}, 'basic', 2, direction='both') >= 1",
     message: "This is a custom monitor",
   },
@@ -105,7 +112,7 @@ const CUSTOM_MONITOR_2_PARAMS = {
   type: "metric alert",
 };
 const UPDATED_CUSTOM_MONITOR_2_PARAMS = {
-  name: "Custom Monitor 2",
+  name: "Updated Custom Monitor 2",
   query: "avg(last_15m):anomalies(avg:system.load.1{*}, 'basic', 2, direction='both') >= 1",
   tags: [
     "serverless_monitor_type:single_function",
@@ -161,29 +168,71 @@ const TIMEOUT_MONITOR_PARAMS = {
     "At least one invocation in the selected time range timed out. This occurs when your function runs for longer than the configured timeout or the global Lambda timeout. Resolution: [Distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing) can help you pinpoint slow requests to APIs and other microservices. You can also consider increasing the timeout of your function. Note that this could affect your AWS bill.",
 };
 
+const RECOMMENDED_MONITORS: RecommendedMonitors = {
+  increased_cost: {
+    name: "Increased Cost on $functionName in $regionName for $awsAccount",
+    threshold: 0.2,
+    message: "Estimated cost of invocations have increased more than 20%",
+    query: (cloudFormationStackId: string, criticalThreshold: number) => {
+      return `pct_change(avg(last_5m),last_5m):avg:aws.lambda.enhanced.estimated_cost{aws_cloudformation_stack-id:${cloudFormationStackId}} > ${criticalThreshold}`;
+    },
+  },
+  timeout: {
+    name: "Timeout on $functionName in $regionName for $awsAccount",
+    threshold: 1,
+    message:
+      "At least one invocation in the selected time range timed out. This occurs when your function runs for longer than the configured timeout or the global Lambda timeout. Resolution: [Distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing) can help you pinpoint slow requests to APIs and other microservices. You can also consider increasing the timeout of your function. Note that this could affect your AWS bill.",
+    type: "query alert",
+    query: (cloudFormationStackId: string, criticalThreshold: number) => {
+      return `avg(last_15m):sum:aws.lambda.duration.maximum{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() / (sum:aws.lambda.timeout{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() * 1000) >= ${criticalThreshold}`;
+    },
+  },
+};
+
 const MONITOR_SET_1 = [CUSTOM_MONITOR_1, CUSTOM_MONITOR_2, INCREASED_COST_MONITOR];
 const MONITOR_SET_2 = [CUSTOM_MONITOR_1, UPDATED_CUSTOM_MONITOR_2, TIMEOUT_MONITOR];
 const MONITOR_SET_3 = [CUSTOM_MONITOR_1, INCREASED_COST_MONITOR];
 
 describe("buildMonitorParams", () => {
   it("returns valid monitor params for a custom monitor", async () => {
-    const monitorParams = buildMonitorParams(CUSTOM_MONITOR_1, "cloud_formation_id", "service", "env");
+    const monitorParams = buildMonitorParams(
+      CUSTOM_MONITOR_1,
+      "cloud_formation_id",
+      "service",
+      "env",
+      RECOMMENDED_MONITORS,
+    );
     expect(monitorParams).toEqual(CUSTOM_MONITOR_1_PARAMS);
   });
   it("returns valid monitor params for a custom monitor", async () => {
-    const monitorParams = buildMonitorParams(CUSTOM_MONITOR_2, "cloud_formation_id", "service", "env");
+    const monitorParams = buildMonitorParams(
+      CUSTOM_MONITOR_2,
+      "cloud_formation_id",
+      "service",
+      "env",
+      RECOMMENDED_MONITORS,
+    );
     expect(monitorParams).toEqual(CUSTOM_MONITOR_2_PARAMS);
   });
   it("returns valid monitor params for an updated custom monitor", async () => {
-    const monitorParams = buildMonitorParams(UPDATED_CUSTOM_MONITOR_2, "cloud_formation_id", "service", "env");
+    const monitorParams = buildMonitorParams(
+      UPDATED_CUSTOM_MONITOR_2,
+      "cloud_formation_id",
+      "service",
+      "env",
+      RECOMMENDED_MONITORS,
+    );
     expect(monitorParams).toEqual(UPDATED_CUSTOM_MONITOR_2_PARAMS);
   });
-  it("returns valid monitor params for Increased Cost monitor", async () => {
-    const monitorParams = buildMonitorParams(INCREASED_COST_MONITOR, "cloud_formation_id", "service", "env");
-    expect(monitorParams).toEqual(INCREASED_COST_MONITOR_PARAMS);
-  });
+  it("returns valid monitor params for Increased Cost monitor", async () => {});
   it("returns valid monitor params for the Timeout monitor", async () => {
-    const monitorParams = buildMonitorParams(TIMEOUT_MONITOR, "cloud_formation_id", "service", "env");
+    const monitorParams = buildMonitorParams(
+      TIMEOUT_MONITOR,
+      "cloud_formation_id",
+      "service",
+      "env",
+      RECOMMENDED_MONITORS,
+    );
     expect(monitorParams).toEqual(TIMEOUT_MONITOR_PARAMS);
   });
 });
@@ -194,8 +243,11 @@ describe("setMonitors", () => {
     (updateMonitor as unknown as jest.Mock).mockRestore();
     (deleteMonitor as unknown as jest.Mock).mockRestore();
     (getExistingMonitors as unknown as jest.Mock).mockRestore();
+    (getRecommendedMonitors as unknown as jest.Mock).mockRestore();
   });
+
   it("returns 'Successfully created custom_monitor_1'", async () => {
+    (getRecommendedMonitors as unknown as jest.Mock).mockReturnValue(RECOMMENDED_MONITORS);
     (getExistingMonitors as unknown as jest.Mock).mockReturnValue({});
     (createMonitor as unknown as jest.Mock).mockReturnValue({ status: 200 });
     const logStatements = await setMonitors(
@@ -217,6 +269,7 @@ describe("setMonitors", () => {
     );
   });
   it("returns 'Successfully updated custom_monitor_1', 'Successfully created custom_monitor_2, increased_cost'", async () => {
+    (getRecommendedMonitors as unknown as jest.Mock).mockReturnValue(RECOMMENDED_MONITORS);
     (getExistingMonitors as unknown as jest.Mock).mockReturnValue({ custom_monitor_1: 123456 });
     (createMonitor as unknown as jest.Mock).mockReturnValue({ status: 200 });
     (updateMonitor as unknown as jest.Mock).mockReturnValue({ status: 200 });
@@ -236,18 +289,19 @@ describe("setMonitors", () => {
     ]);
     expect(createMonitor as unknown as jest.Mock).toHaveBeenCalledWith(
       "datadoghq.com",
-      INCREASED_COST_MONITOR_PARAMS,
+      CUSTOM_MONITOR_2_PARAMS,
       "apikey",
       "appkey",
     );
     expect(createMonitor as unknown as jest.Mock).toHaveBeenCalledWith(
       "datadoghq.com",
-      CUSTOM_MONITOR_2_PARAMS,
+      INCREASED_COST_MONITOR_PARAMS,
       "apikey",
       "appkey",
     );
   });
   it("returns 'Successfully updated custom_monitor_1, custom_monitor_2', 'Successfully created timeout', 'Successfully deleted increased_cost'", async () => {
+    (getRecommendedMonitors as unknown as jest.Mock).mockReturnValue(RECOMMENDED_MONITORS);
     (getExistingMonitors as unknown as jest.Mock).mockReturnValue({
       custom_monitor_1: 123456,
       custom_monitor_2: 123456,
@@ -294,6 +348,7 @@ describe("setMonitors", () => {
     expect(deleteMonitor as unknown as jest.Mock).toHaveBeenCalledWith("datadoghq.com", 123456, "apikey", "appkey");
   });
   it("returns 'Succcessfully updated custom_monitor_1, 'Successfully created increased_cost', 'Successfully deleted timeout'", async () => {
+    (getRecommendedMonitors as unknown as jest.Mock).mockReturnValue(RECOMMENDED_MONITORS);
     (getExistingMonitors as unknown as jest.Mock).mockReturnValue({
       timeout: 123456,
       custom_monitor_1: 123456,

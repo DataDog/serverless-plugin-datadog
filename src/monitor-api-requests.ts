@@ -1,6 +1,6 @@
 import fetch, { Response } from "node-fetch";
 import * as Serverless from "serverless";
-import { MonitorParams } from "./monitors";
+import { MonitorParams, ServerlessMonitor, replaceCriticalThreshold } from "./monitors";
 
 export class InvalidAuthenticationError extends Error {
   constructor(message: string) {
@@ -15,6 +15,20 @@ interface QueriedMonitor {
   id: number;
   name: string;
   tags: string[];
+}
+
+interface RecommendedMonitorParams {
+  id: string;
+  attributes: {
+    query: string;
+    message: string;
+    description: string;
+    type: string;
+    options: {
+      thresholds: { [key: string]: any };
+    };
+    name: string;
+  };
 }
 
 export async function createMonitor(
@@ -32,7 +46,6 @@ export async function createMonitor(
     },
     body: JSON.stringify(monitorParams),
   });
-
   return response;
 }
 
@@ -90,7 +103,6 @@ export async function searchMonitors(site: string, queryTag: string, monitorsApi
 
     const json = await response.json();
     monitors = monitors.concat(json.monitors);
-
     pageCount = json.metadata.page_count;
     page += 1;
   } while (page < pageCount);
@@ -130,11 +142,54 @@ export async function getExistingMonitors(
   const serverlessMonitorIdByMonitorId: { [key: string]: number } = {};
   for (const existingMonitor of existingMonitors) {
     for (const tag of existingMonitor.tags) {
-      if (tag.startsWith("serverless_monitor_id:")) {
+      if (tag.startsWith("serverless_monitor_id:") || tag.startsWith("serverless_id:")) {
         const serverlessMonitorId = tag.substring(tag.indexOf(":") + 1);
         serverlessMonitorIdByMonitorId[serverlessMonitorId] = existingMonitor.id;
       }
     }
   }
   return serverlessMonitorIdByMonitorId;
+}
+
+export async function getRecommendedMonitors(site: string, monitorsApiKey: string, monitorsAppKey: string) {
+  const recommendedMonitors: { [key: string]: ServerlessMonitor } = {};
+  const endpoint = `https://api.${site}/api/v2/monitor/recommended?count=50&start=0&search=tag%3A%22product%3Aserverless%22`;
+  const response: Response = await fetch(endpoint, {
+    method: "GET",
+    headers: {
+      "DD-API-KEY": monitorsApiKey,
+      "DD-APPLICATION-KEY": monitorsAppKey,
+      "Content-Type": "application/json",
+    },
+  });
+  if (response.status !== 200) {
+    throw new Error(`Can't fetch monitor params. Status code: ${response.status}. Message: ${response.statusText}`);
+  }
+
+  const json = await response.json();
+  const recommendedMonitorsData = json.data;
+  recommendedMonitorsData.forEach((recommendedMonitorParam: RecommendedMonitorParams) => {
+    const recommendedMonitor: ServerlessMonitor = {
+      name: recommendedMonitorParam.attributes.name,
+      threshold: recommendedMonitorParam.attributes.options.thresholds.critical,
+      message: recommendedMonitorParam.attributes.message,
+      type: recommendedMonitorParam.attributes.type,
+      query: (cloudFormationStackId: string, criticalThreshold: number) => {
+        let query = recommendedMonitorParam.attributes.query;
+        // replace $scope with cloudformation_stack_id
+        query = query.replace(/\$scope/g, `aws_cloudformation_stack-id:${cloudFormationStackId}`);
+
+        if (criticalThreshold !== recommendedMonitorParam.attributes.options.thresholds.critical) {
+          query = replaceCriticalThreshold(query, criticalThreshold);
+        }
+        return query;
+      },
+    };
+
+    // recommended monitor params have an id that includes a serverless_ prefix that we have to remove to match the monitor ids we use in the plugin
+    const recommendedMonitorId = recommendedMonitorParam.id.replace("serverless_", "");
+    recommendedMonitors[recommendedMonitorId] = recommendedMonitor;
+  });
+
+  return recommendedMonitors;
 }

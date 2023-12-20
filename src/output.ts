@@ -67,7 +67,7 @@ export async function printOutputs(
   }
   logHeader("View Serverless Monitors", true);
   logMessage(
-    `https://${subdomain}.${site}/monitors/manage?q=tag%3A%28%22env%3A${env}%22AND%22service%3A${service}%22%29`,
+    `https://${subdomain}.${site}/monitors/manage?q=tag%3A%28%22env%3A${env}%22%20AND%20%22service%3A${service}%22%29`,
   );
 }
 
