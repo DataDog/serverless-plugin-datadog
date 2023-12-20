@@ -708,11 +708,18 @@ describe("getRecommendedMonitors", () => {
       }),
     );
     // use custom threshold values to test query function
-    expect(response.high_cold_start_rate.query('cloudformation_stackid', 0.1)).toEqual('sum(last_15m):sum:aws.lambda.enhanced.invocations{cold_start:true,aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,functionname,region}.as_count() / sum:aws.lambda.enhanced.invocations{aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,functionname,region}.as_count() >= 0.1'); 
-    expect(response.high_error_rate.query('cloudformation_stackid', 0.05)).toEqual('avg(last_15m):sum:aws.lambda.errors{aws_cloudformation_stack-id:cloudformation_stackid} by {functionname,region,aws_account}.as_count() / sum:aws.lambda.invocations{aws_cloudformation_stack-id:cloudformation_stackid} by {functionname,region,aws_account}.as_count() >= 0.05'); 
-    expect(response.high_iterator_age.query('cloudformation_stackid', 1000)).toEqual('avg(last_15m):min:aws.lambda.iterator_age.maximum{aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,region,functionname} >= 1000'); 
-    expect(response.high_throttles.query('cloudformation_stackid', 0.1)).toEqual('sum(last_15m):sum:aws.lambda.throttles {aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,region,functionname}.as_count() / ( sum:aws.lambda.throttles {aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,region,functionname}.as_count() + sum:aws.lambda.invocations{aws_cloudformation_stack-id:aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,region,functionname}.as_count()) >= 0.1'); 
-
+    expect(response.high_cold_start_rate.query("cloudformation_stackid", 0.1)).toEqual(
+      "sum(last_15m):sum:aws.lambda.enhanced.invocations{cold_start:true,aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,functionname,region}.as_count() / sum:aws.lambda.enhanced.invocations{aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,functionname,region}.as_count() >= 0.1",
+    );
+    expect(response.high_error_rate.query("cloudformation_stackid", 0.05)).toEqual(
+      "avg(last_15m):sum:aws.lambda.errors{aws_cloudformation_stack-id:cloudformation_stackid} by {functionname,region,aws_account}.as_count() / sum:aws.lambda.invocations{aws_cloudformation_stack-id:cloudformation_stackid} by {functionname,region,aws_account}.as_count() >= 0.05",
+    );
+    expect(response.high_iterator_age.query("cloudformation_stackid", 1000)).toEqual(
+      "avg(last_15m):min:aws.lambda.iterator_age.maximum{aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,region,functionname} >= 1000",
+    );
+    expect(response.high_throttles.query("cloudformation_stackid", 0.1)).toEqual(
+      "sum(last_15m):sum:aws.lambda.throttles {aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,region,functionname}.as_count() / ( sum:aws.lambda.throttles {aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,region,functionname}.as_count() + sum:aws.lambda.invocations{aws_cloudformation_stack-id:aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,region,functionname}.as_count()) >= 0.1",
+    );
 
     expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v2/monitor/recommended?count=50&start=0&search=tag%3A%22product%3Aserverless%22",
