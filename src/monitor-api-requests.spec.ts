@@ -672,7 +672,7 @@ describe("getRecommendedMonitors", () => {
             "More than 20% of the function’s invocations were cold starts in the selected time range. Datadog’s [enhanced metrics](https://docs.datadoghq.com/serverless/enhanced_lambda_metrics) and [distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing) can help you understand the impact of cold starts on your applications today. {{#is_alert}} Resolution: Cold starts occur when your serverless applications receive sudden increases in traffic, and can occur when the function was previously inactive or when it was receiving a relatively constant number of requests. Users may perceive cold starts as slow response times or lag. To get ahead of cold starts, consider enabling [provisioned concurrency](https://www.datadoghq.com/blog/monitor-aws-lambda-provisioned-concurrency/) on your impacted Lambda functions. Note that this could affect your AWS bill. {{/is_alert}}",
           type: "query alert",
           query: (cloudFormationStackId: string, criticalThreshold: number) => {
-            return `sum(last_15m):sum:aws.lambda.enhanced.invocations{cold_start:true,${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() / sum:aws.lambda.enhanced.invocations{${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() >= ${criticalThreshold}`;
+            return `sum(last_15m):sum:aws.lambda.enh anced.invocations{cold_start:true,${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() / sum:aws.lambda.enhanced.invocations{${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() >= ${criticalThreshold}`;
           },
         },
         high_error_rate: {
@@ -707,6 +707,13 @@ describe("getRecommendedMonitors", () => {
         },
       }),
     );
+    // use custom threshold values to test query function
+    expect(response.high_cold_start_rate.query('cloudformation_stackid', 0.1)).toEqual('sum(last_15m):sum:aws.lambda.enhanced.invocations{cold_start:true,aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,functionname,region}.as_count() / sum:aws.lambda.enhanced.invocations{aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,functionname,region}.as_count() >= 0.1'); 
+    expect(response.high_error_rate.query('cloudformation_stackid', 0.05)).toEqual('avg(last_15m):sum:aws.lambda.errors{aws_cloudformation_stack-id:cloudformation_stackid} by {functionname,region,aws_account}.as_count() / sum:aws.lambda.invocations{aws_cloudformation_stack-id:cloudformation_stackid} by {functionname,region,aws_account}.as_count() >= 0.05'); 
+    expect(response.high_iterator_age.query('cloudformation_stackid', 1000)).toEqual('avg(last_15m):min:aws.lambda.iterator_age.maximum{aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,region,functionname} >= 1000'); 
+    expect(response.high_throttles.query('cloudformation_stackid', 0.1)).toEqual('sum(last_15m):sum:aws.lambda.throttles {aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,region,functionname}.as_count() / ( sum:aws.lambda.throttles {aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,region,functionname}.as_count() + sum:aws.lambda.invocations{aws_cloudformation_stack-id:aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,region,functionname}.as_count()) >= 0.1'); 
+
+
     expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v2/monitor/recommended?count=50&start=0&search=tag%3A%22product%3Aserverless%22",
       validRequestBody,
