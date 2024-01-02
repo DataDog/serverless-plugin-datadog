@@ -91,8 +91,8 @@ module.exports = class ServerlessPlugin {
   };
   constructor(private serverless: Serverless, private options: Serverless.Options) {}
 
-  private displayedMessages:{[msg:string]: true} = {};
-  private logToCliOnce (message: string) {
+  private displayedMessages: { [msg: string]: true } = {};
+  private logToCliOnce(message: string) {
     if (this.displayedMessages[message] === undefined) {
       this.displayedMessages[message] = true;
       this.serverless.cli.log(message);
