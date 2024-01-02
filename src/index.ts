@@ -91,6 +91,13 @@ module.exports = class ServerlessPlugin {
   };
   constructor(private serverless: Serverless, private options: Serverless.Options) {}
 
+  private displayedMessages: { [msg: string]: true } = {};
+  private logToCliOnce(message: string) {
+    if (this.displayedMessages[message] === undefined) {
+      this.displayedMessages[message] = true;
+      this.serverless.cli.log(message);
+    }
+  }
   private cliSharedInitialize() {
     if (this.options!.function) {
       this.serverless.cli.log(
@@ -271,7 +278,7 @@ module.exports = class ServerlessPlugin {
     this.addTags(handlers, config.addExtension !== true);
 
     if (config.enableSourceCodeIntegration) {
-      this.serverless.cli.log(`Adding source code integration`);
+      this.logToCliOnce(`Adding source code integration`);
       if ((process.env.DATADOG_API_KEY ?? config.apiKey) === undefined) {
         let keyError;
         if (config.apiKeySecretArn) {
@@ -279,7 +286,7 @@ module.exports = class ServerlessPlugin {
         } else {
           keyError = "Datadog credentials were not found";
         }
-        this.serverless.cli.log(
+        this.logToCliOnce(
           `Skipping enabling source code integration because ${keyError}. Please set either DATADOG_API_KEY in your environment, or set the apiKey parameter in Serverless.`,
         );
       } else {
@@ -291,11 +298,11 @@ module.exports = class ServerlessPlugin {
               setSourceCodeIntegrationEnvVar(handler, gitHash, gitRemote);
             });
             if (config.uploadGitMetadata) {
-              this.serverless.cli.log(`Uploading git metadata`);
+              this.logToCliOnce(`Uploading git metadata`);
               await gitMetadata.uploadGitCommitHash((process.env.DATADOG_API_KEY ?? config.apiKey)!, config.site);
             }
           } catch (err) {
-            this.serverless.cli.log(`Error occurred when adding source code integration: ${err}`);
+            this.logToCliOnce(`Error occurred when adding source code integration: ${err}`);
           }
         }
       }
@@ -453,10 +460,10 @@ module.exports = class ServerlessPlugin {
    */
   private addTags(handlers: FunctionInfo[], shouldAddTags: boolean) {
     const provider = this.serverless.service.provider as Provider;
-    this.serverless.cli.log(`Adding Plugin Version ${version} tag`);
+    this.logToCliOnce(`Adding Plugin Version ${version} tag`);
 
     if (shouldAddTags) {
-      this.serverless.cli.log(`Adding service and environment tags`);
+      this.logToCliOnce(`Adding service and environment tags`);
     }
 
     handlers.forEach(({ handler }) => {
