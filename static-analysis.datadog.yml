@@ -1,0 +1,5 @@
+rulesets: 
+- typescript-best-practices       # ensure best practices are followed
+- typescript-code-style           # code-style enforcement for TypeScript
+- typescript-inclusive            # ensure that we use inclusive wording in our codebase
+- typescript-common-security      # ensure your TypeScript code is safe and secure
