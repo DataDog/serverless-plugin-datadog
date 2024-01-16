@@ -263,4 +263,4 @@ This product includes software developed at Datadog (<https://www.datadoghq.com/
 [16]: https://docs.datadoghq.com/tracing/setup_overview/configure_data_security/?tab=mongodb#replace-rules-for-tag-filtering
 [17]: https://www.datadoghq.com/blog/troubleshoot-lambda-function-request-response-payloads/
 [18]: https://docs.datadoghq.com/integrations/guide/source-code-integration
-[19]: https://docs.datadoghq.com/fr/security/application_security/
+[19]: https://docs.datadoghq.com/security/application_security/
