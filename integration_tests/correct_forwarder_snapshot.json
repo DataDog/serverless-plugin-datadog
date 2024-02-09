@@ -89,12 +89,6 @@
         "LogGroupName": "/aws/lambda/dd-sls-plugin-integration-test-dev-PythonHello39"
       }
     },
-    "JavascriptHello14DashxLogGroup": {
-      "Type": "AWS::Logs::LogGroup",
-      "Properties": {
-        "LogGroupName": "/aws/lambda/dd-sls-plugin-integration-test-dev-JavascriptHello14-x"
-      }
-    },
     "JavascriptHello16DashxLogGroup": {
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
@@ -283,16 +277,6 @@
         "FilterPattern": "",
         "LogGroupName": {
           "Ref": "PythonHello39LogGroup"
-        }
-      }
-    },
-    "JavascriptHello14DashxLogGroupSubscription": {
-      "Type": "AWS::Logs::SubscriptionFilter",
-      "Properties": {
-        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
-        "FilterPattern": "",
-        "LogGroupName": {
-          "Ref": "JavascriptHello14DashxLogGroup"
         }
       }
     },
@@ -665,61 +649,6 @@
         "PythonHello39LogGroup"
       ]
     },
-    "JavascriptHello14DashxLambdaFunction": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-          "S3Bucket": {
-            "Ref": "ServerlessDeploymentBucket"
-          },
-          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/dd-sls-plugin-integration-test.zip"
-        },
-        "Handler": "/opt/nodejs/node_modules/datadog-lambda-js/handler.handler",
-        "Runtime": "nodejs14.x",
-        "FunctionName": "dd-sls-plugin-integration-test-dev-JavascriptHello14-x",
-        "MemorySize": 1024,
-        "Timeout": 6,
-        "Tags": [
-          {
-            "Key": "dd_sls_plugin",
-            "Value": "vX.XX.X"
-          },
-          {
-            "Key": "service",
-            "Value": "dd-sls-plugin-integration-test"
-          },
-          {
-            "Key": "env",
-            "Value": "dev"
-          }
-        ],
-        "Environment": {
-          "Variables": {
-            "DD_SITE": "datadoghq.com",
-            "DD_LOG_LEVEL": "info",
-            "DD_FLUSH_TO_LOG": true,
-            "DD_TRACE_ENABLED": true,
-            "DD_MERGE_XRAY_TRACES": false,
-            "DD_LOGS_INJECTION": true,
-            "DD_SERVERLESS_LOGS_ENABLED": true,
-            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
-            "DD_LAMBDA_HANDLER": "js_handler.hello"
-          }
-        },
-        "Role": {
-          "Fn::GetAtt": [
-            "IamRoleLambdaExecution",
-            "Arn"
-          ]
-        },
-        "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node14-x:XXX"
-        ]
-      },
-      "DependsOn": [
-        "JavascriptHello14DashxLogGroup"
-      ]
-    },
     "JavascriptHello16DashxLambdaFunction": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
@@ -895,7 +824,7 @@
           "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/dd-sls-plugin-integration-test.zip"
         },
         "Handler": "js_handler.hello",
-        "Runtime": "nodejs14.x",
+        "Runtime": "nodejs20.x",
         "FunctionName": "dd-sls-plugin-integration-test-dev-ExcludeThis",
         "MemorySize": 1024,
         "Timeout": 6,
@@ -920,7 +849,7 @@
           "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/dd-sls-plugin-integration-test.zip"
         },
         "Handler": "js_handler.hello",
-        "Runtime": "nodejs14.x",
+        "Runtime": "nodejs20.x",
         "FunctionName": "dd-sls-plugin-integration-test-dev-Exclude-This",
         "MemorySize": 1024,
         "Timeout": 6,
@@ -1328,16 +1257,6 @@
       "Properties": {
         "FunctionName": {
           "Ref": "PythonHello39LambdaFunction"
-        },
-        "CodeSha256": "XXXX"
-      }
-    },
-    "JavascriptHello14DashxLambdaVersionXXXX": {
-      "Type": "AWS::Lambda::Version",
-      "DeletionPolicy": "Retain",
-      "Properties": {
-        "FunctionName": {
-          "Ref": "JavascriptHello14DashxLambdaFunction"
         },
         "CodeSha256": "XXXX"
       }
@@ -1933,7 +1852,7 @@
                 ":lambda:path/2015-03-31/functions/",
                 {
                   "Fn::GetAtt": [
-                    "JavascriptHello14DashxLambdaFunction",
+                    "JavascriptHello16DashxLambdaFunction",
                     "Arn"
                   ]
                 },
@@ -1945,7 +1864,7 @@
         "MethodResponses": []
       },
       "DependsOn": [
-        "JavascriptHello14DashxLambdaPermissionApiGateway"
+        "JavascriptHello16DashxLambdaPermissionApiGateway"
       ]
     },
     "ApiGatewayDeploymentxxxx": {
@@ -1998,12 +1917,12 @@
         }
       }
     },
-    "JavascriptHello14DashxLambdaPermissionApiGateway": {
+    "JavascriptHello16DashxLambdaPermissionApiGateway": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "FunctionName": {
           "Fn::GetAtt": [
-            "JavascriptHello14DashxLambdaFunction",
+            "JavascriptHello16DashxLambdaFunction",
             "Arn"
           ]
         },
@@ -2203,7 +2122,7 @@
         }
       }
     },
-    "JavascriptHello14DashxWebsocketsIntegration": {
+    "JavascriptHello16DashxWebsocketsIntegration": {
       "Type": "AWS::ApiGatewayV2::Integration",
       "Properties": {
         "ApiId": {
@@ -2225,7 +2144,7 @@
               ":lambda:path/2015-03-31/functions/",
               {
                 "Fn::GetAtt": [
-                  "JavascriptHello14DashxLambdaFunction",
+                  "JavascriptHello16DashxLambdaFunction",
                   "Arn"
                 ]
               },
@@ -2252,16 +2171,16 @@
         "Principal": "apigateway.amazonaws.com"
       }
     },
-    "JavascriptHello14DashxLambdaPermissionWebsockets": {
+    "JavascriptHello16DashxLambdaPermissionWebsockets": {
       "Type": "AWS::Lambda::Permission",
       "DependsOn": [
         "WebsocketsApi",
-        "JavascriptHello14DashxLambdaFunction"
+        "JavascriptHello16DashxLambdaFunction"
       ],
       "Properties": {
         "FunctionName": {
           "Fn::GetAtt": [
-            "JavascriptHello14DashxLambdaFunction",
+            "JavascriptHello16DashxLambdaFunction",
             "Arn"
           ]
         },
@@ -2283,7 +2202,7 @@
             [
               "integrations",
               {
-                "Ref": "JavascriptHello14DashxWebsocketsIntegration"
+                "Ref": "JavascriptHello16DashxWebsocketsIntegration"
               }
             ]
           ]
@@ -2309,7 +2228,7 @@
           "Format": "$context.identity.sourceIp $context.identity.caller $context.identity.user [$context.requestTime] \"$context.eventType $context.routeKey $context.connectionId\" $context.requestId"
         },
         "DeploymentId": {
-          "Ref": "WebsocketsDeploymentckqcOE1ebmlhFFRpE7NMKPybd4S9QPf1rsPjkB0NjI"
+          "Ref": "WebsocketsDeploymentLprF7rCGSeh3kyAZfYGKU0tnNqO18rZ6K6vGaxgc"
         }
       }
     },
@@ -2319,7 +2238,7 @@
         "LogGroupName": "/aws/websocket/dd-sls-plugin-integration-test-dev"
       }
     },
-    "WebsocketsDeploymentckqcOE1ebmlhFFRpE7NMKPybd4S9QPf1rsPjkB0NjI": {
+    "WebsocketsDeploymentLprF7rCGSeh3kyAZfYGKU0tnNqO18rZ6K6vGaxgc": {
       "Type": "AWS::ApiGatewayV2::Deployment",
       "DependsOn": [
         "SconnectWebsocketsRoute",
@@ -2427,12 +2346,12 @@
       },
       "DependsOn": "HttpApiIntegrationPythonHello39"
     },
-    "JavascriptHello14DashxLambdaPermissionHttpApi": {
+    "JavascriptHello16DashxLambdaPermissionHttpApi": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "FunctionName": {
           "Fn::GetAtt": [
-            "JavascriptHello14DashxLambdaFunction",
+            "JavascriptHello16DashxLambdaFunction",
             "Arn"
           ]
         },
@@ -2464,7 +2383,7 @@
         }
       }
     },
-    "HttpApiIntegrationJavascriptHello14Dashx": {
+    "HttpApiIntegrationJavascriptHello16Dashx": {
       "Type": "AWS::ApiGatewayV2::Integration",
       "Properties": {
         "ApiId": {
@@ -2473,7 +2392,7 @@
         "IntegrationType": "AWS_PROXY",
         "IntegrationUri": {
           "Fn::GetAtt": [
-            "JavascriptHello14DashxLambdaFunction",
+            "JavascriptHello16DashxLambdaFunction",
             "Arn"
           ]
         },
@@ -2494,13 +2413,13 @@
             [
               "integrations",
               {
-                "Ref": "HttpApiIntegrationJavascriptHello14Dashx"
+                "Ref": "HttpApiIntegrationJavascriptHello16Dashx"
               }
             ]
           ]
         }
       },
-      "DependsOn": "HttpApiIntegrationJavascriptHello14Dashx"
+      "DependsOn": "HttpApiIntegrationJavascriptHello16Dashx"
     },
     "ApiGatewayLogGroupSubscription": {
       "Type": "AWS::Logs::SubscriptionFilter",
@@ -2569,15 +2488,6 @@
       },
       "Export": {
         "Name": "sls-dd-sls-plugin-integration-test-dev-PythonHello39LambdaFunctionQualifiedArn"
-      }
-    },
-    "JavascriptHello14DashxLambdaFunctionQualifiedArn": {
-      "Description": "Current Lambda function version",
-      "Value": {
-        "Ref": "JavascriptHello14DashxLambdaVersionXXXX"
-      },
-      "Export": {
-        "Name": "sls-dd-sls-plugin-integration-test-dev-JavascriptHello14DashxLambdaFunctionQualifiedArn"
       }
     },
     "JavascriptHello16DashxLambdaFunctionQualifiedArn": {
