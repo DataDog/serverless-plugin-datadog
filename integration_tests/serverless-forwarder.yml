@@ -90,9 +90,6 @@ functions:
   providedHello:
     handler: provided_handler.hello
     runtime: provided
-  RubyHello27:
-    handler: rb_handler.hello
-    runtime: ruby2.7
   RubyHello32:
     handler: rb_handler.hello
     runtime: ruby3.2
