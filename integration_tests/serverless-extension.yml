@@ -53,9 +53,6 @@ functions:
   DotnetHello6:
     handler: dotnet_handler.hello
     runtime: dotnet6
-  DotnetcoreHello31:
-    handler: dotnet_handler.hello
-    runtime: dotnetcore3.1
   DotnetArmHello6:
     handler: dotnet_handler.hello
     runtime: dotnet6
