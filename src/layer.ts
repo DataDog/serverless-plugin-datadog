@@ -52,7 +52,6 @@ export interface LayerJSON {
 }
 
 export const runtimeLookup: { [key: string]: RuntimeType } = {
-  "nodejs14.x": RuntimeType.NODE,
   "nodejs16.x": RuntimeType.NODE,
   "nodejs18.x": RuntimeType.NODE,
   "nodejs20.x": RuntimeType.NODE,
@@ -88,7 +87,6 @@ export const ARM_RUNTIME_KEYS: { [key: string]: string } = {
   extension: "extension-arm",
   dotnet: "dotnet-arm",
   // The same Node layers work for both x86 and ARM
-  "nodejs14.x": "nodejs14.x",
   "nodejs16.x": "nodejs16.x",
   "nodejs18.x": "nodejs18.x",
   "nodejs20.x": "nodejs20.x",
