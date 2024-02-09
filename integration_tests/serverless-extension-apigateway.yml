@@ -40,9 +40,9 @@ functions:
           path: /users/update
           method: put
       - websocket: $connect
-  JavascriptHello14-x:
+  JavascriptHello16-x:
     handler: js_handler.hello
-    runtime: nodejs14.x
+    runtime: nodejs16.x
     events:
       - http:
           path: users/create
@@ -51,9 +51,6 @@ functions:
           path: /users/remove
           method: delete
       - websocket: $connect
-  JavascriptHello16-x:
-    handler: js_handler.hello
-    runtime: nodejs16.x
   JavascriptHello18-x:
     handler: js_handler.hello
     runtime: nodejs18.x
