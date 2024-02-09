@@ -75,7 +75,7 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              runtime: "nodejs14.x",
+              runtime: "nodejs20.x",
             },
           },
           custom: {
@@ -97,7 +97,7 @@ describe("ServerlessPlugin", () => {
                 expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:.*/),
                 expect.stringMatching(/arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:(.*)*/),
               ],
-              runtime: "nodejs14.x",
+              runtime: "nodejs20.x",
             },
           },
           provider: {
@@ -122,7 +122,7 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              runtime: "nodejs14.x",
+              runtime: "nodejs20.x",
             },
           },
           custom: {
@@ -144,7 +144,7 @@ describe("ServerlessPlugin", () => {
             node1: {
               handler: "my-func.ev",
               layers: [expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:Datadog-Extension\:.*/)],
-              runtime: "nodejs14.x",
+              runtime: "nodejs20.x",
             },
           },
           provider: {
@@ -169,7 +169,7 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              runtime: "nodejs14.x",
+              runtime: "nodejs20.x",
             },
           },
           custom: {
@@ -194,7 +194,7 @@ describe("ServerlessPlugin", () => {
                 expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:.*/),
                 expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:Datadog-Extension\:.*/),
               ],
-              runtime: "nodejs14.x",
+              runtime: "nodejs20.x",
             },
           },
           provider: {
@@ -220,7 +220,7 @@ describe("ServerlessPlugin", () => {
             node1: {
               handler: "my-func.ev",
               layers: [],
-              runtime: "nodejs14.x",
+              runtime: "nodejs20.x",
             },
           },
           custom: {
@@ -240,7 +240,7 @@ describe("ServerlessPlugin", () => {
             node1: {
               handler: "my-func.ev",
               layers: [expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:Datadog-Extension\:.*/)],
-              runtime: "nodejs14.x",
+              runtime: "nodejs20.x",
             },
           },
           provider: {
@@ -264,7 +264,7 @@ describe("ServerlessPlugin", () => {
             node1: {
               handler: "my-func.ev",
               layers: [],
-              runtime: "nodejs14.x",
+              runtime: "nodejs20.x",
             },
           },
           custom: {
@@ -285,7 +285,7 @@ describe("ServerlessPlugin", () => {
             node1: {
               handler: "my-func.ev",
               layers: [],
-              runtime: "nodejs14.x",
+              runtime: "nodejs20.x",
             },
           },
           provider: {
@@ -311,7 +311,7 @@ describe("ServerlessPlugin", () => {
             node1: {
               handler: "my-func.ev",
               layers: [],
-              runtime: "nodejs14.x",
+              runtime: "nodejs20.x",
             },
           },
           custom: {
@@ -334,7 +334,7 @@ describe("ServerlessPlugin", () => {
                 expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:.*/),
                 expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:Datadog-Extension\:.*/),
               ],
-              runtime: "nodejs14.x",
+              runtime: "nodejs20.x",
             },
           },
           provider: {
@@ -564,7 +564,7 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              runtime: "nodejs14.x",
+              runtime: "nodejs20.x",
             },
           },
           custom: {
@@ -607,7 +607,7 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              runtime: "nodejs14.x",
+              runtime: "nodejs20.x",
             },
           },
           custom: {
@@ -647,7 +647,7 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              runtime: "nodejs14.x",
+              runtime: "nodejs20.x",
             },
           },
           custom: {
@@ -687,7 +687,7 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              runtime: "nodejs14.x",
+              runtime: "nodejs20.x",
             },
           },
           custom: {
@@ -727,7 +727,7 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              runtime: "nodejs14.x",
+              runtime: "nodejs20.x",
             },
           },
           custom: {
@@ -770,7 +770,7 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              runtime: "nodejs14.x",
+              runtime: "nodejs20.x",
             },
           },
           custom: {
@@ -809,7 +809,7 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              runtime: "nodejs14.x",
+              runtime: "nodejs20.x",
             },
           },
           custom: {
@@ -856,7 +856,7 @@ describe("ServerlessPlugin", () => {
         functions: {
           node1: {
             handler: "my-func.ev",
-            runtime: "nodejs14.x",
+            runtime: "nodejs20.x",
           },
         },
         custom: {
@@ -894,7 +894,7 @@ describe("ServerlessPlugin", () => {
         functions: {
           node1: {
             handler: "my-func.ev",
-            runtime: "nodejs14.x",
+            runtime: "nodejs20.x",
           },
         },
         custom: {
@@ -933,7 +933,7 @@ describe("ServerlessPlugin", () => {
         functions: {
           node1: {
             handler: "my-func.ev",
-            runtime: "nodejs14.x",
+            runtime: "nodejs20.x",
           },
         },
         custom: {
@@ -979,7 +979,7 @@ describe("ServerlessPlugin", () => {
         functions: {
           node1: {
             handler: "my-func.ev",
-            runtime: "nodejs14.x",
+            runtime: "nodejs20.x",
           },
         },
         custom: {
@@ -1387,7 +1387,7 @@ describe("ServerlessPlugin", () => {
             node1: {
               handler: "my-func.ev",
               layers: [],
-              runtime: "nodejs14.x",
+              runtime: "nodejs20.x",
               tags: {
                 service: "test",
               },
@@ -1590,7 +1590,7 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              runtime: "nodejs14.x",
+              runtime: "nodejs20.x",
             },
           },
           custom: {
@@ -1626,7 +1626,7 @@ describe("ServerlessPlugin", () => {
           functions: {
             node1: {
               handler: "my-func.ev",
-              runtime: "nodejs14.x",
+              runtime: "nodejs20.x",
             },
           },
           custom: {
