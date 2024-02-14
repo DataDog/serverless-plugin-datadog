@@ -60,7 +60,6 @@ describe("findHandlers", () => {
       "java17-function": { handler: "myfile.handler", runtime: "java17" },
       "java21-function": { handler: "myfile.handler", runtime: "java21" },
       "dotnet6-function": { handler: "myfile.handler", runtime: "dotnet6" },
-      "dotnetcore3.1-function": { handler: "myfile.handler", runtime: "dotnetcore3.1" },
       "provided-function": { handler: "myfile.handler", runtime: "provided" },
     });
 
@@ -179,12 +178,6 @@ describe("findHandlers", () => {
         handler: { handler: "myfile.handler", runtime: "dotnet6" },
         type: RuntimeType.DOTNET,
         runtime: "dotnet6",
-      },
-      {
-        name: "dotnetcore3.1-function",
-        handler: { handler: "myfile.handler", runtime: "dotnetcore3.1" },
-        type: RuntimeType.DOTNET,
-        runtime: "dotnetcore3.1",
       },
       {
         name: "provided-function",
