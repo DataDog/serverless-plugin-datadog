@@ -51,7 +51,6 @@ describe("findHandlers", () => {
       "python310-function": { handler: "myfile.handler", runtime: "python3.10" },
       "python311-function": { handler: "myfile.handler", runtime: "python3.11" },
       "python312-function": { handler: "myfile.handler", runtime: "python3.12" },
-      "ruby27-function": { handler: "myfile.handler", runtime: "ruby2.7" },
       "ruby32-function": { handler: "myfile.handler", runtime: "ruby3.2" },
       "java8-function": { handler: "myfile.handler", runtime: "java8" },
       "java8.al2-function": { handler: "myfile.handler", runtime: "java8.al2" },
@@ -59,7 +58,6 @@ describe("findHandlers", () => {
       "java17-function": { handler: "myfile.handler", runtime: "java17" },
       "java21-function": { handler: "myfile.handler", runtime: "java21" },
       "dotnet6-function": { handler: "myfile.handler", runtime: "dotnet6" },
-      "dotnetcore3.1-function": { handler: "myfile.handler", runtime: "dotnetcore3.1" },
       "provided-function": { handler: "myfile.handler", runtime: "provided" },
     });
 
@@ -126,12 +124,6 @@ describe("findHandlers", () => {
         runtime: "python3.12",
       },
       {
-        name: "ruby27-function",
-        handler: { handler: "myfile.handler", runtime: "ruby2.7" },
-        type: RuntimeType.RUBY,
-        runtime: "ruby2.7",
-      },
-      {
         name: "ruby32-function",
         handler: { handler: "myfile.handler", runtime: "ruby3.2" },
         type: RuntimeType.RUBY,
@@ -172,12 +164,6 @@ describe("findHandlers", () => {
         handler: { handler: "myfile.handler", runtime: "dotnet6" },
         type: RuntimeType.DOTNET,
         runtime: "dotnet6",
-      },
-      {
-        name: "dotnetcore3.1-function",
-        handler: { handler: "myfile.handler", runtime: "dotnetcore3.1" },
-        type: RuntimeType.DOTNET,
-        runtime: "dotnetcore3.1",
       },
       {
         name: "provided-function",

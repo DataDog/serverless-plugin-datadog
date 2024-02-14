@@ -61,7 +61,6 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
   "python3.10": RuntimeType.PYTHON,
   "python3.11": RuntimeType.PYTHON,
   "python3.12": RuntimeType.PYTHON,
-  "dotnetcore3.1": RuntimeType.DOTNET,
   dotnet6: RuntimeType.DOTNET,
   java11: RuntimeType.JAVA,
   java17: RuntimeType.JAVA,
@@ -70,7 +69,6 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
   java8: RuntimeType.JAVA,
   "provided.al2": RuntimeType.CUSTOM,
   provided: RuntimeType.CUSTOM,
-  "ruby2.7": RuntimeType.RUBY,
   "ruby3.2": RuntimeType.RUBY,
   "go1.x": RuntimeType.GO,
 };
@@ -82,7 +80,6 @@ export const ARM_RUNTIME_KEYS: { [key: string]: string } = {
   "python3.10": "python3.10-arm",
   "python3.11": "python3.11-arm",
   "python3.12": "python3.12-arm",
-  "ruby2.7": "ruby2.7-arm",
   "ruby3.2": "ruby3.2-arm",
   extension: "extension-arm",
   dotnet: "dotnet-arm",
