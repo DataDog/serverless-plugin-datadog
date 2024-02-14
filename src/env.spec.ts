@@ -990,7 +990,7 @@ describe("setEnvConfiguration", () => {
         handler: {
           environment: {},
           events: [],
-          runtime: "nodejs12.x",
+          runtime: "nodejs20.x",
         },
         name: "function",
         type: RuntimeType.NODE,

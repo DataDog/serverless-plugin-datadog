@@ -42,7 +42,6 @@ describe("findHandlers", () => {
   it("finds all runtimes with matching layers", () => {
     const mockService = createMockService("us-east-1", {
       "go-function": { handler: "myfile.handler", runtime: "go1.10" },
-      "node12-function": { handler: "myfile.handler", runtime: "nodejs12.x" },
       "node14-function": { handler: "myfile.handler", runtime: "nodejs14.x" },
       "node16-function": { handler: "myfile.handler", runtime: "nodejs16.x" },
       "node18-function": { handler: "myfile.handler", runtime: "nodejs18.x" },
@@ -70,12 +69,6 @@ describe("findHandlers", () => {
         handler: { handler: "myfile.handler", runtime: "go1.10" },
         type: RuntimeType.UNSUPPORTED,
         runtime: "go1.10",
-      },
-      {
-        name: "node12-function",
-        handler: { handler: "myfile.handler", runtime: "nodejs12.x" },
-        type: RuntimeType.NODE,
-        runtime: "nodejs12.x",
       },
       {
         name: "node14-function",

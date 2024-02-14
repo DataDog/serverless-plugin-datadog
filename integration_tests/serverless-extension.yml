@@ -30,14 +30,11 @@ functions:
   PythonHello39:
     handler: py_handler.hello
     runtime: python3.9
-  JavascriptHello12-x:
-    handler: js_handler.hello
-    runtime: nodejs12.x
-    layers:
-      - { Ref: FunctionLevelLayerLambdaLayer }
   JavascriptHello14-x:
     handler: js_handler.hello
     runtime: nodejs14.x
+    layers:
+      - { Ref: FunctionLevelLayerLambdaLayer }
   JavascriptHello16-x:
     handler: js_handler.hello
     runtime: nodejs16.x
@@ -75,7 +72,7 @@ layers:
     name: ${self:service}-${sls:stage}-ProviderLevelLayer # optional, Deployed Lambda layer name
     description: It's a text file # optional, Description to publish to AWS
     compatibleRuntimes: # optional, a list of runtimes this layer is compatible with
-      - nodejs12.x
+      - nodejs14.x
   FunctionLevelLayer:
     path: FunctionLevelLayer
     name: ${self:service}-${sls:stage}-FunctionLevelLayer # optional, Deployed Lambda layer name
