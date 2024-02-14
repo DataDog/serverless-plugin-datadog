@@ -63,9 +63,6 @@ functions:
   DotnetHello6:
     handler: dotnet_handler.hello
     runtime: dotnet6
-  DotnetcoreHello31:
-    handler: dotnet_handler.hello
-    runtime: dotnetcore3.1
   JavaHello8:
     handler: java_handler.hello
     runtime: java8
@@ -75,9 +72,6 @@ functions:
   providedHello:
     handler: provided_handler.hello
     runtime: provided
-  RubyHello27:
-    handler: rb_handler.hello
-    runtime: ruby2.7
   RubyHello32:
     handler: rb_handler.hello
     runtime: ruby3.2

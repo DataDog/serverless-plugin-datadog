@@ -131,12 +131,6 @@
         "LogGroupName": "/aws/lambda/dd-sls-plugin-integration-test-dev-DotnetHello6"
       }
     },
-    "DotnetcoreHello31LogGroup": {
-      "Type": "AWS::Logs::LogGroup",
-      "Properties": {
-        "LogGroupName": "/aws/lambda/dd-sls-plugin-integration-test-dev-DotnetcoreHello31"
-      }
-    },
     "JavaHello8LogGroup": {
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
@@ -153,12 +147,6 @@
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
         "LogGroupName": "/aws/lambda/dd-sls-plugin-integration-test-dev-providedHello"
-      }
-    },
-    "RubyHello27LogGroup": {
-      "Type": "AWS::Logs::LogGroup",
-      "Properties": {
-        "LogGroupName": "/aws/lambda/dd-sls-plugin-integration-test-dev-RubyHello27"
       }
     },
     "RubyHello32LogGroup": {
@@ -336,16 +324,6 @@
         }
       }
     },
-    "DotnetcoreHello31LogGroupSubscription": {
-      "Type": "AWS::Logs::SubscriptionFilter",
-      "Properties": {
-        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
-        "FilterPattern": "",
-        "LogGroupName": {
-          "Ref": "DotnetcoreHello31LogGroup"
-        }
-      }
-    },
     "JavaHello8LogGroupSubscription": {
       "Type": "AWS::Logs::SubscriptionFilter",
       "Properties": {
@@ -373,16 +351,6 @@
         "FilterPattern": "",
         "LogGroupName": {
           "Ref": "ProvidedHelloLogGroup"
-        }
-      }
-    },
-    "RubyHello27LogGroupSubscription": {
-      "Type": "AWS::Logs::SubscriptionFilter",
-      "Properties": {
-        "DestinationArn": "arn:aws:lambda:us-east-1:000000000000:function:datadog-forwarder",
-        "FilterPattern": "",
-        "LogGroupName": {
-          "Ref": "RubyHello27LogGroup"
         }
       }
     },
@@ -987,58 +955,6 @@
         "DotnetHello6LogGroup"
       ]
     },
-    "DotnetcoreHello31LambdaFunction": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-          "S3Bucket": {
-            "Ref": "ServerlessDeploymentBucket"
-          },
-          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/dd-sls-plugin-integration-test.zip"
-        },
-        "Handler": "dotnet_handler.hello",
-        "Runtime": "dotnetcore3.1",
-        "FunctionName": "dd-sls-plugin-integration-test-dev-DotnetcoreHello31",
-        "MemorySize": 1024,
-        "Timeout": 6,
-        "Tags": [
-          {
-            "Key": "dd_sls_plugin",
-            "Value": "vX.XX.X"
-          },
-          {
-            "Key": "service",
-            "Value": "dd-sls-plugin-integration-test"
-          },
-          {
-            "Key": "env",
-            "Value": "dev"
-          }
-        ],
-        "Environment": {
-          "Variables": {
-            "DD_SITE": "datadoghq.com",
-            "DD_LOG_LEVEL": "info",
-            "DD_FLUSH_TO_LOG": true,
-            "DD_TRACE_ENABLED": true,
-            "DD_MERGE_XRAY_TRACES": false,
-            "DD_LOGS_INJECTION": true,
-            "DD_SERVERLESS_LOGS_ENABLED": true,
-            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
-            "AWS_LAMBDA_EXEC_WRAPPER": "/opt/datadog_wrapper"
-          }
-        },
-        "Role": {
-          "Fn::GetAtt": [
-            "IamRoleLambdaExecution",
-            "Arn"
-          ]
-        }
-      },
-      "DependsOn": [
-        "DotnetcoreHello31LogGroup"
-      ]
-    },
     "JavaHello8LambdaFunction": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
@@ -1192,60 +1108,6 @@
       },
       "DependsOn": [
         "ProvidedHelloLogGroup"
-      ]
-    },
-    "RubyHello27LambdaFunction": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-          "S3Bucket": {
-            "Ref": "ServerlessDeploymentBucket"
-          },
-          "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/dd-sls-plugin-integration-test.zip"
-        },
-        "Handler": "rb_handler.hello",
-        "Runtime": "ruby2.7",
-        "FunctionName": "dd-sls-plugin-integration-test-dev-RubyHello27",
-        "MemorySize": 1024,
-        "Timeout": 6,
-        "Tags": [
-          {
-            "Key": "dd_sls_plugin",
-            "Value": "vX.XX.X"
-          },
-          {
-            "Key": "service",
-            "Value": "dd-sls-plugin-integration-test"
-          },
-          {
-            "Key": "env",
-            "Value": "dev"
-          }
-        ],
-        "Environment": {
-          "Variables": {
-            "DD_SITE": "datadoghq.com",
-            "DD_LOG_LEVEL": "info",
-            "DD_FLUSH_TO_LOG": true,
-            "DD_TRACE_ENABLED": true,
-            "DD_MERGE_XRAY_TRACES": false,
-            "DD_LOGS_INJECTION": true,
-            "DD_SERVERLESS_LOGS_ENABLED": true,
-            "DD_CAPTURE_LAMBDA_PAYLOAD": false
-          }
-        },
-        "Role": {
-          "Fn::GetAtt": [
-            "IamRoleLambdaExecution",
-            "Arn"
-          ]
-        },
-        "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Ruby2-7:XXX"
-        ]
-      },
-      "DependsOn": [
-        "RubyHello27LogGroup"
       ]
     },
     "RubyHello32LambdaFunction": {
@@ -1402,16 +1264,6 @@
         "CodeSha256": "XXXX"
       }
     },
-    "DotnetcoreHello31LambdaVersionXXXX": {
-      "Type": "AWS::Lambda::Version",
-      "DeletionPolicy": "Retain",
-      "Properties": {
-        "FunctionName": {
-          "Ref": "DotnetcoreHello31LambdaFunction"
-        },
-        "CodeSha256": "XXXX"
-      }
-    },
     "JavaHello8LambdaVersionXXXX": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
@@ -1438,16 +1290,6 @@
       "Properties": {
         "FunctionName": {
           "Ref": "ProvidedHelloLambdaFunction"
-        },
-        "CodeSha256": "XXXX"
-      }
-    },
-    "RubyHello27LambdaVersionXXXX": {
-      "Type": "AWS::Lambda::Version",
-      "DeletionPolicy": "Retain",
-      "Properties": {
-        "FunctionName": {
-          "Ref": "RubyHello27LambdaFunction"
         },
         "CodeSha256": "XXXX"
       }
@@ -2634,15 +2476,6 @@
         "Name": "sls-dd-sls-plugin-integration-test-dev-DotnetHello6LambdaFunctionQualifiedArn"
       }
     },
-    "DotnetcoreHello31LambdaFunctionQualifiedArn": {
-      "Description": "Current Lambda function version",
-      "Value": {
-        "Ref": "DotnetcoreHello31LambdaVersionXXXX"
-      },
-      "Export": {
-        "Name": "sls-dd-sls-plugin-integration-test-dev-DotnetcoreHello31LambdaFunctionQualifiedArn"
-      }
-    },
     "JavaHello8LambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
@@ -2668,15 +2501,6 @@
       },
       "Export": {
         "Name": "sls-dd-sls-plugin-integration-test-dev-ProvidedHelloLambdaFunctionQualifiedArn"
-      }
-    },
-    "RubyHello27LambdaFunctionQualifiedArn": {
-      "Description": "Current Lambda function version",
-      "Value": {
-        "Ref": "RubyHello27LambdaVersionXXXX"
-      },
-      "Export": {
-        "Name": "sls-dd-sls-plugin-integration-test-dev-RubyHello27LambdaFunctionQualifiedArn"
       }
     },
     "RubyHello32LambdaFunctionQualifiedArn": {
