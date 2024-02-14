@@ -42,7 +42,6 @@ describe("findHandlers", () => {
   it("finds all runtimes with matching layers", () => {
     const mockService = createMockService("us-east-1", {
       "go-function": { handler: "myfile.handler", runtime: "go1.10" },
-      "node14-function": { handler: "myfile.handler", runtime: "nodejs14.x" },
       "node16-function": { handler: "myfile.handler", runtime: "nodejs16.x" },
       "node18-function": { handler: "myfile.handler", runtime: "nodejs18.x" },
       "node20-function": { handler: "myfile.handler", runtime: "nodejs20.x" },
@@ -69,12 +68,6 @@ describe("findHandlers", () => {
         handler: { handler: "myfile.handler", runtime: "go1.10" },
         type: RuntimeType.UNSUPPORTED,
         runtime: "go1.10",
-      },
-      {
-        name: "node14-function",
-        handler: { handler: "myfile.handler", runtime: "nodejs14.x" },
-        type: RuntimeType.NODE,
-        runtime: "nodejs14.x",
       },
       {
         name: "node16-function",
@@ -185,55 +178,55 @@ describe("findHandlers", () => {
 describe("applyLambdaLibraryLayers", () => {
   it("adds a layer array if none are present at the function array or service.provider array", () => {
     const handler = {
-      handler: { runtime: "nodejs14.x" },
+      handler: { runtime: "nodejs20.x" },
       type: RuntimeType.NODE,
-      runtime: "nodejs14.x",
+      runtime: "nodejs20.x",
     } as FunctionInfo;
     const layers: LayerJSON = {
-      regions: { "us-east-1": { "nodejs14.x": "node:2" } },
+      regions: { "us-east-1": { "nodejs20.x": "node:2" } },
     };
     const mockService = createMockService("us-east-1", {
-      "node-function": { handler: "myfile.handler", runtime: "nodejs14.x" },
+      "node-function": { handler: "myfile.handler", runtime: "nodejs20.x" },
     });
     applyLambdaLibraryLayers(mockService, [handler], layers);
     expect(handler.handler).toEqual({
-      runtime: "nodejs14.x",
+      runtime: "nodejs20.x",
       layers: ["node:2"],
     });
   });
 
   it("appends to the layer array if already present", () => {
     const handler = {
-      handler: { runtime: "nodejs14.x", layers: ["node:1"] } as any,
+      handler: { runtime: "nodejs20.x", layers: ["node:1"] } as any,
       type: RuntimeType.NODE,
-      runtime: "nodejs14.x",
+      runtime: "nodejs20.x",
     } as FunctionInfo;
     const layers: LayerJSON = {
-      regions: { "us-east-1": { "nodejs14.x": "node:2" } },
+      regions: { "us-east-1": { "nodejs20.x": "node:2" } },
     };
     const mockService = createMockService("us-east-1", {
-      "node-function": { handler: "myfile.handler", runtime: "nodejs14.x" },
+      "node-function": { handler: "myfile.handler", runtime: "nodejs20.x" },
     });
     applyLambdaLibraryLayers(mockService, [handler], layers);
     expect(handler.handler).toEqual({
-      runtime: "nodejs14.x",
+      runtime: "nodejs20.x",
       layers: ["node:1", "node:2"],
     });
   });
 
   it("appends to the function layer array if the function layer array is empty and the provider array has items", () => {
     const handler = {
-      handler: { runtime: "nodejs14.x" } as any,
+      handler: { runtime: "nodejs20.x" } as any,
       type: RuntimeType.NODE,
-      runtime: "nodejs14.x",
+      runtime: "nodejs20.x",
     } as FunctionInfo;
     const layers: LayerJSON = {
-      regions: { "us-east-1": { "nodejs14.x": "node:2" } },
+      regions: { "us-east-1": { "nodejs20.x": "node:2" } },
     };
     const mockService = createMockService(
       "us-east-1",
       {
-        "node-function": { handler: "myfile.handler", runtime: "nodejs14.x" },
+        "node-function": { handler: "myfile.handler", runtime: "nodejs20.x" },
       },
       "x86_64",
       [],
@@ -246,7 +239,7 @@ describe("applyLambdaLibraryLayers", () => {
     });
     applyLambdaLibraryLayers(mockService, [handler], layers);
     expect(handler.handler).toEqual({
-      runtime: "nodejs14.x",
+      runtime: "nodejs20.x",
       layers: ["my-layer-1", "my-layer-2", "node:2"],
     });
     expect(mockService.provider).toEqual({
@@ -258,17 +251,17 @@ describe("applyLambdaLibraryLayers", () => {
 
   it("appends to the function layer array if the function layer array and service.provider layer array each have items", () => {
     const handler = {
-      handler: { runtime: "nodejs14.x", layers: ["my-layer-1"] } as any,
+      handler: { runtime: "nodejs20.x", layers: ["my-layer-1"] } as any,
       type: RuntimeType.NODE,
-      runtime: "nodejs14.x",
+      runtime: "nodejs20.x",
     } as FunctionInfo;
     const layers: LayerJSON = {
-      regions: { "us-east-1": { "nodejs14.x": "node:2" } },
+      regions: { "us-east-1": { "nodejs20.x": "node:2" } },
     };
     const mockService = createMockService(
       "us-east-1",
       {
-        "node-function": { handler: "myfile.handler", runtime: "nodejs14.x" },
+        "node-function": { handler: "myfile.handler", runtime: "nodejs20.x" },
       },
       "x86_64",
       [],
@@ -276,7 +269,7 @@ describe("applyLambdaLibraryLayers", () => {
     );
     applyLambdaLibraryLayers(mockService, [handler], layers);
     expect(handler.handler).toEqual({
-      runtime: "nodejs14.x",
+      runtime: "nodejs20.x",
       layers: ["my-layer-1", "node:2"],
     });
     expect(mockService.provider).toEqual({
@@ -288,56 +281,56 @@ describe("applyLambdaLibraryLayers", () => {
 
   it("doesn't add duplicate layers", () => {
     const handler = {
-      handler: { runtime: "nodejs14.x", layers: ["node:1"] } as any,
+      handler: { runtime: "nodejs20.x", layers: ["node:1"] } as any,
       type: RuntimeType.NODE,
-      runtime: "nodejs14.x",
+      runtime: "nodejs20.x",
     } as FunctionInfo;
     const layers: LayerJSON = {
-      regions: { "us-east-1": { "nodejs14.x": "node:1" } },
+      regions: { "us-east-1": { "nodejs20.x": "node:1" } },
     };
     const mockService = createMockService("us-east-1", {
-      "node-function": { handler: "myfile.handler", runtime: "nodejs14.x" },
+      "node-function": { handler: "myfile.handler", runtime: "nodejs20.x" },
     });
     applyLambdaLibraryLayers(mockService, [handler], layers);
     expect(handler.handler).toEqual({
-      runtime: "nodejs14.x",
+      runtime: "nodejs20.x",
       layers: ["node:1"],
     });
   });
 
   it("only adds layer when region can be found", () => {
     const handler = {
-      handler: { runtime: "nodejs14.x" } as any,
+      handler: { runtime: "nodejs20.x" } as any,
       type: RuntimeType.NODE,
-      runtime: "nodejs14.x",
+      runtime: "nodejs20.x",
     } as FunctionInfo;
     const layers: LayerJSON = {
-      regions: { "us-east-1": { "nodejs14.x": "node:1" } },
+      regions: { "us-east-1": { "nodejs20.x": "node:1" } },
     };
     const mockService = createMockService("us-east-2", {
-      "node-function": { handler: "myfile.handler", runtime: "nodejs14.x" },
+      "node-function": { handler: "myfile.handler", runtime: "nodejs20.x" },
     });
     applyLambdaLibraryLayers(mockService, [handler], layers);
     expect(handler.handler).toEqual({
-      runtime: "nodejs14.x",
+      runtime: "nodejs20.x",
     });
   });
 
   it("only adds layer when layer ARN can be found", () => {
     const handler = {
-      handler: { runtime: "nodejs14.x" } as any,
+      handler: { runtime: "nodejs20.x" } as any,
       type: RuntimeType.NODE,
-      runtime: "nodejs14.x",
+      runtime: "nodejs20.x",
     } as FunctionInfo;
     const layers: LayerJSON = {
       regions: { "us-east-1": { "python3.9": "python:2" } },
     };
     const mockService = createMockService("us-east-1", {
-      "node-function": { handler: "myfile.handler", runtime: "nodejs14.x" },
+      "node-function": { handler: "myfile.handler", runtime: "nodejs20.x" },
     });
     applyLambdaLibraryLayers(mockService, [handler], layers);
     expect(handler.handler).toEqual({
-      runtime: "nodejs14.x",
+      runtime: "nodejs20.x",
     });
   });
 
@@ -345,13 +338,13 @@ describe("applyLambdaLibraryLayers", () => {
     const handler = {
       handler: {} as any,
       type: RuntimeType.NODE,
-      runtime: "nodejs14.x",
+      runtime: "nodejs20.x",
     } as FunctionInfo;
     const layers: LayerJSON = {
       regions: { "us-east-1": { "python3.9": "python:2" } },
     };
     const mockService = createMockService("us-east-1", {
-      "node-function": { handler: "myfile.handler", runtime: "nodejs14.x" },
+      "node-function": { handler: "myfile.handler", runtime: "nodejs20.x" },
     });
     applyLambdaLibraryLayers(mockService, [handler], layers);
     expect(handler.handler).toEqual({});
@@ -366,7 +359,7 @@ describe("applyLambdaLibraryLayers", () => {
       regions: { "us-east-1": { "python3.9": "python:2" } },
     };
     const mockService = createMockService("us-east-1", {
-      "node-function": { handler: "myfile.handler", runtime: "nodejs14.x" },
+      "node-function": { handler: "myfile.handler", runtime: "nodejs20.x" },
     });
     applyLambdaLibraryLayers(mockService, [handler], layers);
     expect(handler.handler).toEqual({});
@@ -374,23 +367,23 @@ describe("applyLambdaLibraryLayers", () => {
 
   it("detects when to use the GovCloud layers", () => {
     const handler = {
-      handler: { runtime: "nodejs14.x" },
+      handler: { runtime: "nodejs20.x" },
       type: RuntimeType.NODE,
-      runtime: "nodejs14.x",
+      runtime: "nodejs20.x",
     } as FunctionInfo;
     const layers: LayerJSON = {
       regions: {
         "us-gov-east-1": {
-          "nodejs14.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node14-x:30",
+          "nodejs20.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node14-x:30",
         },
       },
     };
     const mockService = createMockService("us-gov-east-1", {
-      "node-function": { handler: "myfile.handler", runtime: "nodejs14.x" },
+      "node-function": { handler: "myfile.handler", runtime: "nodejs20.x" },
     });
     applyLambdaLibraryLayers(mockService, [handler], layers);
     expect(handler.handler).toEqual({
-      runtime: "nodejs14.x",
+      runtime: "nodejs20.x",
       layers: ["arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node14-x:30"],
     });
   });
@@ -427,36 +420,36 @@ describe("applyLambdaLibraryLayers", () => {
 
   it("adds extension layer", () => {
     const handler = {
-      handler: { runtime: "nodejs14.x" },
+      handler: { runtime: "nodejs20.x" },
       type: RuntimeType.NODE,
-      runtime: "nodejs14.x",
+      runtime: "nodejs20.x",
     } as FunctionInfo;
     const layers: LayerJSON = {
       regions: { "us-east-1": { extension: "extension:5" } },
     };
     const mockService = createMockService("us-east-1", {
-      "node-function": { handler: "myfile.handler", runtime: "nodejs14.x" },
+      "node-function": { handler: "myfile.handler", runtime: "nodejs20.x" },
     });
     applyExtensionLayer(mockService, [handler], layers);
     expect(handler.handler).toEqual({
-      runtime: "nodejs14.x",
+      runtime: "nodejs20.x",
       layers: ["extension:5"],
     });
   });
 
   it("adds a Lambda library and Extension layer", () => {
     const handler = {
-      handler: { runtime: "nodejs14.x" },
+      handler: { runtime: "nodejs20.x" },
       type: RuntimeType.NODE,
-      runtime: "nodejs14.x",
+      runtime: "nodejs20.x",
     } as FunctionInfo;
     const layers: LayerJSON = {
-      regions: { "us-east-1": { "nodejs14.x": "node:2", extension: "extension:5" } },
+      regions: { "us-east-1": { "nodejs20.x": "node:2", extension: "extension:5" } },
     };
     const mockService = createMockService(
       "us-east-1",
       {
-        "node-function": { handler: "myfile.handler", runtime: "nodejs14.x" },
+        "node-function": { handler: "myfile.handler", runtime: "nodejs20.x" },
       },
       "x86_64",
       [],
@@ -466,7 +459,7 @@ describe("applyLambdaLibraryLayers", () => {
     applyExtensionLayer(mockService, [handler], layers);
     expect(handler.handler).toEqual({
       layers: ["my-layer-1", "my-layer-2", "node:2", "extension:5"],
-      runtime: "nodejs14.x",
+      runtime: "nodejs20.x",
     });
     expect(mockService.provider).toEqual({
       architecture: "x86_64",
@@ -540,14 +533,14 @@ describe("applyLambdaLibraryLayers", () => {
 
   it("adds correct lambda layer given architecture in provider level for node", () => {
     const handler = {
-      handler: { runtime: "nodejs14.x" },
+      handler: { runtime: "nodejs20.x" },
       type: RuntimeType.NODE,
-      runtime: "nodejs14.x",
+      runtime: "nodejs20.x",
     } as FunctionInfo;
     const layers: LayerJSON = {
       regions: {
         "us-east-1": {
-          "nodejs14.x": "nodejs14.x",
+          "nodejs20.x": "nodejs20.x",
           extension: "extension:11",
           "extension-arm": "extension-arm:11",
         },
@@ -556,15 +549,15 @@ describe("applyLambdaLibraryLayers", () => {
     const mockService = createMockService(
       "us-east-1",
       {
-        "node-function": { handler: "myfile.handler", runtime: "nodejs14.x" },
+        "node-function": { handler: "myfile.handler", runtime: "nodejs20.x" },
       },
       "arm64",
     );
     applyLambdaLibraryLayers(mockService, [handler], layers);
     applyExtensionLayer(mockService, [handler], layers);
     expect(handler.handler).toEqual({
-      runtime: "nodejs14.x",
-      layers: ["nodejs14.x", "extension-arm:11"],
+      runtime: "nodejs20.x",
+      layers: ["nodejs20.x", "extension-arm:11"],
     });
   });
 
