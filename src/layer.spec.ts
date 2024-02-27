@@ -59,6 +59,7 @@ describe("findHandlers", () => {
       "java21-function": { handler: "myfile.handler", runtime: "java21" },
       "dotnet6-function": { handler: "myfile.handler", runtime: "dotnet6" },
       "provided-function": { handler: "myfile.handler", runtime: "provided" },
+      "provided.al2023-function": { handler: "myfile.handler", runtime: "provided.al2023" },      
     });
 
     const result = findHandlers(mockService, []);
@@ -170,6 +171,12 @@ describe("findHandlers", () => {
         handler: { handler: "myfile.handler", runtime: "provided" },
         type: RuntimeType.CUSTOM,
         runtime: "provided",
+      },
+      {
+        name: "provided.al2023-function",
+        handler: { handler: "myfile.handler", runtime: "provided.al2023" },
+        type: RuntimeType.CUSTOM,
+        runtime: "provided.al2023",
       },
     ]);
   });
