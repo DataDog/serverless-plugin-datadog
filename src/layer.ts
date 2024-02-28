@@ -68,6 +68,7 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
   "java8.al2": RuntimeType.JAVA,
   java8: RuntimeType.JAVA,
   "provided.al2": RuntimeType.CUSTOM,
+  "provided.al2023": RuntimeType.CUSTOM,
   provided: RuntimeType.CUSTOM,
   "ruby3.2": RuntimeType.RUBY,
   "go1.x": RuntimeType.GO,
