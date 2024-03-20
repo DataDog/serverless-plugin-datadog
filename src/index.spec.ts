@@ -362,7 +362,7 @@ describe("ServerlessPlugin", () => {
           region: "us-east-1",
         },
         functions: {
-          node1: {
+          dotnet6: {
             handler: "my-func.ev",
             layers: [],
             runtime: "dotnet6",
@@ -381,7 +381,7 @@ describe("ServerlessPlugin", () => {
     expect(serverless).toMatchObject({
       service: {
         functions: {
-          node1: {
+          dotnet6: {
             handler: "my-func.ev",
             layers: [
               expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:dd-trace-dotnet\:.*/),

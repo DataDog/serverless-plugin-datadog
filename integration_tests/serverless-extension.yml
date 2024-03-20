@@ -51,6 +51,13 @@ functions:
     handler: dotnet_handler.hello
     runtime: dotnet6
     architecture: arm64
+  DotnetHello8:
+    handler: dotnet_handler.hello
+    runtime: dotnet8
+  DotnetArmHello8:
+    handler: dotnet_handler.hello
+    runtime: dotnet8
+    architecture: arm64
   JavaHello8:
     handler: java_handler.hello
     runtime: java8
