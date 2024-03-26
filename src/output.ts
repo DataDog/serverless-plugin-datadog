@@ -28,7 +28,7 @@ export async function addOutputLinks(
     const key = `${outputPrefix}${name}`.replace(/[^a-z0-9]/gi, "");
     outputs[key] = {
       Description: `See ${name} in Datadog`,
-      Value: `https://${subdomain}.${site}/functions?selection=aws-lambda-functions%2B${functionName?.toLowerCase()}%2B${region}%2B${awsAccount}`,
+      Value: `https://${subdomain}.${site}/functions?cloud=aws&entity_view=lambda_functions&selection=aws-lambda-functions%2B${functionName?.toLowerCase()}%2B${region}%2B${awsAccount}`,
     };
   });
 }
