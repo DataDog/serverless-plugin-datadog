@@ -1523,6 +1523,12 @@ describe("setEnvConfiguration", () => {
       );
     });
 
+    it("fails when `addExtension` is false", () => {
+      expect(() => setEnvConfiguration({ ...config, addExtension: false }, handlers)).toThrow(
+        "`enableASM` requires the extension to be present, and `enableDDTracing` to be enabled",
+      );
+    });
+
     it("defines `DD_SERVERLESS_APPSEC_ENABLED` and `AWS_LAMBDA_EXEC_WRAPPER`", () => {
       setEnvConfiguration(config, handlers);
       expect(handlers).toEqual([
@@ -1546,5 +1552,33 @@ describe("setEnvConfiguration", () => {
         },
       ]);
     });
+
+    it("does not define `DD_SERVERLESS_APPSEC_ENABLED` and `AWS_LAMBDA_EXEC_WRAPPER` when disabled", () => {
+      const offConfig: Configuration = {
+        ...defaultConfiguration,
+        apiKey: "1234",
+        enableASM: false
+      }
+      setEnvConfiguration(offConfig, handlers);
+      expect(handlers).toEqual([
+        {
+          handler: {
+            environment: {
+              DD_API_KEY: "1234",
+              DD_CAPTURE_LAMBDA_PAYLOAD: false,
+              DD_LOGS_INJECTION: false,
+              DD_MERGE_XRAY_TRACES: false,
+              DD_SERVERLESS_LOGS_ENABLED: true,
+              DD_SITE: "datadoghq.com",
+              DD_TRACE_ENABLED: true,
+            },
+            events: [],
+          },
+          name: "function",
+          type: RuntimeType.NODE,
+        },
+      ]);
+    });
+
   });
 });
