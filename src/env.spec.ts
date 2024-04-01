@@ -1557,8 +1557,8 @@ describe("setEnvConfiguration", () => {
       const offConfig: Configuration = {
         ...defaultConfiguration,
         apiKey: "1234",
-        enableASM: false
-      }
+        enableASM: false,
+      };
       setEnvConfiguration(offConfig, handlers);
       expect(handlers).toEqual([
         {
@@ -1579,6 +1579,5 @@ describe("setEnvConfiguration", () => {
         },
       ]);
     });
-
   });
 });

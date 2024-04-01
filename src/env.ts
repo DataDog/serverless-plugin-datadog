@@ -222,7 +222,7 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
       environment[ddTracingEnabledEnvVar] = config.enableDDTracing;
     }
     if (config.enableASM !== undefined && config.enableASM) {
-      if (config.enableASM && !config.enableDDTracing || config.enableASM && !config.addExtension) {
+      if ((config.enableASM && !config.enableDDTracing) || (config.enableASM && !config.addExtension)) {
         throw new Error("`enableASM` requires the extension to be present, and `enableDDTracing` to be enabled");
       }
       environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] ??= AWS_LAMBDA_EXEC_WRAPPER;
