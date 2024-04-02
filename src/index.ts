@@ -308,7 +308,10 @@ module.exports = class ServerlessPlugin {
       }
     }
 
-    redirectHandlers(handlers, config.addLayers, config.customHandler);
+    // defaults to true
+    if (config.redirectHandlers) {
+      redirectHandlers(handlers, config.addLayers, config.customHandler);
+    }
     if (
       (config.testingMode === false || config.integrationTesting === false) &&
       config.skipCloudformationOutputs === false

@@ -115,6 +115,11 @@ export interface Configuration {
   // Step Functions Tracing
   enableStepFunctionsTracing?: boolean;
   mergeStepFunctionAndLambdaTraces?: boolean;
+
+  // Disables handler redirection
+  // Used for testing or for someone exclusively forwarding logs
+  // or including the library only for metrics.
+  redirectHandlers?: boolean;
 }
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
@@ -173,6 +178,7 @@ export const defaultConfiguration: Configuration = {
   skipCloudformationOutputs: false,
   mergeStepFunctionAndLambdaTraces: false,
   enableStepFunctionsTracing: false,
+  redirectHandlers: true,
 };
 
 export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]) {
