@@ -1915,7 +1915,7 @@ describe("ServerlessPlugin", () => {
         },
       });
     });
-    it("skips redirect when redirectHandlers", async () => {
+    it("skips redirect when redirectHandlers set to false", async () => {
       mock({});
       const serverless = {
         cli: {
