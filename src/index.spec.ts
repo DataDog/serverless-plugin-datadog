@@ -1871,5 +1871,94 @@ describe("ServerlessPlugin", () => {
         true,
       );
     });
+    it("redirects by default", async () => {
+      mock({});
+      const serverless = {
+        cli: {
+          log: () => {},
+        },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          provider: {
+            region: "us-east-1",
+          },
+          functions: {
+            nodeFunction: {
+              handler: "my-func.handler",
+              layers: [],
+              runtime: "nodejs20.x",
+            },
+          },
+          custom: {
+            datadog: {
+              apiKey: 1234,
+            },
+          },
+        },
+      };
+
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(serverless).toMatchObject({
+        service: {
+          functions: {
+            nodeFunction: {
+              handler: "/opt/nodejs/node_modules/datadog-lambda-js/handler.handler",
+              layers: [], // layers handled by before:package:createDeploymentArtifacts and out of scope for this test
+              runtime: "nodejs20.x",
+            },
+          },
+          provider: {
+            region: "us-east-1",
+          },
+        },
+      });
+    });
+    it("skips redirect when redirectHandlers set to false", async () => {
+      mock({});
+      const serverless = {
+        cli: {
+          log: () => {},
+        },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          provider: {
+            region: "us-east-1",
+          },
+          functions: {
+            nodeFunction: {
+              handler: "my-func.handler",
+              layers: [],
+              runtime: "nodejs20.x",
+            },
+          },
+          custom: {
+            datadog: {
+              apiKey: 1234,
+              redirectHandlers: false,
+            },
+          },
+        },
+      };
+
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:createDeploymentArtifacts"]();
+      expect(serverless).toMatchObject({
+        service: {
+          functions: {
+            nodeFunction: {
+              handler: "my-func.handler",
+              layers: [], // layers handled by before:package:createDeploymentArtifacts and out of scope for this test
+              runtime: "nodejs20.x",
+            },
+          },
+          provider: {
+            region: "us-east-1",
+          },
+        },
+      });
+    });
   });
 });
