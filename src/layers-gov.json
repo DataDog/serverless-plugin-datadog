@@ -17,8 +17,8 @@
       "python3.12-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python312-ARM:92",
       "ruby3.2": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Ruby3-2:22",
       "ruby3.2-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Ruby3-2-ARM:22",
-      "extension": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Extension:55",
-      "extension-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Extension-ARM:55",
+      "extension": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Extension:56",
+      "extension-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Extension-ARM:56",
       "dotnet": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:dd-trace-dotnet:15",
       "dotnet-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:dd-trace-dotnet-ARM:15",
       "java": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:dd-trace-java:14"
@@ -40,8 +40,8 @@
       "python3.12-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python312-ARM:92",
       "ruby3.2": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Ruby3-2:22",
       "ruby3.2-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Ruby3-2-ARM:22",
-      "extension": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Extension:55",
-      "extension-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Extension-ARM:55",
+      "extension": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Extension:56",
+      "extension-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Extension-ARM:56",
       "dotnet": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:dd-trace-dotnet:15",
       "dotnet-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:dd-trace-dotnet-ARM:15",
       "java": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:dd-trace-java:14"
