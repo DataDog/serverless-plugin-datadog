@@ -24,6 +24,11 @@ export function isSafeToModifyStepFunctionInvoctation(parameters: any): boolean 
   if (!parameters.hasOwnProperty("Input")) {
     return true;
   }
+
+  if (typeof parameters.Input !== "object") {
+    return false;
+  }
+
   if (!parameters.Input.hasOwnProperty("CONTEXT.$")) {
     return true;
   }
@@ -49,7 +54,7 @@ export interface StateMachineStep {
     FunctionName?: string;
     "Payload.$"?: string;
     Input?: {
-      "CONTEXT.$": string;
+      "CONTEXT.$"?: string;
     };
   };
   Next?: string;
@@ -117,6 +122,9 @@ export function updateDefinitionString(
         }
       } else if (isStepFunctionInvocation(step?.Resource)) {
         if (isSafeToModifyStepFunctionInvoctation(step?.Parameters)) {
+          if (step.Parameters && !step.Parameters.Input) {
+            step.Parameters.Input = {};
+          }
           step.Parameters!.Input!["CONTEXT.$"] = "States.JsonMerge($$, $, false)";
           serverless.cli.log(
             `JsonMerge StartExecution context object with Input in step: ${stepName} of state machine: ${stateMachineName}.`,

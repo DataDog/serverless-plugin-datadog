@@ -211,7 +211,7 @@ describe("test isSafeToModifyStepFunctionInvoctation", () => {
 
   it("Input field empty", async () => {
     const parameters = { FunctionName: "bla", Input: {} };
-    expect(isSafeToModifyStepFunctionInvoctation(parameters)).toBeFalsy();
+    expect(isSafeToModifyStepFunctionInvoctation(parameters)).toBeTruthy();
   });
 
   it("Input field is not an object", async () => {
@@ -220,12 +220,12 @@ describe("test isSafeToModifyStepFunctionInvoctation", () => {
   });
 
   it("Input field has stuff in it", async () => {
-    const parameters = { FunctionName: "bla", Input: {"foo": "bar"} };
+    const parameters = { FunctionName: "bla", Input: { foo: "bar" } };
     expect(isSafeToModifyStepFunctionInvoctation(parameters)).toBeTruthy();
   });
 
   it("Input field has CONTEXT.$ already", async () => {
-    const parameters = { FunctionName: "bla", Input: {"CONTEXT.$": "something else"} };
+    const parameters = { FunctionName: "bla", Input: { "CONTEXT.$": "something else" } };
     expect(isSafeToModifyStepFunctionInvoctation(parameters)).toBeFalsy();
   });
 });
