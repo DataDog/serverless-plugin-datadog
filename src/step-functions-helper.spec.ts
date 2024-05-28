@@ -1,6 +1,6 @@
 import {
   isDefaultLambdaApiStep,
-  isSafeToModifyStepFunctionsDefinition,
+  isSafeToModifyStepFunctionLambdaInvocation,
   StateMachineDefinition,
   updateDefinitionString,
 } from "./step-functions-helper";
@@ -183,22 +183,22 @@ describe("test updateDefinitionString", () => {
 describe("test isSafeToModifyStepFunctionsDefinition", () => {
   it("Payload field not set in parameters", async () => {
     const parameters = { FunctionName: "bla" };
-    expect(isSafeToModifyStepFunctionsDefinition(parameters)).toBeTruthy();
+    expect(isSafeToModifyStepFunctionLambdaInvocation(parameters)).toBeTruthy();
   });
 
   it("Payload field empty", async () => {
     const parameters = { FunctionName: "bla", "Payload.$": {} };
-    expect(isSafeToModifyStepFunctionsDefinition(parameters)).toBeFalsy();
+    expect(isSafeToModifyStepFunctionLambdaInvocation(parameters)).toBeFalsy();
   });
 
   it("Payload field default to $", async () => {
     const parameters = { FunctionName: "bla", "Payload.$": "$" };
-    expect(isSafeToModifyStepFunctionsDefinition(parameters)).toBeTruthy();
+    expect(isSafeToModifyStepFunctionLambdaInvocation(parameters)).toBeTruthy();
   });
 
   it("Payload field default to $", async () => {
     const parameters = { FunctionName: "bla", "Payload.$": "something customer has already set and not empty" };
-    expect(isSafeToModifyStepFunctionsDefinition(parameters)).toBeFalsy();
+    expect(isSafeToModifyStepFunctionLambdaInvocation(parameters)).toBeFalsy();
   });
 });
 

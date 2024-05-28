@@ -1,6 +1,6 @@
 import Serverless from "serverless";
 
-export function isSafeToModifyStepFunctionsDefinition(parameters: any): boolean {
+export function isSafeToModifyStepFunctionLambdaInvocation(parameters: any): boolean {
   if (typeof parameters !== "object") {
     return false;
   }
@@ -13,6 +13,20 @@ export function isSafeToModifyStepFunctionsDefinition(parameters: any): boolean 
     }
   }
 
+  return false;
+}
+
+export function isSafeToModifyStepFunctionInvoctation(parameters: any): boolean {
+  if (typeof parameters !== "object") {
+    return false;
+  }
+
+  if (!parameters.hasOwnProperty("Input")) {
+    return true;
+  }
+  if (!parameters.Input.hasOwnProperty("CONTEXT.$")) {
+    return true;
+  }
   return false;
 }
 
@@ -90,7 +104,7 @@ export function updateDefinitionString(
       }
       if (isDefaultLambdaApiStep(step?.Resource)) {
         if (typeof step.Parameters === "object") {
-          if (isSafeToModifyStepFunctionsDefinition(step.Parameters)) {
+          if (isSafeToModifyStepFunctionLambdaInvocation(step.Parameters)) {
             step.Parameters!["Payload.$"] = "States.JsonMerge($$, $, false)";
             serverless.cli.log(
               `JsonMerge Step Functions context object with payload in step: ${stepName} of state machine: ${stateMachineName}.`,
@@ -102,8 +116,8 @@ export function updateDefinitionString(
           }
         }
       } else if (isStepFunctionInvocation(step?.Resource)) {
-        if (typeof step.Parameters === "object" && typeof step.Parameters.Input === "object") {
-          step.Parameters.Input!["CONTEXT.$"] = "States.JsonMerge($$, $, false)";
+        if (isSafeToModifyStepFunctionInvoctation(step?.Parameters)) {
+          step.Parameters!.Input!["CONTEXT.$"] = "States.JsonMerge($$, $, false)";
           serverless.cli.log(
             `JsonMerge StartExecution context object with Input in step: ${stepName} of state machine: ${stateMachineName}.`,
           );
