@@ -146,6 +146,38 @@ describe("test updateDefinitionString", () => {
 
     expect(definitionString["Fn::Sub"].length).toBe(0);
   });
+
+  it("test step function invocation", async () => {
+    const definitionString = {
+      "Fn::Sub": [
+        '{"Comment": "A description of my state machine", "StartAt": "Step Functions StartExecution", "States": {"Step Functions StartExecution": {"Type": "Task", "Resource": "arn:aws:states:::states:startExecution", "Parameters": {"StateMachineArn": "arn:aws:states:us-east-1:425362996713:stateMachine:agocs-test-noop-state-machine-2", "Input": {"StatePayload": "Hello from Step Functions!", "AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID.$": "$$.Execution.Id" }}, "End": true }}}',
+        {},
+      ],
+    };
+    const stateMachineName = "fake-state-machine-name";
+    updateDefinitionString(definitionString, serverless, stateMachineName);
+
+    const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
+    expect(definitionAfterUpdate.States["Step Functions StartExecution"]?.Parameters?.Input?.["CONTEXT.$"]).toBe(
+      "States.JsonMerge($$, $, false)",
+    );
+  });
+
+  // it("test step function invocation without payload", async () => {
+  //   const definitionString = {
+  //     "Fn::Sub": [
+  //       '{"Comment": "A description of my state machine", "StartAt": "Step Functions StartExecution", "States": {"Step Functions StartExecution": {"Type": "Task", "Resource": "arn:aws:states:::states:startExecution", "Parameters": {"StateMachineArn": "arn:aws:states:us-east-1:425362996713:stateMachine:agocs-test-noop-state-machine-2", "Input": {"StatePayload": "Hello from Step Functions!", "AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID.$": "$$.Execution.Id" }}, "End": true }}}',
+  //       {},
+  //     ],
+  //   };
+  //   const stateMachineName = "fake-state-machine-name";
+  //   updateDefinitionString(definitionString, serverless, stateMachineName);
+
+  //   const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
+  //   expect(definitionAfterUpdate.States?.InvokeLambda?.Parameters?.["Payload.$"]).toBe(
+  //     "States.JsonMerge($$, $, false)",
+  //   );
+  // });
 });
 
 describe("test isSafeToModifyStepFunctionsDefinition", () => {

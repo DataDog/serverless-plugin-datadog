@@ -34,6 +34,9 @@ export interface StateMachineStep {
   Parameters?: {
     FunctionName?: string;
     "Payload.$"?: string;
+    Input?: {
+      "CONTEXT.$": string;
+    }
   };
   Next?: string;
   End?: boolean;
@@ -49,6 +52,17 @@ export function isDefaultLambdaApiStep(resource: string | undefined): boolean {
     return true;
   }
   return false;
+}
+
+export function isStepFunctionInvocation(resource: string | undefined): boolean {
+  if (resource === undefined) {
+    return false;
+  }
+  if (resource.startsWith("arn:aws:states:::states:startExecution")) {
+    return true;
+  }
+  return false;
+
 }
 
 export function updateDefinitionString(
@@ -71,8 +85,8 @@ export function updateDefinitionString(
   for (const stepName in states) {
     if (states.hasOwnProperty(stepName)) {
       const step: StateMachineStep = states[stepName];
-      if (!isDefaultLambdaApiStep(step?.Resource)) {
-        // only default lambda api allows context injection
+      if (!isDefaultLambdaApiStep(step?.Resource) && (!isStepFunctionInvocation(step?.Resource))) {
+        // inject context into default Lambda API steps and Step Function invocation steps
         continue;
       }
       if (typeof step.Parameters === "object") {
