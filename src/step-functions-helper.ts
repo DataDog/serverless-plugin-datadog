@@ -88,15 +88,24 @@ export function updateDefinitionString(
         // inject context into default Lambda API steps and Step Function invocation steps
         continue;
       }
-      if (typeof step.Parameters === "object") {
-        if (isSafeToModifyStepFunctionsDefinition(step.Parameters)) {
-          step.Parameters!["Payload.$"] = "States.JsonMerge($$, $, false)";
+      if (isDefaultLambdaApiStep(step?.Resource)) {
+        if (typeof step.Parameters === "object") {
+          if (isSafeToModifyStepFunctionsDefinition(step.Parameters)) {
+            step.Parameters!["Payload.$"] = "States.JsonMerge($$, $, false)";
+            serverless.cli.log(
+              `JsonMerge Step Functions context object with payload in step: ${stepName} of state machine: ${stateMachineName}.`,
+            );
+          } else {
+            serverless.cli.log(
+              `[Warn] Parameters.Payload has been set. Merging traces failed for step: ${stepName} of state machine: ${stateMachineName}`,
+            );
+          }
+        }
+      } else if (isStepFunctionInvocation(step?.Resource)) {
+        if (typeof step.Parameters === "object" && typeof step.Parameters.Input === "object") {
+          step.Parameters.Input!["CONTEXT.$"] = "States.JsonMerge($$, $, false)";
           serverless.cli.log(
-            `JsonMerge Step Functions context object with payload in step: ${stepName} of state machine: ${stateMachineName}.`,
-          );
-        } else {
-          serverless.cli.log(
-            `[Warn] Parameters.Payload has been set. Merging traces failed for step: ${stepName} of state machine: ${stateMachineName}`,
+            `JsonMerge StartExecution context object with Input in step: ${stepName} of state machine: ${stateMachineName}.`,
           );
         }
       }
