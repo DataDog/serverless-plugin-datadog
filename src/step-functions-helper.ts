@@ -16,6 +16,14 @@ export function isSafeToModifyStepFunctionLambdaInvocation(parameters: any): boo
   return false;
 }
 
+// Truth table
+// Input                    | Expected
+// -------------------------|---------
+// Empty object             | true
+// undefined                | true
+// not object               | false
+// object without CONTEXT.$ | true
+// object with CONTEXT.$    | false
 export function isSafeToModifyStepFunctionInvoctation(parameters: any): boolean {
   if (typeof parameters !== "object") {
     return false;
