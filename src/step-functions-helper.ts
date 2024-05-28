@@ -36,7 +36,7 @@ export interface StateMachineStep {
     "Payload.$"?: string;
     Input?: {
       "CONTEXT.$": string;
-    }
+    };
   };
   Next?: string;
   End?: boolean;
@@ -62,7 +62,6 @@ export function isStepFunctionInvocation(resource: string | undefined): boolean 
     return true;
   }
   return false;
-
 }
 
 export function updateDefinitionString(
@@ -85,7 +84,7 @@ export function updateDefinitionString(
   for (const stepName in states) {
     if (states.hasOwnProperty(stepName)) {
       const step: StateMachineStep = states[stepName];
-      if (!isDefaultLambdaApiStep(step?.Resource) && (!isStepFunctionInvocation(step?.Resource))) {
+      if (!isDefaultLambdaApiStep(step?.Resource) && !isStepFunctionInvocation(step?.Resource)) {
         // inject context into default Lambda API steps and Step Function invocation steps
         continue;
       }
