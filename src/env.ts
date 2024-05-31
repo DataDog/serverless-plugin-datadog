@@ -115,6 +115,7 @@ export interface Configuration {
   // Step Functions Tracing
   enableStepFunctionsTracing?: boolean;
   mergeStepFunctionAndLambdaTraces?: boolean;
+  propagateTraceContext?: boolean;
 
   // Disables handler redirection
   // Used for testing or for someone exclusively forwarding logs
