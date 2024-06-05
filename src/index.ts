@@ -247,7 +247,7 @@ module.exports = class ServerlessPlugin {
 
         if (config.mergeStepFunctionAndLambdaTraces || config.propagateTraceContext) {
           this.serverless.cli.log(
-            `mergeStepFunctionAndLambdaTraces is true, trying to modify Step Functions' definitions to merge traces.`,
+            `mergeStepFunctionAndLambdaTraces or propagateTraceContext is true, trying to modify Step Functions' definitions to add trace context.`,
           );
           mergeStepFunctionAndLambdaTraces(resources, this.serverless);
         }

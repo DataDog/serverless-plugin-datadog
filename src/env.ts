@@ -178,6 +178,7 @@ export const defaultConfiguration: Configuration = {
   failOnError: false,
   skipCloudformationOutputs: false,
   mergeStepFunctionAndLambdaTraces: false,
+  propagateTraceContext: false,
   enableStepFunctionsTracing: false,
   redirectHandlers: true,
 };

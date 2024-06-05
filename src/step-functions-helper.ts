@@ -46,9 +46,11 @@ export function isSafeToModifyStepFunctionInvoctation(parameters: any): boolean 
 export interface GeneralResource {
   Type: string;
   Properties?: {
-    DefinitionString?: {
-      "Fn::Sub": any[];
-    };
+    DefinitionString?:
+      | string
+      | {
+          "Fn::Sub": any[];
+        };
   };
 }
 
@@ -91,21 +93,40 @@ export function isStepFunctionInvocation(resource: string | undefined): boolean 
   return false;
 }
 
-export function updateDefinitionString(
-  definitionString: { "Fn::Sub": (string | object)[] },
-  serverless: Serverless,
-  stateMachineName: string,
-): void {
+function parseDefinitionObject(definitionString: { "Fn::Sub": (string | object)[] }): StateMachineDefinition {
   if (
     !(typeof definitionString === "object" && "Fn::Sub" in definitionString && definitionString["Fn::Sub"].length > 0)
   ) {
-    return;
+    throw new Error("unexpected definitionString");
   }
   const unparsedDefinition = definitionString["Fn::Sub"] ? definitionString["Fn::Sub"][0] : ""; // index 0 should always be a string of step functions definition
   if (unparsedDefinition === "") {
-    return;
+    throw new Error("no definition string found in DefinitionString");
   }
   const definitionObj: StateMachineDefinition = JSON.parse(unparsedDefinition as string);
+  return definitionObj;
+}
+
+// Updates the definitionString of a step function to include trace context as appropriate for a Lambda invocation or a nested step function invocation.
+// definitionString can either be an object or a naked string, so we need to return the same and explicitly modify the Resource in span-link.ts
+export function updateDefinitionString(
+  definitionString: string | { "Fn::Sub": (string | object)[] },
+  serverless: Serverless,
+  stateMachineName: string,
+): string | { "Fn::Sub": (string | object)[] } {
+  var definitionObj: StateMachineDefinition;
+
+  if (typeof definitionString !== "string") {
+    // definitionString is a {"Fn::Sub": (string | object)[]}
+    try {
+      definitionObj = parseDefinitionObject(definitionString);
+    } catch (error) {
+      serverless.cli.log("Unable to update StepFunction definition. " + error);
+      return definitionString;
+    }
+  } else {
+    definitionObj = JSON.parse(definitionString);
+  }
 
   const states = definitionObj.States;
   for (const stepName in states) {
@@ -134,14 +155,16 @@ export function updateDefinitionString(
             step.Parameters.Input = {};
           }
           step.Parameters!.Input!["CONTEXT.$"] = "States.JsonMerge($$, $, false)";
-          serverless.cli.log(
-            `JsonMerge StartExecution context object with Input in step: ${stepName} of state machine: ${stateMachineName}.`,
-          );
         }
       }
     }
   }
-  definitionString["Fn::Sub"][0] = JSON.stringify(definitionObj); // writing back to the original JSON created by Serverless framework
+  if (typeof definitionString !== "string") {
+    definitionString["Fn::Sub"][0] = JSON.stringify(definitionObj); // writing back to the original JSON created by Serverless framework
+  } else {
+    definitionString = JSON.stringify(definitionObj);
+  }
+  return definitionString; // return the definitionString so it can be written to the Resource in span-link.ts
 }
 
 export function inspectAndRecommendStepFunctionsInstrumentation(serverless: Serverless) {
