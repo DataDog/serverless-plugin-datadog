@@ -87,10 +87,7 @@ export function isStepFunctionInvocation(resource: string | undefined): boolean 
   if (resource === undefined) {
     return false;
   }
-  if (resource.startsWith("arn:aws:states:::states:startExecution")) {
-    return true;
-  }
-  return false;
+  return resource.startsWith("arn:aws:states:::states:startExecution");
 }
 
 function parseDefinitionObject(definitionString: { "Fn::Sub": (string | object)[] }): StateMachineDefinition {
@@ -133,7 +130,7 @@ export function updateDefinitionString(
     if (states.hasOwnProperty(stepName)) {
       const step: StateMachineStep = states[stepName];
       if (!isDefaultLambdaApiStep(step?.Resource) && !isStepFunctionInvocation(step?.Resource)) {
-        // inject context into default Lambda API steps and Step Function invocation steps
+        // only inject context into default Lambda API steps and Step Function invocation steps
         continue;
       }
       if (isDefaultLambdaApiStep(step?.Resource)) {
