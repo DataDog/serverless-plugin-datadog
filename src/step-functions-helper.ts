@@ -114,7 +114,7 @@ export function updateDefinitionString(
   serverless: Serverless,
   stateMachineName: string,
 ): string | { "Fn::Sub": (string | object)[] } {
-  var definitionObj: StateMachineDefinition;
+  let definitionObj: StateMachineDefinition;
 
   if (typeof definitionString !== "string") {
     // definitionString is a {"Fn::Sub": (string | object)[]}

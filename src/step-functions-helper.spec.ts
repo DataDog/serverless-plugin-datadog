@@ -53,6 +53,16 @@ describe("test updateDefinitionString", () => {
     );
   });
 
+  it("updates the definitionstring of a StepFunction with a string definitionString", async () => {
+    const definitionString =
+      '{"Comment":"Some comment","StartAt":"agocsTest1","States":{"agocsTest1":{"Type":"Task","Resource":"arn:aws:states:::states:startExecution.sync:2","Parameters":{"StateMachineArn":"arn:aws:states:::states:startExecution.sync:2","Input":{"foo":"bar"}},"End":true}}}';
+    const stateMachineName = "fake-state-machine-name";
+    const newDefString = updateDefinitionString(definitionString, serverless, stateMachineName);
+
+    expect(typeof newDefString === "string").toBeTruthy();
+    expect(newDefString).toContain("CONTEXT");
+  });
+
   it("test lambda step without Payload", async () => {
     const definitionString = {
       "Fn::Sub": [

@@ -11,7 +11,7 @@ export function mergeStepFunctionAndLambdaTraces(
       if (resourceObj.Type === "AWS::StepFunctions::StateMachine") {
         if (resourceObj.Properties) {
           const definitionString = resourceObj.Properties?.DefinitionString!;
-          var newDefString = updateDefinitionString(definitionString, serverless, resourceName);
+          const newDefString = updateDefinitionString(definitionString, serverless, resourceName);
           resourceObj.Properties.DefinitionString = newDefString;
         }
       }
