@@ -43,6 +43,7 @@ import { enableTracing, TracingMode } from "./tracing";
 import { redirectHandlers } from "./wrapper";
 import { mergeStepFunctionAndLambdaTraces } from "./span-link";
 import { inspectAndRecommendStepFunctionsInstrumentation } from "./step-functions-helper";
+import { precompilePython } from "./precompile-python";
 
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
 export interface ExtendedFunctionDefinition extends FunctionDefinition {
@@ -319,6 +320,12 @@ module.exports = class ServerlessPlugin {
       await addOutputLinks(this.serverless, config.site, config.subdomain, handlers);
     } else {
       this.serverless.cli.log("Skipped adding output links");
+    }
+
+    if (config.precompilePython) {
+      // TODO: only precompile once
+      // TODO: only precompile if python runtime
+      precompilePython(this.serverless);
     }
   }
 

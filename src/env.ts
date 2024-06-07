@@ -120,6 +120,9 @@ export interface Configuration {
   // Used for testing or for someone exclusively forwarding logs
   // or including the library only for metrics.
   redirectHandlers?: boolean;
+
+  // TODO
+  precompilePython?: boolean | object;
 }
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
@@ -179,6 +182,7 @@ export const defaultConfiguration: Configuration = {
   mergeStepFunctionAndLambdaTraces: false,
   enableStepFunctionsTracing: false,
   redirectHandlers: true,
+  precompilePython: false,
 };
 
 export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]) {
