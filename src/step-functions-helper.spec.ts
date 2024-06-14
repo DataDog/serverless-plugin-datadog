@@ -1,6 +1,7 @@
 import {
   isDefaultLambdaApiStep,
-  isSafeToModifyStepFunctionsDefinition,
+  isSafeToModifyStepFunctionInvoctation,
+  isSafeToModifyStepFunctionLambdaInvocation,
   StateMachineDefinition,
   updateDefinitionString,
 } from "./step-functions-helper";
@@ -50,6 +51,16 @@ describe("test updateDefinitionString", () => {
     expect(definitionAfterUpdate.States?.InvokeLambda?.Parameters?.["Payload.$"]).toBe(
       "States.JsonMerge($$, $, false)",
     );
+  });
+
+  it("updates the definitionstring of a StepFunction with a string definitionString", async () => {
+    const definitionString =
+      '{"Comment":"Some comment","StartAt":"agocsTest1","States":{"agocsTest1":{"Type":"Task","Resource":"arn:aws:states:::states:startExecution.sync:2","Parameters":{"StateMachineArn":"arn:aws:states:::states:startExecution.sync:2","Input":{"foo":"bar"}},"End":true}}}';
+    const stateMachineName = "fake-state-machine-name";
+    const newDefString = updateDefinitionString(definitionString, serverless, stateMachineName);
+
+    expect(typeof newDefString === "string").toBeTruthy();
+    expect(newDefString).toContain("CONTEXT");
   });
 
   it("test lambda step without Payload", async () => {
@@ -146,27 +157,102 @@ describe("test updateDefinitionString", () => {
 
     expect(definitionString["Fn::Sub"].length).toBe(0);
   });
+
+  it("test step function invocation", async () => {
+    const definitionString = {
+      "Fn::Sub": [
+        '{"Comment": "A description of my state machine", "StartAt": "Step Functions StartExecution", "States": {"Step Functions StartExecution": {"Type": "Task", "Resource": "arn:aws:states:::states:startExecution", "Parameters": {"StateMachineArn": "arn:aws:states:us-east-1:425362996713:stateMachine:agocs-test-noop-state-machine-2", "Input": {"StatePayload": "Hello from Step Functions!", "AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID.$": "$$.Execution.Id" }}, "End": true }}}',
+        {},
+      ],
+    };
+    const stateMachineName = "fake-state-machine-name";
+    updateDefinitionString(definitionString, serverless, stateMachineName);
+
+    const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
+    expect(definitionAfterUpdate.States["Step Functions StartExecution"]?.Parameters?.Input?.["CONTEXT.$"]).toBe(
+      "States.JsonMerge($$, $, false)",
+    );
+  });
+
+  it("test step function invocation without input", async () => {
+    const definitionString = {
+      "Fn::Sub": [
+        '{"Comment": "A description of my state machine", "StartAt": "Step Functions StartExecution", "States": {"Step Functions StartExecution": {"Type": "Task", "Resource": "arn:aws:states:::states:startExecution", "Parameters": {"StateMachineArn": "arn:aws:states:us-east-1:425362996713:stateMachine:agocs-test-noop-state-machine-2"}, "End": true }}}',
+        {},
+      ],
+    };
+    const stateMachineName = "fake-state-machine-name";
+    updateDefinitionString(definitionString, serverless, stateMachineName);
+
+    const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
+    expect(definitionAfterUpdate.States["Step Functions StartExecution"]?.Parameters?.Input?.["CONTEXT.$"]).toBe(
+      "States.JsonMerge($$, $, false)",
+    );
+  });
+
+  it("test step function invocation with pre-exisitng context object", async () => {
+    const definitionString = {
+      "Fn::Sub": [
+        '{"Comment": "A description of my state machine", "StartAt": "Step Functions StartExecution", "States": {"Step Functions StartExecution": {"Type": "Task", "Resource": "arn:aws:states:::states:startExecution", "Parameters": {"StateMachineArn": "arn:aws:states:us-east-1:425362996713:stateMachine:agocs-test-noop-state-machine-2", "Input": {"StatePayload": "Hello from Step Functions!", "AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID.$": "$$.Execution.Id", "CONTEXT.$": "something else"}}, "End": true }}}',
+        {},
+      ],
+    };
+    const stateMachineName = "fake-state-machine-name";
+    updateDefinitionString(definitionString, serverless, stateMachineName);
+
+    const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
+    expect(definitionAfterUpdate.States["Step Functions StartExecution"]?.Parameters?.Input?.["CONTEXT.$"]).toBe(
+      "something else",
+    );
+  });
 });
 
-describe("test isSafeToModifyStepFunctionsDefinition", () => {
+describe("test isSafeToModifyStepFunctionLambdaInvocation", () => {
   it("Payload field not set in parameters", async () => {
     const parameters = { FunctionName: "bla" };
-    expect(isSafeToModifyStepFunctionsDefinition(parameters)).toBeTruthy();
+    expect(isSafeToModifyStepFunctionLambdaInvocation(parameters)).toBeTruthy();
   });
 
   it("Payload field empty", async () => {
     const parameters = { FunctionName: "bla", "Payload.$": {} };
-    expect(isSafeToModifyStepFunctionsDefinition(parameters)).toBeFalsy();
+    expect(isSafeToModifyStepFunctionLambdaInvocation(parameters)).toBeFalsy();
   });
 
   it("Payload field default to $", async () => {
     const parameters = { FunctionName: "bla", "Payload.$": "$" };
-    expect(isSafeToModifyStepFunctionsDefinition(parameters)).toBeTruthy();
+    expect(isSafeToModifyStepFunctionLambdaInvocation(parameters)).toBeTruthy();
   });
 
   it("Payload field default to $", async () => {
     const parameters = { FunctionName: "bla", "Payload.$": "something customer has already set and not empty" };
-    expect(isSafeToModifyStepFunctionsDefinition(parameters)).toBeFalsy();
+    expect(isSafeToModifyStepFunctionLambdaInvocation(parameters)).toBeFalsy();
+  });
+});
+
+describe("test isSafeToModifyStepFunctionInvoctation", () => {
+  it("Input field not set in parameters", async () => {
+    const parameters = { StateMachineArn: "bla" };
+    expect(isSafeToModifyStepFunctionInvoctation(parameters)).toBeTruthy();
+  });
+
+  it("Input field empty", async () => {
+    const parameters = { FunctionName: "bla", Input: {} };
+    expect(isSafeToModifyStepFunctionInvoctation(parameters)).toBeTruthy();
+  });
+
+  it("Input field is not an object", async () => {
+    const parameters = { FunctionName: "bla", Input: "foo" };
+    expect(isSafeToModifyStepFunctionInvoctation(parameters)).toBeFalsy();
+  });
+
+  it("Input field has stuff in it", async () => {
+    const parameters = { FunctionName: "bla", Input: { foo: "bar" } };
+    expect(isSafeToModifyStepFunctionInvoctation(parameters)).toBeTruthy();
+  });
+
+  it("Input field has CONTEXT.$ already", async () => {
+    const parameters = { FunctionName: "bla", Input: { "CONTEXT.$": "something else" } };
+    expect(isSafeToModifyStepFunctionInvoctation(parameters)).toBeFalsy();
   });
 });
 
