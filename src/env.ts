@@ -115,7 +115,8 @@ export interface Configuration {
   // Step Functions Tracing
   enableStepFunctionsTracing?: boolean;
   mergeStepFunctionAndLambdaTraces?: boolean;
-  propagateTraceContext?: boolean;
+  propagateTraceContext?: boolean; // Added by mistake. Should have been propagateUpstreamTrace
+  propagateUpstreamTrace?: boolean;
 
   // Disables handler redirection
   // Used for testing or for someone exclusively forwarding logs
@@ -179,6 +180,7 @@ export const defaultConfiguration: Configuration = {
   skipCloudformationOutputs: false,
   mergeStepFunctionAndLambdaTraces: false,
   propagateTraceContext: false,
+  propagateUpstreamTrace: false,
   enableStepFunctionsTracing: false,
   redirectHandlers: true,
 };

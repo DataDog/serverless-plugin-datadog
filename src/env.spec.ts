@@ -200,6 +200,7 @@ describe("getConfig", () => {
       skipCloudformationOutputs: false,
       mergeStepFunctionAndLambdaTraces: false,
       propagateTraceContext: false,
+      propagateUpstreamTrace: false,
       enableStepFunctionsTracing: false,
       redirectHandlers: true,
     });
@@ -241,6 +242,7 @@ describe("getConfig", () => {
       skipCloudformationOutputs: false,
       mergeStepFunctionAndLambdaTraces: false,
       propagateTraceContext: false,
+      propagateUpstreamTrace: false,
       enableStepFunctionsTracing: false,
       redirectHandlers: true,
     });
@@ -283,6 +285,7 @@ describe("getConfig", () => {
       skipCloudformationOutputs: false,
       mergeStepFunctionAndLambdaTraces: false,
       propagateTraceContext: false,
+      propagateUpstreamTrace: false,
       enableStepFunctionsTracing: false,
       redirectHandlers: true,
     });
@@ -325,6 +328,7 @@ it("disable source code integration", () => {
     skipCloudformationOutputs: false,
     mergeStepFunctionAndLambdaTraces: false,
     propagateTraceContext: false,
+    propagateUpstreamTrace: false,
     enableStepFunctionsTracing: false,
     redirectHandlers: true,
   });
@@ -366,6 +370,7 @@ it("disable git metadata upload", () => {
     skipCloudformationOutputs: false,
     mergeStepFunctionAndLambdaTraces: false,
     propagateTraceContext: false,
+    propagateUpstreamTrace: false,
     enableStepFunctionsTracing: false,
     redirectHandlers: true,
   });
