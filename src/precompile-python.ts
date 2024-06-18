@@ -10,23 +10,28 @@ export function precompilePython(serverless: any) {
 
   for (const file of lsDirFiles(slsDir, false)) {
     if (file.endsWith('.zip')) {
-      preCompilePackage(tempDir, file);
+      preCompilePackage(serverless.service.provider.runtime, tempDir, file);
     }
   }
 }
 
-function preCompilePackage(tempDir: string, zipFile: string) {
+function preCompilePackage(python: string, tempDir: string, zipFile: string) {
   spawnSync('unzip', ['-d', tempDir, zipFile]);
-  precompile(tempDir);
+  precompile(python, tempDir);
   replacePyFiles(tempDir);
   spawnSync('rm', [zipFile]);
   execSync(`cd ${tempDir} && zip -r ${zipFile} .`);
   spawnSync('rm', ['-r', tempDir]);
 }
 
-function precompile(dir: string) {
+function precompile(python: string, dir: string) {
   // TODO: run precompile in docker container
-  spawnSync('python', ['-m', 'compileall', '-b', dir]);
+  //spawnSync('python', ['-m', 'compileall', '-b', dir]);
+  console.log("----------------------------------------");
+  console.log("python: ", python);
+  console.log("----------------------------------------");
+  let image = python.replace('python3', 'python:3');
+  spawnSync('docker', ['run', '-v', `${dir}:/mnt`, image, 'python', '-m', 'compileall', '-b', '/mnt']);
 }
 
 function replacePyFiles(dir: string) {
