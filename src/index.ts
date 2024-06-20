@@ -247,7 +247,12 @@ module.exports = class ServerlessPlugin {
 
         if (config.mergeStepFunctionAndLambdaTraces || config.propagateTraceContext) {
           this.serverless.cli.log(
-            `mergeStepFunctionAndLambdaTraces or propagateTraceContext is true, trying to modify Step Functions' definitions to add trace context.`,
+            `mergeStepFunctionAndLambdaTraces and propagateTraceContext will be deprecated. Please use propagateUpstreamTrace instead`,
+          );
+        }
+        if (config.mergeStepFunctionAndLambdaTraces || config.propagateTraceContext || config.propagateUpstreamTrace) {
+          this.serverless.cli.log(
+            `mergeStepFunctionAndLambdaTraces or propagateUpstreamTrace is true, trying to modify Step Functions' definitions to add trace context.`,
           );
           mergeStepFunctionAndLambdaTraces(resources, this.serverless);
         }
