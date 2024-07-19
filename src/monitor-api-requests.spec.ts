@@ -46,6 +46,33 @@ const invalidMonitorParams: MonitorParams = {
   name: "High Error Rate on {{functionname.name}} in {{region.name}} for {{aws_account.name}}",
 };
 
+const templateVariables = [
+  {
+    defaults: ["{{functionname.name}}"],
+    prefix: "",
+    name: "functionName",
+    available_values: [],
+  },
+  {
+    defaults: ["{{region.name}}"],
+    prefix: "",
+    name: "regionName",
+    available_values: [],
+  },
+  {
+    defaults: ["{{aws_account.name}}"],
+    prefix: "",
+    name: "awsAccount",
+    available_values: [],
+  },
+  {
+    defaults: ["*"],
+    prefix: "",
+    name: "scope",
+    available_values: [],
+  },
+];
+
 describe("createMonitor", () => {
   const validRequestBody = {
     body: '{"tags":["serverless_monitor_type:single_function","serverless_monitor_id:high_error_rate","aws_cloudformation_stack-id:cloudformation_stack_id","created_by:dd_sls_plugin","env:dev","service:plugin-demo-ts"],"options":{},"type":"metric alert","query":"avg(last_15m):sum:aws.lambda.errors{aws_cloudformation_stack-id:cloudformation_stack_id} by {functionname,region,aws_account}.as_count() / sum:aws.lambda.invocations{aws_cloudformation_stack-id:cloudformation_stack_id} by {functionname,region,aws_account}.as_count() >= 0.1","message":"More than 10% of the function’s invocations were errors in the selected time range. {{#is_alert}} Resolution: Examine the function’s logs, check for recent code or configuration changes with [Deployment Tracking](https://docs.datadoghq.com/serverless/deployment_tracking), or look for failures across microservices with [distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing).{{/is_alert}}","name":"High Error Rate on {{functionname.name}} in {{region.name}} for {{aws_account.name}}"}',
@@ -431,32 +458,7 @@ describe("getRecommendedMonitors", () => {
               },
               integration_title: "Serverless",
               integration_id: "serverless",
-              template_variables: [
-                {
-                  defaults: ["{{functionname.name}}"],
-                  prefix: "",
-                  name: "functionName",
-                  available_values: [],
-                },
-                {
-                  defaults: ["{{region.name}}"],
-                  prefix: "",
-                  name: "regionName",
-                  available_values: [],
-                },
-                {
-                  defaults: ["{{aws_account.name}}"],
-                  prefix: "",
-                  name: "awsAccount",
-                  available_values: [],
-                },
-                {
-                  defaults: ["*"],
-                  prefix: "",
-                  name: "scope",
-                  available_values: [],
-                },
-              ],
+              template_variables: templateVariables,
               tags: ["serverless_id:high_cold_start_rate", "created_by:dd_sls_app"],
               integration: "serverless",
               last_updated_at: 1696896000000,
@@ -674,6 +676,7 @@ describe("getRecommendedMonitors", () => {
           query: (cloudFormationStackId: string, criticalThreshold: number) => {
             return `sum(last_15m):sum:aws.lambda.enh anced.invocations{cold_start:true,${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() / sum:aws.lambda.enhanced.invocations{${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() >= ${criticalThreshold}`;
           },
+          templateVariables: templateVariables,
         },
         high_error_rate: {
           name: "High Error Rate on $functionName in $regionName for $awsAccount",
@@ -684,6 +687,7 @@ describe("getRecommendedMonitors", () => {
           query: (cloudFormationStackId: string, criticalThreshold: number) => {
             return `avg(last_15m):sum:aws.lambda.errors{${cloudFormationStackId}} by {functionname,region,aws_account}.as_count() / sum:aws.lambda.invocations${cloudFormationStackId}} by {functionname,region,aws_account}.as_count() >= ${criticalThreshold}`;
           },
+          templateVariables: templateVariables,
         },
         high_iterator_age: {
           name: "High Iterator Age on $functionName in $regionName for $awsAccount",
@@ -694,6 +698,7 @@ describe("getRecommendedMonitors", () => {
           query: (cloudFormationStackId: string, criticalThreshold: number) => {
             return `avg(last_15m):min:aws.lambda.iterator_age.maximum${cloudFormationStackId}} by {aws_account,region,functionname} >= ${criticalThreshold}`;
           },
+          templateVariables: templateVariables,
         },
         high_throttles: {
           name: "High Throttles on $functionName in $regionName for $awsAccount",
@@ -704,6 +709,7 @@ describe("getRecommendedMonitors", () => {
           query: (cloudFormationStackId: string, criticalThreshold: number) => {
             return `sum(last_15m):sum:aws.lambda.throttles {${cloudFormationStackId}} by {aws_account,region,functionname}.as_count() / ( sum:aws.lambda.throttles {$scope} by {aws_account,region,functionname}.as_count() + sum:aws.lambda.invocations{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,region,functionname}.as_count()) >= ${criticalThreshold}`;
           },
+          templateVariables: templateVariables,
         },
       }),
     );
