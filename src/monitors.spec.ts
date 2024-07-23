@@ -73,6 +73,10 @@ const TIMEOUT_MONITOR: Monitor = {
   },
 };
 
+const DEFAULT_TIMEOUT_MONITOR: Monitor = {
+  timeout: {},
+};
+
 const CUSTOM_MONITOR_1_PARAMS = {
   name: "Custom Monitor 1",
   query: "max(next_1w):forecast(avg:system.load.1{*}, 'linear', 1, interval='60m', history='1w', model='default') >= 3",
@@ -167,6 +171,50 @@ const TIMEOUT_MONITOR_PARAMS = {
   message:
     "At least one invocation in the selected time range timed out. This occurs when your function runs for longer than the configured timeout or the global Lambda timeout. Resolution: [Distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing) can help you pinpoint slow requests to APIs and other microservices. You can also consider increasing the timeout of your function. Note that this could affect your AWS bill.",
 };
+const DEFAULT_TIMEOUT_MONITOR_PARAMS = {
+  name: "Timeout on {{functionname.name}} in {{region.name}} for {{aws_account.name}}",
+  query:
+    "avg(last_15m):sum:aws.lambda.duration.maximum{aws_cloudformation_stack-id:cloud_formation_id} by {aws_account,functionname,region}.as_count() / (sum:aws.lambda.timeout{aws_cloudformation_stack-id:cloud_formation_id} by {aws_account,functionname,region}.as_count() * 1000) >= 1",
+  tags: [
+    "serverless_monitor_type:single_function",
+    "serverless_monitor_id:timeout",
+    "aws_cloudformation_stack-id:cloud_formation_id",
+    "created_by:dd_sls_plugin",
+    "env:env",
+    "service:service",
+  ],
+  options: {},
+  type: "metric alert",
+  message:
+    "At least one invocation in the selected time range timed out. This occurs when your function runs for longer than the configured timeout or the global Lambda timeout. Resolution: [Distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing) can help you pinpoint slow requests to APIs and other microservices. You can also consider increasing the timeout of your function. Note that this could affect your AWS bill.",
+};
+
+const TEMPLATE_VARIABLES = [
+  {
+    name: "functionName",
+    defaults: ["{{functionname.name}}"],
+    prefix: "",
+    available_values: [],
+  },
+  {
+    name: "regionName",
+    defaults: ["{{region.name}}"],
+    prefix: "",
+    available_values: [],
+  },
+  {
+    name: "awsAccount",
+    defaults: ["{{aws_account.name}}"],
+    prefix: "",
+    available_values: [],
+  },
+  {
+    name: "scope",
+    defaults: ["*"],
+    prefix: "",
+    available_values: [],
+  },
+];
 
 const RECOMMENDED_MONITORS: RecommendedMonitors = {
   increased_cost: {
@@ -176,6 +224,7 @@ const RECOMMENDED_MONITORS: RecommendedMonitors = {
     query: (cloudFormationStackId: string, criticalThreshold: number) => {
       return `pct_change(avg(last_5m),last_5m):avg:aws.lambda.enhanced.estimated_cost{aws_cloudformation_stack-id:${cloudFormationStackId}} > ${criticalThreshold}`;
     },
+    templateVariables: TEMPLATE_VARIABLES,
   },
   timeout: {
     name: "Timeout on $functionName in $regionName for $awsAccount",
@@ -186,6 +235,7 @@ const RECOMMENDED_MONITORS: RecommendedMonitors = {
     query: (cloudFormationStackId: string, criticalThreshold: number) => {
       return `avg(last_15m):sum:aws.lambda.duration.maximum{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() / (sum:aws.lambda.timeout{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() * 1000) >= ${criticalThreshold}`;
     },
+    templateVariables: TEMPLATE_VARIABLES,
   },
 };
 
@@ -234,6 +284,16 @@ describe("buildMonitorParams", () => {
       RECOMMENDED_MONITORS,
     );
     expect(monitorParams).toEqual(TIMEOUT_MONITOR_PARAMS);
+  });
+  it("interpolates template variables in the name of a recommended monitor", async () => {
+    const monitorParams = buildMonitorParams(
+      DEFAULT_TIMEOUT_MONITOR,
+      "cloud_formation_id",
+      "service",
+      "env",
+      RECOMMENDED_MONITORS,
+    );
+    expect(monitorParams).toEqual(DEFAULT_TIMEOUT_MONITOR_PARAMS);
   });
 });
 
