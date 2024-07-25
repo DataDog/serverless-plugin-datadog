@@ -77,6 +77,10 @@ const DEFAULT_TIMEOUT_MONITOR: Monitor = {
   timeout: {},
 };
 
+const NO_TEMPLATE_VARIABLE_MONITOR: Monitor = {
+  test_no_template_variable: {},
+};
+
 const CUSTOM_MONITOR_1_PARAMS = {
   name: "Custom Monitor 1",
   query: "max(next_1w):forecast(avg:system.load.1{*}, 'linear', 1, interval='60m', history='1w', model='default') >= 3",
@@ -171,8 +175,23 @@ const TIMEOUT_MONITOR_PARAMS = {
   message:
     "At least one invocation in the selected time range timed out. This occurs when your function runs for longer than the configured timeout or the global Lambda timeout. Resolution: [Distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing) can help you pinpoint slow requests to APIs and other microservices. You can also consider increasing the timeout of your function. Note that this could affect your AWS bill.",
 };
+const NO_TEMPLATE_VARIABLE_MONITOR_PARAMS = {
+  name: "This is to ensure that serverless plugin works properly when a recommended monitor has no template variable",
+  query: "false",
+  tags: [
+    "serverless_monitor_type:single_function",
+    "serverless_monitor_id:test_no_template_variable",
+    "aws_cloudformation_stack-id:cloud_formation_id",
+    "created_by:dd_sls_plugin",
+    "env:env",
+    "service:service",
+  ],
+  options: {},
+  type: "metric alert",
+  message: "This alert is not supposed to be triggered.",
+};
 const DEFAULT_TIMEOUT_MONITOR_PARAMS = {
-  name: "Timeout on {{functionname.name}} in {{region.name}} for {{aws_account.name}}",
+  name: "Timeout on {{functionname.name}} in {{region.name}} for {{aws_account.name}} with $varNoDefault",
   query:
     "avg(last_15m):sum:aws.lambda.duration.maximum{aws_cloudformation_stack-id:cloud_formation_id} by {aws_account,functionname,region}.as_count() / (sum:aws.lambda.timeout{aws_cloudformation_stack-id:cloud_formation_id} by {aws_account,functionname,region}.as_count() * 1000) >= 1",
   tags: [
@@ -214,6 +233,15 @@ const TEMPLATE_VARIABLES = [
     prefix: "",
     available_values: [],
   },
+  // A template variable with no default value. If it exists in the name of
+  // a recommended monitor, then interpolation code will do nothing, i.e.
+  // it will leave "$varNoDefault" as it is in the name string.
+  {
+    name: "varNoDefault",
+    defaults: [],
+    prefix: "",
+    available_values: [],
+  },
 ];
 
 const RECOMMENDED_MONITORS: RecommendedMonitors = {
@@ -227,7 +255,7 @@ const RECOMMENDED_MONITORS: RecommendedMonitors = {
     templateVariables: TEMPLATE_VARIABLES,
   },
   timeout: {
-    name: "Timeout on $functionName in $regionName for $awsAccount",
+    name: "Timeout on $functionName in $regionName for $awsAccount with $varNoDefault",
     threshold: 1,
     message:
       "At least one invocation in the selected time range timed out. This occurs when your function runs for longer than the configured timeout or the global Lambda timeout. Resolution: [Distributed tracing](https://docs.datadoghq.com/serverless/distributed_tracing) can help you pinpoint slow requests to APIs and other microservices. You can also consider increasing the timeout of your function. Note that this could affect your AWS bill.",
@@ -236,6 +264,14 @@ const RECOMMENDED_MONITORS: RecommendedMonitors = {
       return `avg(last_15m):sum:aws.lambda.duration.maximum{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() / (sum:aws.lambda.timeout{aws_cloudformation_stack-id:${cloudFormationStackId}} by {aws_account,functionname,region}.as_count() * 1000) >= ${criticalThreshold}`;
     },
     templateVariables: TEMPLATE_VARIABLES,
+  },
+  test_no_template_variable: {
+    name: "This is to ensure that serverless plugin works properly when a recommended monitor has no template variable",
+    threshold: 0,
+    message: "This alert is not supposed to be triggered.",
+    query: () => {
+      return "false";
+    },
   },
 };
 
@@ -284,6 +320,16 @@ describe("buildMonitorParams", () => {
       RECOMMENDED_MONITORS,
     );
     expect(monitorParams).toEqual(TIMEOUT_MONITOR_PARAMS);
+  });
+  it("returns valid monitor params for a minotor which has no template variable", async () => {
+    const monitorParams = buildMonitorParams(
+      NO_TEMPLATE_VARIABLE_MONITOR,
+      "cloud_formation_id",
+      "service",
+      "env",
+      RECOMMENDED_MONITORS,
+    );
+    expect(monitorParams).toEqual(NO_TEMPLATE_VARIABLE_MONITOR_PARAMS);
   });
   it("interpolates template variables in the name of a recommended monitor", async () => {
     const monitorParams = buildMonitorParams(
