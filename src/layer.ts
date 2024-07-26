@@ -117,6 +117,7 @@ export function findHandlers(service: Service, exclude: string[], defaultRuntime
  * serverless.yml, but for dotnet and java they are not
  *
  * @param runtimeSetting string set in serverless.yml ex: "dotnet6", "nodejs18.x"
+ * @returns normalized runtime key
  */
 export function normalizeRuntimeKey(runtimeSetting: string): string {
   if (runtimeSetting.startsWith("dotnet")) {
@@ -136,6 +137,7 @@ export function normalizeRuntimeKey(runtimeSetting: string): string {
  * @param layers layers.json file read into an object
  * @param accountId optional account ID that the layers live in - undefined
  *        unless the customer sets a value for useLayersFromAccount in yaml
+ * @param isUsingExtension whether to install the Datadog Lambda Extension as a layer
  */
 export function applyLambdaLibraryLayers(
   service: Service,
