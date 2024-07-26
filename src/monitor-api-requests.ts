@@ -33,7 +33,7 @@ interface RecommendedMonitorParams {
       thresholds: { [key: string]: any };
     };
     name: string;
-    template_variables: TemplateVariable[];
+    template_variables?: TemplateVariable[];
   };
 }
 

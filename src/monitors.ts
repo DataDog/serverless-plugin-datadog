@@ -21,7 +21,7 @@ export interface ServerlessMonitor {
   query: (cloudFormationStackId: string, criticalThreshold: number) => string;
   message: string;
   type?: string;
-  templateVariables: TemplateVariable[];
+  templateVariables?: TemplateVariable[];
 }
 
 export interface RecommendedMonitors {
@@ -33,6 +33,7 @@ export interface RecommendedMonitors {
  * @param cloudFormationStackId - the Cloud Formation Stack ID
  * @param service - the Service
  * @param env  - the Environment
+ * @param recommendedMonitors  - recommended monitors
  * @returns valid monitor parameters
  */
 export function buildMonitorParams(
@@ -84,7 +85,7 @@ export function buildMonitorParams(
       monitorParams.message = recommendedMonitor.message;
     }
     if (!monitorParams.name) {
-      monitorParams.name = interpolateTemplateVariables(recommendedMonitor.templateVariables, recommendedMonitor.name);
+      monitorParams.name = interpolateTemplateVariables(recommendedMonitor, recommendedMonitor.name);
     }
   }
 
@@ -94,6 +95,7 @@ export function buildMonitorParams(
 /**
  * Checks to see if the given monitor is a serverless recommended monitor
  * @param serverlessMonitorId - Unique ID string defined for each monitor
+ * @param recommendedMonitors  - recommended monitors
  * @returns true if a given monitor is a serverless recommended monitor
  */
 function isRecommendedMonitor(serverlessMonitorId: string, recommendedMonitors: RecommendedMonitors) {
@@ -244,16 +246,24 @@ export function replaceCriticalThreshold(query: string, criticalThreshold: numbe
 }
 
 /**
- * Helper function that interpolates template variables, e.g. replaces template
- * variable `$functionName` with its default value `{{functionname.name}}`.
- * @param templateVariables - Template variables defined in the monitor JSON
- * @param name - The string that may contain uninterpolated template variables,
+ * Helper function that interpolates template variables (if any), e.g.
+ * replaces template variable `$functionName` with its default value
+ * `{{functionname.name}}`. Template variables with no default value will be
+ * ignored.
+ * @param recommendedMonitors  - recommended monitors
+ * @param baseString - The string that may contain uninterpolated template variables,
  *        e.g. "High Error Rate on $functionName in $regionName for $awsAccount"
  * @returns Interpolation result, e.g. "High Error Rate on {{functionname.name}} in {{region.name}} for {{aws_account.name}}"
  */
-function interpolateTemplateVariables(templateVariables: TemplateVariable[], name: string): string {
-  templateVariables.forEach((templateVariable) => {
-    name = name.replace("$" + templateVariable.name, templateVariable.defaults[0]);
-  });
-  return name;
+function interpolateTemplateVariables(recommendedMonitor: ServerlessMonitor, baseString: string): string {
+  const templateVariables = recommendedMonitor.templateVariables;
+  let interpolatedString = baseString;
+  if (templateVariables !== undefined && templateVariables.length > 0) {
+    templateVariables.forEach((templateVariable) => {
+      if (templateVariable.defaults.length > 0) {
+        interpolatedString = interpolatedString.replace("$" + templateVariable.name, templateVariable.defaults[0]);
+      }
+    });
+  }
+  return interpolatedString;
 }
