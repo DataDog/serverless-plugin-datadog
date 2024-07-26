@@ -164,7 +164,7 @@ export function updateDefinitionString(
   return definitionString; // return the definitionString so it can be written to the Resource in span-link.ts
 }
 
-export function inspectAndRecommendStepFunctionsInstrumentation(serverless: Serverless) {
+export function inspectAndRecommendStepFunctionsInstrumentation(serverless: Serverless): void {
   const stepFunctions = Object.values((serverless.service as any).stepFunctions?.stateMachines || {});
   if (stepFunctions.length !== 0) {
     serverless.cli.log(

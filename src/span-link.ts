@@ -4,7 +4,7 @@ import * as Serverless from "serverless";
 export function mergeStepFunctionAndLambdaTraces(
   resources: { [key: string]: GeneralResource },
   serverless: Serverless,
-) {
+): void {
   for (const resourceName in resources) {
     if (resources.hasOwnProperty(resourceName)) {
       const resourceObj: GeneralResource = resources[resourceName];

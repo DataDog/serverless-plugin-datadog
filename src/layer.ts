@@ -118,7 +118,7 @@ export function findHandlers(service: Service, exclude: string[], defaultRuntime
  *
  * @param runtimeSetting string set in serverless.yml ex: "dotnet6", "nodejs18.x"
  */
-export function normalizeRuntimeKey(runtimeSetting: string) {
+export function normalizeRuntimeKey(runtimeSetting: string): string {
   if (runtimeSetting.startsWith("dotnet")) {
     return "dotnet";
   }
@@ -143,7 +143,7 @@ export function applyLambdaLibraryLayers(
   layers: LayerJSON,
   accountId?: string,
   isUsingExtension = true,
-) {
+): void {
   const { region } = service.provider;
   // It's possible a local account layer is being used in a region we have not published to so we use a default region's ARNs
   const shouldUseDefaultRegion = layers.regions[region] === undefined && accountId !== undefined;
@@ -210,7 +210,12 @@ export function applyLambdaLibraryLayers(
   }
 }
 
-export function applyExtensionLayer(service: Service, handlers: FunctionInfo[], layers: LayerJSON, accountId?: string) {
+export function applyExtensionLayer(
+  service: Service,
+  handlers: FunctionInfo[],
+  layers: LayerJSON,
+  accountId?: string,
+): void {
   const { region } = service.provider;
   // It's possible a local account layer is being used in a region we have not published to so we use a default region's ARNs
   const shouldUseDefaultRegion = layers.regions[region] === undefined && accountId !== undefined;
@@ -257,11 +262,11 @@ export function isFunctionDefinitionHandler(funcDef: FunctionDefinition): funcDe
   return typeof (funcDef as any).handler === "string";
 }
 
-function addLayer(service: Service, handler: FunctionInfo, layerArn: string) {
+function addLayer(service: Service, handler: FunctionInfo, layerArn: string): void {
   setLayers(handler, pushLayerARN(layerArn, getLayers(service, handler)));
 }
 
-function getLayers(service: Service, handler: FunctionInfo) {
+function getLayers(service: Service, handler: FunctionInfo): string[] {
   const functionLayersList = ((handler.handler as any).layers as string[] | string[]) || [];
   const serviceLayersList = ((service.provider as any).layers as string[] | string[]) || [];
   // Function-level layers override service-level layers
@@ -276,7 +281,7 @@ function getLayers(service: Service, handler: FunctionInfo) {
   }
 }
 
-function removePreviousLayer(service: Service, handler: FunctionInfo, previousLayer: string | undefined) {
+function removePreviousLayer(service: Service, handler: FunctionInfo, previousLayer: string | undefined): void {
   let layersList = getLayers(service, handler);
   if (new Set(layersList).has(previousLayer!)) {
     layersList = layersList?.filter((layer) => layer !== previousLayer);
@@ -284,11 +289,11 @@ function removePreviousLayer(service: Service, handler: FunctionInfo, previousLa
   setLayers(handler, layersList);
 }
 
-function setLayers(handler: FunctionInfo, layers: string[]) {
+function setLayers(handler: FunctionInfo, layers: string[]): void {
   (handler.handler as any).layers = layers;
 }
 
-function buildLocalLambdaLayerARN(layerARN: string | undefined, accountId: string, region: string) {
+function buildLocalLambdaLayerARN(layerARN: string | undefined, accountId: string, region: string): string | undefined {
   if (layerARN === undefined) {
     return;
   }
@@ -299,7 +304,7 @@ function buildLocalLambdaLayerARN(layerARN: string | undefined, accountId: strin
   return localLayerARN;
 }
 
-function getAwsPartitionByRegion(region: string) {
+function getAwsPartitionByRegion(region: string): string {
   if (region.startsWith("us-gov-")) {
     return "aws-us-gov";
   }

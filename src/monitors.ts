@@ -42,7 +42,7 @@ export function buildMonitorParams(
   service: string,
   env: string,
   recommendedMonitors: RecommendedMonitors,
-) {
+): { [x: string]: any } {
   const serverlessMonitorId = Object.keys(monitor)[0];
 
   if (!monitor[serverlessMonitorId]) {
@@ -98,7 +98,7 @@ export function buildMonitorParams(
  * @param recommendedMonitors  - recommended monitors
  * @returns true if a given monitor is a serverless recommended monitor
  */
-function isRecommendedMonitor(serverlessMonitorId: string, recommendedMonitors: RecommendedMonitors) {
+function isRecommendedMonitor(serverlessMonitorId: string, recommendedMonitors: RecommendedMonitors): boolean {
   return recommendedMonitors[serverlessMonitorId] !== undefined;
 }
 
@@ -108,7 +108,7 @@ function isRecommendedMonitor(serverlessMonitorId: string, recommendedMonitors: 
  * @param existingMonitors - Monitors that have already been created
  * @returns true if given monitor already exists
  */
-function doesMonitorExist(serverlessMonitorId: string, existingMonitors: { [key: string]: number }) {
+function doesMonitorExist(serverlessMonitorId: string, existingMonitors: { [key: string]: number }): boolean {
   return Object.keys(existingMonitors).includes(serverlessMonitorId);
 }
 
@@ -126,7 +126,7 @@ async function deleteRemovedMonitors(
   existingMonitors: { [key: string]: number },
   monitorsApiKey: string,
   monitorsAppKey: string,
-) {
+): Promise<string[]> {
   const successfullyDeletedMonitors: string[] = [];
   const currentMonitorIds: string[] = [];
   pluginMonitors.forEach((currentMonitor) => currentMonitorIds.push(Object.keys(currentMonitor)[0]));
@@ -141,6 +141,7 @@ async function deleteRemovedMonitors(
   }
   return successfullyDeletedMonitors;
 }
+
 /**
  * Handles the Monitor API response and logs the appropriate error
  * @param response Monitor API Response
@@ -153,7 +154,7 @@ export function handleMonitorsApiResponse(
   serverlessMonitorId?: string,
   subdomain?: string,
   site?: string,
-) {
+): boolean {
   if (response.status === 200) {
     return true;
   } else if (response.status === 400) {
@@ -184,7 +185,7 @@ export async function setMonitors(
   cloudFormationStackId: string,
   service: string,
   env: string,
-) {
+): Promise<string[]> {
   const recommendedMonitors = await getRecommendedMonitors(site, monitorsApiKey, monitorsAppKey);
   const serverlessMonitorIdByMonitorId = await getExistingMonitors(
     site,
@@ -238,7 +239,7 @@ export async function setMonitors(
  * @param query - the query string
  * @param criticalThreshold = new critical threshold as defined by the customer
  */
-export function replaceCriticalThreshold(query: string, criticalThreshold: number) {
+export function replaceCriticalThreshold(query: string, criticalThreshold: number): string {
   const thresholdComparison = /(>=|>)(.*)$/;
   const newQuery = query.replace(thresholdComparison, `$1 ${criticalThreshold}`);
 

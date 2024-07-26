@@ -42,7 +42,7 @@ export async function createMonitor(
   monitorParams: MonitorParams,
   monitorsApiKey: string,
   monitorsAppKey: string,
-) {
+): Promise<Response> {
   const response: Response = await fetch(`https://api.${site}/api/v1/monitor`, {
     method: "POST",
     headers: {
@@ -61,7 +61,7 @@ export async function updateMonitor(
   monitorParams: MonitorParams,
   monitorsApiKey: string,
   monitorsAppKey: string,
-) {
+): Promise<Response> {
   const response: Response = await fetch(`https://api.${site}/api/v1/monitor/${monitorId}`, {
     method: "PUT",
     headers: {
@@ -75,7 +75,12 @@ export async function updateMonitor(
   return response;
 }
 
-export async function deleteMonitor(site: string, monitorId: number, monitorsApiKey: string, monitorsAppKey: string) {
+export async function deleteMonitor(
+  site: string,
+  monitorId: number,
+  monitorsApiKey: string,
+  monitorsAppKey: string,
+): Promise<Response> {
   const response: Response = await fetch(`https://api.${site}/api/v1/monitor/${monitorId}`, {
     method: "DELETE",
     headers: {
@@ -88,7 +93,12 @@ export async function deleteMonitor(site: string, monitorId: number, monitorsApi
   return response;
 }
 
-export async function searchMonitors(site: string, queryTag: string, monitorsApiKey: string, monitorsAppKey: string) {
+export async function searchMonitors(
+  site: string,
+  queryTag: string,
+  monitorsApiKey: string,
+  monitorsAppKey: string,
+): Promise<QueriedMonitor[]> {
   let monitors: QueriedMonitor[] = [];
   let page = 0;
   let pageCount = 1;
@@ -116,7 +126,7 @@ export async function searchMonitors(site: string, queryTag: string, monitorsApi
   return monitors;
 }
 
-export async function getCloudFormationStackId(serverless: Serverless) {
+export async function getCloudFormationStackId(serverless: Serverless): Promise<string> {
   const stackName = serverless.getProvider("aws").naming.getStackName();
   const describeStackOutput = await serverless
     .getProvider("aws")
@@ -138,7 +148,7 @@ export async function getExistingMonitors(
   cloudFormationStackId: string,
   monitorsApiKey: string,
   monitorsAppKey: string,
-) {
+): Promise<{ [key: string]: number }> {
   const existingMonitors = await searchMonitors(
     site,
     `aws_cloudformation_stack-id:${cloudFormationStackId}`,
@@ -157,7 +167,13 @@ export async function getExistingMonitors(
   return serverlessMonitorIdByMonitorId;
 }
 
-export async function getRecommendedMonitors(site: string, monitorsApiKey: string, monitorsAppKey: string) {
+export async function getRecommendedMonitors(
+  site: string,
+  monitorsApiKey: string,
+  monitorsAppKey: string,
+): Promise<{
+  [key: string]: ServerlessMonitor;
+}> {
   const recommendedMonitors: { [key: string]: ServerlessMonitor } = {};
   const endpoint = `https://api.${site}/api/v2/monitor/recommended?count=50&start=0&search=tag%3A%22product%3Aserverless%22`;
   const response: Response = await fetch(endpoint, {
