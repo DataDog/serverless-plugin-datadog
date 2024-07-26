@@ -17,6 +17,11 @@ interface QueriedMonitor {
   tags: string[];
 }
 
+export interface TemplateVariable {
+  name: string;
+  defaults: string[];
+}
+
 interface RecommendedMonitorParams {
   id: string;
   attributes: {
@@ -28,6 +33,7 @@ interface RecommendedMonitorParams {
       thresholds: { [key: string]: any };
     };
     name: string;
+    template_variables: TemplateVariable[];
   };
 }
 
@@ -184,6 +190,7 @@ export async function getRecommendedMonitors(site: string, monitorsApiKey: strin
         }
         return query;
       },
+      templateVariables: recommendedMonitorParam.attributes.template_variables,
     };
 
     // recommended monitor params have an id that includes a serverless_ prefix that we have to remove to match the monitor ids we use in the plugin

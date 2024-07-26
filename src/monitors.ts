@@ -4,6 +4,7 @@ import {
   deleteMonitor,
   getExistingMonitors,
   getRecommendedMonitors,
+  TemplateVariable,
 } from "./monitor-api-requests";
 import { Response } from "node-fetch";
 
@@ -20,6 +21,7 @@ export interface ServerlessMonitor {
   query: (cloudFormationStackId: string, criticalThreshold: number) => string;
   message: string;
   type?: string;
+  templateVariables: TemplateVariable[];
 }
 
 export interface RecommendedMonitors {
@@ -69,19 +71,20 @@ export function buildMonitorParams(
   ];
 
   if (isRecommendedMonitor(serverlessMonitorId, recommendedMonitors)) {
-    let criticalThreshold = recommendedMonitors[serverlessMonitorId].threshold;
+    const recommendedMonitor = recommendedMonitors[serverlessMonitorId];
+    let criticalThreshold = recommendedMonitor.threshold;
 
     if (monitorParams.options?.thresholds?.critical !== undefined) {
       criticalThreshold = monitorParams.options.thresholds.critical;
     }
 
-    monitorParams.query = recommendedMonitors[serverlessMonitorId].query(cloudFormationStackId, criticalThreshold);
+    monitorParams.query = recommendedMonitor.query(cloudFormationStackId, criticalThreshold);
 
     if (!monitorParams.message) {
-      monitorParams.message = recommendedMonitors[serverlessMonitorId].message;
+      monitorParams.message = recommendedMonitor.message;
     }
     if (!monitorParams.name) {
-      monitorParams.name = recommendedMonitors[serverlessMonitorId].name;
+      monitorParams.name = interpolateTemplateVariables(recommendedMonitor.templateVariables, recommendedMonitor.name);
     }
   }
 
@@ -238,4 +241,19 @@ export function replaceCriticalThreshold(query: string, criticalThreshold: numbe
   const newQuery = query.replace(thresholdComparison, `$1 ${criticalThreshold}`);
 
   return newQuery;
+}
+
+/**
+ * Helper function that interpolates template variables, e.g. replaces template
+ * variable `$functionName` with its default value `{{functionname.name}}`.
+ * @param templateVariables - Template variables defined in the monitor JSON
+ * @param name - The string that may contain uninterpolated template variables,
+ *        e.g. "High Error Rate on $functionName in $regionName for $awsAccount"
+ * @returns Interpolation result, e.g. "High Error Rate on {{functionname.name}} in {{region.name}} for {{aws_account.name}}"
+ */
+function interpolateTemplateVariables(templateVariables: TemplateVariable[], name: string): string {
+  templateVariables.forEach((templateVariable) => {
+    name = name.replace("$" + templateVariable.name, templateVariable.defaults[0]);
+  });
+  return name;
 }
