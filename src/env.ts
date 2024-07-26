@@ -185,7 +185,7 @@ export const defaultConfiguration: Configuration = {
   redirectHandlers: true,
 };
 
-export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]) {
+export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]): void {
   handlers.forEach(({ handler, type }) => {
     handler.environment ??= {};
     const environment = handler.environment as any;
@@ -290,7 +290,7 @@ export function setSourceCodeIntegrationEnvVar(
   handler: ExtendedFunctionDefinition,
   gitHash: string,
   gitRemote: string,
-) {
+): void {
   handler.environment ??= {};
   if (handler.environment[ddTagsEnvVar] !== undefined) {
     handler.environment[ddTagsEnvVar] += `,`;
@@ -300,7 +300,7 @@ export function setSourceCodeIntegrationEnvVar(
   handler.environment[ddTagsEnvVar] += `git.commit.sha:${gitHash},git.repository_url:${gitRemote}`;
 }
 
-function throwEnvVariableError(variable: string, value: string, functionName: string) {
+function throwEnvVariableError(variable: string, value: string, functionName: string): void {
   throw new Error(`Environment variable ${variable} should be set to ${value} for function ${functionName}`);
 }
 
@@ -332,7 +332,7 @@ export function getConfig(service: Service): Configuration {
   return config;
 }
 
-export function forceExcludeDepsFromWebpack(service: Service) {
+export function forceExcludeDepsFromWebpack(service: Service): void {
   const includeModules = getPropertyFromPath(service, ["custom", "webpack", "includeModules"]);
   if (includeModules === undefined) {
     return;
@@ -350,7 +350,7 @@ export function forceExcludeDepsFromWebpack(service: Service) {
   }
 }
 
-function getPropertyFromPath(obj: any, path: string[]) {
+function getPropertyFromPath(obj: any, path: string[]): any {
   for (const part of path) {
     let prop = obj[part];
     if (prop === undefined || prop === true) {
@@ -365,7 +365,7 @@ function getPropertyFromPath(obj: any, path: string[]) {
   return obj;
 }
 
-export function hasWebpackPlugin(service: Service) {
+export function hasWebpackPlugin(service: Service): boolean {
   const plugins: string[] | undefined = (service as any).plugins;
   if (plugins === undefined) {
     return false;

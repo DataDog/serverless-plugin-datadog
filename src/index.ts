@@ -92,13 +92,13 @@ module.exports = class ServerlessPlugin {
   constructor(private serverless: Serverless, private options: Serverless.Options) {}
 
   private displayedMessages: { [msg: string]: true } = {};
-  private logToCliOnce(message: string) {
+  private logToCliOnce(message: string): void {
     if (this.displayedMessages[message] === undefined) {
       this.displayedMessages[message] = true;
       this.serverless.cli.log(message);
     }
   }
-  private cliSharedInitialize() {
+  private cliSharedInitialize(): void {
     if (this.options!.function) {
       this.serverless.cli.log(
         "Warning: Using serverless deploy -f option only updates the function code and will not update CloudFormation stack (env variables included).",
@@ -106,7 +106,7 @@ module.exports = class ServerlessPlugin {
     }
   }
 
-  private async beforePackageFunction() {
+  private async beforePackageFunction(): Promise<void> {
     const config = getConfig(this.serverless.service);
     if (config.enabled === false) return;
     this.serverless.cli.log("Auto instrumenting functions with Datadog");
@@ -162,7 +162,7 @@ module.exports = class ServerlessPlugin {
     enableTracing(this.serverless.service, tracingMode, handlers);
   }
 
-  private async afterPackageCompileFunctions() {
+  private async afterPackageCompileFunctions(): Promise<void> {
     // State machines' "Properties" field will not be added until "after:package:compileFunctions"
     // hook. So we are updating Properties.Tag at this hook
 
@@ -180,7 +180,7 @@ module.exports = class ServerlessPlugin {
     }
   }
 
-  private async afterPackageFunction() {
+  private async afterPackageFunction(): Promise<void> {
     const config = getConfig(this.serverless.service);
     if (config.enabled === false) return;
 
@@ -327,7 +327,7 @@ module.exports = class ServerlessPlugin {
     }
   }
 
-  private async afterDeploy() {
+  private async afterDeploy(): Promise<void> {
     const config = getConfig(this.serverless.service);
     const custom = (this.serverless.service.custom ?? {}) as any;
     const service = custom.datadog?.service ?? this.serverless.service.getServiceName();
@@ -366,7 +366,7 @@ module.exports = class ServerlessPlugin {
     return printOutputs(this.serverless, config.site, config.subdomain, service, env);
   }
 
-  private debugLogHandlers(handlers: FunctionInfo[]) {
+  private debugLogHandlers(handlers: FunctionInfo[]): void {
     for (const handler of handlers) {
       if (handler.type === RuntimeType.UNSUPPORTED) {
         if (handler.runtime === undefined) {
@@ -384,7 +384,7 @@ module.exports = class ServerlessPlugin {
    * Check for service, env, version, and additional tags at the custom level.
    * If these don't already exsist on the function level as env vars, adds them as DD_XXX env vars
    */
-  private addDDEnvVars(handlers: FunctionInfo[]) {
+  private addDDEnvVars(handlers: FunctionInfo[]): void {
     const provider = this.serverless.service.provider as Provider;
     const service = this.serverless.service as Service;
 
@@ -425,7 +425,7 @@ module.exports = class ServerlessPlugin {
    * Check for service, env, version, and additional tags at the custom level.
    * If these tags don't already exsist on the function level, adds them as tags
    */
-  private addDDTags(handlers: FunctionInfo[]) {
+  private addDDTags(handlers: FunctionInfo[]): void {
     const service = this.serverless.service as Service;
 
     let custom = service.custom as any;
@@ -466,7 +466,7 @@ module.exports = class ServerlessPlugin {
    * as well as function level. Automatically create tags for service and env with
    * properties from deployment configurations if needed; does not override any existing values.
    */
-  private addTags(handlers: FunctionInfo[], shouldAddTags: boolean) {
+  private addTags(handlers: FunctionInfo[], shouldAddTags: boolean): void {
     const provider = this.serverless.service.provider as Provider;
     this.logToCliOnce(`Adding Plugin Version ${version} tag`);
 
@@ -491,7 +491,7 @@ module.exports = class ServerlessPlugin {
     });
   }
 
-  private extractDatadogForwarder(config: Configuration) {
+  private extractDatadogForwarder(config: Configuration): string | undefined {
     const forwarderArn: string | undefined = config.forwarderArn;
     const forwarder: string | undefined = config.forwarder;
     if (forwarderArn && forwarder) {
@@ -508,7 +508,7 @@ module.exports = class ServerlessPlugin {
   }
 };
 
-function configHasOldProperties(obj: any) {
+function configHasOldProperties(obj: any): void {
   let hasOldProperties = false;
   let message = "The following configuration options have been removed:";
 
@@ -531,7 +531,7 @@ function configHasOldProperties(obj: any) {
   }
 }
 
-function validateConfiguration(config: Configuration) {
+function validateConfiguration(config: Configuration): void {
   checkForMultipleApiKeys(config);
 
   const siteList: string[] = [
@@ -573,7 +573,7 @@ function validateConfiguration(config: Configuration) {
   }
 }
 
-function checkForMultipleApiKeys(config: Configuration) {
+function checkForMultipleApiKeys(config: Configuration): void {
   let multipleApiKeysMessage;
   if (config.apiKey !== undefined && config.apiKMSKey !== undefined && config.apiKeySecretArn !== undefined) {
     multipleApiKeysMessage = "`apiKey`, `apiKMSKey`, and `apiKeySecretArn`";

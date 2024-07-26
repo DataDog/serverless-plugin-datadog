@@ -29,16 +29,17 @@ interface ForwarderConfigs {
   SubToAccessLogGroups: boolean;
   SubToExecutionLogGroups: boolean;
 }
+interface SubscriptionFilter {
+  creationTime: number;
+  destinationArn: string;
+  distribution: string;
+  filterName: string;
+  filterPattern: string;
+  logGroupName: string;
+  roleArn: string;
+}
 interface DescribeSubscriptionFiltersResponse {
-  subscriptionFilters: {
-    creationTime: number;
-    destinationArn: string;
-    distribution: string;
-    filterName: string;
-    filterPattern: string;
-    logGroupName: string;
-    roleArn: string;
-  }[];
+  subscriptionFilters: SubscriptionFilter[];
 }
 
 type SubLogsConfig =
@@ -77,7 +78,7 @@ function isLogGroup(value: any): value is LogGroupResource {
  * @param aws Serverless framework provided AWS client
  * @param functionArn The forwarder ARN to be validated
  */
-async function validateForwarderArn(aws: Aws, functionArn: CloudFormationObjectArn | string) {
+async function validateForwarderArn(aws: Aws, functionArn: CloudFormationObjectArn | string): Promise<void> {
   try {
     await aws.request("Lambda", "getFunction", { FunctionName: functionArn });
   } catch (err) {
@@ -89,7 +90,7 @@ export async function addExecutionLogGroupsAndSubscriptions(
   service: Service,
   aws: Aws,
   functionArn: CloudFormationObjectArn | string,
-) {
+): Promise<void> {
   const extendedProvider = (service.provider as any)?.logs;
 
   if (!isLogsConfig(extendedProvider)) {
@@ -118,7 +119,7 @@ export async function addExecutionLogGroupsAndSubscriptions(
   }
 }
 
-export async function addStepFunctionLogGroup(aws: Aws, resources: any, stepFunction: any) {
+export async function addStepFunctionLogGroup(aws: Aws, resources: any, stepFunction: any): Promise<void> {
   const stepFunctionName = stepFunction.name;
   const logGroupName = `/aws/vendedlogs/states/${stepFunctionName}-Logs-${aws.getStage()}`;
   const logGroupResourceName = `${normalizeResourceName(stepFunctionName)}LogGroup`;
@@ -141,14 +142,14 @@ export async function addStepFunctionLogGroup(aws: Aws, resources: any, stepFunc
   };
 }
 
-export function addDdSlsPluginTag(stateMachineObj: any) {
+export function addDdSlsPluginTag(stateMachineObj: any): void {
   stateMachineObj.Properties?.Tags?.push({
     Key: "dd_sls_plugin",
     Value: `v${version}`,
   });
 }
 
-export function addDdTraceEnabledTag(stateMachineObj: any, enableStepFunctionsTracing: undefined | boolean) {
+export function addDdTraceEnabledTag(stateMachineObj: any, enableStepFunctionsTracing: undefined | boolean): void {
   if (!enableStepFunctionsTracing) {
     return;
   }
@@ -162,7 +163,7 @@ export async function addStepFunctionLogGroupSubscription(
   resources: any,
   stepFunction: any,
   functionArn: CloudFormationObjectArn | string,
-) {
+): Promise<void> {
   const logGroupSubscriptionResourceName = `${normalizeResourceName(stepFunction.name)}LogGroupSubscription`;
 
   // parse log group name out of arn in logging config destination
@@ -189,7 +190,7 @@ export async function addCloudWatchForwarderSubscriptions(
   functionArn: CloudFormationObjectArn | string,
   forwarderConfigs: ForwarderConfigs,
   handlers: FunctionInfo[],
-) {
+): Promise<string[]> {
   const resources = service.provider.compiledCloudFormationTemplate?.Resources;
   if (resources === undefined) {
     return ["No cloudformation stack available. Skipping subscribing Datadog forwarder."];
@@ -231,7 +232,7 @@ export async function addCloudWatchForwarderSubscriptions(
   return errors;
 }
 
-export async function canSubscribeLogGroup(aws: Aws, logGroupName: string, expectedSubName: string) {
+export async function canSubscribeLogGroup(aws: Aws, logGroupName: string, expectedSubName: string): Promise<boolean> {
   const subscriptionFilters = await describeSubscriptionFilters(aws, logGroupName);
   const numberOfActiveSubscriptionFilters: number = subscriptionFilters.length;
   let foundDatadogSubscriptionFilter: boolean = false;
@@ -248,7 +249,7 @@ export async function canSubscribeLogGroup(aws: Aws, logGroupName: string, expec
   }
 }
 
-export async function describeSubscriptionFilters(aws: Aws, logGroupName: string) {
+export async function describeSubscriptionFilters(aws: Aws, logGroupName: string): Promise<SubscriptionFilter[]> {
   try {
     const result: DescribeSubscriptionFiltersResponse = await aws.request(
       "CloudWatchLogs",
@@ -265,21 +266,21 @@ export async function describeSubscriptionFilters(aws: Aws, logGroupName: string
 }
 
 // Helper functions to validate we have a particular log group and if we should subscribe to it
-function validateRestApiSubscription(resource: any, subscribe: boolean, extendedProvider: any) {
+function validateRestApiSubscription(resource: any, subscribe: boolean, extendedProvider: any): boolean {
   return (
     restAccessLoggingIsEnabled(extendedProvider) &&
     resource.Properties.LogGroupName.startsWith("/aws/api-gateway/") &&
     subscribe
   );
 }
-function validateHttpApiSubscription(resource: any, subscribe: boolean, extendedProvider: any) {
+function validateHttpApiSubscription(resource: any, subscribe: boolean, extendedProvider: any): boolean {
   return (
     httpAccessLoggingIsEnabled(extendedProvider) &&
     resource.Properties.LogGroupName.startsWith("/aws/http-api/") &&
     subscribe
   );
 }
-function validateWebsocketSubscription(resource: any, subscribe: boolean, extendedProvider: any) {
+function validateWebsocketSubscription(resource: any, subscribe: boolean, extendedProvider: any): boolean {
   return (
     websocketAccessLoggingIsEnabled(extendedProvider) &&
     resource.Properties.LogGroupName.startsWith("/aws/websocket/") &&
@@ -293,7 +294,7 @@ function shouldSubscribe(
   forwarderConfigs: ForwarderConfigs,
   handlers: FunctionInfo[],
   service: Service,
-) {
+): boolean {
   const extendedProvider = (service.provider as any)?.logs;
   if (!isLogGroup(resource)) {
     return false;
@@ -441,33 +442,33 @@ function isSubLogsConfig(obj: any): obj is SubLogsConfig {
   return true;
 }
 
-function restAccessLoggingIsEnabled(obj: LogsConfig) {
+function restAccessLoggingIsEnabled(obj: LogsConfig): boolean {
   if (obj?.restApi === false) {
     return false;
   }
   return obj?.restApi === true || obj?.restApi?.accessLogging === true;
 }
-function restExecutionLoggingIsEnabled(obj: LogsConfig) {
+function restExecutionLoggingIsEnabled(obj: LogsConfig): boolean {
   if (obj?.restApi === false) {
     return false;
   }
   return obj?.restApi === true || obj?.restApi?.executionLogging === true;
 }
-function httpAccessLoggingIsEnabled(obj: LogsConfig) {
+function httpAccessLoggingIsEnabled(obj: LogsConfig): boolean {
   if (obj?.httpApi === false) {
     return false;
   }
   return obj?.httpApi === true || obj?.httpApi?.accessLogging === true;
 }
 
-function websocketAccessLoggingIsEnabled(obj: LogsConfig) {
+function websocketAccessLoggingIsEnabled(obj: LogsConfig): boolean {
   if (obj?.websocket === false) {
     return false;
   }
   return obj?.websocket === true || obj?.websocket?.accessLogging === true;
 }
 
-function websocketExecutionLoggingIsEnabled(obj: LogsConfig) {
+function websocketExecutionLoggingIsEnabled(obj: LogsConfig): boolean {
   if (obj?.websocket === false) {
     return false;
   }
@@ -488,6 +489,6 @@ function getLogGroupLogicalId(functionName: string): string {
 }
 
 // Resource names in CloudFormation Templates can only have alphanumeric characters
-function normalizeResourceName(resourceName: string) {
+function normalizeResourceName(resourceName: string): string {
   return resourceName.replace(/[^0-9a-z]/gi, "");
 }
