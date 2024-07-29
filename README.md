@@ -167,7 +167,6 @@ custom:
             include_tags: true
             notify_audit: true
             thresholds:
-              ok: 0.025
               warning: 0.05
               critical: 0.1
 ```
@@ -198,7 +197,6 @@ custom:
             notify_audit: true
             notify_no_data: false
             thresholds:
-              ok: 1
               warning: 2
               critical: 3
 ```
