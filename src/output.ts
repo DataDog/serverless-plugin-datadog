@@ -15,7 +15,7 @@ export async function addOutputLinks(
   site: string,
   subdomain: string,
   handlers: FunctionInfo[],
-) {
+): Promise<void> {
   const awsAccount = await serverless.getProvider("aws").getAccountId();
   const region = serverless.service.provider.region;
   const outputs = serverless.service.provider.compiledCloudFormationTemplate?.Outputs;
@@ -39,7 +39,7 @@ export async function printOutputs(
   subdomain: string,
   service: string,
   env: string,
-) {
+): Promise<void> {
   const stackName = serverless.getProvider("aws").naming.getStackName();
   const describeStackOutput = await serverless
     .getProvider("aws")
@@ -71,11 +71,11 @@ export async function printOutputs(
   );
 }
 
-function logHeader(message: string, underline = false) {
+function logHeader(message: string, underline = false): void {
   const startFont = underline ? `${yellowFont}${underlineFont}` : `${yellowFont}`;
   console.log(`${startFont}${message}${endFont}`);
 }
 
-function logMessage(message: string) {
+function logMessage(message: string): void {
   console.log(`  ${message}`);
 }
