@@ -85,7 +85,7 @@ export function buildMonitorParams(
       monitorParams.message = recommendedMonitor.message;
     }
     if (!monitorParams.name) {
-      monitorParams.name = interpolateTemplateVariables(recommendedMonitor, recommendedMonitor.name);
+      monitorParams.name = getInterpolatedMonitorName(recommendedMonitor);
     }
   }
 
@@ -254,24 +254,20 @@ export function replaceCriticalThreshold(query: string, criticalThreshold: numbe
 }
 
 /**
- * Helper function that interpolates template variables (if any), e.g.
- * replaces template variable `$functionName` with its default value
- * `{{functionname.name}}`. Template variables with no default value will be
- * ignored.
+ * Helper function that interpolates template variables (if any) into the name
+ * of a recommended monitor, e.g. replaces template variable `$functionName`
+ * with its default value `{{functionname.name}}`. The interpolation result is
+ * returned. The original monitor params are not altered.
+ * Template variables with no default value will be ignored.
  * @param recommendedMonitors  - recommended monitors
- * @param baseString - The string that may contain uninterpolated template variables,
- *        e.g. "High Error Rate on $functionName in $regionName for $awsAccount"
  * @returns Interpolation result, e.g. "High Error Rate on {{functionname.name}} in {{region.name}} for {{aws_account.name}}"
  */
-function interpolateTemplateVariables(recommendedMonitor: ServerlessMonitor, baseString: string): string {
-  const templateVariables = recommendedMonitor.templateVariables;
-  let interpolatedString = baseString;
-  if (templateVariables !== undefined && templateVariables.length > 0) {
-    templateVariables.forEach((templateVariable) => {
-      if (templateVariable.defaults.length > 0) {
-        interpolatedString = interpolatedString.replace("$" + templateVariable.name, templateVariable.defaults[0]);
-      }
-    });
-  }
-  return interpolatedString;
+function getInterpolatedMonitorName(recommendedMonitor: ServerlessMonitor): string {
+  let interpolatedName = recommendedMonitor.name;
+  recommendedMonitor.templateVariables?.forEach((templateVariable) => {
+    if (templateVariable.defaults.length > 0) {
+      interpolatedName = interpolatedName.replace("$" + templateVariable.name, templateVariable.defaults[0]);
+    }
+  });
+  return interpolatedName;
 }
