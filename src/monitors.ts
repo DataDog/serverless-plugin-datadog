@@ -114,6 +114,7 @@ function doesMonitorExist(serverlessMonitorId: string, existingMonitors: { [key:
 
 /**
  * Deletes the monitors that have been removed from the plugin
+ * @param site Which Datadog site to send data to, e.g. datadoghq.com
  * @param pluginMonitors Monitors that are currently defined in the plugin
  * @param existingMonitors Monitors that have already been created
  * @param monitorsApiKey API Key
@@ -146,8 +147,9 @@ async function deleteRemovedMonitors(
  * Handles the Monitor API response and logs the appropriate error
  * @param response Monitor API Response
  * @param serverlessMonitorId Serverless Monitor ID
- * @param subdomain
- * @param site
+ * @param subdomain Subdomain to use for app URLs, e.g. "app"
+ * @param site Which Datadog site to send data to, e.g. datadoghq.com
+ * @returns true if the response is 200 OK. Throw an error for other HTTP status codes.
  */
 export function handleMonitorsApiResponse(
   response: Response,
@@ -168,13 +170,17 @@ export function handleMonitorsApiResponse(
 
 /**
  * Creates, updates, and deletes the appropriate monitor configurations as defined in the serverless.yml file
+ * @param subdomain - Subdomain to use for app URLs, e.g. "app"
+ * @param site - Which Datadog site to send data to, e.g. datadoghq.com
  * @param monitors - Monitors defined in the serverless.yml file
  * @param monitorsApiKey - the API Key
  * @param monitorsAppKey - the Application Key
  * @param cloudFormationStackId - the Cloud Formation Stack ID
  * @param service - the Service
  * @param env - the Environment
- * @returns monitors that have been successfully created, updated, and deleted according to the configuration defined in the plugin
+ * @returns Log statements showing the monitors that have been successfully
+ *          created, updated, and deleted according to the configuration
+ *          defined in the plugin
  */
 export async function setMonitors(
   subdomain: string,
@@ -238,6 +244,7 @@ export async function setMonitors(
 /** Helper function that replaces the default threshold included in the query string with the new critical threshold configured by the customer
  * @param query - the query string
  * @param criticalThreshold = new critical threshold as defined by the customer
+ * @returns the query string where the critical threshold is already replaced
  */
 export function replaceCriticalThreshold(query: string, criticalThreshold: number): string {
   const thresholdComparison = /(>=|>)(.*)$/;

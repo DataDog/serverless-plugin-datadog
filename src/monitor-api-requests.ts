@@ -175,6 +175,7 @@ export async function getRecommendedMonitors(
   [key: string]: ServerlessMonitor;
 }> {
   const recommendedMonitors: { [key: string]: ServerlessMonitor } = {};
+  // Setting a count of 50 in the hope that all can be fetched at once. The default is 10 per page.
   const endpoint = `https://api.${site}/api/v2/monitor/recommended?count=50&start=0&search=tag%3A%22product%3Aserverless%22`;
   const response: Response = await fetch(endpoint, {
     method: "GET",
