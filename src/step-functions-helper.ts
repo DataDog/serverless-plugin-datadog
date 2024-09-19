@@ -128,10 +128,7 @@ export function updateDefinitionString(
   // Step 2: Mutate the definition object
   const states = definitionObj.States;
   for (const [stepName, step] of Object.entries(states)) {
-    if (!isDefaultLambdaApiStep(step?.Resource) && !isStepFunctionInvocation(step?.Resource)) {
-      // only inject context into default Lambda API steps and Step Function invocation steps
-      continue;
-    }
+    // only inject context into default Lambda API steps and Step Function invocation steps
     if (isDefaultLambdaApiStep(step?.Resource)) {
       updateDefinitionForDefaultLambdaApiStep(stepName, step, serverless, stateMachineName);
     } else if (isStepFunctionInvocation(step?.Resource)) {
