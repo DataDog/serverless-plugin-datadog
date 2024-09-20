@@ -126,33 +126,30 @@ export function updateDefinitionString(
   }
 
   const states = definitionObj.States;
-  for (const stepName in states) {
-    if (states.hasOwnProperty(stepName)) {
-      const step: StateMachineStep = states[stepName];
-      if (!isDefaultLambdaApiStep(step?.Resource) && !isStepFunctionInvocation(step?.Resource)) {
-        // only inject context into default Lambda API steps and Step Function invocation steps
-        continue;
+  for (const [stepName, step] of Object.entries(states)) {
+    if (!isDefaultLambdaApiStep(step?.Resource) && !isStepFunctionInvocation(step?.Resource)) {
+      // only inject context into default Lambda API steps and Step Function invocation steps
+      continue;
+    }
+    if (isDefaultLambdaApiStep(step?.Resource)) {
+      if (typeof step.Parameters === "object") {
+        if (isSafeToModifyStepFunctionLambdaInvocation(step.Parameters)) {
+          step.Parameters!["Payload.$"] = "States.JsonMerge($$, $, false)";
+          serverless.cli.log(
+            `JsonMerge Step Functions context object with payload in step: ${stepName} of state machine: ${stateMachineName}.`,
+          );
+        } else {
+          serverless.cli.log(
+            `[Warn] Parameters.Payload has been set. Merging traces failed for step: ${stepName} of state machine: ${stateMachineName}`,
+          );
+        }
       }
-      if (isDefaultLambdaApiStep(step?.Resource)) {
-        if (typeof step.Parameters === "object") {
-          if (isSafeToModifyStepFunctionLambdaInvocation(step.Parameters)) {
-            step.Parameters!["Payload.$"] = "States.JsonMerge($$, $, false)";
-            serverless.cli.log(
-              `JsonMerge Step Functions context object with payload in step: ${stepName} of state machine: ${stateMachineName}.`,
-            );
-          } else {
-            serverless.cli.log(
-              `[Warn] Parameters.Payload has been set. Merging traces failed for step: ${stepName} of state machine: ${stateMachineName}`,
-            );
-          }
+    } else if (isStepFunctionInvocation(step?.Resource)) {
+      if (isSafeToModifyStepFunctionInvoctation(step?.Parameters)) {
+        if (step.Parameters && !step.Parameters.Input) {
+          step.Parameters.Input = {};
         }
-      } else if (isStepFunctionInvocation(step?.Resource)) {
-        if (isSafeToModifyStepFunctionInvoctation(step?.Parameters)) {
-          if (step.Parameters && !step.Parameters.Input) {
-            step.Parameters.Input = {};
-          }
-          step.Parameters!.Input!["CONTEXT.$"] = "States.JsonMerge($$, $, false)";
-        }
+        step.Parameters!.Input!["CONTEXT.$"] = "States.JsonMerge($$, $, false)";
       }
     }
   }

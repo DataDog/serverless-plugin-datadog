@@ -5,16 +5,12 @@ export function mergeStepFunctionAndLambdaTraces(
   resources: { [key: string]: GeneralResource },
   serverless: Serverless,
 ): void {
-  for (const resourceName in resources) {
-    if (resources.hasOwnProperty(resourceName)) {
-      const resourceObj: GeneralResource = resources[resourceName];
-      if (resourceObj.Type === "AWS::StepFunctions::StateMachine") {
-        if (resourceObj.Properties) {
-          const definitionString = resourceObj.Properties?.DefinitionString!;
-          const newDefString = updateDefinitionString(definitionString, serverless, resourceName);
-          resourceObj.Properties.DefinitionString = newDefString;
-        }
-      }
+  for (const [resourceName, resourceObj] of Object.entries(resources)) {
+    if (resourceObj.Type !== "AWS::StepFunctions::StateMachine" || !resourceObj.Properties) {
+      continue;
     }
+    const definitionString = resourceObj.Properties?.DefinitionString!;
+    const newDefString = updateDefinitionString(definitionString, serverless, resourceName);
+    resourceObj.Properties.DefinitionString = newDefString;
   }
 }
