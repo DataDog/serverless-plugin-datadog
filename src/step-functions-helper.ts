@@ -111,8 +111,8 @@ export function updateDefinitionString(
   serverless: Serverless,
   stateMachineName: string,
 ): string | { "Fn::Sub": (string | object)[] } {
+  // Step 1: Parse definition object from definition string
   let definitionObj: StateMachineDefinition;
-
   if (typeof definitionString !== "string") {
     // definitionString is a {"Fn::Sub": (string | object)[]}
     try {
@@ -125,6 +125,7 @@ export function updateDefinitionString(
     definitionObj = JSON.parse(definitionString);
   }
 
+  // Step 2: Mutate the definition object
   const states = definitionObj.States;
   for (const [stepName, step] of Object.entries(states)) {
     if (!isDefaultLambdaApiStep(step?.Resource) && !isStepFunctionInvocation(step?.Resource)) {
@@ -132,33 +133,48 @@ export function updateDefinitionString(
       continue;
     }
     if (isDefaultLambdaApiStep(step?.Resource)) {
-      if (typeof step.Parameters === "object") {
-        if (isSafeToModifyStepFunctionLambdaInvocation(step.Parameters)) {
-          step.Parameters!["Payload.$"] = "States.JsonMerge($$, $, false)";
-          serverless.cli.log(
-            `JsonMerge Step Functions context object with payload in step: ${stepName} of state machine: ${stateMachineName}.`,
-          );
-        } else {
-          serverless.cli.log(
-            `[Warn] Parameters.Payload has been set. Merging traces failed for step: ${stepName} of state machine: ${stateMachineName}`,
-          );
-        }
-      }
+      updateDefinitionForDefaultLambdaApiStep(stepName, step, serverless, stateMachineName);
     } else if (isStepFunctionInvocation(step?.Resource)) {
-      if (isSafeToModifyStepFunctionInvoctation(step?.Parameters)) {
-        if (step.Parameters && !step.Parameters.Input) {
-          step.Parameters.Input = {};
-        }
-        step.Parameters!.Input!["CONTEXT.$"] = "States.JsonMerge($$, $, false)";
-      }
+      updateDefinitionForStepFunctionInvocationStep(step);
     }
   }
+
+  // Step 3: Convert definition object back into definition string
   if (typeof definitionString !== "string") {
     definitionString["Fn::Sub"][0] = JSON.stringify(definitionObj); // writing back to the original JSON created by Serverless framework
   } else {
     definitionString = JSON.stringify(definitionObj);
   }
   return definitionString; // return the definitionString so it can be written to the Resource in span-link.ts
+}
+
+function updateDefinitionForDefaultLambdaApiStep(
+  stepName: string,
+  step: StateMachineStep,
+  serverless: Serverless,
+  stateMachineName: string,
+): void {
+  if (typeof step.Parameters === "object") {
+    if (isSafeToModifyStepFunctionLambdaInvocation(step.Parameters)) {
+      step.Parameters!["Payload.$"] = "States.JsonMerge($$, $, false)";
+      serverless.cli.log(
+        `JsonMerge Step Functions context object with payload in step: ${stepName} of state machine: ${stateMachineName}.`,
+      );
+    } else {
+      serverless.cli.log(
+        `[Warn] Parameters.Payload has been set. Merging traces failed for step: ${stepName} of state machine: ${stateMachineName}`,
+      );
+    }
+  }
+}
+
+function updateDefinitionForStepFunctionInvocationStep(step: StateMachineStep): void {
+  if (isSafeToModifyStepFunctionInvoctation(step?.Parameters)) {
+    if (step.Parameters && !step.Parameters.Input) {
+      step.Parameters.Input = {};
+    }
+    step.Parameters!.Input!["CONTEXT.$"] = "States.JsonMerge($$, $, false)";
+  }
 }
 
 export function inspectAndRecommendStepFunctionsInstrumentation(serverless: Serverless): void {
