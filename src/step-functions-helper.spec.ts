@@ -36,6 +36,8 @@ function serviceWithResources(resources?: Record<string, any>, serviceName = "my
 
 describe("test updateDefinitionString", () => {
   const serverless = serviceWithResources().serverless;
+  const stateMachineName = "fake-state-machine-name";
+
   it("test lambda step with non-object Parameters field", async () => {
     const definitionString = {
       "Fn::Sub": [
@@ -43,7 +45,6 @@ describe("test updateDefinitionString", () => {
         {},
       ],
     };
-    const stateMachineName = "fake-state-machine-name";
     updateDefinitionString(definitionString, serverless, stateMachineName);
 
     const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
@@ -57,7 +58,6 @@ describe("test updateDefinitionString", () => {
         {},
       ],
     };
-    const stateMachineName = "fake-state-machine-name";
     updateDefinitionString(definitionString, serverless, stateMachineName);
 
     const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
@@ -73,7 +73,6 @@ describe("test updateDefinitionString", () => {
         {},
       ],
     };
-    const stateMachineName = "fake-state-machine-name";
     updateDefinitionString(definitionString, serverless, stateMachineName);
 
     const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
@@ -87,7 +86,6 @@ describe("test updateDefinitionString", () => {
         {},
       ],
     };
-    const stateMachineName = "fake-state-machine-name";
     updateDefinitionString(definitionString, serverless, stateMachineName);
 
     const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
@@ -97,7 +95,6 @@ describe("test updateDefinitionString", () => {
   it("updates the definitionstring of a StepFunction with a string definitionString", async () => {
     const definitionString =
       '{"Comment":"Some comment","StartAt":"agocsTest1","States":{"agocsTest1":{"Type":"Task","Resource":"arn:aws:states:::states:startExecution.sync:2","Parameters":{"StateMachineArn":"arn:aws:states:::states:startExecution.sync:2","Input":{"foo":"bar"}},"End":true}}}';
-    const stateMachineName = "fake-state-machine-name";
     const newDefString = updateDefinitionString(definitionString, serverless, stateMachineName);
 
     expect(typeof newDefString === "string").toBeTruthy();
@@ -111,7 +108,6 @@ describe("test updateDefinitionString", () => {
         {},
       ],
     };
-    const stateMachineName = "fake-state-machine-name";
     updateDefinitionString(definitionString, serverless, stateMachineName);
 
     const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
@@ -127,7 +123,6 @@ describe("test updateDefinitionString", () => {
         {},
       ],
     };
-    const stateMachineName = "fake-state-machine-name";
     updateDefinitionString(definitionString, serverless, stateMachineName);
 
     const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
@@ -141,7 +136,6 @@ describe("test updateDefinitionString", () => {
         {},
       ],
     };
-    const stateMachineName = "fake-state-machine-name";
     updateDefinitionString(definitionString, serverless, stateMachineName);
 
     const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
@@ -155,7 +149,6 @@ describe("test updateDefinitionString", () => {
         {},
       ],
     };
-    const stateMachineName = "fake-state-machine-name";
     updateDefinitionString(definitionString, serverless, stateMachineName);
 
     const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
@@ -174,7 +167,6 @@ describe("test updateDefinitionString", () => {
         {},
       ],
     };
-    const stateMachineName = "fake-state-machine-name";
     updateDefinitionString(definitionString, serverless, stateMachineName);
 
     const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
@@ -193,7 +185,6 @@ describe("test updateDefinitionString", () => {
     const definitionString = {
       "Fn::Sub": [],
     };
-    const stateMachineName = "fake-state-machine-name";
     updateDefinitionString(definitionString, serverless, stateMachineName);
 
     expect(definitionString["Fn::Sub"].length).toBe(0);
@@ -206,7 +197,6 @@ describe("test updateDefinitionString", () => {
         {},
       ],
     };
-    const stateMachineName = "fake-state-machine-name";
     updateDefinitionString(definitionString, serverless, stateMachineName);
 
     const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
@@ -222,7 +212,6 @@ describe("test updateDefinitionString", () => {
         {},
       ],
     };
-    const stateMachineName = "fake-state-machine-name";
     updateDefinitionString(definitionString, serverless, stateMachineName);
 
     const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
@@ -238,7 +227,6 @@ describe("test updateDefinitionString", () => {
         {},
       ],
     };
-    const stateMachineName = "fake-state-machine-name";
     updateDefinitionString(definitionString, serverless, stateMachineName);
 
     const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
