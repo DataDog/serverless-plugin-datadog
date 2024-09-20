@@ -1,21 +1,5 @@
 import Serverless from "serverless";
 
-export function isSafeToModifyStepFunctionLambdaInvocation(parameters: any): boolean {
-  if (typeof parameters !== "object") {
-    return false;
-  }
-  if (!parameters.hasOwnProperty("Payload.$")) {
-    return true;
-  } else {
-    if (parameters["Payload.$"] === "$") {
-      // $ % is the default original unchanged payload
-      return true;
-    }
-  }
-
-  return false;
-}
-
 // Truth table
 // Input                    | Expected
 // -------------------------|---------
@@ -160,16 +144,26 @@ https://docs.datadoghq.com/serverless/step_functions/troubleshooting/`,
     return;
   }
 
-  if (isSafeToModifyStepFunctionLambdaInvocation(step.Parameters)) {
+  if (!step.Parameters.hasOwnProperty("Payload.$")) {
     step.Parameters!["Payload.$"] = "States.JsonMerge($$, $, false)";
     serverless.cli.log(
       `JsonMerge Step Functions context object with payload in step: ${stepName} of state machine: ${stateMachineName}.`,
     );
-  } else {
-    serverless.cli.log(
-      `[Warn] Parameters.Payload has been set. Merging traces failed for step: ${stepName} of state machine: ${stateMachineName}`,
-    );
+    return;
   }
+
+  if (step.Parameters["Payload.$"] === "$") {
+    // $ % is the default original unchanged payload
+    step.Parameters!["Payload.$"] = "States.JsonMerge($$, $, false)";
+    serverless.cli.log(
+      `JsonMerge Step Functions context object with payload in step: ${stepName} of state machine: ${stateMachineName}.`,
+    );
+    return;
+  }
+
+  serverless.cli.log(
+    `[Warn] Parameters.Payload has been set. Merging traces failed for step: ${stepName} of state machine: ${stateMachineName}`,
+  );
 }
 
 function updateDefinitionForStepFunctionInvocationStep(step: StateMachineStep): void {
