@@ -37,6 +37,20 @@ function serviceWithResources(resources?: Record<string, any>, serviceName = "my
 
 describe("test updateDefinitionString", () => {
   const serverless = serviceWithResources().serverless;
+  it("test lambda step with non-object Parameters field", async () => {
+    const definitionString = {
+      "Fn::Sub": [
+        '{"Comment":"fake comment","StartAt":"InvokeLambda","States":{"InvokeLambda":{"Type":"Task","Parameters":"Just a string!","Resource":"arn:aws:states:::lambda:invoke","End":true}}}',
+        {},
+      ],
+    };
+    const stateMachineName = "fake-state-machine-name";
+    updateDefinitionString(definitionString, serverless, stateMachineName);
+
+    const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
+    expect(definitionAfterUpdate.States?.InvokeLambda?.Parameters).toBe("Just a string!");
+  });
+
   it("test lambda step with default payload of '$'", async () => {
     const definitionString = {
       "Fn::Sub": [

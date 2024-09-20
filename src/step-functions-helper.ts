@@ -151,17 +151,24 @@ function updateDefinitionForDefaultLambdaApiStep(
   serverless: Serverless,
   stateMachineName: string,
 ): void {
-  if (typeof step.Parameters === "object") {
-    if (isSafeToModifyStepFunctionLambdaInvocation(step.Parameters)) {
-      step.Parameters!["Payload.$"] = "States.JsonMerge($$, $, false)";
-      serverless.cli.log(
-        `JsonMerge Step Functions context object with payload in step: ${stepName} of state machine: ${stateMachineName}.`,
-      );
-    } else {
-      serverless.cli.log(
-        `[Warn] Parameters.Payload has been set. Merging traces failed for step: ${stepName} of state machine: ${stateMachineName}`,
-      );
-    }
+  if (typeof step.Parameters !== "object") {
+    serverless.cli.log(
+      `[Warn] Parameters field is not a JSON object. Merging traces failed for step: ${stepName} of state machine: ${stateMachineName}. \
+Your Step Functions trace will not be merged with downstream Lambda traces. To manually merge these traces, check out \
+https://docs.datadoghq.com/serverless/step_functions/troubleshooting/`,
+    );
+    return;
+  }
+
+  if (isSafeToModifyStepFunctionLambdaInvocation(step.Parameters)) {
+    step.Parameters!["Payload.$"] = "States.JsonMerge($$, $, false)";
+    serverless.cli.log(
+      `JsonMerge Step Functions context object with payload in step: ${stepName} of state machine: ${stateMachineName}.`,
+    );
+  } else {
+    serverless.cli.log(
+      `[Warn] Parameters.Payload has been set. Merging traces failed for step: ${stepName} of state machine: ${stateMachineName}`,
+    );
   }
 }
 
