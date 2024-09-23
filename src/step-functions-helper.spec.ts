@@ -1,7 +1,6 @@
 import {
   isDefaultLambdaApiStep,
   isSafeToModifyStepFunctionInvoctation,
-  isSafeToModifyStepFunctionLambdaInvocation,
   StateMachineDefinition,
   updateDefinitionString,
 } from "./step-functions-helper";
@@ -65,6 +64,34 @@ describe("test updateDefinitionString", () => {
     expect(definitionAfterUpdate.States?.InvokeLambda?.Parameters?.["Payload.$"]).toBe(
       "States.JsonMerge($$, $, false)",
     );
+  });
+
+  it("test lambda step with empty payload", async () => {
+    const definitionString = {
+      "Fn::Sub": [
+        '{"Comment":"fake comment","StartAt":"InvokeLambda","States":{"InvokeLambda":{"Type":"Task","Parameters":{"FunctionName":"fake-function-name","Payload.$":{}},"Resource":"arn:aws:states:::lambda:invoke","End":true}}}',
+        {},
+      ],
+    };
+    const stateMachineName = "fake-state-machine-name";
+    updateDefinitionString(definitionString, serverless, stateMachineName);
+
+    const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
+    expect(definitionAfterUpdate.States?.InvokeLambda?.Parameters?.["Payload.$"]).toStrictEqual({});
+  });
+
+  it("test lambda step with custom payload", async () => {
+    const definitionString = {
+      "Fn::Sub": [
+        '{"Comment":"fake comment","StartAt":"InvokeLambda","States":{"InvokeLambda":{"Type":"Task","Parameters":{"FunctionName":"fake-function-name","Payload.$":"$$.State"},"Resource":"arn:aws:states:::lambda:invoke","End":true}}}',
+        {},
+      ],
+    };
+    const stateMachineName = "fake-state-machine-name";
+    updateDefinitionString(definitionString, serverless, stateMachineName);
+
+    const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
+    expect(definitionAfterUpdate.States?.InvokeLambda?.Parameters?.["Payload.$"]).toBe("$$.State");
   });
 
   it("updates the definitionstring of a StepFunction with a string definitionString", async () => {
@@ -218,28 +245,6 @@ describe("test updateDefinitionString", () => {
     expect(definitionAfterUpdate.States["Step Functions StartExecution"]?.Parameters?.Input?.["CONTEXT.$"]).toBe(
       "something else",
     );
-  });
-});
-
-describe("test isSafeToModifyStepFunctionLambdaInvocation", () => {
-  it("Payload field not set in parameters", async () => {
-    const parameters = { FunctionName: "bla" };
-    expect(isSafeToModifyStepFunctionLambdaInvocation(parameters)).toBeTruthy();
-  });
-
-  it("Payload field empty", async () => {
-    const parameters = { FunctionName: "bla", "Payload.$": {} };
-    expect(isSafeToModifyStepFunctionLambdaInvocation(parameters)).toBeFalsy();
-  });
-
-  it("Payload field default to $", async () => {
-    const parameters = { FunctionName: "bla", "Payload.$": "$" };
-    expect(isSafeToModifyStepFunctionLambdaInvocation(parameters)).toBeTruthy();
-  });
-
-  it("Payload field default to $", async () => {
-    const parameters = { FunctionName: "bla", "Payload.$": "something customer has already set and not empty" };
-    expect(isSafeToModifyStepFunctionLambdaInvocation(parameters)).toBeFalsy();
   });
 });
 
