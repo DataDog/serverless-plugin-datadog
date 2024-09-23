@@ -151,6 +151,18 @@ https://docs.datadoghq.com/serverless/step_functions/troubleshooting/`,
     return;
   }
 
+  if (step.Parameters.hasOwnProperty("Payload")) {
+    const payload = step.Parameters.Payload;
+    if (typeof payload !== "object") {
+      serverless.cli.log(
+        `[Warn] Payload field is not a JSON object. Merging traces failed for step: ${stepName} of state machine: ${stateMachineName}. \
+  Your Step Functions trace will not be merged with downstream Lambda traces. To manually merge these traces, check out \
+  https://docs.datadoghq.com/serverless/step_functions/troubleshooting/`,
+      );
+      return;
+    }
+  }
+
   if (step.Parameters["Payload.$"] === "$") {
     // $ % is the default original unchanged payload
     step.Parameters!["Payload.$"] = "States.JsonMerge($$, $, false)";
