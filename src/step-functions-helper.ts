@@ -47,6 +47,7 @@ export interface StateMachineStep {
   Parameters?: {
     FunctionName?: string;
     "Payload.$"?: string;
+    Payload?: string;
     Input?: {
       "CONTEXT.$"?: string;
     };
@@ -144,11 +145,9 @@ https://docs.datadoghq.com/serverless/step_functions/troubleshooting/`,
     return;
   }
 
-  if (!step.Parameters.hasOwnProperty("Payload.$")) {
-    step.Parameters!["Payload.$"] = "States.JsonMerge($$, $, false)";
-    serverless.cli.log(
-      `JsonMerge Step Functions context object with payload in step: ${stepName} of state machine: ${stateMachineName}.`,
-    );
+  if (!step.Parameters.hasOwnProperty("Payload.$") && !step.Parameters.hasOwnProperty("Payload")) {
+    step.Parameters!["Payload.$"] = "$$['Execution', 'State', 'StateMachine']";
+    serverless.cli.log(`Merging traces for step: ${stepName} of state machine: ${stateMachineName}.`);
     return;
   }
 
