@@ -42,12 +42,21 @@ export interface StateMachineDefinition {
   States: { [key: string]: StateMachineStep };
 }
 
+export type PayloadObject = {
+  "Execution.$"?: any;
+  Execution?: any;
+  "State.$"?: any;
+  State?: any;
+  "StateMachine.$"?: any;
+  StateMachine?: any;
+};
+
 export interface StateMachineStep {
   Resource?: string;
   Parameters?: {
     FunctionName?: string;
     "Payload.$"?: string;
-    Payload?: string;
+    Payload?: string | PayloadObject;
     Input?: {
       "CONTEXT.$"?: string;
     };
@@ -154,11 +163,48 @@ https://docs.datadoghq.com/serverless/step_functions/troubleshooting/`,
   if (step.Parameters.hasOwnProperty("Payload")) {
     const payload = step.Parameters.Payload;
     if (typeof payload !== "object") {
+      // Case 3: payload is not a JSON object
       serverless.cli.log(
         `[Warn] Payload field is not a JSON object. Merging traces failed for step: ${stepName} of state machine: ${stateMachineName}. \
   Your Step Functions trace will not be merged with downstream Lambda traces. To manually merge these traces, check out \
   https://docs.datadoghq.com/serverless/step_functions/troubleshooting/`,
       );
+      return;
+    }
+
+    // Case 2: payload is a JSON object
+    if (
+      payload["Execution.$"] === "$$.Execution" &&
+      payload["State.$"] === "$$.State" &&
+      payload["StateMachine.$"] === "$$.StateMachine"
+    ) {
+      // Case 2.1: already injected into "Payload"
+      serverless.cli.log(
+        `Context injection is already set up. Skipping merging traces for step: ${stepName} of state machine: \${stateMachineName}.\n`,
+      );
+
+      return;
+    } else if (
+      payload.hasOwnProperty("Execution.$") ||
+      payload.hasOwnProperty("Execution") ||
+      payload.hasOwnProperty("State.$") ||
+      payload.hasOwnProperty("State") ||
+      payload.hasOwnProperty("StateMachine.$") ||
+      payload.hasOwnProperty("StateMachine")
+    ) {
+      // Case 2.2: "Payload" object has Execution, State or StateMachine field but conject injection is not set up completely
+      serverless.cli
+        .log(`[Warn] Step ${stepName} of state machine: ${stateMachineName} may be using custom Execution, State or StateMachine field. \
+Step Functions Context Object injection skipped. Your Step Functions trace will not be merged with downstream Lambda traces. To manually \
+merge these traces, check out https://docs.datadoghq.com/serverless/step_functions/troubleshooting/\n`);
+
+      return;
+    } else {
+      // Case 2.3: "Payload" object has no Execution, State or StateMachine field
+      payload["Execution.$"] = "$$.Execution";
+      payload["State.$"] = "$$.State";
+      payload["StateMachine.$"] = "$$.StateMachine";
+
       return;
     }
   }
