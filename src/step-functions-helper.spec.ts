@@ -116,6 +116,19 @@ describe("test updateDefinitionString", () => {
     );
   });
 
+  it("test lambda step when Payload is not an object", async () => {
+    const definitionString = {
+      "Fn::Sub": [
+        '{"Comment":"fake comment","StartAt":"InvokeLambda","States":{"InvokeLambda":{"Type":"Task","Parameters":{"FunctionName":"fake-function-name","Payload":"Just a string!"},"Resource":"arn:aws:states:::lambda:invoke","End":true}}}',
+        {},
+      ],
+    };
+    updateDefinitionString(definitionString, serverless, stateMachineName);
+
+    const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
+    expect(definitionAfterUpdate.States?.InvokeLambda?.Parameters?.["Payload"]).toBe("Just a string!");
+  });
+
   it("test lambda step with custom Payload", async () => {
     const definitionString = {
       "Fn::Sub": [
