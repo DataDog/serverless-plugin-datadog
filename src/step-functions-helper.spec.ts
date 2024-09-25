@@ -101,7 +101,7 @@ describe("test updateDefinitionString", () => {
     expect(newDefString).toContain("CONTEXT");
   });
 
-  it("test lambda step without Payload", async () => {
+  it("test lambda step without Payload or Payload.$", async () => {
     const definitionString = {
       "Fn::Sub": [
         '{"Comment":"fake comment","StartAt":"InvokeLambda","States":{"InvokeLambda":{"Type":"Task","Parameters":{"FunctionName":"fake-function-name"},"Resource":"arn:aws:states:::lambda:invoke","End":true}}}',
@@ -112,8 +112,21 @@ describe("test updateDefinitionString", () => {
 
     const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
     expect(definitionAfterUpdate.States?.InvokeLambda?.Parameters?.["Payload.$"]).toBe(
-      "States.JsonMerge($$, $, false)",
+      "$$['Execution', 'State', 'StateMachine']",
     );
+  });
+
+  it("test lambda step with custom Payload", async () => {
+    const definitionString = {
+      "Fn::Sub": [
+        '{"Comment":"fake comment","StartAt":"InvokeLambda","States":{"InvokeLambda":{"Type":"Task","Parameters":{"FunctionName":"fake-function-name","Payload":{"CustomerId":42}},"Resource":"arn:aws:states:::lambda:invoke","End":true}}}',
+        {},
+      ],
+    };
+    updateDefinitionString(definitionString, serverless, stateMachineName);
+
+    const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
+    expect(definitionAfterUpdate.States?.InvokeLambda?.Parameters?.["Payload"]).toStrictEqual({ CustomerId: 42 });
   });
 
   it("test lambda step already has customized payload set do nothing", async () => {
