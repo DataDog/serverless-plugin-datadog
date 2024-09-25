@@ -116,7 +116,7 @@ describe("test updateDefinitionString", () => {
     );
   });
 
-  it("test lambda step when Payload is not an object", async () => {
+  it("Case 3: test lambda step when Payload is not an object", async () => {
     const definitionString = {
       "Fn::Sub": [
         '{"Comment":"fake comment","StartAt":"InvokeLambda","States":{"InvokeLambda":{"Type":"Task","Parameters":{"FunctionName":"fake-function-name","Payload":"Just a string!"},"Resource":"arn:aws:states:::lambda:invoke","End":true}}}',
@@ -129,7 +129,39 @@ describe("test updateDefinitionString", () => {
     expect(definitionAfterUpdate.States?.InvokeLambda?.Parameters?.["Payload"]).toBe("Just a string!");
   });
 
-  it("test lambda step with custom Payload", async () => {
+  it("Case 2.1: test lambda step when Execution, State and StateMachine are already injected into Payload", async () => {
+    const definitionString = {
+      "Fn::Sub": [
+        '{"Comment":"fake comment","StartAt":"InvokeLambda","States":{"InvokeLambda":{"Type":"Task","Parameters":{"FunctionName":"fake-function-name","Payload":{"Execution.$":"$$.Execution","State.$":"$$.State","StateMachine.$":"$$.StateMachine"}},"Resource":"arn:aws:states:::lambda:invoke","End":true}}}',
+        {},
+      ],
+    };
+    updateDefinitionString(definitionString, serverless, stateMachineName);
+
+    const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
+    expect(definitionAfterUpdate.States?.InvokeLambda?.Parameters?.["Payload"]).toStrictEqual({
+      "Execution.$": "$$.Execution",
+      "State.$": "$$.State",
+      "StateMachine.$": "$$.StateMachine",
+    });
+  });
+
+  it("Case 2.2: test lambda step when some of Execution, State or StateMachine field but conject injection is not set up completely", async () => {
+    const definitionString = {
+      "Fn::Sub": [
+        '{"Comment":"fake comment","StartAt":"InvokeLambda","States":{"InvokeLambda":{"Type":"Task","Parameters":{"FunctionName":"fake-function-name","Payload":{"Execution":"$$.Execution"}},"Resource":"arn:aws:states:::lambda:invoke","End":true}}}',
+        {},
+      ],
+    };
+    updateDefinitionString(definitionString, serverless, stateMachineName);
+
+    const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
+    expect(definitionAfterUpdate.States?.InvokeLambda?.Parameters?.["Payload"]).toStrictEqual({
+      Execution: "$$.Execution",
+    });
+  });
+
+  it("Case 2.3: test lambda step when none of Execution, State, or StateMachine is in Payload", async () => {
     const definitionString = {
       "Fn::Sub": [
         '{"Comment":"fake comment","StartAt":"InvokeLambda","States":{"InvokeLambda":{"Type":"Task","Parameters":{"FunctionName":"fake-function-name","Payload":{"CustomerId":42}},"Resource":"arn:aws:states:::lambda:invoke","End":true}}}',
@@ -139,7 +171,12 @@ describe("test updateDefinitionString", () => {
     updateDefinitionString(definitionString, serverless, stateMachineName);
 
     const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
-    expect(definitionAfterUpdate.States?.InvokeLambda?.Parameters?.["Payload"]).toStrictEqual({ CustomerId: 42 });
+    expect(definitionAfterUpdate.States?.InvokeLambda?.Parameters?.["Payload"]).toStrictEqual({
+      CustomerId: 42,
+      "Execution.$": "$$.Execution",
+      "State.$": "$$.State",
+      "StateMachine.$": "$$.StateMachine",
+    });
   });
 
   it("test lambda step already has customized payload set do nothing", async () => {
