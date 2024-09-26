@@ -207,20 +207,38 @@ merge these traces, check out https://docs.datadoghq.com/serverless/step_functio
 
       return;
     }
-  }
+  } else {
+    // Case 4: Parameters has "Payload.$" field
 
-  if (step.Parameters["Payload.$"] === "$") {
-    // $ % is the default original unchanged payload
-    step.Parameters!["Payload.$"] = "States.JsonMerge($$, $, false)";
+    // Case 4.1: default "Payload.$"
+    if (step.Parameters["Payload.$"] === "$") {
+      step.Parameters!["Payload.$"] = "States.JsonMerge($$, $, false)";
+      serverless.cli.log(
+        `JsonMerge Step Functions context object with payload in step: ${stepName} of state machine: ${stateMachineName}.`,
+      );
+      return;
+    }
+
+    // Case 4.2: context injection is already set up using "Payload.$"
+    if (
+      step.Parameters["Payload.$"] === "States.JsonMerge($$, $, false)" ||
+      step.Parameters["Payload.$"] === "$$['Execution', 'State', 'StateMachine']"
+    ) {
+      serverless.cli.log(
+        `[Warn] Step ${stepName} of state machine ${stateMachineName}: Context injection is already set up. Skipping context injection.\n`,
+      );
+
+      return;
+    }
+
+    // Case 4.3: custom "Payload.$"
     serverless.cli.log(
-      `JsonMerge Step Functions context object with payload in step: ${stepName} of state machine: ${stateMachineName}.`,
+      `[Warn] Step ${stepName} of state machine ${stateMachineName} has a custom Payload field. Step Functions Context Object injection \
+skipped. Your Step Functions trace will not be merged with downstream Lambda traces. To manually merge these traces, \
+check out https://docs.datadoghq.com/serverless/step_functions/troubleshooting/\n`,
     );
     return;
   }
-
-  serverless.cli.log(
-    `[Warn] Parameters.Payload has been set. Merging traces failed for step: ${stepName} of state machine: ${stateMachineName}`,
-  );
 }
 
 function updateDefinitionForStepFunctionInvocationStep(step: StateMachineStep): void {
