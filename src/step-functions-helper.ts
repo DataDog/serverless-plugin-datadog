@@ -139,6 +139,18 @@ export function updateDefinitionString(
   return definitionString; // return the definitionString so it can be written to the Resource in span-link.ts
 }
 
+// Truth table
+// Case | Input                                                    | Will update
+// -----|----------------------------------------------------------|-------------
+//   1  | No "Payload" or "Payload.$"                              | true
+//  2.1 | "Payload" is object, already injected                    | false
+//  2.2 | "Payload" object has Execution, State or StateMachine    | false
+//  2.3 | "Payload" object has no Execution, State or StateMachine | true
+//   3  | "Payload" is not object                                  | false
+//  4.1 | "Payload.$": "$" (default payload)                       | true
+//  4.2 | "Payload.$": "States.JsonMerge($$, $, false)" or         | false
+//      | "Payload.$": "$$['Execution', 'State', 'StateMachine']"  |
+//  4.3 | Custom "Payload.$"                                       | false
 function updateDefinitionForDefaultLambdaApiStep(
   stepName: string,
   step: StateMachineStep,
@@ -154,16 +166,12 @@ https://docs.datadoghq.com/serverless/step_functions/troubleshooting/`,
     return;
   }
 
-  if (!step.Parameters.hasOwnProperty("Payload.$") && !step.Parameters.hasOwnProperty("Payload")) {
-    step.Parameters!["Payload.$"] = "$$['Execution', 'State', 'StateMachine']";
-    serverless.cli.log(`Merging traces for step: ${stepName} of state machine: ${stateMachineName}.`);
-    return;
-  }
-
+  // Case 2 & 3: Parameters has "Payload" field
   if (step.Parameters.hasOwnProperty("Payload")) {
     const payload = step.Parameters.Payload;
+
+    // Case 3: payload is not a JSON object
     if (typeof payload !== "object") {
-      // Case 3: payload is not a JSON object
       serverless.cli.log(
         `[Warn] Payload field is not a JSON object. Merging traces failed for step: ${stepName} of state machine: ${stateMachineName}. \
   Your Step Functions trace will not be merged with downstream Lambda traces. To manually merge these traces, check out \
@@ -184,7 +192,10 @@ https://docs.datadoghq.com/serverless/step_functions/troubleshooting/`,
       );
 
       return;
-    } else if (
+    }
+
+    // Case 2.2: "Payload" object has Execution, State or StateMachine field but conject injection is not set up completely
+    if (
       payload.hasOwnProperty("Execution.$") ||
       payload.hasOwnProperty("Execution") ||
       payload.hasOwnProperty("State.$") ||
@@ -192,24 +203,24 @@ https://docs.datadoghq.com/serverless/step_functions/troubleshooting/`,
       payload.hasOwnProperty("StateMachine.$") ||
       payload.hasOwnProperty("StateMachine")
     ) {
-      // Case 2.2: "Payload" object has Execution, State or StateMachine field but conject injection is not set up completely
       serverless.cli
         .log(`[Warn] Step ${stepName} of state machine: ${stateMachineName} may be using custom Execution, State or StateMachine field. \
 Step Functions Context Object injection skipped. Your Step Functions trace will not be merged with downstream Lambda traces. To manually \
 merge these traces, check out https://docs.datadoghq.com/serverless/step_functions/troubleshooting/\n`);
 
       return;
-    } else {
-      // Case 2.3: "Payload" object has no Execution, State or StateMachine field
-      payload["Execution.$"] = "$$.Execution";
-      payload["State.$"] = "$$.State";
-      payload["StateMachine.$"] = "$$.StateMachine";
-
-      return;
     }
-  } else {
-    // Case 4: Parameters has "Payload.$" field
 
+    // Case 2.3: "Payload" object has no Execution, State or StateMachine field
+    payload["Execution.$"] = "$$.Execution";
+    payload["State.$"] = "$$.State";
+    payload["StateMachine.$"] = "$$.StateMachine";
+
+    return;
+  }
+
+  // Case 4: Parameters has "Payload.$" field
+  if (step.Parameters.hasOwnProperty("Payload.$")) {
     // Case 4.1: default "Payload.$"
     if (step.Parameters["Payload.$"] === "$") {
       step.Parameters!["Payload.$"] = "States.JsonMerge($$, $, false)";
@@ -239,6 +250,10 @@ check out https://docs.datadoghq.com/serverless/step_functions/troubleshooting/\
     );
     return;
   }
+
+  // Case 1: No "Payload" or "Payload.$"
+  step.Parameters!["Payload.$"] = "$$['Execution', 'State', 'StateMachine']";
+  serverless.cli.log(`Merging traces for step: ${stepName} of state machine: ${stateMachineName}.`);
 }
 
 function updateDefinitionForStepFunctionInvocationStep(step: StateMachineStep): void {

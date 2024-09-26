@@ -66,7 +66,7 @@ describe("test updateDefinitionString", () => {
     );
   });
 
-  it("test lambda step with empty payload", async () => {
+  it("Case 4.3: test lambda step with empty payload", async () => {
     const definitionString = {
       "Fn::Sub": [
         '{"Comment":"fake comment","StartAt":"InvokeLambda","States":{"InvokeLambda":{"Type":"Task","Parameters":{"FunctionName":"fake-function-name","Payload.$":{}},"Resource":"arn:aws:states:::lambda:invoke","End":true}}}',
@@ -79,7 +79,7 @@ describe("test updateDefinitionString", () => {
     expect(definitionAfterUpdate.States?.InvokeLambda?.Parameters?.["Payload.$"]).toStrictEqual({});
   });
 
-  it("test lambda step with custom payload", async () => {
+  it("Case 4.3: test lambda step with custom payload", async () => {
     const definitionString = {
       "Fn::Sub": [
         '{"Comment":"fake comment","StartAt":"InvokeLambda","States":{"InvokeLambda":{"Type":"Task","Parameters":{"FunctionName":"fake-function-name","Payload.$":"$$.State"},"Resource":"arn:aws:states:::lambda:invoke","End":true}}}',
@@ -101,7 +101,7 @@ describe("test updateDefinitionString", () => {
     expect(newDefString).toContain("CONTEXT");
   });
 
-  it("test lambda step without Payload or Payload.$", async () => {
+  it("Case 1: test lambda step without Payload or Payload.$", async () => {
     const definitionString = {
       "Fn::Sub": [
         '{"Comment":"fake comment","StartAt":"InvokeLambda","States":{"InvokeLambda":{"Type":"Task","Parameters":{"FunctionName":"fake-function-name"},"Resource":"arn:aws:states:::lambda:invoke","End":true}}}',
