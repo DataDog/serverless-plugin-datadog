@@ -1,32 +1,5 @@
 import Serverless from "serverless";
 
-// Truth table
-// Input                    | Expected
-// -------------------------|---------
-// Empty object             | true
-// undefined                | true
-// not object               | false
-// object without CONTEXT.$ | true
-// object with CONTEXT.$    | false
-export function isSafeToModifyStepFunctionInvoctation(parameters: any): boolean {
-  if (typeof parameters !== "object") {
-    return false;
-  }
-
-  if (!parameters.hasOwnProperty("Input")) {
-    return true;
-  }
-
-  if (typeof parameters.Input !== "object") {
-    return false;
-  }
-
-  if (!parameters.Input.hasOwnProperty("CONTEXT.$")) {
-    return true;
-  }
-  return false;
-}
-
 export interface GeneralResource {
   Type: string;
   Properties?: {
@@ -51,15 +24,18 @@ export type PayloadObject = {
   StateMachine?: any;
 };
 
+export type StepFunctionInput = {
+  "CONTEXT.$"?: string;
+  [key: string]: unknown;
+};
+
 export interface StateMachineStep {
   Resource?: string;
   Parameters?: {
     FunctionName?: string;
     "Payload.$"?: string;
     Payload?: string | PayloadObject;
-    Input?: {
-      "CONTEXT.$"?: string;
-    };
+    Input?: string | StepFunctionInput;
   };
   Next?: string;
   End?: boolean;
@@ -256,13 +232,35 @@ check out https://docs.datadoghq.com/serverless/step_functions/troubleshooting/\
   serverless.cli.log(`Merging traces for step: ${stepName} of state machine: ${stateMachineName}.`);
 }
 
-function updateDefinitionForStepFunctionInvocationStep(step: StateMachineStep): void {
-  if (isSafeToModifyStepFunctionInvoctation(step?.Parameters)) {
-    if (step.Parameters && !step.Parameters.Input) {
-      step.Parameters.Input = {};
-    }
-    step.Parameters!.Input!["CONTEXT.$"] = "States.JsonMerge($$, $, false)";
+// Truth table
+// Input                    | Expected
+// -------------------------|---------
+// Empty object             | true
+// undefined                | true
+// not object               | false
+// object without CONTEXT.$ | true
+// object with CONTEXT.$    | false
+export function updateDefinitionForStepFunctionInvocationStep(step: StateMachineStep): boolean {
+  const parameters = step?.Parameters;
+  if (typeof parameters !== "object") {
+    return false;
   }
+
+  if (!parameters.hasOwnProperty("Input")) {
+    parameters.Input = { "CONTEXT.$": "States.JsonMerge($$, $, false)" };
+    return true;
+  }
+
+  if (typeof parameters.Input !== "object") {
+    return false;
+  }
+
+  if (!parameters.Input.hasOwnProperty("CONTEXT.$")) {
+    parameters.Input["CONTEXT.$"] = "States.JsonMerge($$, $, false)";
+    return true;
+  }
+
+  return false;
 }
 
 export function inspectAndRecommendStepFunctionsInstrumentation(serverless: Serverless): void {
