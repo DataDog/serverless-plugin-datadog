@@ -256,9 +256,14 @@ export function updateDefinitionForStepFunctionInvocationStep(step: StateMachine
     return false;
   }
 
+<<<<<<< HEAD
   // Case 1: No "CONTEXT" or "CONTEXT.$"
   if (!parameters.Input.hasOwnProperty("CONTEXT") && !parameters.Input.hasOwnProperty("CONTEXT.$")) {
     parameters.Input["CONTEXT.$"] = "$$['Execution', 'State', 'StateMachine']";
+=======
+  if (!parameters.Input.hasOwnProperty("CONTEXT.$")) {
+    parameters.Input["CONTEXT.$"] = "States.JsonMerge($$, $, false)";
+>>>>>>> 5b7d0de (chore: Refactor sfn->sfn context injection code by merging two functions)
     return true;
   }
 
