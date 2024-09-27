@@ -188,7 +188,7 @@ https://docs.datadoghq.com/serverless/step_functions/troubleshooting/`,
     ) {
       // Case 2.1: already injected into "Payload"
       serverless.cli.log(
-        `Context injection is already set up. Skipping merging traces for step: ${stepName} of state machine: \${stateMachineName}.\n`,
+        `Context injection is already set up. Skipping merging traces for step: ${stepName} of state machine: ${stateMachineName}.\n`,
       );
 
       return;
