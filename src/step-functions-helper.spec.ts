@@ -328,34 +328,43 @@ describe("test updateDefinitionString", () => {
 });
 
 describe("test updateDefinitionForStepFunctionInvocationStep", () => {
+  const stepName = "Step Functions StartExecution";
+  const serverless = serviceWithResources().serverless;
+  const stateMachineName = "fake-state-machine-name";
   it("Input field not set in parameters", async () => {
     const parameters = { FunctionName: "bla" };
     const step = { Parameters: parameters };
-    expect(updateDefinitionForStepFunctionInvocationStep(step)).toBeTruthy();
+    expect(updateDefinitionForStepFunctionInvocationStep(stepName, step, serverless, stateMachineName)).toBeTruthy();
   });
 
   it("Case 1: Input field empty", async () => {
     const parameters = { FunctionName: "bla", Input: {} };
     const step = { Parameters: parameters };
-    expect(updateDefinitionForStepFunctionInvocationStep(step)).toBeTruthy();
+    expect(updateDefinitionForStepFunctionInvocationStep(stepName, step, serverless, stateMachineName)).toBeTruthy();
   });
 
   it("Input field is not an object", async () => {
     const parameters = { FunctionName: "bla", Input: "foo" };
     const step = { Parameters: parameters };
-    expect(updateDefinitionForStepFunctionInvocationStep(step)).toBeFalsy();
+    expect(updateDefinitionForStepFunctionInvocationStep(stepName, step, serverless, stateMachineName)).toBeFalsy();
   });
 
   it('Case 1: Input field has stuff in it but no "CONTEXT" or "CONTEXT.$"', async () => {
     const parameters = { FunctionName: "bla", Input: { foo: "bar" } };
     const step = { Parameters: parameters };
-    expect(updateDefinitionForStepFunctionInvocationStep(step)).toBeTruthy();
+    expect(updateDefinitionForStepFunctionInvocationStep(stepName, step, serverless, stateMachineName)).toBeTruthy();
+  });
+
+  it('Case 2: Input field has "CONTEXT" field', async () => {
+    const parameters = { FunctionName: "bla", Input: { CONTEXT: "foo" } };
+    const step = { Parameters: parameters };
+    expect(updateDefinitionForStepFunctionInvocationStep(stepName, step, serverless, stateMachineName)).toBeFalsy();
   });
 
   it("Input field has CONTEXT.$ already", async () => {
     const parameters = { FunctionName: "bla", Input: { "CONTEXT.$": "something else" } };
     const step = { Parameters: parameters };
-    expect(updateDefinitionForStepFunctionInvocationStep(step)).toBeFalsy();
+    expect(updateDefinitionForStepFunctionInvocationStep(stepName, step, serverless, stateMachineName)).toBeFalsy();
   });
 });
 

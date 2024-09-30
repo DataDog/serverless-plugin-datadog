@@ -103,7 +103,7 @@ export function updateDefinitionString(
     if (isDefaultLambdaApiStep(step?.Resource)) {
       updateDefinitionForDefaultLambdaApiStep(stepName, step, serverless, stateMachineName);
     } else if (isStepFunctionInvocation(step?.Resource)) {
-      updateDefinitionForStepFunctionInvocationStep(step);
+      updateDefinitionForStepFunctionInvocationStep(stepName, step, serverless, stateMachineName);
     }
   }
 
@@ -241,7 +241,12 @@ check out https://docs.datadoghq.com/serverless/step_functions/troubleshooting/\
 // not object               | false
 // object without CONTEXT.$ | true
 // object with CONTEXT.$    | false
-export function updateDefinitionForStepFunctionInvocationStep(step: StateMachineStep): boolean {
+export function updateDefinitionForStepFunctionInvocationStep(
+  stepName: string,
+  step: StateMachineStep,
+  serverless: Serverless,
+  stateMachineName: string,
+): boolean {
   const parameters = step?.Parameters;
   if (typeof parameters !== "object") {
     return false;
@@ -256,15 +261,21 @@ export function updateDefinitionForStepFunctionInvocationStep(step: StateMachine
     return false;
   }
 
-<<<<<<< HEAD
   // Case 1: No "CONTEXT" or "CONTEXT.$"
   if (!parameters.Input.hasOwnProperty("CONTEXT") && !parameters.Input.hasOwnProperty("CONTEXT.$")) {
     parameters.Input["CONTEXT.$"] = "$$['Execution', 'State', 'StateMachine']";
-=======
-  if (!parameters.Input.hasOwnProperty("CONTEXT.$")) {
-    parameters.Input["CONTEXT.$"] = "States.JsonMerge($$, $, false)";
->>>>>>> 5b7d0de (chore: Refactor sfn->sfn context injection code by merging two functions)
     return true;
+  }
+
+  // Case 2: Has 'CONTEXT' field.
+  // This case should be rare, so we don't support context injection for this case for now.
+  if (parameters.Input.hasOwnProperty("CONTEXT")) {
+    serverless.cli
+      .log(`[Warn] Step ${stepName} of state machine ${stateMachineName} has custom CONTEXT field. Step Functions Context \
+Object injection skipped. Your Step Functions trace will not be merged with downstream Step Function traces. To manually \
+merge these traces, check out https://docs.datadoghq.com/serverless/step_functions/troubleshooting/\n`);
+
+    return false;
   }
 
   return false;
