@@ -278,6 +278,24 @@ merge these traces, check out https://docs.datadoghq.com/serverless/step_functio
     return false;
   }
 
+  // Case 3.1 context injection is already set up
+  if (
+    parameters.Input["CONTEXT.$"] === "States.JsonMerge($$, $, false)" ||
+    parameters.Input["CONTEXT.$"] === `$$['Execution', 'State', 'StateMachine']`
+  ) {
+    serverless.cli.log(
+      `Step ${stepName} of state machine ${stateMachineName}: Context injection is already set up. Skipping context injection.\n`,
+    );
+
+    return false;
+  }
+
+  // Case 3.2 custom CONTEXT.$ field
+  serverless.cli
+    .log(`[Warn] Step ${stepName} of state machine ${stateMachineName}: Parameters.Input field has a custom CONTEXT.$ field. Step \
+Functions Context Object injection skipped. Your Step Functions trace will not be merged with downstream Step Function traces. To \
+manually merge these traces, check out https://docs.datadoghq.com/serverless/step_functions/troubleshooting/\n`);
+
   return false;
 }
 

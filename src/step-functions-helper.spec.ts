@@ -361,7 +361,19 @@ describe("test updateDefinitionForStepFunctionInvocationStep", () => {
     expect(updateDefinitionForStepFunctionInvocationStep(stepName, step, serverless, stateMachineName)).toBeFalsy();
   });
 
-  it("Input field has CONTEXT.$ already", async () => {
+  it("Case 3.1: Context injection already set up using States.JsonMerge($$, $, false)", async () => {
+    const parameters = { FunctionName: "bla", Input: { "CONTEXT.$": "States.JsonMerge($$, $, false)" } };
+    const step = { Parameters: parameters };
+    expect(updateDefinitionForStepFunctionInvocationStep(stepName, step, serverless, stateMachineName)).toBeFalsy();
+  });
+
+  it("Case 3.1: Context injection already set up using $$['Execution', 'State', 'StateMachine']", async () => {
+    const parameters = { FunctionName: "bla", Input: { "CONTEXT.$": "$$['Execution', 'State', 'StateMachine']" } };
+    const step = { Parameters: parameters };
+    expect(updateDefinitionForStepFunctionInvocationStep(stepName, step, serverless, stateMachineName)).toBeFalsy();
+  });
+
+  it("Case 3.2: Input field has a custom CONTEXT.$ field", async () => {
     const parameters = { FunctionName: "bla", Input: { "CONTEXT.$": "something else" } };
     const step = { Parameters: parameters };
     expect(updateDefinitionForStepFunctionInvocationStep(stepName, step, serverless, stateMachineName)).toBeFalsy();
