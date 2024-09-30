@@ -236,7 +236,7 @@ merge these traces, check out https://docs.datadoghq.com/serverless/step_functio
       step.Parameters["Payload.$"] === "$$['Execution', 'State', 'StateMachine']"
     ) {
       serverless.cli.log(
-        `[Warn] Step ${stepName} of state machine ${stateMachineName}: Context injection is already set up. Skipping context injection.\n`,
+        `Step ${stepName} of state machine ${stateMachineName}: Context injection is already set up. Skipping context injection.\n`,
       );
 
       return;
