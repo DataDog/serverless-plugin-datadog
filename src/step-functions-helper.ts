@@ -26,6 +26,7 @@ export type PayloadObject = {
 
 export type StepFunctionInput = {
   "CONTEXT.$"?: string;
+  CONTEXT?: string;
   [key: string]: unknown;
 };
 
@@ -255,8 +256,9 @@ export function updateDefinitionForStepFunctionInvocationStep(step: StateMachine
     return false;
   }
 
-  if (!parameters.Input.hasOwnProperty("CONTEXT.$")) {
-    parameters.Input["CONTEXT.$"] = "States.JsonMerge($$, $, false)";
+  // Case 1: No "CONTEXT" or "CONTEXT.$"
+  if (!parameters.Input.hasOwnProperty("CONTEXT") && !parameters.Input.hasOwnProperty("CONTEXT.$")) {
+    parameters.Input["CONTEXT.$"] = "$$['Execution', 'State', 'StateMachine']";
     return true;
   }
 

@@ -295,7 +295,7 @@ describe("test updateDefinitionString", () => {
 
     const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
     const input = definitionAfterUpdate.States["Step Functions StartExecution"]?.Parameters?.Input as StepFunctionInput;
-    expect(input["CONTEXT.$"]).toBe("States.JsonMerge($$, $, false)");
+    expect(input["CONTEXT.$"]).toBe("$$['Execution', 'State', 'StateMachine']");
   });
 
   it("test step function invocation without input", async () => {
@@ -334,7 +334,7 @@ describe("test updateDefinitionForStepFunctionInvocationStep", () => {
     expect(updateDefinitionForStepFunctionInvocationStep(step)).toBeTruthy();
   });
 
-  it("Input field empty", async () => {
+  it("Case 1: Input field empty", async () => {
     const parameters = { FunctionName: "bla", Input: {} };
     const step = { Parameters: parameters };
     expect(updateDefinitionForStepFunctionInvocationStep(step)).toBeTruthy();
@@ -346,7 +346,7 @@ describe("test updateDefinitionForStepFunctionInvocationStep", () => {
     expect(updateDefinitionForStepFunctionInvocationStep(step)).toBeFalsy();
   });
 
-  it("Input field has stuff in it", async () => {
+  it('Case 1: Input field has stuff in it but no "CONTEXT" or "CONTEXT.$"', async () => {
     const parameters = { FunctionName: "bla", Input: { foo: "bar" } };
     const step = { Parameters: parameters };
     expect(updateDefinitionForStepFunctionInvocationStep(step)).toBeTruthy();
