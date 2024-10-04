@@ -241,6 +241,18 @@ check out https://docs.datadoghq.com/serverless/step_functions/troubleshooting/\
 // not object               | false
 // object without CONTEXT.$ | true
 // object with CONTEXT.$    | false
+
+// Truth table
+// Case | Input                                                    | Expected
+// -----|----------------------------------------------------------|---------
+//  0.1 | Parameters field is not an object                        | false
+//  0.2 | Parameters field has no Input field                      | true
+//  0.3 | Parameters.Input is not an object                        | false
+//   1  | No "CONTEXT" or "CONTEXT.$"                              | true
+//   2  | Has "CONTEXT"                                            | false
+//  3.1 | "CONTEXT.$": "States.JsonMerge($$, $, false)" or         | false
+//      | "CONTEXT.$": "$$['Execution', 'State', 'StateMachine']"  |
+//  3.2 | Custom "CONTEXT.$"                                       | false
 export function updateDefinitionForStepFunctionInvocationStep(
   stepName: string,
   step: StateMachineStep,
@@ -248,15 +260,19 @@ export function updateDefinitionForStepFunctionInvocationStep(
   stateMachineName: string,
 ): boolean {
   const parameters = step?.Parameters;
+
+  // Case 0.1: Parameters field is not an object
   if (typeof parameters !== "object") {
     return false;
   }
 
+  // Case 0.2: Parameters field has no Input field
   if (!parameters.hasOwnProperty("Input")) {
     parameters.Input = { "CONTEXT.$": "States.JsonMerge($$, $, false)" };
     return true;
   }
 
+  // Case 0.3: Parameters.Input is not an object
   if (typeof parameters.Input !== "object") {
     return false;
   }

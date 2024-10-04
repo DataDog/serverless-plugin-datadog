@@ -331,7 +331,8 @@ describe("test updateDefinitionForStepFunctionInvocationStep", () => {
   const stepName = "Step Functions StartExecution";
   const serverless = serviceWithResources().serverless;
   const stateMachineName = "fake-state-machine-name";
-  it("Input field not set in parameters", async () => {
+
+  it("Case 0.2: Input field not set in parameters", async () => {
     const parameters = { FunctionName: "bla" };
     const step = { Parameters: parameters };
     expect(updateDefinitionForStepFunctionInvocationStep(stepName, step, serverless, stateMachineName)).toBeTruthy();
@@ -343,7 +344,7 @@ describe("test updateDefinitionForStepFunctionInvocationStep", () => {
     expect(updateDefinitionForStepFunctionInvocationStep(stepName, step, serverless, stateMachineName)).toBeTruthy();
   });
 
-  it("Input field is not an object", async () => {
+  it("Case 0.3: Input field is not an object", async () => {
     const parameters = { FunctionName: "bla", Input: "foo" };
     const step = { Parameters: parameters };
     expect(updateDefinitionForStepFunctionInvocationStep(stepName, step, serverless, stateMachineName)).toBeFalsy();
