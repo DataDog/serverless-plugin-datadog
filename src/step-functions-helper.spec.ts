@@ -1,8 +1,9 @@
 import {
   isDefaultLambdaApiStep,
-  isSafeToModifyStepFunctionInvoctation,
   StateMachineDefinition,
   updateDefinitionString,
+  updateDefinitionForStepFunctionInvocationStep,
+  StepFunctionInput,
 } from "./step-functions-helper";
 
 import Service from "serverless/classes/Service";
@@ -293,9 +294,8 @@ describe("test updateDefinitionString", () => {
     updateDefinitionString(definitionString, serverless, stateMachineName);
 
     const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
-    expect(definitionAfterUpdate.States["Step Functions StartExecution"]?.Parameters?.Input?.["CONTEXT.$"]).toBe(
-      "States.JsonMerge($$, $, false)",
-    );
+    const input = definitionAfterUpdate.States["Step Functions StartExecution"]?.Parameters?.Input as StepFunctionInput;
+    expect(input["CONTEXT.$"]).toBe("States.JsonMerge($$, $, false)");
   });
 
   it("test step function invocation without input", async () => {
@@ -308,9 +308,8 @@ describe("test updateDefinitionString", () => {
     updateDefinitionString(definitionString, serverless, stateMachineName);
 
     const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
-    expect(definitionAfterUpdate.States["Step Functions StartExecution"]?.Parameters?.Input?.["CONTEXT.$"]).toBe(
-      "States.JsonMerge($$, $, false)",
-    );
+    const input = definitionAfterUpdate.States["Step Functions StartExecution"]?.Parameters?.Input as StepFunctionInput;
+    expect(input["CONTEXT.$"]).toBe("States.JsonMerge($$, $, false)");
   });
 
   it("test step function invocation with pre-exisitng context object", async () => {
@@ -323,36 +322,40 @@ describe("test updateDefinitionString", () => {
     updateDefinitionString(definitionString, serverless, stateMachineName);
 
     const definitionAfterUpdate: StateMachineDefinition = JSON.parse(definitionString["Fn::Sub"][0] as string);
-    expect(definitionAfterUpdate.States["Step Functions StartExecution"]?.Parameters?.Input?.["CONTEXT.$"]).toBe(
-      "something else",
-    );
+    const input = definitionAfterUpdate.States["Step Functions StartExecution"]?.Parameters?.Input as StepFunctionInput;
+    expect(input["CONTEXT.$"]).toBe("something else");
   });
 });
 
-describe("test isSafeToModifyStepFunctionInvoctation", () => {
+describe("test updateDefinitionForStepFunctionInvocationStep", () => {
   it("Input field not set in parameters", async () => {
-    const parameters = { StateMachineArn: "bla" };
-    expect(isSafeToModifyStepFunctionInvoctation(parameters)).toBeTruthy();
+    const parameters = { FunctionName: "bla" };
+    const step = { Parameters: parameters };
+    expect(updateDefinitionForStepFunctionInvocationStep(step)).toBeTruthy();
   });
 
   it("Input field empty", async () => {
     const parameters = { FunctionName: "bla", Input: {} };
-    expect(isSafeToModifyStepFunctionInvoctation(parameters)).toBeTruthy();
+    const step = { Parameters: parameters };
+    expect(updateDefinitionForStepFunctionInvocationStep(step)).toBeTruthy();
   });
 
   it("Input field is not an object", async () => {
     const parameters = { FunctionName: "bla", Input: "foo" };
-    expect(isSafeToModifyStepFunctionInvoctation(parameters)).toBeFalsy();
+    const step = { Parameters: parameters };
+    expect(updateDefinitionForStepFunctionInvocationStep(step)).toBeFalsy();
   });
 
   it("Input field has stuff in it", async () => {
     const parameters = { FunctionName: "bla", Input: { foo: "bar" } };
-    expect(isSafeToModifyStepFunctionInvoctation(parameters)).toBeTruthy();
+    const step = { Parameters: parameters };
+    expect(updateDefinitionForStepFunctionInvocationStep(step)).toBeTruthy();
   });
 
   it("Input field has CONTEXT.$ already", async () => {
     const parameters = { FunctionName: "bla", Input: { "CONTEXT.$": "something else" } };
-    expect(isSafeToModifyStepFunctionInvoctation(parameters)).toBeFalsy();
+    const step = { Parameters: parameters };
+    expect(updateDefinitionForStepFunctionInvocationStep(step)).toBeFalsy();
   });
 });
 
