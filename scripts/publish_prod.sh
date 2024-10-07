@@ -68,9 +68,6 @@ if [ "$UPDATE_LAYERS" != "false" ]; then
     fi
 fi
 
-# Verify NPM access before updating layer arns (slow)
-yarn login
-
 if [ "$UPDATE_LAYERS" != "false" ]; then
     aws-vault exec sso-govcloud-us1-fed-engineering -- aws sts get-caller-identity
     aws-vault exec sso-prod-engineering -- aws sts get-caller-identity
@@ -92,11 +89,7 @@ echo
 echo "Bumping the version number and committing the changes"
 yarn version --new-version "$VERSION"
 
-echo
-echo 'Publishing to npm'
-yarn
 yarn build
-yarn publish --new-version "$VERSION"
 
 echo
 echo 'Pushing updates to GitHub'
@@ -104,5 +97,5 @@ git push origin main
 git push origin "refs/tags/v$VERSION"
 
 echo
-echo "DONE! Please create a new release using the link below."
+echo "DONE! Please create a new release using the link below. It will trigger a GitHub action to publish to npm."
 echo "https://github.com/DataDog/serverless-plugin-datadog/releases/new?tag=v$VERSION&title=v$VERSION"

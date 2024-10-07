@@ -1,0 +1,38 @@
+name: Publish packages on NPM
+on:
+  release:
+    types: [created]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "18.x"
+      - run: yarn config set npmAuthToken $NPM_PUBLISH_TOKEN
+        env:
+          NPM_PUBLISH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+      - run: yarn
+      - run: yarn build
+      - run: yarn publish
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Send success message to Slack
+        if: success()
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"channel":"#serverless-onboarding-and-enablement-ops","text":"✅ serverless-plugin-datadog NPM publish succeeded."}' \
+          -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
+          https://slack.com/api/chat.postMessage
+
+      - name: Send failure message to Slack
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"channel":"#serverless-onboarding-and-enablement-ops","text":"❌ serverless-plugin-datadog NPM publish failed. Please check GitHub Actions log for investigation."}' \
+          -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
+          https://slack.com/api/chat.postMessage
