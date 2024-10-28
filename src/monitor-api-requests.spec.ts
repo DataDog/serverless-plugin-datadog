@@ -437,7 +437,7 @@ describe("getRecommendedMonitors", () => {
         data: [
           {
             type: "recommended-monitor",
-            id: "serverless_high_cold_start_rate",
+            id: "serverless-[enhanced_metrics]_lambda_function_cold_start_rate_is_high",
             attributes: {
               classification: "metric",
               query:
@@ -473,7 +473,7 @@ describe("getRecommendedMonitors", () => {
           },
           {
             type: "recommended-monitor",
-            id: "serverless_high_error_rate",
+            id: "serverless-lambda_function_invocations_are_failing",
             attributes: {
               classification: "metric",
               query:
@@ -534,7 +534,7 @@ describe("getRecommendedMonitors", () => {
           },
           {
             type: "recommended-monitor",
-            id: "serverless_high_iterator_age",
+            id: "serverless-lambda_function's_iterator_age_is_increasing",
             attributes: {
               classification: "metric",
               query:
@@ -595,7 +595,7 @@ describe("getRecommendedMonitors", () => {
           },
           {
             type: "recommended-monitor",
-            id: "serverless_high_throttles",
+            id: "serverless-lambda_function_invocations_are_throttling",
             attributes: {
               classification: "metric",
               query:

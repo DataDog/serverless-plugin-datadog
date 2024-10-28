@@ -37,6 +37,19 @@ interface RecommendedMonitorParams {
   };
 }
 
+/**
+ * Maps recommended monitor API IDs to IDs, where "API IDs" mean the keys in the monitor API response JSON
+ */
+const recommendedMonitorApiIdToId = {
+  "serverless-lambda_function_invocations_are_failing": "high_error_rate",
+  "serverless-lambda_function_is_timing_out": "timeout",
+  "serverless-[enhanced_metrics]_lambda_function_is_running_out_of_memory": "out_of_memory",
+  "serverless-lambda_function's_iterator_age_is_increasing": "high_iterator_age",
+  "serverless-[enhanced_metrics]_lambda_function_cold_start_rate_is_high": "high_cold_start_rate",
+  "serverless-lambda_function_invocations_are_throttling": "high_throttles",
+  "serverless-[enhanced_metrics]_lambda_function_cost_is_increasing": "increased_cost",
+};
+
 export async function createMonitor(
   site: string,
   monitorParams: MonitorParams,
@@ -210,10 +223,18 @@ export async function getRecommendedMonitors(
       templateVariables: recommendedMonitorParam.attributes.template_variables,
     };
 
-    // recommended monitor params have an id that includes a serverless_ prefix that we have to remove to match the monitor ids we use in the plugin
-    const recommendedMonitorId = recommendedMonitorParam.id.replace("serverless_", "");
-    recommendedMonitors[recommendedMonitorId] = recommendedMonitor;
+    const recommendedMonitorApiId = recommendedMonitorParam.id;
+    if (isValidRecommendedMonitorApiId(recommendedMonitorApiId)) {
+      const recommendedMonitorId = recommendedMonitorApiIdToId[recommendedMonitorApiId];
+      recommendedMonitors[recommendedMonitorId] = recommendedMonitor;
+    }
   });
 
   return recommendedMonitors;
+}
+
+function isValidRecommendedMonitorApiId(
+  recommendedMonitorApiId: string,
+): recommendedMonitorApiId is keyof typeof recommendedMonitorApiIdToId {
+  return recommendedMonitorApiId in recommendedMonitorApiIdToId;
 }
