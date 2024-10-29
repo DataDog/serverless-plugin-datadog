@@ -5,6 +5,8 @@ import {
   deleteMonitor,
   searchMonitors,
   getRecommendedMonitors,
+  parseRecommendedMonitorServerlessId,
+  RecommendedMonitorParams,
 } from "./monitor-api-requests";
 import { MonitorParams, handleMonitorsApiResponse } from "./monitors";
 
@@ -654,6 +656,68 @@ describe("getRecommendedMonitors", () => {
               created_at: 1696896000000,
             },
           },
+          // A misconfigured recommended monitor where the serverless_id tag is missing. It should be ignored by getRecommendedMonitors().
+          {
+            type: "recommended-monitor",
+            id: "serverless-lambda_function_is_timing_out",
+            attributes: {
+              classification: "metric",
+              query:
+                "max(last_15m):floor(max:aws.lambda.duration.maximum{$scope} by {aws_account,functionname,region} / (max:aws.lambda.timeout{$scope} by {aws_account,functionname,region} * 1000)) >= 1",
+              message:
+                "At least one invocation in the evaluated time range timed out. This occurs when your function runs for longer than the configured timeout or the global Lambda timeout. \n {{#is_alert}} Resolution: \n * View slow traces for this function to help you pinpoint slow requests to APIs and other microservices.\n * You can also consider increasing the timeout of your function. Note that this could affect your AWS bill. {{/is_alert}}",
+              title: "Lambda function is timing out",
+              description:
+                "Lambda functions have a configurable limited execution time beyond which execution will stop immediately. This monitor can alert when such a timeout is detected.",
+              type: "query alert",
+              options: {
+                thresholds: { critical: 1 },
+                notify_no_data: false,
+                silenced: {},
+                notify_audit: false,
+                new_host_delay: 300,
+                include_tags: false,
+              },
+              integration_title: "Serverless",
+              integration_id: "serverless",
+              template_variables: [
+                {
+                  defaults: ["{{functionname.name}}"],
+                  prefix: "",
+                  name: "functionName",
+                  available_values: [],
+                },
+                {
+                  defaults: ["{{region.name}}"],
+                  prefix: "",
+                  name: "regionName",
+                  available_values: [],
+                },
+                {
+                  defaults: ["{{aws_account.name}}"],
+                  prefix: "",
+                  name: "awsAccount",
+                  available_values: [],
+                },
+                {
+                  defaults: ["*"],
+                  prefix: "",
+                  name: "scope",
+                  available_values: [],
+                },
+              ],
+              tags: ["created_by:dd_sls_app"],
+              integration: "serverless",
+              last_updated_at: 1696896000000,
+              meta_tags: ["product:serverless", "integration:amazon-lambda"],
+              name: "Timeout on $functionName in $regionName for $awsAccount",
+              recommended_monitor_metadata: {
+                matcher: "serverless_id:timeout",
+              },
+              version: 2,
+              created_at: 1696896000000,
+            },
+          },
         ],
         meta: {
           page: { total_filtered_count: 7, total_count: 7 },
@@ -728,8 +792,30 @@ describe("getRecommendedMonitors", () => {
     );
 
     expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
-      "https://api.datadoghq.com/api/v2/monitor/recommended?count=50&start=0&search=tag%3A%22product%3Aserverless%22",
+      "https://api.datadoghq.com/api/v2/monitor/recommended?count=50&start=0&search=tag%3A%22product%3Aserverless%22%20AND%20tag%3A%22integration%3Aamazon-lambda%22",
       validRequestBody,
     );
+  });
+});
+
+describe("parseRecommendedMonitorServerlessId", () => {
+  it("parses serverless id if serverless_id tag exists", async () => {
+    const recommendedMonitorParams = {
+      id: "cold_start_rate_is_high",
+      attributes: {
+        tags: ["created_by:dd_sls_app", "serverless_id:high_cold_start_rate"],
+      },
+    } as RecommendedMonitorParams;
+    expect(parseRecommendedMonitorServerlessId(recommendedMonitorParams)).toBe("high_cold_start_rate");
+  });
+
+  it("returns undefined if serverless_id tag doesn't exist", async () => {
+    const recommendedMonitorParams = {
+      id: "cold_start_rate_is_high",
+      attributes: {
+        tags: ["created_by:dd_sls_app"],
+      },
+    } as RecommendedMonitorParams;
+    expect(parseRecommendedMonitorServerlessId(recommendedMonitorParams)).toBeUndefined();
   });
 });
