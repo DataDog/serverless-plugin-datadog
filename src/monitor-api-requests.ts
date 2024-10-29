@@ -22,7 +22,7 @@ export interface TemplateVariable {
   defaults: string[];
 }
 
-interface RecommendedMonitorParams {
+export interface RecommendedMonitorParams {
   id: string;
   attributes: {
     query: string;
@@ -34,21 +34,9 @@ interface RecommendedMonitorParams {
     };
     name: string;
     template_variables?: TemplateVariable[];
+    tags: string[];
   };
 }
-
-/**
- * Maps recommended monitor API IDs to IDs, where "API IDs" mean the keys in the monitor API response JSON
- */
-const recommendedMonitorApiIdToId = {
-  "serverless-lambda_function_invocations_are_failing": "high_error_rate",
-  "serverless-lambda_function_is_timing_out": "timeout",
-  "serverless-[enhanced_metrics]_lambda_function_is_running_out_of_memory": "out_of_memory",
-  "serverless-lambda_function's_iterator_age_is_increasing": "high_iterator_age",
-  "serverless-[enhanced_metrics]_lambda_function_cold_start_rate_is_high": "high_cold_start_rate",
-  "serverless-lambda_function_invocations_are_throttling": "high_throttles",
-  "serverless-[enhanced_metrics]_lambda_function_cost_is_increasing": "increased_cost",
-};
 
 export async function createMonitor(
   site: string,
@@ -189,7 +177,7 @@ export async function getRecommendedMonitors(
 }> {
   const recommendedMonitors: { [key: string]: ServerlessMonitor } = {};
   // Setting a count of 50 in the hope that all can be fetched at once. The default is 10 per page.
-  const endpoint = `https://api.${site}/api/v2/monitor/recommended?count=50&start=0&search=tag%3A%22product%3Aserverless%22`;
+  const endpoint = `https://api.${site}/api/v2/monitor/recommended?count=50&start=0&search=tag%3A%22product%3Aserverless%22%20AND%20tag%3A%22integration%3Aamazon-lambda%22`;
   const response: Response = await fetch(endpoint, {
     method: "GET",
     headers: {
@@ -205,6 +193,11 @@ export async function getRecommendedMonitors(
   const json = await response.json();
   const recommendedMonitorsData = json.data;
   recommendedMonitorsData.forEach((recommendedMonitorParam: RecommendedMonitorParams) => {
+    const recommendedMonitorId = parseRecommendedMonitorServerlessId(recommendedMonitorParam);
+    if (recommendedMonitorId === undefined) {
+      return;
+    }
+
     const recommendedMonitor: ServerlessMonitor = {
       name: recommendedMonitorParam.attributes.name,
       threshold: recommendedMonitorParam.attributes.options.thresholds.critical,
@@ -222,19 +215,19 @@ export async function getRecommendedMonitors(
       },
       templateVariables: recommendedMonitorParam.attributes.template_variables,
     };
-
-    const recommendedMonitorApiId = recommendedMonitorParam.id;
-    if (isValidRecommendedMonitorApiId(recommendedMonitorApiId)) {
-      const recommendedMonitorId = recommendedMonitorApiIdToId[recommendedMonitorApiId];
-      recommendedMonitors[recommendedMonitorId] = recommendedMonitor;
-    }
+    recommendedMonitors[recommendedMonitorId] = recommendedMonitor;
   });
 
   return recommendedMonitors;
 }
 
-function isValidRecommendedMonitorApiId(
-  recommendedMonitorApiId: string,
-): recommendedMonitorApiId is keyof typeof recommendedMonitorApiIdToId {
-  return recommendedMonitorApiId in recommendedMonitorApiIdToId;
+export function parseRecommendedMonitorServerlessId(
+  recommendedMonitorParams: RecommendedMonitorParams,
+): string | undefined {
+  for (const tag of recommendedMonitorParams.attributes.tags) {
+    if (tag.startsWith("serverless_id:")) {
+      return tag.substring(tag.indexOf(":") + 1);
+    }
+  }
+  return undefined;
 }
