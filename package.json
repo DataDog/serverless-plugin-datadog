@@ -9,7 +9,8 @@
   "scripts": {
     "prebuild": "./scripts/check_layers_json.sh",
     "build": "tsc",
-    "test": "jest",
+    "test": "jest --config jest.config.js",
+    "test:integration": "jest ./integration_tests --config jest.integration.config.js",
     "test:watch": "jest --watch",
     "coverage": "jest --coverage",
     "lint": "tslint --project tsconfig.json",
