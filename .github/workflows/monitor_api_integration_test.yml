@@ -44,7 +44,7 @@ jobs:
         if: failure()
         run: |
           set -x
-          OPS_MESSAGE=":gh-check-passed: Serverless Plugin failed to fetch recommended monitors from monitor API!
+          OPS_MESSAGE=":gh-check-failed: Serverless Plugin failed to fetch recommended monitors from monitor API!
           Please check GitHub Action log: https://github.com/DataDog/serverless-plugin-datadog/actions/workflows/monitor_api_integration_test.yml"
           curl -H "Content-type: application/json" -X POST "$SLACK_WEBHOOK" -d '{
           "channel": "'"$SLACK_CHANNEL"'",
