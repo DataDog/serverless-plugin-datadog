@@ -1872,7 +1872,7 @@ describe("ServerlessPlugin", () => {
       );
     });
 
-    it("sets DD tags for the state machine", async () => {
+    it("sets tags for the state machine", async () => {
       const serverless = {
         cli: { log: () => {} },
         getProvider: (_name: string) => awsMock(),
@@ -1912,15 +1912,15 @@ describe("ServerlessPlugin", () => {
       ).toHaveProperty(
         "Tags",
         expect.arrayContaining([
-          { Key: "DD_ENV", Value: "prod" },
-          { Key: "DD_SERVICE", Value: "my-service" },
-          { Key: "DD_VERSION", Value: "1.0.0" },
+          { Key: "env", Value: "prod" },
+          { Key: "service", Value: "my-service" },
+          { Key: "version", Value: "1.0.0" },
           { Key: "dd-custom-tag", Value: "custom-tag-value" },
         ]),
       );
     });
 
-    it("does not override existing DD tags on the state machine", async () => {
+    it("does not override existing tags on the state machine", async () => {
       const serverless = {
         cli: { log: () => {} },
         getProvider: (_name: string) => awsMock(),
@@ -1934,9 +1934,9 @@ describe("ServerlessPlugin", () => {
                   Type: "AWS::StepFunctions::StateMachine",
                   Properties: {
                     Tags: [
-                      { Key: "DD_ENV", Value: "dev" },
-                      { Key: "DD_SERVICE", Value: "my-existing-service" },
-                      { Key: "DD_VERSION", Value: "0.0.9" },
+                      { Key: "env", Value: "dev" },
+                      { Key: "service", Value: "my-existing-service" },
+                      { Key: "version", Value: "0.0.9" },
                       { Key: "dd-custom-tag", Value: "existing-tag-value" },
                     ],
                   },
@@ -1967,9 +1967,9 @@ describe("ServerlessPlugin", () => {
       ).toHaveProperty(
         "Tags",
         expect.arrayContaining([
-          { Key: "DD_ENV", Value: "dev" },
-          { Key: "DD_SERVICE", Value: "my-existing-service" },
-          { Key: "DD_VERSION", Value: "0.0.9" },
+          { Key: "env", Value: "dev" },
+          { Key: "service", Value: "my-existing-service" },
+          { Key: "version", Value: "0.0.9" },
           { Key: "dd-custom-tag", Value: "existing-tag-value" },
         ]),
       );
