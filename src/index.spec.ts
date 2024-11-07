@@ -1871,6 +1871,110 @@ describe("ServerlessPlugin", () => {
         true,
       );
     });
+
+    it("sets DD tags for the state machine", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            compiledCloudFormationTemplate: {
+              Resources: {
+                FirstStateMachine: {
+                  Type: "AWS::StepFunctions::StateMachine",
+                  Properties: {},
+                },
+              },
+            },
+          },
+          functions: {
+            function1: {},
+          },
+          resources: {},
+          custom: {
+            datadog: {
+              forwarderArn: "some-arn",
+              env: "prod",
+              service: "my-service",
+              version: "1.0.0",
+              tags: "dd-custom-tag:custom-tag-value",
+            },
+          },
+        },
+      };
+
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:compileFunctions"]();
+      expect(
+        serverless.service.provider.compiledCloudFormationTemplate.Resources.FirstStateMachine.Properties,
+      ).toHaveProperty(
+        "Tags",
+        expect.arrayContaining([
+          { Key: "DD_ENV", Value: "prod" },
+          { Key: "DD_SERVICE", Value: "my-service" },
+          { Key: "DD_VERSION", Value: "1.0.0" },
+          { Key: "dd-custom-tag", Value: "custom-tag-value" },
+        ]),
+      );
+    });
+
+    it("does not override existing DD tags on the state machine", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            compiledCloudFormationTemplate: {
+              Resources: {
+                FirstStateMachine: {
+                  Type: "AWS::StepFunctions::StateMachine",
+                  Properties: {
+                    Tags: [
+                      { Key: "DD_ENV", Value: "dev" },
+                      { Key: "DD_SERVICE", Value: "my-existing-service" },
+                      { Key: "DD_VERSION", Value: "0.0.9" },
+                      { Key: "dd-custom-tag", Value: "existing-tag-value" },
+                    ],
+                  },
+                },
+              },
+            },
+          },
+          functions: {
+            function1: {},
+          },
+          resources: {},
+          custom: {
+            datadog: {
+              forwarderArn: "some-arn",
+              env: "prod",
+              service: "my-service",
+              version: "1.0.0",
+              tags: "dd-custom-tag:new-tag-value",
+            },
+          },
+        },
+      };
+
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["after:package:compileFunctions"]();
+      expect(
+        serverless.service.provider.compiledCloudFormationTemplate.Resources.FirstStateMachine.Properties,
+      ).toHaveProperty(
+        "Tags",
+        expect.arrayContaining([
+          { Key: "DD_ENV", Value: "dev" },
+          { Key: "DD_SERVICE", Value: "my-existing-service" },
+          { Key: "DD_VERSION", Value: "0.0.9" },
+          { Key: "dd-custom-tag", Value: "existing-tag-value" },
+        ]),
+      );
+    });
+
     it("redirects by default", async () => {
       mock({});
       const serverless = {

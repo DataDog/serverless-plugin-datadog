@@ -148,7 +148,7 @@ module.exports = class ServerlessPlugin {
       this.serverless.cli.log("Adding Datadog Env Vars");
       this.addDDEnvVars(handlers);
     } else {
-      this.addDDTags(handlers);
+      this.addDDTagsForLambda(handlers);
     }
 
     let tracingMode = TracingMode.NONE;
@@ -176,6 +176,7 @@ module.exports = class ServerlessPlugin {
         }
         addDdSlsPluginTag(stateMachineObj); // obj is a state machine object
         addDdTraceEnabledTag(stateMachineObj, config.enableStepFunctionsTracing);
+        this.addDDTagsForStateMachine(stateMachineObj);
       }
     }
   }
@@ -423,9 +424,9 @@ module.exports = class ServerlessPlugin {
 
   /**
    * Check for service, env, version, and additional tags at the custom level.
-   * If these tags don't already exsist on the function level, adds them as tags
+   * If these tags don't already exist on the function level, adds them as tags
    */
-  private addDDTags(handlers: FunctionInfo[]): void {
+  private addDDTagsForLambda(handlers: FunctionInfo[]): void {
     const service = this.serverless.service as Service;
 
     let custom = service.custom as any;
@@ -459,6 +460,57 @@ module.exports = class ServerlessPlugin {
         });
       }
     });
+  }
+
+  /**
+   * Check for service, env, version, and additional tags at the custom level.
+   * If these don't already exsist on the state machine level, add them as DD_XXX tags.
+   */
+  private addDDTagsForStateMachine(stateMachine: any): void {
+    const service = this.serverless.service as Service;
+
+    const datadog = service.custom?.datadog;
+    if (datadog === undefined) {
+      return;
+    }
+
+    stateMachine.Properties ??= {};
+    stateMachine.Properties.Tags ??= {};
+    const tags = stateMachine.Properties.Tags;
+
+    if (datadog.service && !tags.hasOwnProperty(TagKeys.Service)) {
+      tags.push({
+        Key: ddServiceEnvVar,
+        Value: datadog.service,
+      });
+    }
+
+    if (datadog.env && !tags.hasOwnProperty(TagKeys.Env)) {
+      tags.push({
+        Key: ddEnvEnvVar,
+        Value: datadog.env,
+      });
+    }
+
+    if (datadog.version && !tags.hasOwnProperty(TagKeys.Version)) {
+      tags.push({
+        Key: ddVersionEnvVar,
+        Value: datadog.version,
+      });
+    }
+
+    if (datadog.tags) {
+      const tagsArray = datadog.tags.split(",");
+      tagsArray.forEach((tag: string) => {
+        const [key, value] = tag.split(":");
+        if (key && value && !tags.hasOwnProperty(key)) {
+          tags.push({
+            Key: key,
+            Value: value,
+          });
+        }
+      });
+    }
   }
 
   /**
