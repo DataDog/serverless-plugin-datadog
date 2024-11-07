@@ -1,0 +1,48 @@
+name: Publish packages on NPM
+on:
+  release:
+    types: [created]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "18.x"
+      - run: yarn config set npmAuthToken $NPM_PUBLISH_TOKEN
+        env:
+          NPM_PUBLISH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+      - run: yarn
+      - run: yarn build
+      - run: yarn publish
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Send success message to Slack
+        env:
+          SLACK_CHANNEL: "#serverless-onboarding-and-enablement-ops"
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        if: success()
+        run: |
+          set -x
+          OPS_MESSAGE=":gh-check-passed: serverless-plugin-datadog NPM publish succeeded!"
+          curl -H "Content-type: application/json" -X POST "$SLACK_WEBHOOK" -d '{
+            "channel": "'"$SLACK_CHANNEL"'",
+            "text": "'"$OPS_MESSAGE"'"
+          }'
+
+      - name: Send failure message to Slack
+        env:
+          SLACK_CHANNEL: "#serverless-onboarding-and-enablement-ops"
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        if: failure()
+        run: |
+          set -x
+          OPS_MESSAGE=":gh-check-passed: serverless-plugin-datadog NPM publish failed!
+          Please check GitHub Action log: https://github.com/DataDog/serverless-plugin-datadog/actions/workflows/publish.yml"
+          curl -H "Content-type: application/json" -X POST "$SLACK_WEBHOOK" -d '{
+            "channel": "'"$SLACK_CHANNEL"'",
+            "text": "'"$OPS_MESSAGE"'"
