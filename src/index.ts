@@ -176,7 +176,7 @@ module.exports = class ServerlessPlugin {
         }
         addDdSlsPluginTag(stateMachineObj); // obj is a state machine object
         addDdTraceEnabledTag(stateMachineObj, config.enableStepFunctionsTracing);
-        this.addDDTagsForStateMachine(stateMachineObj);
+        this.addTagsForStateMachine(stateMachineObj);
       }
     }
   }
@@ -464,9 +464,9 @@ module.exports = class ServerlessPlugin {
 
   /**
    * Check for service, env, version, and additional tags at the custom level.
-   * If these don't already exsist on the state machine level, add them as DD_XXX tags.
+   * If these don't already exist on the state machine level, add them.
    */
-  private addDDTagsForStateMachine(stateMachine: any): void {
+  private addTagsForStateMachine(stateMachine: any): void {
     const service = this.serverless.service as Service;
 
     const datadog = service.custom?.datadog;
@@ -480,21 +480,21 @@ module.exports = class ServerlessPlugin {
 
     if (datadog.service && !tags.hasOwnProperty(TagKeys.Service)) {
       tags.push({
-        Key: ddServiceEnvVar,
+        Key: TagKeys.Service,
         Value: datadog.service,
       });
     }
 
     if (datadog.env && !tags.hasOwnProperty(TagKeys.Env)) {
       tags.push({
-        Key: ddEnvEnvVar,
+        Key: TagKeys.Env,
         Value: datadog.env,
       });
     }
 
     if (datadog.version && !tags.hasOwnProperty(TagKeys.Version)) {
       tags.push({
-        Key: ddVersionEnvVar,
+        Key: TagKeys.Version,
         Value: datadog.version,
       });
     }
