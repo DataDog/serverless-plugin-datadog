@@ -1,8 +1,6 @@
 name: monitor-api-integration-test
 
 on:
-  push:
-  pull_request:
   schedule:
     # 1pm UTC (9am EDT, 8am EST), every day
     - cron: "0 13 * * *"
@@ -33,10 +31,6 @@ jobs:
           DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
         run: npm run test:integration
 
-  notify:
-    runs-on: ubuntu-latest
-    needs: integration-tests
-    steps:
       - name: Send failure message to Slack
         env:
           SLACK_CHANNEL: "#serverless-onboarding-and-enablement-ops"
@@ -49,3 +43,4 @@ jobs:
           curl -H "Content-type: application/json" -X POST "$SLACK_WEBHOOK" -d '{
           "channel": "'"$SLACK_CHANNEL"'",
           "text": "'"$OPS_MESSAGE"'"
+          }'
