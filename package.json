@@ -1,6 +1,6 @@
 {
   "name": "serverless-plugin-datadog",
-  "version": "5.73.0",
+  "version": "5.74.0",
   "description": "Serverless plugin to automatically instrument python and node functions with datadog tracing",
   "main": "dist/src/index.js",
   "repository": "https://github.com/DataDog/serverless-plugin-datadog",
@@ -64,5 +64,6 @@
   },
   "peerDependencies": {
     "serverless": "4.x || 3.x || 2.x || 1.x"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
