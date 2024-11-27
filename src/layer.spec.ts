@@ -211,7 +211,7 @@ describe("applyLambdaLibraryLayers", () => {
     });
     applyLambdaLibraryLayers(mockService, [handler], layers);
     expect(handler.handler).toEqual({
-      runtime: "nodejs2w.x",
+      runtime: "nodejs22.x",
       layers: ["node:2"],
     });
   });
