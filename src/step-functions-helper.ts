@@ -42,16 +42,12 @@ export interface StateMachineStep {
   End?: boolean;
 }
 
-export function isDefaultLambdaApiStep(resource: string | undefined): boolean {
-  // default means not legacy lambda api
-  if (resource === undefined) {
-    return false;
-  }
-  if (resource === "arn:aws:states:::lambda:invoke") {
-    // Legacy Lambda API resource.startsWith("arn:aws:lambda"), but it cannot inject context obj.
-    return true;
-  }
-  return false;
+export function isLambdaApiStep(resource: string | undefined): boolean {
+  // Allow for either the standard or legacy definitions of a lambda step
+  return (
+    resource !== undefined &&
+    (resource?.startsWith("arn:aws:states:::lambda:invoke") || resource?.startsWith("arn:aws:lambda"))
+  );
 }
 
 export function isStepFunctionInvocation(resource: string | undefined): boolean {
@@ -99,8 +95,8 @@ export function updateDefinitionString(
   // Step 2: Mutate the definition object
   const states = definitionObj.States;
   for (const [stepName, step] of Object.entries(states)) {
-    // only inject context into default Lambda API steps and Step Function invocation steps
-    if (isDefaultLambdaApiStep(step?.Resource)) {
+    // only inject context into Lambda API steps and Step Function invocation steps
+    if (isLambdaApiStep(step?.Resource)) {
       updateDefinitionForDefaultLambdaApiStep(stepName, step, serverless, stateMachineName);
     } else if (isStepFunctionInvocation(step?.Resource)) {
       updateDefinitionForStepFunctionInvocationStep(stepName, step, serverless, stateMachineName);

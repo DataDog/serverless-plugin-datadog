@@ -1,5 +1,5 @@
 import {
-  isDefaultLambdaApiStep,
+  isLambdaApiStep,
   StateMachineDefinition,
   updateDefinitionString,
   updateDefinitionForStepFunctionInvocationStep,
@@ -223,7 +223,7 @@ describe("test updateDefinitionString", () => {
     expect(definitionAfterUpdate.States?.InvokeLambda?.Parameters?.["Payload.$"]).toBe("something-customized");
   });
 
-  it("test lambda basic legacy integration do nothing", async () => {
+  it("test lambda legacy integration with undefined parameters do nothing", async () => {
     const definitionString = {
       "Fn::Sub": [
         '{"Comment":"fake comment","StartAt":"InvokeLambda","States":{"InvokeLambda":{"Type":"Task","Resource":"arn:aws:lambda:sa-east-1:601427271234:function:unit-test-function-name","End":true}}}',
@@ -254,7 +254,7 @@ describe("test updateDefinitionString", () => {
     });
   });
 
-  it("test legacy lambda api do nothing", async () => {
+  it("test legacy lambda context is injected", async () => {
     const definitionString = {
       "Fn::Sub": [
         '{"Comment":"fake comment","StartAt":"InvokeLambda","States":{"InvokeLambda":{"Type":"Task","Parameters":{"FunctionName":"fake-function-name","Payload.$":"$"},"Resource":"arn:aws:lambda:sa-east-1:601427271234:function:unit-test-function-name","End":true}}}',
@@ -268,7 +268,7 @@ describe("test updateDefinitionString", () => {
       End: true,
       Parameters: {
         FunctionName: "fake-function-name",
-        "Payload.$": "$",
+        "Payload.$": "States.JsonMerge($$, $, false)",
       },
       Resource: "arn:aws:lambda:sa-east-1:601427271234:function:unit-test-function-name",
       Type: "Task",
@@ -381,29 +381,29 @@ describe("test updateDefinitionForStepFunctionInvocationStep", () => {
   });
 });
 
-describe("test isDefaultLambdaApiStep", () => {
+describe("test isLambdaApiStep", () => {
   it("resource is default lambda", async () => {
     const resource = "arn:aws:states:::lambda:invoke";
-    expect(isDefaultLambdaApiStep(resource)).toBeTruthy();
+    expect(isLambdaApiStep(resource)).toBeTruthy();
   });
 
   it("resource is lambda arn for legacy lambda api", async () => {
     const resource = "arn:aws:lambda:sa-east-1:601427271234:function:hello-function";
-    expect(isDefaultLambdaApiStep(resource)).toBeFalsy();
+    expect(isLambdaApiStep(resource)).toBeTruthy();
   });
 
   it("resource of dynamodb", async () => {
     const resource = "arn:aws:states:::dynamodb:updateItem";
-    expect(isDefaultLambdaApiStep(resource)).toBeFalsy();
+    expect(isLambdaApiStep(resource)).toBeFalsy();
   });
 
   it("resource of empty string", async () => {
     const resource = "";
-    expect(isDefaultLambdaApiStep(resource)).toBeFalsy();
+    expect(isLambdaApiStep(resource)).toBeFalsy();
   });
 
   it("resource of undefined", async () => {
     const resource = undefined;
-    expect(isDefaultLambdaApiStep(resource)).toBeFalsy();
+    expect(isLambdaApiStep(resource)).toBeFalsy();
   });
 });
