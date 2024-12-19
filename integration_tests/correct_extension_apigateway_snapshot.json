@@ -262,6 +262,8 @@
             "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "DD_TRACE_CLOUD_REQUEST_PAYLOAD_TAGGING": "",
+            "DD_TRACE_CLOUD_RESPONSE_PAYLOAD_TAGGING": "",
             "DD_SERVICE": "dd-sls-plugin-integration-test",
             "DD_ENV": "dev",
             "DD_LAMBDA_HANDLER": "py_handler.hello"
@@ -312,6 +314,8 @@
             "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "DD_TRACE_CLOUD_REQUEST_PAYLOAD_TAGGING": "",
+            "DD_TRACE_CLOUD_RESPONSE_PAYLOAD_TAGGING": "",
             "DD_SERVICE": "dd-sls-plugin-integration-test",
             "DD_ENV": "dev",
             "DD_LAMBDA_HANDLER": "py_handler.hello"
@@ -362,6 +366,8 @@
             "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "DD_TRACE_CLOUD_REQUEST_PAYLOAD_TAGGING": "",
+            "DD_TRACE_CLOUD_RESPONSE_PAYLOAD_TAGGING": "",
             "DD_SERVICE": "dd-sls-plugin-integration-test",
             "DD_ENV": "dev",
             "DD_LAMBDA_HANDLER": "py_handler.hello"
@@ -412,6 +418,8 @@
             "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "DD_TRACE_CLOUD_REQUEST_PAYLOAD_TAGGING": "",
+            "DD_TRACE_CLOUD_RESPONSE_PAYLOAD_TAGGING": "",
             "DD_SERVICE": "dd-sls-plugin-integration-test",
             "DD_ENV": "dev",
             "DD_LAMBDA_HANDLER": "js_handler.hello"
@@ -462,6 +470,8 @@
             "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "DD_TRACE_CLOUD_REQUEST_PAYLOAD_TAGGING": "",
+            "DD_TRACE_CLOUD_RESPONSE_PAYLOAD_TAGGING": "",
             "DD_SERVICE": "dd-sls-plugin-integration-test",
             "DD_ENV": "dev",
             "DD_LAMBDA_HANDLER": "js_handler.hello"
@@ -512,6 +522,8 @@
             "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "DD_TRACE_CLOUD_REQUEST_PAYLOAD_TAGGING": "",
+            "DD_TRACE_CLOUD_RESPONSE_PAYLOAD_TAGGING": "",
             "DD_SERVICE": "dd-sls-plugin-integration-test",
             "DD_ENV": "dev",
             "DD_LAMBDA_HANDLER": "js_handler.hello"
@@ -562,6 +574,8 @@
             "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "DD_TRACE_CLOUD_REQUEST_PAYLOAD_TAGGING": "",
+            "DD_TRACE_CLOUD_RESPONSE_PAYLOAD_TAGGING": "",
             "AWS_LAMBDA_EXEC_WRAPPER": "/opt/datadog_wrapper",
             "DD_SERVICE": "dd-sls-plugin-integration-test",
             "DD_ENV": "dev"
@@ -612,6 +626,8 @@
             "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "DD_TRACE_CLOUD_REQUEST_PAYLOAD_TAGGING": "",
+            "DD_TRACE_CLOUD_RESPONSE_PAYLOAD_TAGGING": "",
             "AWS_LAMBDA_EXEC_WRAPPER": "/opt/datadog_wrapper",
             "DD_SERVICE": "dd-sls-plugin-integration-test",
             "DD_ENV": "dev"
@@ -662,6 +678,8 @@
             "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "DD_TRACE_CLOUD_REQUEST_PAYLOAD_TAGGING": "",
+            "DD_TRACE_CLOUD_RESPONSE_PAYLOAD_TAGGING": "",
             "AWS_LAMBDA_EXEC_WRAPPER": "/opt/datadog_wrapper",
             "DD_SERVICE": "dd-sls-plugin-integration-test",
             "DD_ENV": "dev"
@@ -712,6 +730,8 @@
             "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "DD_TRACE_CLOUD_REQUEST_PAYLOAD_TAGGING": "",
+            "DD_TRACE_CLOUD_RESPONSE_PAYLOAD_TAGGING": "",
             "AWS_LAMBDA_EXEC_WRAPPER": "/opt/datadog_wrapper",
             "DD_SERVICE": "dd-sls-plugin-integration-test",
             "DD_ENV": "dev"
@@ -762,6 +782,8 @@
             "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "DD_TRACE_CLOUD_REQUEST_PAYLOAD_TAGGING": "",
+            "DD_TRACE_CLOUD_RESPONSE_PAYLOAD_TAGGING": "",
             "DD_SERVICE": "dd-sls-plugin-integration-test",
             "DD_ENV": "dev"
           }
@@ -810,6 +832,8 @@
             "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "DD_TRACE_CLOUD_REQUEST_PAYLOAD_TAGGING": "",
+            "DD_TRACE_CLOUD_RESPONSE_PAYLOAD_TAGGING": "",
             "DD_SERVICE": "dd-sls-plugin-integration-test",
             "DD_ENV": "dev"
           }
