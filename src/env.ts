@@ -28,9 +28,9 @@ export interface Configuration {
   apiKMSKey?: string;
   // Whether to capture and store the payload and response of a lambda invocation
   captureLambdaPayload?: boolean;
-  // Wheter to capture and store the AWS Payload requests services
+  // Whether to capture and store the AWS Payload requests services
   captureCloudRequestPayload?: string;
-  // Wheter to capture and store the AWS Payload response services
+  // Whether to capture and store the AWS Payload response services
   captureCloudResponsePayload?: string;
   // Which Datadog site to send to (for example, datadoghq.com or datadoghq.eu)
   site: string;
