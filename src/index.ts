@@ -607,7 +607,7 @@ function validateConfiguration(config: Configuration): void {
       config.apiKeySecretArn === undefined
     ) {
       throw new Error(
-        "`The environment variable `DATADOG_API_KEY` or configuration variable `apiKMSKey` or `apiKeySecretArn` must be set because `addExtension` is set to true as default.",
+        "The environment variable `DATADOG_API_KEY` or configuration variable `apiKMSKey` or `apiKeySecretArn` must be set because `addExtension` is set to true as default.",
       );
     }
   }

@@ -834,7 +834,7 @@ describe("ServerlessPlugin", () => {
       }
       expect(threwError).toBe(true);
       expect(thrownErrorMessage).toEqual(
-        "When `addExtension` is true, the environment variable `DATADOG_API_KEY` or configuration variable `apiKMSKey` or `apiKeySecretArn` must be set.",
+        "The environment variable `DATADOG_API_KEY` or configuration variable `apiKMSKey` or `apiKeySecretArn` must be set because `addExtension` is set to true as default.",
       );
     });
   });
