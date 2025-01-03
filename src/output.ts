@@ -76,6 +76,6 @@ function logHeader(message: string, underline = false): void {
   console.log(`${startFont}${message}${endFont}`);
 }
 
-function logMessage(message: string): void {
+export function logMessage(message: string): void {
   console.log(`  ${message}`);
 }
