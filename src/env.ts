@@ -8,7 +8,7 @@
 
 import Service from "serverless/classes/Service";
 import { ExtendedFunctionDefinition, FunctionInfo, runtimeLookup, RuntimeType } from "./layer";
-import { logMessage } from "output";
+import { logMessage } from "./output";
 
 export interface Configuration {
   // Whether Datadog is enabled. Defaults to true.
