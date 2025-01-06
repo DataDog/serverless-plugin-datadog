@@ -842,7 +842,7 @@ describe("ServerlessPlugin", () => {
   it("allows use of DATADOG_API_KEY and DATADOG_APP_KEY to create monitors", async () => {
     process.env.DATADOG_API_KEY = "1234";
     process.env.DATADOG_APP_KEY = "5678";
-    
+
     const serverless = {
       cli: {
         log: () => {},
