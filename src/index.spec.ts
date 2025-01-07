@@ -834,7 +834,7 @@ describe("ServerlessPlugin", () => {
       }
       expect(threwError).toBe(true);
       expect(thrownErrorMessage).toEqual(
-        "When `addExtension` is true, the environment variable `DATADOG_API_KEY` or configuration variable `apiKMSKey` or `apiKeySecretArn` must be set.",
+        "The environment variable `DATADOG_API_KEY` or configuration variable `apiKMSKey` or `apiKeySecretArn` must be set because `addExtension` is set to true as default.",
       );
     });
   });
@@ -842,7 +842,7 @@ describe("ServerlessPlugin", () => {
   it("allows use of DATADOG_API_KEY and DATADOG_APP_KEY to create monitors", async () => {
     process.env.DATADOG_API_KEY = "1234";
     process.env.DATADOG_APP_KEY = "5678";
-    mock({});
+
     const serverless = {
       cli: {
         log: () => {},

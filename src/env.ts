@@ -8,6 +8,7 @@
 
 import Service from "serverless/classes/Service";
 import { ExtendedFunctionDefinition, FunctionInfo, runtimeLookup, RuntimeType } from "./layer";
+import { logMessage } from "./output";
 
 export interface Configuration {
   // Whether Datadog is enabled. Defaults to true.
@@ -202,6 +203,7 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
       config.apiKeySecretArn === undefined
     ) {
       environment[apiKeyEnvVar] = process.env.DATADOG_API_KEY;
+      logMessage("Using DATADOG_API_KEY environment variable for authentication");
     }
     if (config.apiKey !== undefined && environment[apiKeyEnvVar] === undefined) {
       environment[apiKeyEnvVar] = config.apiKey;
