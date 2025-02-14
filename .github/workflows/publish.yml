@@ -19,7 +19,7 @@ jobs:
 
       - name: Send success message to Slack
         env:
-          SLACK_CHANNEL: "#serverless-onboarding-and-enablement-ops"
+          SLACK_CHANNEL: "#serverless-releases"
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         if: success()
         run: |
