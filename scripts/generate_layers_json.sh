@@ -26,6 +26,18 @@ if [ "$1" = "-g" ]; then
     FILE_NAME="src/layers-gov.json"
 fi
 
+# Fetch the layers for each region in parallel
+echo "Fetching layers for each region"
+rm -rf layers
+mkdir layers
+for region in $AVAILABLE_REGIONS; do
+  {
+    aws lambda list-layers --region "$region" | jq -c '[.Layers[] | {LayerName, LastLayerArn: .LatestMatchingVersion.LayerVersionArn}]' > layers/$region.json
+  } &
+done
+wait # Wait for all parallel jobs to complete
+
+echo "Generating layers json"
 for region in $AVAILABLE_REGIONS
 do
     for ((i=0;i<${#LAYER_NAMES[@]};++i));
@@ -34,7 +46,7 @@ do
         layer_name=${LAYER_NAMES[i]}
         json_layer_name=${JSON_LAYER_NAMES[i]}
 
-        last_layer_arn=$(aws lambda list-layer-versions --layer-name $layer_name --region $region | jq -r ".LayerVersions | .[0] |  .LayerVersionArn | select (.!=null)")
+        last_layer_arn=$(cat layers/$region.json | jq -r --arg layer_name $layer_name '.[] | select(.LayerName == $layer_name) .LastLayerArn')
 
         if [ -z $last_layer_arn ]; then
              >&2 echo "No layer found for $region, $layer_name"
@@ -46,3 +58,5 @@ do
 done
 echo "Writing to ${FILE_NAME}"
 jq '.' <<< $INPUT_JSON > $FILE_NAME
+
+rm -rf layers
