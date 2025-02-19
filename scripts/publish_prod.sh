@@ -69,7 +69,10 @@ if [ "$UPDATE_LAYERS" != "false" ]; then
 fi
 
 if [ "$UPDATE_LAYERS" != "false" ]; then
+    echo "If an SSO authorization link is printed below, please make sure to authorize it with your GovCloud account."
     aws-vault exec sso-govcloud-us1-fed-engineering -- aws sts get-caller-identity
+
+    echo "If an SSO authorization link is printed below, please make sure to authorize it with your datadoghq.com account."
     aws-vault exec sso-prod-engineering -- aws sts get-caller-identity
 
     echo "Updating layer versions for GovCloud AWS accounts"
