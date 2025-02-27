@@ -655,6 +655,7 @@
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
+            "DD_LAMBDA_HANDLER": "js_handler.hello"
           }
         },
         "Role": {
@@ -662,7 +663,10 @@
             "IamRoleLambdaExecution",
             "Arn"
           ]
-        }
+        },
+        "Layers": [
+          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node18-x:XXX"
+        ]
       },
       "DependsOn": [
         "JavascriptHello18DashxLogGroup"
