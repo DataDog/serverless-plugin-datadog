@@ -29,6 +29,10 @@ export interface Configuration {
   apiKMSKey?: string;
   // Whether to capture and store the payload and response of a lambda invocation
   captureLambdaPayload?: boolean;
+  // Whether to capture and store the AWS Payload requests services
+  captureCloudRequestPayload?: string;
+  // Whether to capture and store the AWS Payload response services
+  captureCloudResponsePayload?: string;
   // Which Datadog site to send to (for example, datadoghq.com or datadoghq.eu)
   site: string;
   // The subdomain to use for app url links that are printed to output. Defaults to app
@@ -137,6 +141,8 @@ const ddMergeXrayTracesEnvVar = "DD_MERGE_XRAY_TRACES";
 const logInjectionEnvVar = "DD_LOGS_INJECTION";
 const ddLogsEnabledEnvVar = "DD_SERVERLESS_LOGS_ENABLED";
 const ddCaptureLambdaPayloadEnvVar = "DD_CAPTURE_LAMBDA_PAYLOAD";
+const ddCaptureCloudRequestPayload = "DD_TRACE_CLOUD_REQUEST_PAYLOAD_TAGGING";
+const ddCaptureCloudResponsePayload = "DD_TRACE_CLOUD_RESPONSE_PAYLOAD_TAGGING";
 const ddColdStartTracingEnabledEnvVar = "DD_COLD_START_TRACING";
 const ddMinColdStartDurationEnvVar = "DD_MIN_COLD_START_DURATION";
 const ddColdStartTracingSkipLibsEnvVar = "DD_COLD_START_TRACE_SKIP_LIB";
@@ -177,6 +183,8 @@ export const defaultConfiguration: Configuration = {
   subscribeToStepFunctionLogs: false,
   enableDDLogs: true,
   captureLambdaPayload: false,
+  captureCloudRequestPayload: "",
+  captureCloudResponsePayload: "",
   failOnError: false,
   skipCloudformationOutputs: false,
   mergeStepFunctionAndLambdaTraces: false,
@@ -253,6 +261,12 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     }
     if (environment[ddCaptureLambdaPayloadEnvVar] === undefined) {
       environment[ddCaptureLambdaPayloadEnvVar] = config.captureLambdaPayload;
+    }
+    if (environment[ddCaptureCloudRequestPayload] === undefined) {
+      environment[ddCaptureCloudRequestPayload] = config.captureCloudRequestPayload;
+    }
+    if (environment[ddCaptureCloudResponsePayload] === undefined) {
+      environment[ddCaptureCloudResponsePayload] = config.captureCloudResponsePayload;
     }
     if (config.enableColdStartTracing !== undefined && environment[ddColdStartTracingEnabledEnvVar] === undefined) {
       environment[ddColdStartTracingEnabledEnvVar] = config.enableColdStartTracing;
