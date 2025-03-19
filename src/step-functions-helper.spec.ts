@@ -350,6 +350,12 @@ describe("test updateDefinitionForStepFunctionInvocationStep", () => {
     expect(updateDefinitionForStepFunctionInvocationStep(stepName, step, serverless, stateMachineName)).toBeFalsy();
   });
 
+  it('Case 0.4: Parameters field has "Input.$" field', async () => {
+    const parameters = { FunctionName: "bla", "Input.$": "$" };
+    const step = { Parameters: parameters };
+    expect(updateDefinitionForStepFunctionInvocationStep(stepName, step, serverless, stateMachineName)).toBeFalsy();
+  });
+
   it('Case 1: Input field has stuff in it but no "CONTEXT" or "CONTEXT.$"', async () => {
     const parameters = { FunctionName: "bla", Input: { foo: "bar" } };
     const step = { Parameters: parameters };
