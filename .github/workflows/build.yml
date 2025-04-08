@@ -10,10 +10,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set up Node 16
+      - name: Set up Node 22
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 22
 
       - name: Cache Node modules
         id: cache-node-modules
@@ -43,7 +43,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        node-version: [16, 18]
+        node-version: [18, 22]
 
     steps:
       - name: Checkout

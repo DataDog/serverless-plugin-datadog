@@ -244,6 +244,7 @@ check out https://docs.datadoghq.com/serverless/step_functions/troubleshooting/\
 //  0.1 | Parameters field is not an object                        | false
 //  0.2 | Parameters field has no Input field                      | true
 //  0.3 | Parameters.Input is not an object                        | false
+//  0.4 | Parameters field has "Input.$" field                     | false
 //   1  | No "CONTEXT" or "CONTEXT.$"                              | true
 //   2  | Has "CONTEXT"                                            | false
 //  3.1 | "CONTEXT.$": "States.JsonMerge($$, $, false)" or         | false
@@ -259,6 +260,16 @@ export function updateDefinitionForStepFunctionInvocationStep(
 
   // Case 0.1: Parameters field is not an object
   if (typeof parameters !== "object") {
+    return false;
+  }
+
+  // Case 0.4: Parameters field has "Input.$" field
+  if (parameters.hasOwnProperty("Input.$")) {
+    serverless.cli
+      .log(`[Warn] Step ${stepName} of state machine ${stateMachineName} has custom "Input.$" field. Step Functions Context \
+Object injection skipped. Your Step Functions trace will not be merged with downstream Step Function traces. To manually \
+merge these traces, check out https://docs.datadoghq.com/serverless/step_functions/troubleshooting/ and \
+https://github.com/DataDog/serverless-plugin-datadog/issues/584\n`);
     return false;
   }
 
