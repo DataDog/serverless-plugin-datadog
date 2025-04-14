@@ -134,7 +134,7 @@ There are seven recommended monitors with default values pre-configured.
 
 To create a recommended monitor, you must use its respective serverless monitor ID. Note that you must also set the `DATADOG_API_KEY` and `DATADOG_APP_KEY` in your environment.
 
-If you’d like to further configure the parameters for a recommended monitor, you can directly define the parameter values below the serverless monitor ID. Parameters not specified under a recommended monitor will use the default recommended value. The `query` parameter for recommended monitors cannot be directly modified and will default to using the `query` valued as defined above; however, you may change the threshold value in `query` by re-defining it within the `options` parameter. To delete a monitor, remove the monitor from the `serverless.yml` template. For further documentation on how to define monitor parameters, see the [Datadog Monitors API](https://docs.datadoghq.com/api/latest/monitors/#create-a-monitor).
+If you'd like to further configure the parameters for a recommended monitor, you can directly define the parameter values below the serverless monitor ID. Parameters not specified under a recommended monitor will use the default recommended value. The `query` parameter for recommended monitors cannot be directly modified and will default to using the `query` valued as defined above; however, you may change the threshold value in `query` by re-defining it within the `options` parameter. To delete a monitor, remove the monitor from the `serverless.yml` template. For further documentation on how to define monitor parameters, see the [Datadog Monitors API](https://docs.datadoghq.com/api/latest/monitors/#create-a-monitor).
 
 Monitor creation occurs after the function is deployed. In the event that a monitor is unsuccessfully created, the function will still be successfully deployed.
 
@@ -159,7 +159,7 @@ custom:
     monitors:
       - high_error_rate:
           name: "High Error Rate with Modified Warning Threshold"
-          message: "More than 10% of the function’s invocations were errors in the selected time range. Notify @data.dog@datadoghq.com @slack-serverless-monitors"
+          message: "More than 10% of the function's invocations were errors in the selected time range. Notify @data.dog@datadoghq.com @slack-serverless-monitors"
           tags: ["modified_error_rate", "serverless", "error_rate"]
           require_full_window: true
           priority: 2
