@@ -30,7 +30,7 @@ export interface RecommendedMonitors {
 /**
  * Adds the appropriate tags and required parameters that will be passed as part of the request body for creating and updating monitors
  * @param monitor - the Monitor object that is defined in the serverless.yml file
- * @param cloudFormationStackId - the Cloud Formation Stack ID
+ * @param cloudFormationStackId - the CloudFormation stack ID
  * @param service - the Service
  * @param env  - the Environment
  * @param recommendedMonitors  - recommended monitors
@@ -175,7 +175,7 @@ export function handleMonitorsApiResponse(
  * @param monitors - Monitors defined in the serverless.yml file
  * @param monitorsApiKey - the API Key
  * @param monitorsAppKey - the Application Key
- * @param cloudFormationStackId - the Cloud Formation Stack ID
+ * @param cloudFormationStackId - the CloudFormation stack ID
  * @param service - the Service
  * @param env - the Environment
  * @returns Log statements showing the monitors that have been successfully
@@ -243,7 +243,7 @@ export async function setMonitors(
 
 /** Helper function that replaces the default threshold included in the query string with the new critical threshold configured by the customer
  * @param query - the query string
- * @param criticalThreshold = new critical threshold as defined by the customer
+ * @param criticalThreshold - new critical threshold as defined by the customer
  * @returns the query string where the critical threshold is already replaced
  */
 export function replaceCriticalThreshold(query: string, criticalThreshold: number): string {

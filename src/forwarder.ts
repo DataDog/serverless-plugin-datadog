@@ -61,7 +61,7 @@ type LogsConfig =
 const REST_EXECUTION_LOG_GROUP_KEY = "RestExecutionLogGroup";
 const REST_EXECUTION_SUBSCRIPTION_KEY = "RestExecutionLogGroupSubscription";
 const WEBSOCKETS_EXECUTION_LOG_GROUP_KEY = "WebsocketsExecutionLogGroup";
-const WEBSOCKETS_EXECUTION_SUBCRIPTION_KEY = "WebsocketsExecutionLogGroupSubscription";
+const WEBSOCKETS_EXECUTION_SUBSCRIPTION_KEY = "WebsocketsExecutionLogGroupSubscription";
 
 // When users define ARN with CloudFormation functions, the ARN takes this type instead of a string.
 export interface CloudFormationObjectArn {
@@ -115,7 +115,7 @@ export async function addExecutionLogGroupsAndSubscriptions(
     // add subscription
     resources[WEBSOCKETS_EXECUTION_LOG_GROUP_KEY] = executionLogGroupName;
     const executionSubscription = subscribeToExecutionLogGroup(functionArn, WEBSOCKETS_EXECUTION_LOG_GROUP_KEY);
-    resources[WEBSOCKETS_EXECUTION_SUBCRIPTION_KEY] = executionSubscription;
+    resources[WEBSOCKETS_EXECUTION_SUBSCRIPTION_KEY] = executionSubscription;
   }
 }
 

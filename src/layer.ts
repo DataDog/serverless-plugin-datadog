@@ -136,7 +136,7 @@ export function normalizeRuntimeKey(runtimeSetting: string): string {
 /**
  * Add library layers for the given runtime and architecture
  *
- * @param service SLS framework service
+ * @param service Serverless framework service
  * @param handlers Lambda functions to add layers to
  * @param layers layers.json file read into an object
  * @param accountId optional account ID that the layers live in - undefined
