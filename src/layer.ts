@@ -74,7 +74,17 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
   "provided.al2023": RuntimeType.CUSTOM,
   provided: RuntimeType.CUSTOM,
   "ruby3.2": RuntimeType.RUBY,
+  "ruby3.2-arm": RuntimeType.RUBY,
+  "ruby3.3": RuntimeType.RUBY,
+  "ruby3.3-arm": RuntimeType.RUBY,
+  "ruby3.4": RuntimeType.RUBY,
+  "ruby3.4-arm": RuntimeType.RUBY,
   "go1.x": RuntimeType.GO,
+  extension: RuntimeType.CUSTOM,
+  "extension-arm": RuntimeType.CUSTOM,
+  dotnet: RuntimeType.DOTNET,
+  "dotnet-arm": RuntimeType.DOTNET,
+  java: RuntimeType.JAVA,
 };
 
 // Map from x86 runtime keys in layers.json to the corresponding ARM runtime keys
@@ -86,6 +96,8 @@ export const ARM_RUNTIME_KEYS: { [key: string]: string } = {
   "python3.12": "python3.12-arm",
   "python3.13": "python3.13-arm",
   "ruby3.2": "ruby3.2-arm",
+  "ruby3.3": "ruby3.3-arm",
+  "ruby3.4": "ruby3.4-arm",
   extension: "extension-arm",
   dotnet: "dotnet-arm",
   // The same Node layers work for both x86 and ARM
