@@ -280,8 +280,18 @@ module.exports = class ServerlessPlugin {
    * This function does not set tags. That is done in afterPackageCompileFunctions().
    */
   private async instrumentStepFunctions(config: Configuration, aws: Aws, datadogForwarderArn: string): Promise<void> {
+    const compiledCfnTemplate = this.serverless.service.provider.compiledCloudFormationTemplate;
+
+    // Compiled CloudFormation template may be unavailable if the user only deploys part of the stack.
+    // See https://github.com/DataDog/serverless-plugin-datadog/issues/593
+    // In that case, skip instrumenting step functions.
+    if (!compiledCfnTemplate) {
+      this.serverless.cli.log("Compiled CloudFormation template not found. Skipping instrumenting step functions.");
+      return;
+    }
+
     if (config.enableStepFunctionsTracing || config.subscribeToStepFunctionLogs) {
-      const resources = this.serverless.service.provider.compiledCloudFormationTemplate?.Resources;
+      const resources = compiledCfnTemplate.Resources;
       const stepFunctions = Object.values((this.serverless.service as any).stepFunctions.stateMachines);
       if (stepFunctions.length === 0) {
         this.serverless.cli.log("subscribeToStepFunctionLogs is set to true but no step functions were found.");

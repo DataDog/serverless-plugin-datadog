@@ -2064,5 +2064,33 @@ describe("ServerlessPlugin", () => {
         },
       });
     });
+
+    // Compiled CloudFormation template may be unavailable if the user only deploys part of the stack.
+    // See https://github.com/DataDog/serverless-plugin-datadog/issues/593
+    it("does not throw an error if compiled CloudFormation template is unavailable", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          getAllFunctions: () => [],
+          provider: {
+            region: "us-east-1",
+          },
+          functions: {
+            first: {},
+          },
+          custom: {
+            datadog: {
+              forwarderArn: "some-arn",
+              addExtension: false,
+              enableStepFunctionsTracing: true,
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await expect(plugin.hooks["after:package:createDeploymentArtifacts"]()).resolves.not.toThrow();
+    });
   });
 });
