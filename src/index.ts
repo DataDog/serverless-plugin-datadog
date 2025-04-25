@@ -286,7 +286,8 @@ module.exports = class ServerlessPlugin {
     // See https://github.com/DataDog/serverless-plugin-datadog/issues/593
     // In that case, skip instrumenting step functions.
     if (!compiledCfnTemplate) {
-      this.serverless.cli.log("Compiled CloudFormation template not found. Skipping instrumenting step functions.");
+      this.serverless.cli.log(`Compiled CloudFormation template not found. Skipping instrumenting step functions.
+This is expected if you only deploy part of the stack.`);
       return;
     }
 
