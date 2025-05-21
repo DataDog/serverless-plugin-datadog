@@ -938,6 +938,60 @@ describe("applyLambdaLibraryLayers", () => {
       runtime: "dotnet6",
     });
   });
+
+  it("adds the FIPS extension layer when enableFIPS is true", () => {
+    const handler = {
+      handler: { runtime: "dotnet6" },
+      type: RuntimeType.DOTNET,
+      runtime: "dotnet6",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: {
+        "us-gov-east-1": {
+          "extension-fips": "arn:aws:lambda:us-gov-east-1:464622532012:layer:Datadog-Extension-FIPS:47",
+        },
+      },
+    };
+    const mockService = createMockService(
+      "us-gov-east-1",
+      {
+        "dotnet-function": { handler: "AwsDotnetCsharp::AwsDotnetCsharp.Handler::HelloWorld", runtime: "dotnet6" },
+      },
+      "x86_64",
+    );
+    applyExtensionLayer(mockService, [handler], layers, undefined, true);
+    expect(handler.handler).toEqual({
+      runtime: "dotnet6",
+      layers: ["arn:aws:lambda:us-gov-east-1:464622532012:layer:Datadog-Extension-FIPS:47"],
+    });
+  });
+
+  it("adds the ARM FIPS extension layer when enableFIPS is true", () => {
+    const handler = {
+      handler: { runtime: "dotnet6" },
+      type: RuntimeType.DOTNET,
+      runtime: "dotnet6",
+    } as FunctionInfo;
+    const layers: LayerJSON = {
+      regions: {
+        "us-gov-east-1": {
+          "extension-arm-fips": "arn:aws:lambda:us-gov-east-1:464622532012:layer:Datadog-Extension-FIPS:47",
+        },
+      },
+    };
+    const mockService = createMockService(
+      "us-gov-east-1",
+      {
+        "dotnet-function": { handler: "AwsDotnetCsharp::AwsDotnetCsharp.Handler::HelloWorld", runtime: "dotnet6" },
+      },
+      "arm64",
+    );
+    applyExtensionLayer(mockService, [handler], layers, undefined, true);
+    expect(handler.handler).toEqual({
+      runtime: "dotnet6",
+      layers: ["arn:aws:lambda:us-gov-east-1:464622532012:layer:Datadog-Extension-FIPS:47"],
+    });
+  });
 });
 
 describe("pushLayerARN", () => {

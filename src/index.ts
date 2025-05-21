@@ -139,7 +139,7 @@ module.exports = class ServerlessPlugin {
     if (config.addExtension) {
       this.serverless.cli.log("Adding Datadog Lambda Extension Layer to functions");
       this.debugLogHandlers(handlers);
-      applyExtensionLayer(this.serverless.service, handlers, allLayers, accountId);
+      applyExtensionLayer(this.serverless.service, handlers, allLayers, accountId, config.enableFIPS);
     } else {
       this.serverless.cli.log("Skipping adding Lambda Extension Layer");
     }

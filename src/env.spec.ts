@@ -203,6 +203,7 @@ describe("getConfig", () => {
       propagateUpstreamTrace: false,
       enableStepFunctionsTracing: false,
       redirectHandlers: true,
+      enableFIPS: false,
     });
   });
 
@@ -245,6 +246,7 @@ describe("getConfig", () => {
       propagateUpstreamTrace: false,
       enableStepFunctionsTracing: false,
       redirectHandlers: true,
+      enableFIPS: false,
     });
   });
 
@@ -288,6 +290,7 @@ describe("getConfig", () => {
       propagateUpstreamTrace: false,
       enableStepFunctionsTracing: false,
       redirectHandlers: true,
+      enableFIPS: false,
     });
   });
 });
@@ -331,6 +334,7 @@ it("disable source code integration", () => {
     propagateUpstreamTrace: false,
     enableStepFunctionsTracing: false,
     redirectHandlers: true,
+    enableFIPS: false,
   });
 });
 
@@ -373,6 +377,7 @@ it("disable git metadata upload", () => {
     propagateUpstreamTrace: false,
     enableStepFunctionsTracing: false,
     redirectHandlers: true,
+    enableFIPS: false,
   });
 });
 
