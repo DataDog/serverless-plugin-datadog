@@ -123,6 +123,10 @@ export interface Configuration {
   // Used for testing or for someone exclusively forwarding logs
   // or including the library only for metrics.
   redirectHandlers?: boolean;
+
+  // When set to `true`, a FIPS-compliant lambda extension layer will be used.
+  // Only works if `addExtension` is `true` and `site` is `ddog-gov.com`.
+  enableFIPS?: boolean;
 }
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
@@ -184,6 +188,7 @@ export const defaultConfiguration: Configuration = {
   propagateUpstreamTrace: false,
   enableStepFunctionsTracing: false,
   redirectHandlers: true,
+  enableFIPS: false,
 };
 
 export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]): void {

@@ -221,6 +221,7 @@ export function applyExtensionLayer(
   handlers: FunctionInfo[],
   layers: LayerJSON,
   accountId?: string,
+  enableFIPS: boolean = false,
 ): void {
   const { region } = service.provider;
   // It's possible a local account layer is being used in a region we have not published to so we use a default region's ARNs
@@ -245,6 +246,10 @@ export function applyExtensionLayer(
           : regionRuntimes[extensionLayerKey];
       removePreviousLayer(service, handler, prevExtensionARN);
       extensionLayerKey = ARM_RUNTIME_KEYS[extensionLayerKey];
+    }
+
+    if (enableFIPS) {
+      extensionLayerKey = `${extensionLayerKey}-fips`;
     }
 
     let extensionARN = regionRuntimes[extensionLayerKey];
