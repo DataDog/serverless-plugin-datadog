@@ -939,7 +939,7 @@ describe("applyLambdaLibraryLayers", () => {
     });
   });
 
-  it("adds the FIPS extension layer when enableFIPS is true", () => {
+  it("adds the FIPS extension layer when isFIPSEnabled is true", () => {
     const handler = {
       handler: { runtime: "dotnet6" },
       type: RuntimeType.DOTNET,
@@ -966,7 +966,7 @@ describe("applyLambdaLibraryLayers", () => {
     });
   });
 
-  it("adds the ARM FIPS extension layer when enableFIPS is true", () => {
+  it("adds the ARM FIPS extension layer when isFIPSEnabled is true", () => {
     const handler = {
       handler: { runtime: "dotnet6" },
       type: RuntimeType.DOTNET,

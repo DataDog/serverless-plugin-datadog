@@ -139,8 +139,8 @@ module.exports = class ServerlessPlugin {
     if (config.addExtension) {
       this.serverless.cli.log("Adding Datadog Lambda Extension Layer to functions");
       this.debugLogHandlers(handlers);
-      const enableFIPS = config.enableFIPS ?? this.getDefaultEnableFIPSFlag(config);
-      applyExtensionLayer(this.serverless.service, handlers, allLayers, accountId, enableFIPS);
+      const isFIPSEnabled = config.isFIPSEnabled ?? this.getDefaultIsFIPSEnabledFlag(config);
+      applyExtensionLayer(this.serverless.service, handlers, allLayers, accountId, isFIPSEnabled);
     } else {
       this.serverless.cli.log("Skipping adding Lambda Extension Layer");
     }
@@ -164,10 +164,10 @@ module.exports = class ServerlessPlugin {
   }
 
   /**
-   * The enableFIPS flag defaults to `true` if `addExtension` is `true` and `site` is `ddog-gov.com`,
+   * The isFIPSEnabled flag defaults to `true` if `addExtension` is `true` and `site` is `ddog-gov.com`,
    * and defaults to `false` otherwise.
    */
-  private getDefaultEnableFIPSFlag(config: Configuration): boolean {
+  private getDefaultIsFIPSEnabledFlag(config: Configuration): boolean {
     return config.addExtension && config.site === "ddog-gov.com";
   }
 
