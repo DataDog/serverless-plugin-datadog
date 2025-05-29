@@ -188,7 +188,6 @@ export const defaultConfiguration: Configuration = {
   propagateUpstreamTrace: false,
   enableStepFunctionsTracing: false,
   redirectHandlers: true,
-  enableFIPS: false,
 };
 
 export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]): void {
