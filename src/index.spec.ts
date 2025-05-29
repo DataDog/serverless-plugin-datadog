@@ -347,6 +347,58 @@ describe("ServerlessPlugin", () => {
         },
       });
     });
+
+    it("adds FIPS extension layer when GovCloud is used", async () => {
+      mock({});
+      const serverless = {
+        cli: {
+          log: () => {},
+        },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          provider: {
+            region: "us-gov-east-1",
+          },
+          functions: {
+            node1: {
+              handler: "my-func.ev",
+              layers: [],
+              runtime: "nodejs20.x",
+            },
+          },
+          custom: {
+            datadog: {
+              addExtension: true,
+              site: "ddog-gov.com",
+              apiKey: 1234,
+            },
+          },
+        },
+      };
+
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
+      expect(serverless).toMatchObject({
+        service: {
+          functions: {
+            node1: {
+              handler: "my-func.ev",
+              layers: [
+                expect.stringMatching(/arn\:aws\-us\-gov\:lambda\:us\-gov\-east\-1\:.*\:layer\:.*/),
+                expect.stringMatching(
+                  /arn\:aws\-us\-gov\:lambda\:us\-gov\-east\-1\:.*\:layer\:Datadog-Extension-FIPS\:.*/,
+                ),
+              ],
+              runtime: "nodejs20.x",
+            },
+          },
+          provider: {
+            region: "us-gov-east-1",
+          },
+        },
+      });
+    });
   });
 
   it("Adds tracing layer for dotnet", async () => {
