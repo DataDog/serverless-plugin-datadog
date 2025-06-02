@@ -7,6 +7,7 @@
  */
 import { FunctionDefinition, FunctionDefinitionHandler } from "serverless";
 import Service from "serverless/classes/Service";
+import { Configuration } from "./env";
 
 export enum RuntimeType {
   NODE = "node",
@@ -271,6 +272,14 @@ export function pushLayerARN(layerARN: string, currentLayers: string[]): string[
 
 export function isFunctionDefinitionHandler(funcDef: FunctionDefinition): funcDef is FunctionDefinitionHandler {
   return typeof (funcDef as any).handler === "string";
+}
+
+/**
+ * The isFIPSEnabled flag defaults to `true` if `addExtension` is `true` and region
+ * starts with "us-gov-", and defaults to `false` otherwise.
+ */
+export function getDefaultIsFIPSEnabledFlag(config: Configuration, region: string): boolean {
+  return config.addExtension && region.startsWith("us-gov-");
 }
 
 function addLayer(service: Service, handler: FunctionInfo, layerArn: string): void {

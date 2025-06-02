@@ -33,7 +33,14 @@ import {
   addStepFunctionLogGroupSubscription,
 } from "./forwarder";
 import { newSimpleGit } from "./git";
-import { applyExtensionLayer, applyLambdaLibraryLayers, findHandlers, FunctionInfo, RuntimeType } from "./layer";
+import {
+  applyExtensionLayer,
+  applyLambdaLibraryLayers,
+  findHandlers,
+  FunctionInfo,
+  RuntimeType,
+  getDefaultIsFIPSEnabledFlag,
+} from "./layer";
 import * as govLayers from "./layers-gov.json";
 import * as layers from "./layers.json";
 import { getCloudFormationStackId } from "./monitor-api-requests";
@@ -139,7 +146,8 @@ module.exports = class ServerlessPlugin {
     if (config.addExtension) {
       this.serverless.cli.log("Adding Datadog Lambda Extension Layer to functions");
       this.debugLogHandlers(handlers);
-      const isFIPSEnabled = config.isFIPSEnabled ?? this.getDefaultIsFIPSEnabledFlag(config);
+      const isFIPSEnabled =
+        config.isFIPSEnabled ?? getDefaultIsFIPSEnabledFlag(config, this.serverless.service.provider.region);
       applyExtensionLayer(this.serverless.service, handlers, allLayers, accountId, isFIPSEnabled);
     } else {
       this.serverless.cli.log("Skipping adding Lambda Extension Layer");
@@ -161,14 +169,6 @@ module.exports = class ServerlessPlugin {
       tracingMode = TracingMode.XRAY;
     }
     enableTracing(this.serverless.service, tracingMode, handlers);
-  }
-
-  /**
-   * The isFIPSEnabled flag defaults to `true` if `addExtension` is `true` and `site` is `ddog-gov.com`,
-   * and defaults to `false` otherwise.
-   */
-  private getDefaultIsFIPSEnabledFlag(config: Configuration): boolean {
-    return config.addExtension && config.site === "ddog-gov.com";
   }
 
   private async afterPackageCompileFunctions(): Promise<void> {
