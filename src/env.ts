@@ -125,7 +125,7 @@ export interface Configuration {
   redirectHandlers?: boolean;
 
   // When set to `true`, a FIPS-compliant lambda extension layer will be used.
-  // Only works if `addExtension` is `true` and `site` is `ddog-gov.com`.
+  // Only works if `addExtension` is `true`.
   isFIPSEnabled?: boolean;
 }
 const webpackPluginName = "serverless-webpack";
