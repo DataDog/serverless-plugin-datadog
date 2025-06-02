@@ -348,7 +348,7 @@ describe("ServerlessPlugin", () => {
       });
     });
 
-    it("adds FIPS extension layer when GovCloud is used", async () => {
+    it("adds FIPS extension layer by default for GovCloud regions", async () => {
       mock({});
       const serverless = {
         cli: {

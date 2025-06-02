@@ -276,7 +276,7 @@ export function isFunctionDefinitionHandler(funcDef: FunctionDefinition): funcDe
 
 /**
  * The isFIPSEnabled flag defaults to `true` if `addExtension` is `true` and region
- * starts with "us-gov-", and defaults to `false` otherwise.
+ * starts with "us-gov-". It defaults to `false` otherwise.
  */
 export function getDefaultIsFIPSEnabledFlag(config: Configuration, region: string): boolean {
   return config.addExtension && region.startsWith("us-gov-");
