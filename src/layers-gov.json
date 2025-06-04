@@ -24,6 +24,8 @@
       "ruby3.3-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Ruby3-3-ARM:25",
       "extension": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Extension:80",
       "extension-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Extension-ARM:80",
+      "extension-fips": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Extension-FIPS:80",
+      "extension-arm-fips": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Extension-ARM-FIPS:80",
       "dotnet": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:dd-trace-dotnet:20",
       "dotnet-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:dd-trace-dotnet-ARM:20",
       "java": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:dd-trace-java:21"
@@ -52,6 +54,8 @@
       "ruby3.3-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Ruby3-3-ARM:25",
       "extension": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Extension:80",
       "extension-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Extension-ARM:80",
+      "extension-fips": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Extension-FIPS:80",
+      "extension-arm-fips": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Extension-ARM-FIPS:80",
       "dotnet": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:dd-trace-dotnet:20",
       "dotnet-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:dd-trace-dotnet-ARM:20",
       "java": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:dd-trace-java:21"
