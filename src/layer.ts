@@ -37,6 +37,8 @@ const DEFAULT_ARCHITECTURE = X86_64_ARCHITECTURE;
 
 const DEFAULT_REGION = "us-east-1";
 
+const US_GOV_REGION_PREFIX = "us-gov-";
+
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
 export interface ExtendedFunctionDefinition extends FunctionDefinition {
   architecture?: string;
@@ -250,7 +252,7 @@ export function applyExtensionLayer(
     }
 
     if (isFIPSEnabled) {
-      extensionLayerKey = `${extensionLayerKey}-fips`;
+      extensionLayerKey += "-fips";
     }
 
     let extensionARN = regionRuntimes[extensionLayerKey];
@@ -279,7 +281,7 @@ export function isFunctionDefinitionHandler(funcDef: FunctionDefinition): funcDe
  * starts with "us-gov-". It defaults to `false` otherwise.
  */
 export function getDefaultIsFIPSEnabledFlag(config: Configuration, region: string): boolean {
-  return config.addExtension && region.startsWith("us-gov-");
+  return config.addExtension && region.startsWith(US_GOV_REGION_PREFIX);
 }
 
 function addLayer(service: Service, handler: FunctionInfo, layerArn: string): void {
@@ -325,7 +327,7 @@ function buildLocalLambdaLayerARN(layerARN: string | undefined, accountId: strin
 }
 
 function getAwsPartitionByRegion(region: string): string {
-  if (region.startsWith("us-gov-")) {
+  if (region.startsWith(US_GOV_REGION_PREFIX)) {
     return "aws-us-gov";
   }
   if (region.startsWith("cn-")) {
