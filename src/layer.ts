@@ -7,6 +7,7 @@
  */
 import { FunctionDefinition, FunctionDefinitionHandler } from "serverless";
 import Service from "serverless/classes/Service";
+import { Configuration } from "./env";
 
 export enum RuntimeType {
   NODE = "node",
@@ -35,6 +36,8 @@ const ARM64_ARCHITECTURE = "arm64";
 const DEFAULT_ARCHITECTURE = X86_64_ARCHITECTURE;
 
 const DEFAULT_REGION = "us-east-1";
+
+const US_GOV_REGION_PREFIX = "us-gov-";
 
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
 export interface ExtendedFunctionDefinition extends FunctionDefinition {
@@ -221,6 +224,7 @@ export function applyExtensionLayer(
   handlers: FunctionInfo[],
   layers: LayerJSON,
   accountId?: string,
+  isFIPSEnabled: boolean = false,
 ): void {
   const { region } = service.provider;
   // It's possible a local account layer is being used in a region we have not published to so we use a default region's ARNs
@@ -247,6 +251,10 @@ export function applyExtensionLayer(
       extensionLayerKey = ARM_RUNTIME_KEYS[extensionLayerKey];
     }
 
+    if (isFIPSEnabled) {
+      extensionLayerKey += "-fips";
+    }
+
     let extensionARN = regionRuntimes[extensionLayerKey];
     if (accountId && extensionARN) {
       extensionARN = buildLocalLambdaLayerARN(extensionARN, accountId, region);
@@ -266,6 +274,14 @@ export function pushLayerARN(layerARN: string, currentLayers: string[]): string[
 
 export function isFunctionDefinitionHandler(funcDef: FunctionDefinition): funcDef is FunctionDefinitionHandler {
   return typeof (funcDef as any).handler === "string";
+}
+
+/**
+ * The isFIPSEnabled flag defaults to `true` if `addExtension` is `true` and region
+ * starts with "us-gov-". It defaults to `false` otherwise.
+ */
+export function getDefaultIsFIPSEnabledFlag(config: Configuration, region: string): boolean {
+  return config.addExtension && region.startsWith(US_GOV_REGION_PREFIX);
 }
 
 function addLayer(service: Service, handler: FunctionInfo, layerArn: string): void {
@@ -311,7 +327,7 @@ function buildLocalLambdaLayerARN(layerARN: string | undefined, accountId: strin
 }
 
 function getAwsPartitionByRegion(region: string): string {
-  if (region.startsWith("us-gov-")) {
+  if (region.startsWith(US_GOV_REGION_PREFIX)) {
     return "aws-us-gov";
   }
   if (region.startsWith("cn-")) {
