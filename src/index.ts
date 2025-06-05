@@ -620,12 +620,11 @@ function validateConfiguration(config: Configuration): void {
     "us3.datadoghq.com",
     "us5.datadoghq.com",
     "ap1.datadoghq.com",
+    "ap2.datadoghq.com",
     "ddog-gov.com",
   ];
   if (!config.testingMode && config.site !== undefined && !siteList.includes(config.site.toLowerCase())) {
-    throw new Error(
-      "Warning: Invalid site URL. Must be either datadoghq.com, datadoghq.eu, us3.datadoghq.com, us5.datadoghq.com, ap1.datadoghq.com, or ddog-gov.com.",
-    );
+    throw new Error(`Warning: Invalid site URL. Must be one of ${siteList.join(", ")}.`);
   }
   if (config.addExtension) {
     if (
