@@ -206,6 +206,7 @@ export async function getRecommendedMonitors(
       query: (cloudFormationStackId: string, criticalThreshold: number) => {
         let query = recommendedMonitorParam.attributes.query;
         // replace $scope with cloudformation_stack_id
+        query = query.replace(/aws_cloudformation_stack-id:\$scope/g, `aws_cloudformation_stack-id:${cloudFormationStackId}`);
         query = query.replace(/\$scope/g, `aws_cloudformation_stack-id:${cloudFormationStackId}`);
 
         if (criticalThreshold !== recommendedMonitorParam.attributes.options.thresholds.critical) {
