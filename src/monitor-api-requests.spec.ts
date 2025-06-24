@@ -788,7 +788,7 @@ describe("getRecommendedMonitors", () => {
       "avg(last_15m):min:aws.lambda.iterator_age.maximum{aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,region,functionname} >= 1000",
     );
     expect(response.high_throttles.query("cloudformation_stackid", 0.1)).toEqual(
-      "sum(last_15m):sum:aws.lambda.throttles {aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,region,functionname}.as_count() / ( sum:aws.lambda.throttles {aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,region,functionname}.as_count() + sum:aws.lambda.invocations{aws_cloudformation_stack-id:aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,region,functionname}.as_count()) >= 0.1",
+      "sum(last_15m):sum:aws.lambda.throttles {aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,region,functionname}.as_count() / ( sum:aws.lambda.throttles {aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,region,functionname}.as_count() + sum:aws.lambda.invocations{aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,region,functionname}.as_count()) >= 0.1",
     );
 
     expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
