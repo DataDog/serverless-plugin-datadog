@@ -127,6 +127,16 @@ export interface Configuration {
   // When set to `true`, a FIPS-compliant lambda extension layer will be used.
   // Only works if `addExtension` is `true`.
   isFIPSEnabled?: boolean;
+
+  // When set to `true`, the LLM Observability feature is enabled.
+  llmObsEnabled?: boolean;
+
+  // The name of your LLM application, service, or project, under which all traces and
+  // spans are grouped. This helps distinguish between different applications or experiments.
+  llmObsMlApp?: string;
+
+  // Only required if you are not using the Datadog Agent.
+  llmObsAgentlessEnabled?: boolean;
 }
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
@@ -149,6 +159,9 @@ const ddEncodeAuthorizerContextEnvVar = "DD_ENCODE_AUTHORIZER_CONTEXT";
 const ddDecodeAuthorizerContextEnvVar = "DD_DECODE_AUTHORIZER_CONTEXT";
 const ddApmFlushDeadlineMillisecondsEnvVar = "DD_APM_FLUSH_DEADLINE_MILLISECONDS";
 const ddUseLayersFromAccount = "DD_USE_LAYERS_FROM_ACCOUNT";
+const ddLlmObsEnabled = "DD_LLMOBS_ENABLED";
+const ddLlmObsMlApp = "DD_LLMOBS_ML_APP";
+const ddLlmObsAgentlessEnabled = "DD_LLMOBS_AGENTLESS_ENABLED";
 
 export const ddServiceEnvVar = "DD_SERVICE";
 export const ddEnvEnvVar = "DD_ENV";
@@ -282,6 +295,29 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     if (config.useLayersFromAccount !== undefined && environment[ddUseLayersFromAccount] === undefined) {
       environment[ddUseLayersFromAccount] = config.useLayersFromAccount;
     }
+
+    if (config.llmObsEnabled === true && (config.llmObsMlApp === undefined || config.llmObsMlApp === "")) {
+      throw new Error("When `llmObsEnabled` is true, `llmObsMlApp` must also be set.");
+    }
+
+    if (config.llmObsMlApp !== undefined && config.llmObsMlApp !== "") {
+      const llmObsMlAppRegex = /^[a-zA-Z0-9_\-:\.\/]{1,193}$/;
+      if (!llmObsMlAppRegex.test(config.llmObsMlApp)) {
+        throw new Error(
+          "`llmObsMlApp` must be only contain up to 193 alphanumeric characters, hyphens, underscores, periods, and slashes.",
+        );
+      }
+    }
+    if (config.llmObsEnabled !== undefined && environment[ddLlmObsEnabled] === undefined) {
+      environment[ddLlmObsEnabled] = config.llmObsEnabled;
+    }
+    if (config.llmObsMlApp !== undefined && environment[ddLlmObsMlApp] === undefined) {
+      environment[ddLlmObsMlApp] = config.llmObsMlApp;
+    }
+    if (config.llmObsAgentlessEnabled !== undefined && environment[ddLlmObsAgentlessEnabled] === undefined) {
+      environment[ddLlmObsAgentlessEnabled] = config.llmObsAgentlessEnabled;
+    }
+
     if (type === RuntimeType.DOTNET || type === RuntimeType.JAVA) {
       if (environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] === undefined) {
         environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] = AWS_LAMBDA_EXEC_WRAPPER;
