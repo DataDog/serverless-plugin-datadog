@@ -304,7 +304,7 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
       const llmObsMlAppRegex = /^[a-zA-Z0-9_\-:\.\/]{1,193}$/;
       if (!llmObsMlAppRegex.test(config.llmObsMlApp)) {
         throw new Error(
-          "`llmObsMlApp` must be only contain up to 193 alphanumeric characters, hyphens, underscores, periods, and slashes.",
+          "`llmObsMlApp` must only contain up to 193 alphanumeric characters, hyphens, underscores, periods, and slashes.",
         );
       }
     }
