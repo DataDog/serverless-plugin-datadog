@@ -999,6 +999,157 @@ describe("setEnvConfiguration", () => {
     ]);
   });
 
+  it("sets LLM Observability environment variables", () => {
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
+    setEnvConfiguration(
+      {
+        addLayers: false,
+        apiKey: "1234",
+        apiKMSKey: "5678",
+        site: "datadoghq.eu",
+        subdomain: "app",
+        logLevel: "info",
+        flushMetricsToLogs: true,
+        enableXrayTracing: true,
+        enableDDTracing: true,
+        enableDDLogs: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
+        subscribeToStepFunctionLogs: false,
+        addExtension: true,
+        enableTags: true,
+        injectLogContext: false,
+        exclude: ["dd-excluded-function"],
+        enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
+        failOnError: false,
+        skipCloudformationOutputs: false,
+        llmObsEnabled: true,
+        llmObsMlApp: "my-llm-app",
+        llmObsAgentlessEnabled: false,
+      },
+      handlers,
+    );
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_KMS_API_KEY: "5678",
+            DD_LOGS_INJECTION: false,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_LOG_LEVEL: "info",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_MERGE_XRAY_TRACES: true,
+            DD_LLMOBS_ENABLED: true,
+            DD_LLMOBS_ML_APP: "my-llm-app",
+            DD_LLMOBS_AGENTLESS_ENABLED: false,
+          },
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ]);
+  });
+
+  it("throws error when `llmObsEnabled` is true but `llmObsMlApp` is not set", () => {
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
+    expect(() => {
+      setEnvConfiguration(
+        {
+          addLayers: false,
+          apiKey: "1234",
+          apiKMSKey: "5678",
+          site: "datadoghq.eu",
+          subdomain: "app",
+          logLevel: "info",
+          flushMetricsToLogs: true,
+          enableXrayTracing: true,
+          enableDDTracing: true,
+          enableDDLogs: true,
+          subscribeToAccessLogs: true,
+          subscribeToExecutionLogs: false,
+          subscribeToStepFunctionLogs: false,
+          addExtension: true,
+          enableTags: true,
+          injectLogContext: false,
+          exclude: ["dd-excluded-function"],
+          enableSourceCodeIntegration: true,
+          uploadGitMetadata: false,
+          failOnError: false,
+          skipCloudformationOutputs: false,
+          llmObsEnabled: true,
+        },
+        handlers,
+      );
+    }).toThrowError("When `llmObsEnabled` is true, `llmObsMlApp` must also be set.");
+  });
+
+  it("throws error when `llmObsMlApp` is set to an invalid value", () => {
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
+    expect(() => {
+      setEnvConfiguration(
+        {
+          addLayers: false,
+          apiKey: "1234",
+          apiKMSKey: "5678",
+          site: "datadoghq.eu",
+          subdomain: "app",
+          logLevel: "info",
+          flushMetricsToLogs: true,
+          enableXrayTracing: true,
+          enableDDTracing: true,
+          enableDDLogs: true,
+          subscribeToAccessLogs: true,
+          subscribeToExecutionLogs: false,
+          subscribeToStepFunctionLogs: false,
+          addExtension: true,
+          enableTags: true,
+          injectLogContext: false,
+          exclude: ["dd-excluded-function"],
+          enableSourceCodeIntegration: true,
+          uploadGitMetadata: false,
+          failOnError: false,
+          skipCloudformationOutputs: false,
+          llmObsEnabled: true,
+          llmObsMlApp: "NO-YELLING!!!",
+        },
+        handlers,
+      );
+    }).toThrowError(
+      "`llmObsMlApp` must only contain up to 193 alphanumeric characters, hyphens, underscores, periods, and slashes.",
+    );
+  });
+
   it("throws error when trying to add `DD_API_KEY_SECRET_ARN` while using sync metrics in a node runtime", () => {
     const handlers: FunctionInfo[] = [
       {
