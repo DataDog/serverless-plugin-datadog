@@ -165,7 +165,8 @@ export async function handleMonitorsApiResponse(
       `400 Bad Request: ${response_text}. This could be due to incorrect syntax or a missing required tag for ${serverlessMonitorId}. Have you looked at your monitor tag policies? https://${subdomain}.${site}/monitors/settings/policies`,
     );
   } else {
-    throw new Error(`${response.status} ${response.statusText}`);
+    const response_text = await response.text();
+    throw new Error(`${response.status} ${response.statusText}: ${response_text}`);
   }
 }
 
