@@ -160,13 +160,13 @@ export async function handleMonitorsApiResponse(
   if (response.status === 200) {
     return true;
   } else if (response.status === 400) {
-    const response_text = await response.text();
+    const responseText = await response.text();
     throw new Error(
-      `400 Bad Request: ${response_text}. This could be due to incorrect syntax or a missing required tag for ${serverlessMonitorId}. Have you looked at your monitor tag policies? https://${subdomain}.${site}/monitors/settings/policies`,
+      `400 Bad Request: ${responseText}. This could be due to incorrect syntax or a missing required tag for ${serverlessMonitorId}. Have you looked at your monitor tag policies? https://${subdomain}.${site}/monitors/settings/policies`,
     );
   } else {
-    const response_text = await response.text();
-    throw new Error(`${response.status} ${response.statusText}: ${response_text}`);
+    const responseText = await response.text();
+    throw new Error(`${response.status} ${response.statusText}: ${responseText}`);
   }
 }
 
