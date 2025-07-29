@@ -43,7 +43,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        node-version: [18, 22]
+        node-version: [20, 22]
 
     steps:
       - name: Checkout
