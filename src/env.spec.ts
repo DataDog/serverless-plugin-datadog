@@ -1746,4 +1746,215 @@ describe("setEnvConfiguration", () => {
       ]);
     });
   });
+
+  describe("enabling `enableAppsecRuntimeApiProxy`", () => {
+    let handlers: FunctionInfo[] = [];
+    beforeEach(() => {
+      handlers = [
+        {
+          handler: {
+            environment: {},
+            events: [],
+          },
+          name: "function",
+          type: RuntimeType.NODE,
+        },
+      ];
+    });
+
+    const config: Configuration = {
+      ...defaultConfiguration,
+      apiKey: "1234",
+      enableAppsecRuntimeApiProxy: true,
+    };
+
+    it("fails when `enableDDTracing` is false", () => {
+      expect(() => setEnvConfiguration({ ...config, enableDDTracing: false }, handlers)).toThrow(
+        "`enableAppsecRuntimeApiProxy` requires the extension to be present, and `enableDDTracing` to be enabled",
+      );
+    });
+
+    it("fails when `addExtension` is false", () => {
+      expect(() => setEnvConfiguration({ ...config, addExtension: false }, handlers)).toThrow(
+        "`enableAppsecRuntimeApiProxy` requires the extension to be present, and `enableDDTracing` to be enabled",
+      );
+    });
+
+    it("defines `DD_SERVERLESS_APPSEC_ENABLED` and `AWS_LAMBDA_EXEC_WRAPPER`", () => {
+      setEnvConfiguration(config, handlers);
+      expect(handlers).toEqual([
+        {
+          handler: {
+            environment: {
+              AWS_LAMBDA_EXEC_WRAPPER: "/opt/datadog_wrapper",
+              DD_API_KEY: "1234",
+              DD_CAPTURE_LAMBDA_PAYLOAD: false,
+              DD_LOGS_INJECTION: false,
+              DD_MERGE_XRAY_TRACES: false,
+              DD_SERVERLESS_APPSEC_ENABLED: true,
+              DD_SERVERLESS_LOGS_ENABLED: true,
+              DD_SITE: "datadoghq.com",
+              DD_TRACE_ENABLED: true,
+            },
+            events: [],
+          },
+          name: "function",
+          type: RuntimeType.NODE,
+        },
+      ]);
+    });
+
+    it("does not define `DD_SERVERLESS_APPSEC_ENABLED` and `AWS_LAMBDA_EXEC_WRAPPER` when disabled", () => {
+      const offConfig: Configuration = {
+        ...defaultConfiguration,
+        apiKey: "1234",
+        enableAppsecRuntimeApiProxy: false,
+      };
+      setEnvConfiguration(offConfig, handlers);
+      expect(handlers).toEqual([
+        {
+          handler: {
+            environment: {
+              DD_API_KEY: "1234",
+              DD_CAPTURE_LAMBDA_PAYLOAD: false,
+              DD_LOGS_INJECTION: false,
+              DD_MERGE_XRAY_TRACES: false,
+              DD_SERVERLESS_LOGS_ENABLED: true,
+              DD_SITE: "datadoghq.com",
+              DD_TRACE_ENABLED: true,
+            },
+            events: [],
+          },
+          name: "function",
+          type: RuntimeType.NODE,
+        },
+      ]);
+    });
+  });
+
+  describe("enabling `enableAppsec`", () => {
+    let handlers: FunctionInfo[] = [];
+    beforeEach(() => {
+      handlers = [
+        {
+          handler: {
+            environment: {},
+            events: [],
+          },
+          name: "function-python",
+          type: RuntimeType.PYTHON,
+        },
+        {
+          handler: {
+            environment: {},
+            events: [],
+          },
+          name: "function-node",
+          type: RuntimeType.NODE,
+        },
+      ];
+    });
+
+    const config: Configuration = {
+      ...defaultConfiguration,
+      apiKey: "1234",
+      enableAppsec: true,
+    };
+
+    it("fails when `enableDDTracing` is false", () => {
+      expect(() => setEnvConfiguration({ ...config, enableDDTracing: false }, handlers)).toThrow(
+        "`enableAppsec` requires the extension to be present, and `enableDDTracing` to be enabled",
+      );
+    });
+
+    it("fails when `addExtension` is false", () => {
+      expect(() => setEnvConfiguration({ ...config, addExtension: false }, handlers)).toThrow(
+        "`enableAppsec` requires the extension to be present, and `enableDDTracing` to be enabled",
+      );
+    });
+
+    it("defines `DD_SERVERLESS_APPSEC_ENABLED` and `AWS_LAMBDA_EXEC_WRAPPER` for Node and `DD_APPSEC_ENABLED_FOR_PYTHON` for Python", () => {
+      setEnvConfiguration(config, handlers);
+      expect(handlers).toEqual([
+        {
+          handler: {
+            environment: {
+              DD_API_KEY: "1234",
+              DD_CAPTURE_LAMBDA_PAYLOAD: false,
+              DD_LOGS_INJECTION: false,
+              DD_MERGE_XRAY_TRACES: false,
+              DD_APPSEC_ENABLED: true,
+              DD_SERVERLESS_LOGS_ENABLED: true,
+              DD_SITE: "datadoghq.com",
+              DD_TRACE_ENABLED: true,
+            },
+            events: [],
+          },
+          name: "function-python",
+          type: RuntimeType.PYTHON,
+        },
+        {
+          handler: {
+            environment: {
+              AWS_LAMBDA_EXEC_WRAPPER: "/opt/datadog_wrapper",
+              DD_API_KEY: "1234",
+              DD_CAPTURE_LAMBDA_PAYLOAD: false,
+              DD_LOGS_INJECTION: false,
+              DD_MERGE_XRAY_TRACES: false,
+              DD_SERVERLESS_APPSEC_ENABLED: true,
+              DD_SERVERLESS_LOGS_ENABLED: true,
+              DD_SITE: "datadoghq.com",
+              DD_TRACE_ENABLED: true,
+            },
+            events: [],
+          },
+          name: "function-node",
+          type: RuntimeType.NODE,
+        },
+      ]);
+    });
+
+    it("does not define `DD_SERVERLESS_APPSEC_ENABLED`, `DD_APPSEC_ENABLED` and `AWS_LAMBDA_EXEC_WRAPPER` when disabled", () => {
+      const offConfig: Configuration = {
+        ...defaultConfiguration,
+        apiKey: "1234",
+        enableAppsecRuntimeApiProxy: false,
+      };
+      setEnvConfiguration(offConfig, handlers);
+      expect(handlers).toEqual([
+        {
+          handler: {
+            environment: {
+              DD_API_KEY: "1234",
+              DD_CAPTURE_LAMBDA_PAYLOAD: false,
+              DD_LOGS_INJECTION: false,
+              DD_MERGE_XRAY_TRACES: false,
+              DD_SERVERLESS_LOGS_ENABLED: true,
+              DD_SITE: "datadoghq.com",
+              DD_TRACE_ENABLED: true,
+            },
+            events: [],
+          },
+          name: "function-python",
+          type: RuntimeType.PYTHON,
+        },
+        {
+          handler: {
+            environment: {
+              DD_API_KEY: "1234",
+              DD_CAPTURE_LAMBDA_PAYLOAD: false,
+              DD_LOGS_INJECTION: false,
+              DD_MERGE_XRAY_TRACES: false,
+              DD_SERVERLESS_LOGS_ENABLED: true,
+              DD_SITE: "datadoghq.com",
+              DD_TRACE_ENABLED: true,
+            },
+            events: [],
+          },
+          name: "function-node",
+          type: RuntimeType.NODE,
+        },
+      ]);
+    });
+  });
 });
