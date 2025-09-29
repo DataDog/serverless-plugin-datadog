@@ -8,7 +8,7 @@
 
 import Service from "serverless/classes/Service";
 import { ExtendedFunctionDefinition, FunctionInfo, runtimeLookup, RuntimeType } from "./layer";
-import { logMessage } from "./output";
+import { logMessage, logWarningMessage } from "./output";
 
 export interface Configuration {
   // Whether Datadog is enabled. Defaults to true.
@@ -41,8 +41,12 @@ export interface Configuration {
   enableXrayTracing: boolean;
   // Enable tracing on Lambda function using dd-trace, datadog's APM library.
   enableDDTracing: boolean;
-  // Enable ASM on Lambda functions
+  // Enable ASM on Lambda functions (deprecated: users should switch to either enableAppsec or enableAppsecRuntimeAPIProxy)
   enableASM?: boolean;
+  // Enable Appsec on Lambda functions
+  enableAppsec?: boolean;
+  // Enable Appsec through a Runtime API Proxy in the extension
+  enableAppsecRuntimeApiProxy?: boolean;
   // Enable forwarding Logs
   enableDDLogs: boolean;
   // Enable profiling
@@ -146,7 +150,8 @@ const siteURLEnvVar = "DD_SITE";
 const logLevelEnvVar = "DD_LOG_LEVEL";
 const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
 const ddTracingEnabledEnvVar = "DD_TRACE_ENABLED";
-const ddASMEnabledEnvVar = "DD_SERVERLESS_APPSEC_ENABLED";
+const ddServerlessAppsecEnabled = "DD_SERVERLESS_APPSEC_ENABLED";
+const ddAppsecEnabledEnvVar = "DD_APPSEC_ENABLED";
 const ddMergeXrayTracesEnvVar = "DD_MERGE_XRAY_TRACES";
 const logInjectionEnvVar = "DD_LOGS_INJECTION";
 const ddLogsEnabledEnvVar = "DD_SERVERLESS_LOGS_ENABLED";
@@ -250,12 +255,44 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     if (config.enableDDTracing !== undefined && environment[ddTracingEnabledEnvVar] === undefined) {
       environment[ddTracingEnabledEnvVar] = config.enableDDTracing;
     }
-    if (config.enableASM !== undefined && config.enableASM) {
-      if ((config.enableASM && !config.enableDDTracing) || (config.enableASM && !config.addExtension)) {
-        throw new Error("`enableASM` requires the extension to be present, and `enableDDTracing` to be enabled");
+
+    if (
+      (config.enableAppsec && config.enableAppsecRuntimeApiProxy) ||
+      (config.enableAppsec && config.enableASM) ||
+      (config.enableASM && config.enableAppsecRuntimeApiProxy)
+    ) {
+      throw new Error(
+        "`enableAppsec`, `enableAppsecRuntimeApiProxy` and `enableASM` are mutually exclusive; set only `enableAppsec` or `enableAppsecRuntimeApiProxy`",
+      );
+    }
+
+    if (config.enableAppsec !== undefined && config.enableAppsec) {
+      if (!config.enableDDTracing) {
+        throw new Error("`enableAppsec` requires `enableDDTracing` to be enabled");
+      }
+      if (type === RuntimeType.PYTHON) {
+        environment[ddAppsecEnabledEnvVar] ??= config.enableAppsec;
+      } else {
+        environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] ??= AWS_LAMBDA_EXEC_WRAPPER;
+        environment[ddServerlessAppsecEnabled] ??= config.enableAppsec;
+      }
+    }
+    if (config.enableAppsecRuntimeApiProxy !== undefined && config.enableAppsecRuntimeApiProxy) {
+      if (!config.enableDDTracing) {
+        throw new Error("`enableAppsecRuntimeApiProxy` requires `enableDDTracing` to be enabled");
       }
       environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] ??= AWS_LAMBDA_EXEC_WRAPPER;
-      environment[ddASMEnabledEnvVar] ??= config.enableASM;
+      environment[ddServerlessAppsecEnabled] ??= config.enableAppsecRuntimeApiProxy;
+    }
+    if (config.enableASM !== undefined && config.enableASM) {
+      logWarningMessage(
+        "Warning: `enableASM` is deprecated; set `enableAppsec` or `enableAppsecRuntimeApiProxy` instead",
+      );
+      if (!config.enableDDTracing) {
+        throw new Error("`enableASM` requires `enableDDTracing` to be enabled");
+      }
+      environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] ??= AWS_LAMBDA_EXEC_WRAPPER;
+      environment[ddServerlessAppsecEnabled] ??= config.enableASM;
     }
     if (config.enableXrayTracing !== undefined && environment[ddMergeXrayTracesEnvVar] === undefined) {
       environment[ddMergeXrayTracesEnvVar] = config.enableXrayTracing;
