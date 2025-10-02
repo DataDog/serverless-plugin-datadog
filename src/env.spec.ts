@@ -1662,7 +1662,7 @@ describe("setEnvConfiguration", () => {
     });
   });
 
-  describe("enabling `enableAppsec`", () => {
+  describe("enabling `enableAppSec`", () => {
     let handlers: FunctionInfo[] = [];
     beforeEach(() => {
       handlers = [
@@ -1688,37 +1688,37 @@ describe("setEnvConfiguration", () => {
     const config: Configuration = {
       ...defaultConfiguration,
       apiKey: "1234",
-      enableAppsec: true,
+      enableAppSec: true,
     };
 
     const enableASMCconflictingConfig: Configuration = {
       ...defaultConfiguration,
       apiKey: "1234",
-      enableAppsec: true,
+      enableAppSec: true,
       enableASM: true,
     };
-    const enableAppsecRuntimeApiProxyConflictingConfig: Configuration = {
+    const enableAppSecRuntimeApiProxyConflictingConfig: Configuration = {
       ...defaultConfiguration,
       apiKey: "1234",
-      enableAppsec: true,
-      enableAppsecRuntimeApiProxy: true,
+      enableAppSec: true,
+      enableAppSecRuntimeApiProxy: true,
     };
 
     it("fails when `enableASM` is true", () => {
       expect(() => setEnvConfiguration({ ...enableASMCconflictingConfig }, handlers)).toThrow(
-        "`enableAppsec`, `enableAppsecRuntimeApiProxy` and `enableASM` are mutually exclusive; set only `enableAppsec` or `enableAppsecRuntimeApiProxy`",
+        "`enableAppSec`, `enableAppSecRuntimeApiProxy` and `enableASM` are mutually exclusive; set only `enableAppSec` or `enableAppSecRuntimeApiProxy`",
       );
     });
 
-    it("fails when `enableAppsecRuntimeApiProxy` is true", () => {
-      expect(() => setEnvConfiguration({ ...enableAppsecRuntimeApiProxyConflictingConfig }, handlers)).toThrow(
-        "`enableAppsec`, `enableAppsecRuntimeApiProxy` and `enableASM` are mutually exclusive; set only `enableAppsec` or `enableAppsecRuntimeApiProxy`",
+    it("fails when `enableAppSecRuntimeApiProxy` is true", () => {
+      expect(() => setEnvConfiguration({ ...enableAppSecRuntimeApiProxyConflictingConfig }, handlers)).toThrow(
+        "`enableAppSec`, `enableAppSecRuntimeApiProxy` and `enableASM` are mutually exclusive; set only `enableAppSec` or `enableAppSecRuntimeApiProxy`",
       );
     });
 
     it("fails when `enableDDTracing` is false", () => {
       expect(() => setEnvConfiguration({ ...config, enableDDTracing: false }, handlers)).toThrow(
-        "`enableAppsec` requires `enableDDTracing` to be enabled",
+        "`enableAppSec` requires `enableDDTracing` to be enabled",
       );
     });
 
@@ -1767,7 +1767,7 @@ describe("setEnvConfiguration", () => {
       const offConfig: Configuration = {
         ...defaultConfiguration,
         apiKey: "1234",
-        enableAppsec: false,
+        enableAppSec: false,
       };
       setEnvConfiguration(offConfig, handlers);
       expect(handlers).toEqual([
@@ -1807,7 +1807,7 @@ describe("setEnvConfiguration", () => {
     });
   });
 
-  describe("enabling `enableAppsecRuntimeApiProxy`", () => {
+  describe("enabling `enableAppSecRuntimeApiProxy`", () => {
     let handlers: FunctionInfo[] = [];
     beforeEach(() => {
       handlers = [
@@ -1825,12 +1825,12 @@ describe("setEnvConfiguration", () => {
     const config: Configuration = {
       ...defaultConfiguration,
       apiKey: "1234",
-      enableAppsecRuntimeApiProxy: true,
+      enableAppSecRuntimeApiProxy: true,
     };
 
     it("fails when `enableDDTracing` is false", () => {
       expect(() => setEnvConfiguration({ ...config, enableDDTracing: false }, handlers)).toThrow(
-        "`enableAppsecRuntimeApiProxy` requires `enableDDTracing` to be enabled",
+        "`enableAppSecRuntimeApiProxy` requires `enableDDTracing` to be enabled",
       );
     });
 

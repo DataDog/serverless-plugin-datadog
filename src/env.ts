@@ -41,12 +41,12 @@ export interface Configuration {
   enableXrayTracing: boolean;
   // Enable tracing on Lambda function using dd-trace, datadog's APM library.
   enableDDTracing: boolean;
-  // Enable ASM on Lambda functions (deprecated: users should switch to either enableAppsec or enableAppsecRuntimeAPIProxy)
+  // Enable ASM on Lambda functions (deprecated: users should switch to either enableAppSec or enableAppSecRuntimeAPIProxy)
   enableASM?: boolean;
   // Enable Appsec on Lambda functions
-  enableAppsec?: boolean;
+  enableAppSec?: boolean;
   // Enable Appsec through a Runtime API Proxy in the extension
-  enableAppsecRuntimeApiProxy?: boolean;
+  enableAppSecRuntimeApiProxy?: boolean;
   // Enable forwarding Logs
   enableDDLogs: boolean;
   // Enable profiling
@@ -257,36 +257,36 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     }
 
     if (
-      (config.enableAppsec && config.enableAppsecRuntimeApiProxy) ||
-      (config.enableAppsec && config.enableASM) ||
-      (config.enableASM && config.enableAppsecRuntimeApiProxy)
+      (config.enableAppSec && config.enableAppSecRuntimeApiProxy) ||
+      (config.enableAppSec && config.enableASM) ||
+      (config.enableASM && config.enableAppSecRuntimeApiProxy)
     ) {
       throw new Error(
-        "`enableAppsec`, `enableAppsecRuntimeApiProxy` and `enableASM` are mutually exclusive; set only `enableAppsec` or `enableAppsecRuntimeApiProxy`",
+        "`enableAppSec`, `enableAppSecRuntimeApiProxy` and `enableASM` are mutually exclusive; set only `enableAppSec` or `enableAppSecRuntimeApiProxy`",
       );
     }
 
-    if (config.enableAppsec !== undefined && config.enableAppsec) {
+    if (config.enableAppSec !== undefined && config.enableAppSec) {
       if (!config.enableDDTracing) {
-        throw new Error("`enableAppsec` requires `enableDDTracing` to be enabled");
+        throw new Error("`enableAppSec` requires `enableDDTracing` to be enabled");
       }
       if (type === RuntimeType.PYTHON) {
-        environment[ddAppsecEnabledEnvVar] ??= config.enableAppsec;
+        environment[ddAppsecEnabledEnvVar] ??= config.enableAppSec;
       } else {
         environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] ??= AWS_LAMBDA_EXEC_WRAPPER;
-        environment[ddServerlessAppsecEnabled] ??= config.enableAppsec;
+        environment[ddServerlessAppsecEnabled] ??= config.enableAppSec;
       }
     }
-    if (config.enableAppsecRuntimeApiProxy !== undefined && config.enableAppsecRuntimeApiProxy) {
+    if (config.enableAppSecRuntimeApiProxy !== undefined && config.enableAppSecRuntimeApiProxy) {
       if (!config.enableDDTracing) {
-        throw new Error("`enableAppsecRuntimeApiProxy` requires `enableDDTracing` to be enabled");
+        throw new Error("`enableAppSecRuntimeApiProxy` requires `enableDDTracing` to be enabled");
       }
       environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] ??= AWS_LAMBDA_EXEC_WRAPPER;
-      environment[ddServerlessAppsecEnabled] ??= config.enableAppsecRuntimeApiProxy;
+      environment[ddServerlessAppsecEnabled] ??= config.enableAppSecRuntimeApiProxy;
     }
     if (config.enableASM !== undefined && config.enableASM) {
       logWarningMessage(
-        "Warning: `enableASM` is deprecated; set `enableAppsec` or `enableAppsecRuntimeApiProxy` instead",
+        "Warning: `enableASM` is deprecated; set `enableAppSec` or `enableAppSecRuntimeApiProxy` instead",
       );
       if (!config.enableDDTracing) {
         throw new Error("`enableASM` requires `enableDDTracing` to be enabled");
