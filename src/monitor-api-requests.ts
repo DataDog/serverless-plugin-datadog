@@ -1,4 +1,3 @@
-import fetch, { Response } from "node-fetch";
 import * as Serverless from "serverless";
 import { MonitorParams, ServerlessMonitor, replaceCriticalThreshold } from "./monitors";
 
@@ -44,7 +43,7 @@ export async function createMonitor(
   monitorsApiKey: string,
   monitorsAppKey: string,
 ): Promise<Response> {
-  const response: Response = await fetch(`https://api.${site}/api/v1/monitor`, {
+  const response = await fetch(`https://api.${site}/api/v1/monitor`, {
     method: "POST",
     headers: {
       "DD-API-KEY": monitorsApiKey,
@@ -63,7 +62,7 @@ export async function updateMonitor(
   monitorsApiKey: string,
   monitorsAppKey: string,
 ): Promise<Response> {
-  const response: Response = await fetch(`https://api.${site}/api/v1/monitor/${monitorId}`, {
+  const response = await fetch(`https://api.${site}/api/v1/monitor/${monitorId}`, {
     method: "PUT",
     headers: {
       "DD-API-KEY": monitorsApiKey,
@@ -82,7 +81,7 @@ export async function deleteMonitor(
   monitorsApiKey: string,
   monitorsAppKey: string,
 ): Promise<Response> {
-  const response: Response = await fetch(`https://api.${site}/api/v1/monitor/${monitorId}`, {
+  const response = await fetch(`https://api.${site}/api/v1/monitor/${monitorId}`, {
     method: "DELETE",
     headers: {
       "DD-API-KEY": monitorsApiKey,
@@ -105,7 +104,7 @@ export async function searchMonitors(
   let pageCount = 1;
   do {
     const query = `tag:"${queryTag}"`;
-    const response: Response = await fetch(`https://api.${site}/api/v1/monitor/search?query=${query}&page=${page}`, {
+    const response = await fetch(`https://api.${site}/api/v1/monitor/search?query=${query}&page=${page}`, {
       method: "GET",
       headers: {
         "DD-API-KEY": monitorsApiKey,
@@ -118,7 +117,7 @@ export async function searchMonitors(
       throw new Error(`Can't fetch monitors. Status code: ${response.status}. Message: ${response.statusText}`);
     }
 
-    const json = await response.json();
+    const json: any = await response.json(); // TODO: use proper type/parsing
     monitors = monitors.concat(json.monitors);
     pageCount = json.metadata.page_count;
     page += 1;
@@ -178,7 +177,7 @@ export async function getRecommendedMonitors(
   const recommendedMonitors: { [key: string]: ServerlessMonitor } = {};
   // Setting a count of 50 in the hope that all can be fetched at once. The default is 10 per page.
   const endpoint = `https://api.${site}/api/v2/monitor/recommended?count=50&start=0&search=tag%3A%22product%3Aserverless%22%20AND%20tag%3A%22integration%3Aamazon-lambda%22`;
-  const response: Response = await fetch(endpoint, {
+  const response = await fetch(endpoint, {
     method: "GET",
     headers: {
       "DD-API-KEY": monitorsApiKey,
@@ -190,7 +189,7 @@ export async function getRecommendedMonitors(
     throw new Error(`Can't fetch monitor params. Status code: ${response.status}. Message: ${response.statusText}`);
   }
 
-  const json = await response.json();
+  const json: any = await response.json(); // TODO: use proper type/parsing
   const recommendedMonitorsData = json.data;
   recommendedMonitorsData.forEach((recommendedMonitorParam: RecommendedMonitorParams) => {
     const recommendedMonitorId = parseRecommendedMonitorServerlessId(recommendedMonitorParam);

@@ -6,7 +6,6 @@ import {
   getRecommendedMonitors,
   TemplateVariable,
 } from "./monitor-api-requests";
-import { Response } from "node-fetch";
 
 export interface MonitorParams {
   [key: string]: any;
