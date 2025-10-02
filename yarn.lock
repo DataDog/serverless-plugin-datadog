@@ -339,7 +339,7 @@
     "@smithy/util-utf8" "^4.0.0"
     tslib "^2.6.2"
 
-"@aws-sdk/core@3.856.0", "@aws-sdk/core@^3.709.0":
+"@aws-sdk/core@3.856.0":
   version "3.856.0"
   resolved "https://registry.yarnpkg.com/@aws-sdk/core/-/core-3.856.0.tgz#ac0d4216399ba8083c7dad17e05542f3b5ddf689"
   integrity sha512-8E5qLsjJ/AwOCOwKxKdfaLEWiRZBrtFJaWlDkC8vTT0/nCzCLMxW8lEKMzkvsxRfje0YZ3V1+rcNycvlz0jVTw==
@@ -617,6 +617,14 @@
     "@smithy/types" "^4.3.1"
     tslib "^2.6.2"
 
+"@aws-sdk/types@^3.887.0":
+  version "3.893.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/types/-/types-3.893.0.tgz#1afbdb9d62bf86caeac380e3cac11a051076400a"
+  integrity sha512-Aht1nn5SnA0N+Tjv0dzhAY7CQbxVtmq1bBR6xI0MhG7p2XYVh1wXuKTzrldEvQWwA3odOYunAfT9aBiKZx9qIg==
+  dependencies:
+    "@smithy/types" "^4.5.0"
+    tslib "^2.6.2"
+
 "@aws-sdk/util-endpoints@3.848.0":
   version "3.848.0"
   resolved "https://registry.yarnpkg.com/@aws-sdk/util-endpoints/-/util-endpoints-3.848.0.tgz#dea15ac0949fcbc518426fb4a86d1e9bd53433db"
@@ -765,10 +773,10 @@
     "@typespec/ts-http-runtime" "^0.3.0"
     tslib "^2.6.2"
 
-"@azure/identity@^4.10.2":
-  version "4.10.2"
-  resolved "https://registry.yarnpkg.com/@azure/identity/-/identity-4.10.2.tgz#6609ce398824ff0bb53f1ad1043a9f1cc93e56b8"
-  integrity sha512-Uth4vz0j+fkXCkbvutChUj03PDCokjbC6Wk9JT8hHEUtpy/EurNKAseb3+gO6Zi9VYBvwt61pgbzn1ovk942Qg==
+"@azure/identity@^4.10.1":
+  version "4.12.0"
+  resolved "https://registry.yarnpkg.com/@azure/identity/-/identity-4.12.0.tgz#272e39a8742191aac0b9f5ec683984bf4d88e7cb"
+  integrity sha512-6vuh2R3Cte6SD6azNalLCjIDoryGdcvDVEV7IDRPtm5lHX5ffkDlIalaoOp5YJU08e4ipjJENel20kSMDLAcug==
   dependencies:
     "@azure/abort-controller" "^2.0.0"
     "@azure/core-auth" "^1.9.0"
@@ -1079,66 +1087,191 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@datadog/datadog-ci@3.17.0":
-  version "3.17.0"
-  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci/-/datadog-ci-3.17.0.tgz#d3542c4d318d2c26c5027012ba0f4c22a6c2f2b3"
-  integrity sha512-tKMTmB2TRVavIcAbCVtfyhFCgGO4+qSfRxT/ogkZ0T6VB70y8qPzFUlmka4WSDclPnBO5IRafzYNmzjmT5F6vg==
+"@datadog/datadog-ci-base@3.21.4":
+  version "3.21.4"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-base/-/datadog-ci-base-3.21.4.tgz#1a6fed89ae6429cf3f5dee2e70997522a53edaf8"
+  integrity sha512-tIjA/SQpnDjZlbIl7ve1XsWhSwPll239EzTFjNJSd1QOGyn630cPuQHsZ4Lnnzx9h63tE5+2fJ/8ti+ROXl43Q==
   dependencies:
-    "@aws-sdk/client-cloudwatch-logs" "^3.709.0"
-    "@aws-sdk/client-iam" "^3.709.0"
-    "@aws-sdk/client-lambda" "^3.709.0"
-    "@aws-sdk/client-sfn" "^3.709.0"
-    "@aws-sdk/core" "^3.709.0"
-    "@aws-sdk/credential-provider-ini" "^3.709.0"
-    "@aws-sdk/credential-providers" "^3.709.0"
-    "@azure/arm-appservice" "^16.0.0"
-    "@azure/arm-resources" "^6.1.0"
-    "@azure/identity" "^4.10.2"
-    "@google-cloud/logging" "^11.1.0"
-    "@google-cloud/run" "^2.1.0"
-    "@smithy/property-provider" "^2.0.12"
-    "@smithy/util-retry" "^2.0.4"
     "@types/datadog-metrics" "0.6.1"
-    ajv "^8.12.0"
-    ajv-formats "^2.1.1"
     async-retry "1.3.1"
-    axios "^1.8.4"
+    axios "^1.12.1"
     chalk "3.0.0"
     clipanion "^3.2.1"
     datadog-metrics "0.9.3"
     debug "^4.4.1"
     deep-extend "0.6.0"
-    deep-object-diff "^1.1.9"
-    fast-deep-equal "^3.1.3"
-    fast-levenshtein "^3.0.0"
     fast-xml-parser "^4.4.1"
     form-data "^4.0.4"
-    fuzzy "^0.1.3"
-    get-value "^4.0.1"
     glob "^10.4.5"
-    google-auth-library "^9.12.0"
     inquirer "^8.2.5"
-    inquirer-checkbox-plus-prompt "^1.4.2"
-    jest-diff "^30.0.4"
-    js-yaml "3.13.1"
     jszip "^3.10.1"
-    ora "5.4.1"
-    packageurl-js "^2.0.1"
     proxy-agent "^6.4.0"
     semver "^7.5.3"
-    set-value "^4.1.0"
     simple-git "3.16.0"
-    ssh2 "^1.16.0"
-    ssh2-streams "0.4.10"
-    sshpk "1.16.1"
     terminal-link "2.1.1"
     tiny-async-pool "^2.1.0"
     typanion "^3.14.0"
     upath "^2.0.1"
+
+"@datadog/datadog-ci-plugin-aas@3.21.4":
+  version "3.21.4"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-aas/-/datadog-ci-plugin-aas-3.21.4.tgz#9416a4ce6dc5ac8f4c85c774c07b4b8f99831a4a"
+  integrity sha512-dnyTgA5gsH763w9hC0aaJTs3FPBywgIt+3JReJUenp3JO0resYMA8L4YBG7S2g4gAvKUUayTriDEK+bsG+EtFA==
+  dependencies:
+    "@azure/arm-appservice" "^16.0.0"
+    "@azure/arm-resources" "^6.1.0"
+    "@azure/identity" "^4.10.1"
+    chalk "3.0.0"
+    fast-deep-equal "^3.1.3"
+
+"@datadog/datadog-ci-plugin-cloud-run@3.21.4":
+  version "3.21.4"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-cloud-run/-/datadog-ci-plugin-cloud-run-3.21.4.tgz#e6d28d3cb1d80ba82f959a39cedb0c535b718379"
+  integrity sha512-y3kXPA5GYl2HKO56qZw4gX/6PBLXqfFC5e8mowNGpFWwTQQ/23ZXe9ZE5sAa3Wo/Bg+u1SkX5yllOax9ZibiyA==
+  dependencies:
+    "@google-cloud/logging" "^11.2.0"
+    "@google-cloud/run" "^3.0.0"
+    chalk "3.0.0"
+    google-auth-library "^10.2.1"
+    inquirer "^8.2.5"
+    inquirer-checkbox-plus-prompt "^1.4.2"
+    jest-diff "^30.0.4"
+    ora "5.4.1"
+    upath "^2.0.1"
+
+"@datadog/datadog-ci-plugin-deployment@3.21.4":
+  version "3.21.4"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-deployment/-/datadog-ci-plugin-deployment-3.21.4.tgz#34498097121562b1ba934dd1b77a30fed37c676a"
+  integrity sha512-FrrdI9uBnNjqbMIbwqnyUpB3DQFNLrPlOuctIarVmHSeTjn+UUPNzIb2In1iiKTiZtQD8KWPV9K3hFkrURlSlQ==
+  dependencies:
+    axios "^1.11.0"
+    chalk "3.0.0"
+    simple-git "3.16.0"
+
+"@datadog/datadog-ci-plugin-dora@3.21.4":
+  version "3.21.4"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-dora/-/datadog-ci-plugin-dora-3.21.4.tgz#ba0ce044ab75ee05188d07510419fb85c66a064e"
+  integrity sha512-7/V+UgzkoSCYN0qzHgum3ivfVl7DXkLnyU/RzqzsZMMwMyZzVAIHcD2EZZYGpmDYlTLVm7YKYQ9GAlw/4Bpk7w==
+  dependencies:
+    axios "^1.11.0"
+    chalk "3.0.0"
+    simple-git "3.16.0"
+
+"@datadog/datadog-ci-plugin-gate@3.21.4":
+  version "3.21.4"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-gate/-/datadog-ci-plugin-gate-3.21.4.tgz#4787df458e2417e887c0475f1b49dc6a1e27a417"
+  integrity sha512-xy5Dgzob0tpJq2ksN0P3wI7a1a8GU8zAF9bAic1Y8Uz5wQHlL2jDD6B/O4unD8nATDAIQz8eX66+ldw9d74B9g==
+  dependencies:
+    "@types/uuid" "^9.0.2"
+    axios "^1.12.1"
+    chalk "3.0.0"
     uuid "^9.0.0"
+
+"@datadog/datadog-ci-plugin-lambda@3.21.4":
+  version "3.21.4"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-lambda/-/datadog-ci-plugin-lambda-3.21.4.tgz#b6e26663be3d18884f824c89a7551ed69af515b2"
+  integrity sha512-L/khmS1T63Em+A/ulbYdcgwdvOur9kPGwFmmshp6RYhrzKgCh9UGzTbHS40J6Oh632jBO5EIYkfopX2B4pB2IA==
+  dependencies:
+    "@aws-sdk/client-cloudwatch-logs" "^3.709.0"
+    "@aws-sdk/client-lambda" "^3.709.0"
+    "@aws-sdk/credential-provider-ini" "^3.709.0"
+    "@aws-sdk/credential-providers" "^3.709.0"
+    "@aws-sdk/types" "^3.887.0"
+    "@smithy/property-provider" "^2.0.12"
+    "@smithy/util-retry" "^2.0.4"
+    chalk "3.0.0"
+    fuzzy "^0.1.3"
+    inquirer "^8.2.5"
+    inquirer-checkbox-plus-prompt "^1.4.2"
+    ora "5.4.1"
+    typanion "^3.14.0"
+    upath "^2.0.1"
+
+"@datadog/datadog-ci-plugin-sarif@3.21.4":
+  version "3.21.4"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-sarif/-/datadog-ci-plugin-sarif-3.21.4.tgz#9d480878f3f3b0745d1e5f6345dec86a26340d4e"
+  integrity sha512-gzIzTh9NfiTEQA5+1djHnmzuWIPJSDbPM5X3a8rVj2O7yMGhJTdaHSrXf+w3exABaTgLgYKO/1SXQTA9sKbjkA==
+  dependencies:
+    ajv "^8.12.0"
+    ajv-formats "^2.1.1"
+    axios "^1.11.0"
+    chalk "3.0.0"
+    form-data "^4.0.4"
+    simple-git "3.16.0"
+    upath "^2.0.1"
+    uuid "^9.0.0"
+
+"@datadog/datadog-ci-plugin-sbom@3.21.4":
+  version "3.21.4"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-sbom/-/datadog-ci-plugin-sbom-3.21.4.tgz#5d234d78619cc451b0dd373a23a226f038aa493c"
+  integrity sha512-xIpV3pCqKk2/OMmjWD+UgNqeVERLVqiGfztosNoSqgBMiZbEmI7sIi17TOwzNohygXoLcrYsIOmapt5YTgxOGw==
+  dependencies:
+    ajv "^8.12.0"
+    ajv-formats "^2.1.1"
+    axios "^1.11.0"
+    chalk "3.0.0"
+    packageurl-js "^2.0.1"
+    simple-git "3.16.0"
+    upath "^2.0.1"
+
+"@datadog/datadog-ci-plugin-stepfunctions@3.21.4":
+  version "3.21.4"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-stepfunctions/-/datadog-ci-plugin-stepfunctions-3.21.4.tgz#06b7c23b203290448524574ab3fcb63608c6d51e"
+  integrity sha512-ihURD8C7RMge0WxAl/ZIajTi54l+f2OrOK+MwKnGk8qNufgFKPDadpigIlu/s2LqQLu8CkmI7D8VGNlBMY2Hdg==
+  dependencies:
+    "@aws-sdk/client-cloudwatch-logs" "^3.709.0"
+    "@aws-sdk/client-iam" "^3.709.0"
+    "@aws-sdk/client-sfn" "^3.709.0"
+    deep-object-diff "^1.1.9"
+
+"@datadog/datadog-ci-plugin-synthetics@3.21.4":
+  version "3.21.4"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-synthetics/-/datadog-ci-plugin-synthetics-3.21.4.tgz#81b671d428c9a1733e33bf815a6e423a339d8749"
+  integrity sha512-nlgqOjTcH4y0tdE+uvBDwasNAshvehhrlLxWFxr2i9Is6haCFN02sO5jdcsFF44xEoqsvqZm9MpWnDo9blnuGA==
+  dependencies:
+    axios "^1.12.1"
+    chalk "3.0.0"
+    debug "^4.4.1"
+    deep-extend "0.6.0"
+    fast-levenshtein "^3.0.0"
+    get-value "^4.0.1"
+    ora "5.4.1"
+    set-value "^4.1.0"
+    ssh2 "^1.16.0"
+    sshpk "1.16.1"
+    upath "^2.0.1"
     ws "^7.5.10"
     xml2js "0.5.0"
     yamux-js "0.1.2"
+
+"@datadog/datadog-ci@3.21.4":
+  version "3.21.4"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci/-/datadog-ci-3.21.4.tgz#703845732994a9a45b6d55b7c5dccea74390b7f0"
+  integrity sha512-o0yyuj3nFZuPaJAwWGcBrShCecMz6kmhibSL6+EYf/QE8pJ5/MTxvU50051j28wtqWwQAg1Nsdla5c3ZJ9ELVg==
+  dependencies:
+    "@datadog/datadog-ci-base" "3.21.4"
+    "@datadog/datadog-ci-plugin-aas" "3.21.4"
+    "@datadog/datadog-ci-plugin-cloud-run" "3.21.4"
+    "@datadog/datadog-ci-plugin-deployment" "3.21.4"
+    "@datadog/datadog-ci-plugin-dora" "3.21.4"
+    "@datadog/datadog-ci-plugin-gate" "3.21.4"
+    "@datadog/datadog-ci-plugin-lambda" "3.21.4"
+    "@datadog/datadog-ci-plugin-sarif" "3.21.4"
+    "@datadog/datadog-ci-plugin-sbom" "3.21.4"
+    "@datadog/datadog-ci-plugin-stepfunctions" "3.21.4"
+    "@datadog/datadog-ci-plugin-synthetics" "3.21.4"
+    axios "^1.12.1"
+    chalk "3.0.0"
+    clipanion "^3.2.1"
+    fast-xml-parser "^4.4.1"
+    form-data "^4.0.4"
+    inquirer "^8.2.5"
+    js-yaml "3.13.1"
+    semver "^7.5.3"
+    simple-git "3.16.0"
+    typanion "^3.14.0"
+    upath "^2.0.1"
+    uuid "^9.0.0"
 
 "@google-cloud/common@^5.0.0":
   version "5.0.2"
@@ -1155,15 +1288,15 @@
     retry-request "^7.0.0"
     teeny-request "^9.0.0"
 
-"@google-cloud/logging@^11.1.0":
-  version "11.2.0"
-  resolved "https://registry.yarnpkg.com/@google-cloud/logging/-/logging-11.2.0.tgz#d282f136467cc4500932f1fa6d4fe58325eb2db2"
-  integrity sha512-Ma94jvuoMpbgNniwtelOt8w82hxK62FuOXZonEv0Hyk3B+/YVuLG/SWNyY9yMso/RXnPEc1fP2qo9kDrjf/b2w==
+"@google-cloud/logging@^11.2.0":
+  version "11.2.1"
+  resolved "https://registry.yarnpkg.com/@google-cloud/logging/-/logging-11.2.1.tgz#5fe9d7a093e717d071994f95c398d4fadd57ea96"
+  integrity sha512-2h9HBJG3OAsvzXmb81qXmaTPfXYU7KJTQUxunoOKFGnY293YQ/eCkW1Y5mHLocwpEqeqQYT/Qvl6Tk+Q7PfStw==
   dependencies:
     "@google-cloud/common" "^5.0.0"
     "@google-cloud/paginator" "^5.0.0"
     "@google-cloud/projectify" "^4.0.0"
-    "@google-cloud/promisify" "^4.0.0"
+    "@google-cloud/promisify" "4.0.0"
     "@opentelemetry/api" "^1.7.0"
     arrify "^2.0.1"
     dot-prop "^6.0.0"
@@ -1190,15 +1323,20 @@
   resolved "https://registry.yarnpkg.com/@google-cloud/projectify/-/projectify-4.0.0.tgz#d600e0433daf51b88c1fa95ac7f02e38e80a07be"
   integrity sha512-MmaX6HeSvyPbWGwFq7mXdo0uQZLGBYCwziiLIGq5JVX+/bdI3SAq6bP98trV5eTWfLuvsMcIC1YJOF2vfteLFA==
 
+"@google-cloud/promisify@4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@google-cloud/promisify/-/promisify-4.0.0.tgz#a906e533ebdd0f754dca2509933334ce58b8c8b1"
+  integrity sha512-Orxzlfb9c67A15cq2JQEyVc7wEsmFBmHjZWZYQMUyJ1qivXyMwdyNOs9odi79hze+2zqdTtu1E19IM/FtqZ10g==
+
 "@google-cloud/promisify@^4.0.0":
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/@google-cloud/promisify/-/promisify-4.1.0.tgz#df8b060f0121c6462233f5420738dcda09c6df4a"
   integrity sha512-G/FQx5cE/+DqBbOpA5jKsegGwdPniU6PuIEMt+qxWgFxvxuFOzVmp6zYchtYuwAWV5/8Dgs0yAmjvNZv3uXLQg==
 
-"@google-cloud/run@^2.1.0":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@google-cloud/run/-/run-2.3.0.tgz#50399d20ebf97e0e545cabadfd71580d3373839a"
-  integrity sha512-wiabDmKc64GY0zlDPhB4SEu839wj5W7/ym6nepLg98OL0wJgbIHp9BT7XX7ay3H0u6VIuksPbwdxeJbBrEJsVQ==
+"@google-cloud/run@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@google-cloud/run/-/run-3.0.0.tgz#79b7f576d1f81cdd7cdf7a341739d96c037ef5da"
+  integrity sha512-WL3v+2AeUN9BCmdB2dBKmi48c4kV0WNFar3M4VXpn1GuKd51oBVbGku90HRSkIB8wD2UKU0sP3wPx0D7qY4WSQ==
   dependencies:
     google-gax "^5.0.0"
 
@@ -2030,6 +2168,13 @@
   dependencies:
     tslib "^2.6.2"
 
+"@smithy/types@^4.5.0":
+  version "4.6.0"
+  resolved "https://registry.yarnpkg.com/@smithy/types/-/types-4.6.0.tgz#8ea8b15fedee3cdc555e8f947ce35fb1e973bb7a"
+  integrity sha512-4lI9C8NzRPOv66FaY1LL1O/0v0aLVrq/mXP/keUa9mJOApEeae43LsLd2kZRUJw91gxOQfLIrV3OvqPgWz1YsA==
+  dependencies:
+    tslib "^2.6.2"
+
 "@smithy/url-parser@^4.0.4":
   version "4.0.4"
   resolved "https://registry.yarnpkg.com/@smithy/url-parser/-/url-parser-4.0.4.tgz#049143f4c156356e177bd69242675db26fe4f4db"
@@ -2377,7 +2522,7 @@
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-4.0.5.tgz#cb6e2a691b70cb177c6e3ae9c1d2e8b2ea8cd304"
   integrity sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==
 
-"@types/uuid@^9.0.1":
+"@types/uuid@^9.0.1", "@types/uuid@^9.0.2":
   version "9.0.8"
   resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-9.0.8.tgz#7545ba4fc3c003d6c756f651f3bf163d8f0f29ba"
   integrity sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA==
@@ -2546,7 +2691,7 @@ asl-validator@^3.11.0:
     jsonpath-plus "^10.3.0"
     yaml "^2.3.1"
 
-asn1@^0.2.6, asn1@~0.2.0, asn1@~0.2.3:
+asn1@^0.2.6, asn1@~0.2.3:
   version "0.2.6"
   resolved "https://registry.yarnpkg.com/asn1/-/asn1-0.2.6.tgz#0d3a7bb6e64e02a90c0303b31f292868ea09a08d"
   integrity sha512-ix/FxPn0MDjeyJ7i/yoHGFt/EX6LyNbxSEhPPXODPL+KB0VPk86UYfL0lMdy+KCnv+fmvIzySwaK5COwqVbWTQ==
@@ -2589,7 +2734,7 @@ available-typed-arrays@^1.0.7:
   dependencies:
     possible-typed-array-names "^1.0.0"
 
-axios@^1.8.4:
+axios@^1.11.0, axios@^1.12.1:
   version "1.12.2"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.12.2.tgz#6c307390136cf7a2278d09cec63b136dfc6e6da7"
   integrity sha512-vMJzPewAlRyOgxV2dU0Cuz2O8zzzx9VYtbJOaBgXFeLc4IV/Eg50n4LowmehOOR61S8ZMpc2K5Sa7g6A4jfkUw==
@@ -4069,7 +4214,20 @@ google-auth-library@^10.1.0:
     gtoken "^8.0.0"
     jws "^4.0.0"
 
-google-auth-library@^9.0.0, google-auth-library@^9.12.0, google-auth-library@^9.3.0:
+google-auth-library@^10.2.1:
+  version "10.4.0"
+  resolved "https://registry.yarnpkg.com/google-auth-library/-/google-auth-library-10.4.0.tgz#2d5e36f3e0b0f33b1c5466a2f25617ff2c258c91"
+  integrity sha512-CmIrSy1bqMQUsPmA9+hcSbAXL80cFhu40cGMUjCaLpNKVzzvi+0uAHq8GNZxkoGYIsTX4ZQ7e4aInAqWxgn4fg==
+  dependencies:
+    base64-js "^1.3.0"
+    ecdsa-sig-formatter "^1.0.11"
+    gaxios "^7.0.0"
+    gcp-metadata "^7.0.0"
+    google-logging-utils "^1.0.0"
+    gtoken "^8.0.0"
+    jws "^4.0.0"
+
+google-auth-library@^9.0.0, google-auth-library@^9.3.0:
   version "9.15.1"
   resolved "https://registry.yarnpkg.com/google-auth-library/-/google-auth-library-9.15.1.tgz#0c5d84ed1890b2375f1cd74f03ac7b806b392928"
   integrity sha512-Jb6Z0+nvECVz+2lzSMt9u98UsoakXxA2HGHMCxh+so3n90XgYWkq5dur19JAJV7ONiJY22yBTyJB1TSkvPq9Ng==
@@ -6330,15 +6488,6 @@ sprintf-kit@^2.0.1, sprintf-kit@^2.0.2:
   dependencies:
     es5-ext "^0.10.64"
 
-ssh2-streams@0.4.10:
-  version "0.4.10"
-  resolved "https://registry.yarnpkg.com/ssh2-streams/-/ssh2-streams-0.4.10.tgz#48ef7e8a0e39d8f2921c30521d56dacb31d23a34"
-  integrity sha512-8pnlMjvnIZJvmTzUIIA5nT4jr2ZWNNVHwyXfMGdRJbug9TpI3kd99ffglgfSWqujVv/0gxwMsDn9j9RVst8yhQ==
-  dependencies:
-    asn1 "~0.2.0"
-    bcrypt-pbkdf "^1.0.2"
-    streamsearch "~0.1.2"
-
 ssh2@^1.16.0:
   version "1.16.0"
   resolved "https://registry.yarnpkg.com/ssh2/-/ssh2-1.16.0.tgz#79221d40cbf4d03d07fe881149de0a9de928c9f0"
@@ -6383,11 +6532,6 @@ stream-shift@^1.0.2:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/stream-shift/-/stream-shift-1.0.3.tgz#85b8fab4d71010fc3ba8772e8046cc49b8a3864b"
   integrity sha512-76ORR0DO1o1hlKwTbi/DM3EXWGf3ZJYO8cXX5RJwnul2DEg2oyoZyjLNoQM8WsvZiFKCRfC1O0J7iCvie3RZmQ==
-
-streamsearch@~0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/streamsearch/-/streamsearch-0.1.2.tgz#808b9d0e56fc273d809ba57338e929919a1a9f1a"
-  integrity sha512-jos8u++JKm0ARcSUTAZXOVC0mSox7Bhn6sBgty73P1f3JGf7yG2clTbBNHUdde/kdvP2FESam+vM6l8jBrNxHA==
 
 string-length@^4.0.1:
   version "4.0.2"
