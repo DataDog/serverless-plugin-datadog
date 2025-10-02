@@ -190,7 +190,7 @@ export async function getRecommendedMonitors(
     throw new Error(`Can't fetch monitor params. Status code: ${response.status}. Message: ${response.statusText}`);
   }
 
-  const json = await response.json();
+  const json: any = await response.json(); // TODO: use proper type/parsing
   const recommendedMonitorsData = json.data;
   recommendedMonitorsData.forEach((recommendedMonitorParam: RecommendedMonitorParams) => {
     const recommendedMonitorId = parseRecommendedMonitorServerlessId(recommendedMonitorParam);
