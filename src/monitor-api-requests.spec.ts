@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import {
   createMonitor,
   updateMonitor,
@@ -10,7 +9,9 @@ import {
 } from "./monitor-api-requests";
 import { MonitorParams, handleMonitorsApiResponse } from "./monitors";
 
-jest.mock("node-fetch");
+beforeAll(() => {
+  global.fetch = jest.fn();
+});
 
 const monitorParams: MonitorParams = {
   tags: [
