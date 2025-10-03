@@ -1662,6 +1662,230 @@ describe("setEnvConfiguration", () => {
     });
   });
 
+  describe("enabling `enableAppSec`", () => {
+    let handlers: FunctionInfo[] = [];
+    beforeEach(() => {
+      handlers = [
+        {
+          handler: {
+            environment: {},
+            events: [],
+          },
+          name: "function-node",
+          type: RuntimeType.NODE,
+        },
+        {
+          handler: {
+            environment: {},
+            events: [],
+          },
+          name: "function-python",
+          type: RuntimeType.PYTHON,
+        },
+      ];
+    });
+
+    const config: Configuration = {
+      ...defaultConfiguration,
+      apiKey: "1234",
+      enableAppSec: true,
+    };
+
+    const enableASMCconflictingConfig: Configuration = {
+      ...defaultConfiguration,
+      apiKey: "1234",
+      enableAppSec: true,
+      enableASM: true,
+    };
+    const enableAppSecRuntimeApiProxyConflictingConfig: Configuration = {
+      ...defaultConfiguration,
+      apiKey: "1234",
+      enableAppSec: true,
+      enableAppSecRuntimeApiProxy: true,
+    };
+
+    it("fails when `enableASM` is true", () => {
+      expect(() => setEnvConfiguration({ ...enableASMCconflictingConfig }, handlers)).toThrow(
+        "`enableAppSec`, `enableAppSecRuntimeApiProxy` and `enableASM` are mutually exclusive; set only `enableAppSec` or `enableAppSecRuntimeApiProxy`",
+      );
+    });
+
+    it("fails when `enableAppSecRuntimeApiProxy` is true", () => {
+      expect(() => setEnvConfiguration({ ...enableAppSecRuntimeApiProxyConflictingConfig }, handlers)).toThrow(
+        "`enableAppSec`, `enableAppSecRuntimeApiProxy` and `enableASM` are mutually exclusive; set only `enableAppSec` or `enableAppSecRuntimeApiProxy`",
+      );
+    });
+
+    it("fails when `enableDDTracing` is false", () => {
+      expect(() => setEnvConfiguration({ ...config, enableDDTracing: false }, handlers)).toThrow(
+        "`enableAppSec` requires `enableDDTracing` to be enabled",
+      );
+    });
+
+    it("defines `DD_APPSEC_ENABLED` on Python runtimes and `DD_SERVERLESS_APPSEC_ENABLED` on Node runtimes", () => {
+      setEnvConfiguration(config, handlers);
+      expect(handlers).toEqual([
+        {
+          handler: {
+            environment: {
+              AWS_LAMBDA_EXEC_WRAPPER: "/opt/datadog_wrapper",
+              DD_API_KEY: "1234",
+              DD_CAPTURE_LAMBDA_PAYLOAD: false,
+              DD_LOGS_INJECTION: false,
+              DD_MERGE_XRAY_TRACES: false,
+              DD_SERVERLESS_APPSEC_ENABLED: true,
+              DD_SERVERLESS_LOGS_ENABLED: true,
+              DD_SITE: "datadoghq.com",
+              DD_TRACE_ENABLED: true,
+            },
+            events: [],
+          },
+          name: "function-node",
+          type: RuntimeType.NODE,
+        },
+        {
+          handler: {
+            environment: {
+              DD_API_KEY: "1234",
+              DD_CAPTURE_LAMBDA_PAYLOAD: false,
+              DD_LOGS_INJECTION: false,
+              DD_MERGE_XRAY_TRACES: false,
+              DD_APPSEC_ENABLED: true,
+              DD_SERVERLESS_LOGS_ENABLED: true,
+              DD_SITE: "datadoghq.com",
+              DD_TRACE_ENABLED: true,
+            },
+            events: [],
+          },
+          name: "function-python",
+          type: RuntimeType.PYTHON,
+        },
+      ]);
+    });
+
+    it("does not define `DD_APPSEC_ENABLED`, `DD_SERVERLESS_APPSEC_ENABLED` or `AWS_LAMBDA_EXEC_WRAPPER` when disabled", () => {
+      const offConfig: Configuration = {
+        ...defaultConfiguration,
+        apiKey: "1234",
+        enableAppSec: false,
+      };
+      setEnvConfiguration(offConfig, handlers);
+      expect(handlers).toEqual([
+        {
+          handler: {
+            environment: {
+              DD_API_KEY: "1234",
+              DD_CAPTURE_LAMBDA_PAYLOAD: false,
+              DD_LOGS_INJECTION: false,
+              DD_MERGE_XRAY_TRACES: false,
+              DD_SERVERLESS_LOGS_ENABLED: true,
+              DD_SITE: "datadoghq.com",
+              DD_TRACE_ENABLED: true,
+            },
+            events: [],
+          },
+          name: "function-node",
+          type: RuntimeType.NODE,
+        },
+        {
+          handler: {
+            environment: {
+              DD_API_KEY: "1234",
+              DD_CAPTURE_LAMBDA_PAYLOAD: false,
+              DD_LOGS_INJECTION: false,
+              DD_MERGE_XRAY_TRACES: false,
+              DD_SERVERLESS_LOGS_ENABLED: true,
+              DD_SITE: "datadoghq.com",
+              DD_TRACE_ENABLED: true,
+            },
+            events: [],
+          },
+          name: "function-python",
+          type: RuntimeType.PYTHON,
+        },
+      ]);
+    });
+  });
+
+  describe("enabling `enableAppSecRuntimeApiProxy`", () => {
+    let handlers: FunctionInfo[] = [];
+    beforeEach(() => {
+      handlers = [
+        {
+          handler: {
+            environment: {},
+            events: [],
+          },
+          name: "function",
+          type: RuntimeType.NODE,
+        },
+      ];
+    });
+
+    const config: Configuration = {
+      ...defaultConfiguration,
+      apiKey: "1234",
+      enableAppSecRuntimeApiProxy: true,
+    };
+
+    it("fails when `enableDDTracing` is false", () => {
+      expect(() => setEnvConfiguration({ ...config, enableDDTracing: false }, handlers)).toThrow(
+        "`enableAppSecRuntimeApiProxy` requires `enableDDTracing` to be enabled",
+      );
+    });
+
+    it("defines `DD_SERVERLESS_APPSEC_ENABLED` and `AWS_LAMBDA_EXEC_WRAPPER`", () => {
+      setEnvConfiguration(config, handlers);
+      expect(handlers).toEqual([
+        {
+          handler: {
+            environment: {
+              AWS_LAMBDA_EXEC_WRAPPER: "/opt/datadog_wrapper",
+              DD_API_KEY: "1234",
+              DD_CAPTURE_LAMBDA_PAYLOAD: false,
+              DD_LOGS_INJECTION: false,
+              DD_MERGE_XRAY_TRACES: false,
+              DD_SERVERLESS_APPSEC_ENABLED: true,
+              DD_SERVERLESS_LOGS_ENABLED: true,
+              DD_SITE: "datadoghq.com",
+              DD_TRACE_ENABLED: true,
+            },
+            events: [],
+          },
+          name: "function",
+          type: RuntimeType.NODE,
+        },
+      ]);
+    });
+
+    it("does not define `DD_SERVERLESS_APPSEC_ENABLED` and `AWS_LAMBDA_EXEC_WRAPPER` when disabled", () => {
+      const offConfig: Configuration = {
+        ...defaultConfiguration,
+        apiKey: "1234",
+        enableASM: false,
+      };
+      setEnvConfiguration(offConfig, handlers);
+      expect(handlers).toEqual([
+        {
+          handler: {
+            environment: {
+              DD_API_KEY: "1234",
+              DD_CAPTURE_LAMBDA_PAYLOAD: false,
+              DD_LOGS_INJECTION: false,
+              DD_MERGE_XRAY_TRACES: false,
+              DD_SERVERLESS_LOGS_ENABLED: true,
+              DD_SITE: "datadoghq.com",
+              DD_TRACE_ENABLED: true,
+            },
+            events: [],
+          },
+          name: "function",
+          type: RuntimeType.NODE,
+        },
+      ]);
+    });
+  });
+
   describe("enabling `enableASM`", () => {
     let handlers: FunctionInfo[] = [];
     beforeEach(() => {
@@ -1685,13 +1909,7 @@ describe("setEnvConfiguration", () => {
 
     it("fails when `enableDDTracing` is false", () => {
       expect(() => setEnvConfiguration({ ...config, enableDDTracing: false }, handlers)).toThrow(
-        "`enableASM` requires the extension to be present, and `enableDDTracing` to be enabled",
-      );
-    });
-
-    it("fails when `addExtension` is false", () => {
-      expect(() => setEnvConfiguration({ ...config, addExtension: false }, handlers)).toThrow(
-        "`enableASM` requires the extension to be present, and `enableDDTracing` to be enabled",
+        "`enableASM` requires `enableDDTracing` to be enabled",
       );
     });
 
