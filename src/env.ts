@@ -150,7 +150,7 @@ const siteURLEnvVar = "DD_SITE";
 const logLevelEnvVar = "DD_LOG_LEVEL";
 const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
 const ddTracingEnabledEnvVar = "DD_TRACE_ENABLED";
-const ddServerlessAppsecEnabled = "DD_SERVERLESS_APPSEC_ENABLED";
+const ddServerlessAppsecEnabledEnvVar = "DD_SERVERLESS_APPSEC_ENABLED";
 const ddAppsecEnabledEnvVar = "DD_APPSEC_ENABLED";
 const ddMergeXrayTracesEnvVar = "DD_MERGE_XRAY_TRACES";
 const logInjectionEnvVar = "DD_LOGS_INJECTION";
@@ -266,7 +266,7 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
       );
     }
 
-    if (config.enableAppSec !== undefined && config.enableAppSec) {
+    if (config.enableAppSec) {
       if (!config.enableDDTracing) {
         throw new Error("`enableAppSec` requires `enableDDTracing` to be enabled");
       }
@@ -274,17 +274,15 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
         environment[ddAppsecEnabledEnvVar] ??= config.enableAppSec;
       } else {
         environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] ??= AWS_LAMBDA_EXEC_WRAPPER;
-        environment[ddServerlessAppsecEnabled] ??= config.enableAppSec;
+        environment[ddServerlessAppsecEnabledEnvVar] ??= config.enableAppSec;
       }
-    }
-    if (config.enableAppSecRuntimeApiProxy !== undefined && config.enableAppSecRuntimeApiProxy) {
+    } else if (config.enableAppSecRuntimeApiProxy) {
       if (!config.enableDDTracing) {
         throw new Error("`enableAppSecRuntimeApiProxy` requires `enableDDTracing` to be enabled");
       }
       environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] ??= AWS_LAMBDA_EXEC_WRAPPER;
-      environment[ddServerlessAppsecEnabled] ??= config.enableAppSecRuntimeApiProxy;
-    }
-    if (config.enableASM !== undefined && config.enableASM) {
+      environment[ddServerlessAppsecEnabledEnvVar] ??= config.enableAppSecRuntimeApiProxy;
+    } else if (config.enableASM) {
       logWarningMessage(
         "Warning: `enableASM` is deprecated; set `enableAppSec` or `enableAppSecRuntimeApiProxy` instead",
       );
@@ -292,8 +290,9 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
         throw new Error("`enableASM` requires `enableDDTracing` to be enabled");
       }
       environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] ??= AWS_LAMBDA_EXEC_WRAPPER;
-      environment[ddServerlessAppsecEnabled] ??= config.enableASM;
+      environment[ddServerlessAppsecEnabledEnvVar] ??= config.enableASM;
     }
+
     if (config.enableXrayTracing !== undefined && environment[ddMergeXrayTracesEnvVar] === undefined) {
       environment[ddMergeXrayTracesEnvVar] = config.enableXrayTracing;
     }
