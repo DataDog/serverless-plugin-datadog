@@ -96,7 +96,10 @@ module.exports = class ServerlessPlugin {
       usage: "Automatically instruments your lambdas with DataDog",
     },
   };
-  constructor(private serverless: Serverless, private options: Serverless.Options) {}
+  constructor(
+    private serverless: Serverless,
+    private options: Serverless.Options,
+  ) {}
 
   private displayedMessages: { [msg: string]: true } = {};
   private logToCliOnce(message: string): void {
