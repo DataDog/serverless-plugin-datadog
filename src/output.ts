@@ -2,6 +2,7 @@ import * as Serverless from "serverless";
 import { FunctionInfo } from "./layer";
 
 const yellowFont = "\x1b[33m";
+const orangeFont = "\x1b[38;2;255;165;0m";
 const underlineFont = "\x1b[4m";
 const endFont = "\x1b[0m";
 const outputPrefix = "DatadogMonitor";
@@ -78,4 +79,8 @@ function logHeader(message: string, underline = false): void {
 
 export function logMessage(message: string): void {
   console.log(`  ${message}`);
+}
+
+export function logWarningMessage(message: string): void {
+  console.log(`  ${orangeFont}${message}${endFont}`);
 }
