@@ -10,6 +10,14 @@
     "@jridgewell/gen-mapping" "^0.3.5"
     "@jridgewell/trace-mapping" "^0.3.24"
 
+"@antfu/install-pkg@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@antfu/install-pkg/-/install-pkg-1.1.0.tgz#78fa036be1a6081b5a77a5cf59f50c7752b6ba26"
+  integrity sha512-MGQsmw10ZyI+EJo45CdSER4zEb+p31LpDAFp2Z3gkSd1yqVZGi0Ebx++YTEMonJy4oChEMLsxZ64j8FH6sSqtQ==
+  dependencies:
+    package-manager-detector "^1.3.0"
+    tinyexec "^1.0.1"
+
 "@aws-crypto/crc32@5.2.0":
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/@aws-crypto/crc32/-/crc32-5.2.0.tgz#cfcc22570949c98c6689cfcbd2d693d36cdae2e1"
@@ -1087,11 +1095,12 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@datadog/datadog-ci-base@3.21.4":
-  version "3.21.4"
-  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-base/-/datadog-ci-base-3.21.4.tgz#1a6fed89ae6429cf3f5dee2e70997522a53edaf8"
-  integrity sha512-tIjA/SQpnDjZlbIl7ve1XsWhSwPll239EzTFjNJSd1QOGyn630cPuQHsZ4Lnnzx9h63tE5+2fJ/8ti+ROXl43Q==
+"@datadog/datadog-ci-base@3.22.2":
+  version "3.22.2"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-base/-/datadog-ci-base-3.22.2.tgz#6b4545eae44f37c05f604b2049ea3e73d9731b4e"
+  integrity sha512-87Q1dHcOczRhddo9ugB6JZYOep70rQ9rHMByOF81RKFjufQWtbU+ZPl0pKge3DvDiR3oXo01PrzUsS+Ss38QOw==
   dependencies:
+    "@antfu/install-pkg" "^1.1.0"
     "@types/datadog-metrics" "0.6.1"
     async-retry "1.3.1"
     axios "^1.12.1"
@@ -1113,10 +1122,10 @@
     typanion "^3.14.0"
     upath "^2.0.1"
 
-"@datadog/datadog-ci-plugin-aas@3.21.4":
-  version "3.21.4"
-  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-aas/-/datadog-ci-plugin-aas-3.21.4.tgz#9416a4ce6dc5ac8f4c85c774c07b4b8f99831a4a"
-  integrity sha512-dnyTgA5gsH763w9hC0aaJTs3FPBywgIt+3JReJUenp3JO0resYMA8L4YBG7S2g4gAvKUUayTriDEK+bsG+EtFA==
+"@datadog/datadog-ci-plugin-aas@3.22.2":
+  version "3.22.2"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-aas/-/datadog-ci-plugin-aas-3.22.2.tgz#ea72031bb9edfcd62744a8f099b9dc395338e545"
+  integrity sha512-sWOaVLCSSRbpCJYVAUbQQBNgeMl1bJSdg+QIWz5/lulHeLWD0CFWg96F4oJ3hC0rqZ9HLPhmqYwAUqKeLjh5WA==
   dependencies:
     "@azure/arm-appservice" "^16.0.0"
     "@azure/arm-resources" "^6.1.0"
@@ -1124,10 +1133,10 @@
     chalk "3.0.0"
     fast-deep-equal "^3.1.3"
 
-"@datadog/datadog-ci-plugin-cloud-run@3.21.4":
-  version "3.21.4"
-  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-cloud-run/-/datadog-ci-plugin-cloud-run-3.21.4.tgz#e6d28d3cb1d80ba82f959a39cedb0c535b718379"
-  integrity sha512-y3kXPA5GYl2HKO56qZw4gX/6PBLXqfFC5e8mowNGpFWwTQQ/23ZXe9ZE5sAa3Wo/Bg+u1SkX5yllOax9ZibiyA==
+"@datadog/datadog-ci-plugin-cloud-run@3.22.2":
+  version "3.22.2"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-cloud-run/-/datadog-ci-plugin-cloud-run-3.22.2.tgz#74e0a02208ccaf3ab5722313e2741229f443b45e"
+  integrity sha512-AU7Y0He3XAoXzpidbTYhImVpDvZd0mD+kK+kXfsiKJzmJ/GhQTRgwHrfrUi6sNE8Mo/jLsAreEDlxPUbDyOXCQ==
   dependencies:
     "@google-cloud/logging" "^11.2.0"
     "@google-cloud/run" "^3.0.0"
@@ -1139,38 +1148,38 @@
     ora "5.4.1"
     upath "^2.0.1"
 
-"@datadog/datadog-ci-plugin-deployment@3.21.4":
-  version "3.21.4"
-  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-deployment/-/datadog-ci-plugin-deployment-3.21.4.tgz#34498097121562b1ba934dd1b77a30fed37c676a"
-  integrity sha512-FrrdI9uBnNjqbMIbwqnyUpB3DQFNLrPlOuctIarVmHSeTjn+UUPNzIb2In1iiKTiZtQD8KWPV9K3hFkrURlSlQ==
+"@datadog/datadog-ci-plugin-deployment@3.22.2":
+  version "3.22.2"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-deployment/-/datadog-ci-plugin-deployment-3.22.2.tgz#e66fd4306796578ceb8c46b881da86a420712fbb"
+  integrity sha512-jctYlrcoFafqkYVJxMG0o1c9H7lYuJlG4YWHdbmAgSBOz4WidYsdGtJdBYtKC9k/lRnwQPvlh1BD/Q+i9HlzSg==
   dependencies:
     axios "^1.11.0"
     chalk "3.0.0"
     simple-git "3.16.0"
 
-"@datadog/datadog-ci-plugin-dora@3.21.4":
-  version "3.21.4"
-  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-dora/-/datadog-ci-plugin-dora-3.21.4.tgz#ba0ce044ab75ee05188d07510419fb85c66a064e"
-  integrity sha512-7/V+UgzkoSCYN0qzHgum3ivfVl7DXkLnyU/RzqzsZMMwMyZzVAIHcD2EZZYGpmDYlTLVm7YKYQ9GAlw/4Bpk7w==
+"@datadog/datadog-ci-plugin-dora@3.22.2":
+  version "3.22.2"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-dora/-/datadog-ci-plugin-dora-3.22.2.tgz#0418f8915cd56a3a7a8c7446b651523b56e36c57"
+  integrity sha512-QT+kCXNJfstJvyM7+Nh60vlsc/EDcPh/0t7JsxvM3I2mEFh92RqYDHE5FFbiLeERDM08fAHU8OXVpASgjgGFWQ==
   dependencies:
     axios "^1.11.0"
     chalk "3.0.0"
     simple-git "3.16.0"
 
-"@datadog/datadog-ci-plugin-gate@3.21.4":
-  version "3.21.4"
-  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-gate/-/datadog-ci-plugin-gate-3.21.4.tgz#4787df458e2417e887c0475f1b49dc6a1e27a417"
-  integrity sha512-xy5Dgzob0tpJq2ksN0P3wI7a1a8GU8zAF9bAic1Y8Uz5wQHlL2jDD6B/O4unD8nATDAIQz8eX66+ldw9d74B9g==
+"@datadog/datadog-ci-plugin-gate@3.22.2":
+  version "3.22.2"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-gate/-/datadog-ci-plugin-gate-3.22.2.tgz#31b540510dd977ade8a4e2228285d38b1bf03134"
+  integrity sha512-Z4Cu5Uww3UMO9pyFyHKGu0BbBo9GeDn1oueKRmUfVZ0k3er5BsEKXH+LBl1AW+ml1jVaebY0oFvHie/7DfDzcA==
   dependencies:
     "@types/uuid" "^9.0.2"
     axios "^1.12.1"
     chalk "3.0.0"
     uuid "^9.0.0"
 
-"@datadog/datadog-ci-plugin-lambda@3.21.4":
-  version "3.21.4"
-  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-lambda/-/datadog-ci-plugin-lambda-3.21.4.tgz#b6e26663be3d18884f824c89a7551ed69af515b2"
-  integrity sha512-L/khmS1T63Em+A/ulbYdcgwdvOur9kPGwFmmshp6RYhrzKgCh9UGzTbHS40J6Oh632jBO5EIYkfopX2B4pB2IA==
+"@datadog/datadog-ci-plugin-lambda@3.22.2":
+  version "3.22.2"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-lambda/-/datadog-ci-plugin-lambda-3.22.2.tgz#2486c6a4dd6f1556fc8ff101a7d10ce6deda55d1"
+  integrity sha512-VltSckazmRr6yE3waHNc9YTo5YMDUeENAEDv0KSc41mxHbcKd6AdTw74vXwvQm81I5JGsOTAiw7JsGeqarm0qg==
   dependencies:
     "@aws-sdk/client-cloudwatch-logs" "^3.709.0"
     "@aws-sdk/client-lambda" "^3.709.0"
@@ -1187,10 +1196,10 @@
     typanion "^3.14.0"
     upath "^2.0.1"
 
-"@datadog/datadog-ci-plugin-sarif@3.21.4":
-  version "3.21.4"
-  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-sarif/-/datadog-ci-plugin-sarif-3.21.4.tgz#9d480878f3f3b0745d1e5f6345dec86a26340d4e"
-  integrity sha512-gzIzTh9NfiTEQA5+1djHnmzuWIPJSDbPM5X3a8rVj2O7yMGhJTdaHSrXf+w3exABaTgLgYKO/1SXQTA9sKbjkA==
+"@datadog/datadog-ci-plugin-sarif@3.22.2":
+  version "3.22.2"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-sarif/-/datadog-ci-plugin-sarif-3.22.2.tgz#02094c0f0e54b0d4b536e3599feb4a3b71997fac"
+  integrity sha512-ru65wSnlU4EoJAjK0/nvP5CN6uddSIpXp5owKb3OXUEUyRbeBUQ2l2yhRaIthx6WpFmZjIrdheKB076DXuu13g==
   dependencies:
     ajv "^8.12.0"
     ajv-formats "^2.1.1"
@@ -1201,10 +1210,10 @@
     upath "^2.0.1"
     uuid "^9.0.0"
 
-"@datadog/datadog-ci-plugin-sbom@3.21.4":
-  version "3.21.4"
-  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-sbom/-/datadog-ci-plugin-sbom-3.21.4.tgz#5d234d78619cc451b0dd373a23a226f038aa493c"
-  integrity sha512-xIpV3pCqKk2/OMmjWD+UgNqeVERLVqiGfztosNoSqgBMiZbEmI7sIi17TOwzNohygXoLcrYsIOmapt5YTgxOGw==
+"@datadog/datadog-ci-plugin-sbom@3.22.2":
+  version "3.22.2"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-sbom/-/datadog-ci-plugin-sbom-3.22.2.tgz#994585a616b110bbc86691d984590c9ec13c4812"
+  integrity sha512-T+SZCcJD/Ugqrn4d3+d48Ovf+Ryrkxz82vgwywr6sL8RehtpX4qCVq02AOpm41pP4smnINMRZL9KypedQeSGmQ==
   dependencies:
     ajv "^8.12.0"
     ajv-formats "^2.1.1"
@@ -1214,20 +1223,20 @@
     simple-git "3.16.0"
     upath "^2.0.1"
 
-"@datadog/datadog-ci-plugin-stepfunctions@3.21.4":
-  version "3.21.4"
-  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-stepfunctions/-/datadog-ci-plugin-stepfunctions-3.21.4.tgz#06b7c23b203290448524574ab3fcb63608c6d51e"
-  integrity sha512-ihURD8C7RMge0WxAl/ZIajTi54l+f2OrOK+MwKnGk8qNufgFKPDadpigIlu/s2LqQLu8CkmI7D8VGNlBMY2Hdg==
+"@datadog/datadog-ci-plugin-stepfunctions@3.22.2":
+  version "3.22.2"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-stepfunctions/-/datadog-ci-plugin-stepfunctions-3.22.2.tgz#08198cf84094434512c20156a0385f3f0ce966b8"
+  integrity sha512-+nux1KncqXDo+wSwmcY4N+Qf6BM4FPpTujeqEMsovudcrxpYKLo/bGNTOgDMc6VL2SM80htoRCJeD1fa/u0GPw==
   dependencies:
     "@aws-sdk/client-cloudwatch-logs" "^3.709.0"
     "@aws-sdk/client-iam" "^3.709.0"
     "@aws-sdk/client-sfn" "^3.709.0"
     deep-object-diff "^1.1.9"
 
-"@datadog/datadog-ci-plugin-synthetics@3.21.4":
-  version "3.21.4"
-  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-synthetics/-/datadog-ci-plugin-synthetics-3.21.4.tgz#81b671d428c9a1733e33bf815a6e423a339d8749"
-  integrity sha512-nlgqOjTcH4y0tdE+uvBDwasNAshvehhrlLxWFxr2i9Is6haCFN02sO5jdcsFF44xEoqsvqZm9MpWnDo9blnuGA==
+"@datadog/datadog-ci-plugin-synthetics@3.22.2":
+  version "3.22.2"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-synthetics/-/datadog-ci-plugin-synthetics-3.22.2.tgz#5beedbdc03c55eb87fd3cba5ad7038beb5681c0f"
+  integrity sha512-7JuGnnw1GGdsw3OUjJTjCPDaRNdFROB199CNWOsu9psLDCOLfb3zKVVEpIno+u+2HGL0/PIRQz8F6dM499Nb+g==
   dependencies:
     axios "^1.12.1"
     chalk "3.0.0"
@@ -1244,28 +1253,27 @@
     xml2js "0.5.0"
     yamux-js "0.1.2"
 
-"@datadog/datadog-ci@3.21.4":
-  version "3.21.4"
-  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci/-/datadog-ci-3.21.4.tgz#703845732994a9a45b6d55b7c5dccea74390b7f0"
-  integrity sha512-o0yyuj3nFZuPaJAwWGcBrShCecMz6kmhibSL6+EYf/QE8pJ5/MTxvU50051j28wtqWwQAg1Nsdla5c3ZJ9ELVg==
+"@datadog/datadog-ci@3.22.2":
+  version "3.22.2"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci/-/datadog-ci-3.22.2.tgz#65d3f5ca35b16685cb70bf2db926080965f5a8e6"
+  integrity sha512-OejGdY0g+S0/9oJNCueBSU3ZXjNCn+JWhxvx+jroB/FolkOEDESmugludf3/uOjM3mCeuUlGoDhwIAmezF0AvA==
   dependencies:
-    "@datadog/datadog-ci-base" "3.21.4"
-    "@datadog/datadog-ci-plugin-aas" "3.21.4"
-    "@datadog/datadog-ci-plugin-cloud-run" "3.21.4"
-    "@datadog/datadog-ci-plugin-deployment" "3.21.4"
-    "@datadog/datadog-ci-plugin-dora" "3.21.4"
-    "@datadog/datadog-ci-plugin-gate" "3.21.4"
-    "@datadog/datadog-ci-plugin-lambda" "3.21.4"
-    "@datadog/datadog-ci-plugin-sarif" "3.21.4"
-    "@datadog/datadog-ci-plugin-sbom" "3.21.4"
-    "@datadog/datadog-ci-plugin-stepfunctions" "3.21.4"
-    "@datadog/datadog-ci-plugin-synthetics" "3.21.4"
+    "@datadog/datadog-ci-base" "3.22.2"
+    "@datadog/datadog-ci-plugin-aas" "3.22.2"
+    "@datadog/datadog-ci-plugin-cloud-run" "3.22.2"
+    "@datadog/datadog-ci-plugin-deployment" "3.22.2"
+    "@datadog/datadog-ci-plugin-dora" "3.22.2"
+    "@datadog/datadog-ci-plugin-gate" "3.22.2"
+    "@datadog/datadog-ci-plugin-lambda" "3.22.2"
+    "@datadog/datadog-ci-plugin-sarif" "3.22.2"
+    "@datadog/datadog-ci-plugin-sbom" "3.22.2"
+    "@datadog/datadog-ci-plugin-stepfunctions" "3.22.2"
+    "@datadog/datadog-ci-plugin-synthetics" "3.22.2"
     axios "^1.12.1"
     chalk "3.0.0"
     clipanion "^3.2.1"
     fast-xml-parser "^4.4.1"
     form-data "^4.0.4"
-    inquirer "^8.2.5"
     js-yaml "3.13.1"
     semver "^7.5.3"
     simple-git "3.16.0"
@@ -5861,6 +5869,11 @@ package-json-from-dist@^1.0.0:
   resolved "https://registry.yarnpkg.com/package-json-from-dist/-/package-json-from-dist-1.0.1.tgz#4f1471a010827a86f94cfd9b0727e36d267de505"
   integrity sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==
 
+package-manager-detector@^1.3.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/package-manager-detector/-/package-manager-detector-1.4.0.tgz#d6e77ff8409b0574d8e9e1488366f384ecf5afa9"
+  integrity sha512-rRZ+pR1Usc+ND9M2NkmCvE/LYJS+8ORVV9X0KuNSY/gFsp7RBHJM/ADh9LYq4Vvfq6QkKrW6/weuh8SMEtN5gw==
+
 packageurl-js@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/packageurl-js/-/packageurl-js-2.0.1.tgz#a8fa43a64971b5dd0dca5fb904b950a6cc317a6f"
@@ -6320,10 +6333,10 @@ semver@^6.3.0, semver@^6.3.1:
   resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.1.tgz#556d2ef8689146e46dcea4bfdd095f3434dffcb4"
   integrity sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==
 
-semver@^7.5.3, semver@^7.5.4, semver@^7.7.2:
-  version "7.7.2"
-  resolved "https://registry.yarnpkg.com/semver/-/semver-7.7.2.tgz#67d99fdcd35cec21e6f8b87a7fd515a33f982b58"
-  integrity sha512-RF0Fw+rO5AMf9MAyaRXI4AV0Ulj5lMHqVxxdSgiVbixSCXoEmmX/jk0CuJw4+3SqroYO9VoUh+HcuJivvtJemA==
+semver@^7.5.3, semver@^7.5.4, semver@^7.7.3:
+  version "7.7.3"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.7.3.tgz#4b5f4143d007633a8dc671cd0a6ef9147b8bb946"
+  integrity sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==
 
 serverless-step-functions@^3.17.0:
   version "3.23.3"
@@ -6760,6 +6773,11 @@ tiny-async-pool@^2.1.0:
   resolved "https://registry.yarnpkg.com/tiny-async-pool/-/tiny-async-pool-2.1.0.tgz#3ec126568c18a7916912fb9fbecf812337ec6b84"
   integrity sha512-ltAHPh/9k0STRQqaoUX52NH4ZQYAJz24ZAEwf1Zm+HYg3l9OXTWeqWKyYsHu40wF/F0rxd2N2bk5sLvX2qlSvg==
 
+tinyexec@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/tinyexec/-/tinyexec-1.0.1.tgz#70c31ab7abbb4aea0a24f55d120e5990bfa1e0b1"
+  integrity sha512-5uC6DDlmeqiOwCPmK9jMSdOuZTh8bU39Ys6yidB+UTt5hfZUPGAypSgFRiEp+jbi9qH40BLDvy85jIU88wKSqw==
+
 tmp@^0.0.33:
   version "0.0.33"
   resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.0.33.tgz#6d34335889768d21b2bcda0aa277ced3b1bfadf9"
@@ -6809,9 +6827,9 @@ trim-repeated@^1.0.0:
     escape-string-regexp "^1.0.2"
 
 ts-jest@^29.1.1:
-  version "29.4.4"
-  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-29.4.4.tgz#fc6fefe28652ed81b8e1381ef8391901d9f81417"
-  integrity sha512-ccVcRABct5ZELCT5U0+DZwkXMCcOCLi2doHRrKy1nK/s7J7bch6TzJMsrY09WxgUUIP/ITfmcDS8D2yl63rnXw==
+  version "29.4.5"
+  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-29.4.5.tgz#a6b0dc401e521515d5342234be87f1ca96390a6f"
+  integrity sha512-HO3GyiWn2qvTQA4kTgjDcXiMwYQt68a1Y8+JuLRVpdIzm+UOLSHgl/XqR4c6nzJkq5rOkjc02O2I7P7l/Yof0Q==
   dependencies:
     bs-logger "^0.2.6"
     fast-json-stable-stringify "^2.1.0"
@@ -6819,7 +6837,7 @@ ts-jest@^29.1.1:
     json5 "^2.2.3"
     lodash.memoize "^4.1.2"
     make-error "^1.3.6"
-    semver "^7.7.2"
+    semver "^7.7.3"
     type-fest "^4.41.0"
     yargs-parser "^21.1.1"
 
