@@ -275,6 +275,12 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
         );
       }
 
+      if (config.appSecMode === "tracer" && !IN_TRACER_APPSEC_SUPPORTED_RUNTIMES.includes(type)) {
+        throw new Error(
+          `\`appSecMode\` is set to \`tracer\`. This requires the function to be a Python runtime. Found: ${type}`,
+        );
+      }
+
       if (
         (config.appSecMode === "on" && IN_TRACER_APPSEC_SUPPORTED_RUNTIMES.includes(type) && config.addLayers) ||
         config.appSecMode === "tracer"

@@ -209,11 +209,17 @@ custom:
 
 ### Enable in-tracer App and API Protection
 
-The [Datadog Lambda Library for Python][8] (version `8.114.0` or later) can run [App and API Protection][19] directly inside the instrumented application, giving the security engine additional context. Support for other runtimes will follow. This complements the in-extension implementation delivered by the [Datadog Lambda Extension][12]. `appSecMode` selects which implementation runs:
-- `on`: with `addLayers: true` on Python functions, App and API Protection runs within the library; other runtimes or manually supplied libraries fall back to the extension.
-- `tracer`: require the library implementation (every function must be in Python and use the Python library at version `8.114.0` or newer).
-- `extension`: always use the extension implementation, even when the library is present.
-- `off`: disable App and API Protection entirely.
+The [Datadog Lambda Library for Python][8] (version `8.114.0` or later) can run [App and API Protection][19] inside your function, giving the security engine more request context. This complements the in-extension approach provided by the [Datadog Lambda Extension][12]. Support for additional runtimes is coming.
+
+`appSecMode` controls which implementation runs:
+
+* **`on` (recommended):** Enable App and API Protection.
+  - If you’re on a supported runtime and using the plugin-provided layers (`addLayers: true`), enable the library implementation.
+  - For other runtimes, enable the **extension** implementation.
+* **`tracer`:** Force the library implementation. Every function must be Python and use the Python library at version `8.114.0` or newer.
+* **`extension`:** Force the **extension** implementation, even if a library with support is present.
+* **`off`:** Disable App and API Protection.
+
 
 
 ## Breaking Changes
