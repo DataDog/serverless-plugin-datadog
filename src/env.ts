@@ -8,7 +8,10 @@
 
 import Service from "serverless/classes/Service";
 import { ExtendedFunctionDefinition, FunctionInfo, runtimeLookup, RuntimeType } from "./layer";
-import { logMessage } from "./output";
+import { logMessage, logWarningMessage } from "./output";
+
+export type AppSecMode = "off" | "on" | "tracer" | "extension";
+const APPSEC_MODES = ["off", "on", "tracer", "extension"];
 
 export interface Configuration {
   // Whether Datadog is enabled. Defaults to true.
@@ -41,7 +44,9 @@ export interface Configuration {
   enableXrayTracing: boolean;
   // Enable tracing on Lambda function using dd-trace, datadog's APM library.
   enableDDTracing: boolean;
-  // Enable ASM on Lambda functions
+  // Configure App and API Protection behavior.
+  appSecMode?: AppSecMode;
+  // @deprected Use appSecMode instead; enable App and API Protection
   enableASM?: boolean;
   // Enable forwarding Logs
   enableDDLogs: boolean;
@@ -146,7 +151,8 @@ const siteURLEnvVar = "DD_SITE";
 const logLevelEnvVar = "DD_LOG_LEVEL";
 const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
 const ddTracingEnabledEnvVar = "DD_TRACE_ENABLED";
-const ddASMEnabledEnvVar = "DD_SERVERLESS_APPSEC_ENABLED";
+const ddServerlessAppsecEnabledEnvVar = "DD_SERVERLESS_APPSEC_ENABLED";
+const ddAppsecEnabledEnvVar = "DD_APPSEC_ENABLED";
 const ddMergeXrayTracesEnvVar = "DD_MERGE_XRAY_TRACES";
 const logInjectionEnvVar = "DD_LOGS_INJECTION";
 const ddLogsEnabledEnvVar = "DD_SERVERLESS_LOGS_ENABLED";
@@ -172,6 +178,8 @@ export const ddTagsEnvVar = "DD_TAGS";
 // Currently it is only used for Java and .NET
 const AWS_LAMBDA_EXEC_WRAPPER_VAR = "AWS_LAMBDA_EXEC_WRAPPER";
 const AWS_LAMBDA_EXEC_WRAPPER = "/opt/datadog_wrapper";
+
+const IN_TRACER_APPSEC_SUPPORTED_RUNTIMES = [RuntimeType.PYTHON];
 
 export const defaultConfiguration: Configuration = {
   addLayers: true,
@@ -250,12 +258,47 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     if (config.enableDDTracing !== undefined && environment[ddTracingEnabledEnvVar] === undefined) {
       environment[ddTracingEnabledEnvVar] = config.enableDDTracing;
     }
+
+    if (config.appSecMode && !APPSEC_MODES.includes(config.appSecMode)) {
+      throw new Error("`appSecMode` can only be set to one of `off`, `on`, `tracer` or `extension`");
+    }
+
+    const appsecEnabled = config.appSecMode !== undefined && ["on", "tracer", "extension"].includes(config.appSecMode);
+    if (appsecEnabled && config.enableASM) {
+      throw new Error("`appSecMode` and `enableASM` are mutually exclusive; Set only `appSecMode`");
+    }
+
+    if (appsecEnabled) {
+      if (!config.enableDDTracing) {
+        throw new Error(
+          "`appSecMode` is set with one of `on`, `tracer` or `extension`. This requires the extension to be present, and `enableDDTracing` to be enabled",
+        );
+      }
+
+      if (config.appSecMode === "tracer" && !IN_TRACER_APPSEC_SUPPORTED_RUNTIMES.includes(type)) {
+        throw new Error(
+          `\`appSecMode\` is set to \`tracer\`. This requires the function to be a Python runtime. Found: ${type}`,
+        );
+      }
+
+      if (
+        (config.appSecMode === "on" && IN_TRACER_APPSEC_SUPPORTED_RUNTIMES.includes(type) && config.addLayers) ||
+        config.appSecMode === "tracer"
+      )
+        environment[ddAppsecEnabledEnvVar] = true;
+      else if (config.appSecMode === "on" || config.appSecMode === "extension") {
+        environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] ??= AWS_LAMBDA_EXEC_WRAPPER;
+        environment[ddServerlessAppsecEnabledEnvVar] = true;
+      }
+    }
+
     if (config.enableASM !== undefined && config.enableASM) {
+      logWarningMessage("`enableASM` is deprecated, use `appSecMode` instead.");
       if ((config.enableASM && !config.enableDDTracing) || (config.enableASM && !config.addExtension)) {
         throw new Error("`enableASM` requires the extension to be present, and `enableDDTracing` to be enabled");
       }
       environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] ??= AWS_LAMBDA_EXEC_WRAPPER;
-      environment[ddASMEnabledEnvVar] ??= config.enableASM;
+      environment[ddServerlessAppsecEnabledEnvVar] ??= config.enableASM;
     }
     if (config.enableXrayTracing !== undefined && environment[ddMergeXrayTracesEnvVar] === undefined) {
       environment[ddMergeXrayTracesEnvVar] = config.enableXrayTracing;

@@ -38,7 +38,8 @@ To further configure your plugin, use the following custom parameters in your `s
 | `tags`                        | A comma separated list of `key`:`value` pairs as a single string. When set along with `extensionLayerVersion`, a `DD_TAGS` environment variable is added to all Lambda functions with the provided value. When set along with `forwarderArn`, the plugin parses the string and sets each `key`:`value` pair as a tag on all Lambda functions.                                                                                |
 | `enableXrayTracing`           | Set `true` to enable X-Ray tracing on the Lambda functions and API Gateway integrations. Defaults to `false`.                                                                                                                                                                                                                                                                                                                |
 | `enableDDTracing`             | Enable Datadog tracing on the Lambda function. Defaults to `true`.                                                                                                                                                                                                                                                                                                                                                           |
-| `enableASM`                   | Enable [Datadog App and API Protection (AAP)][19] on the Lambda function. Requires the Datadog extension to be present (using `addExtension` or manually added) and `enableDDTracing`. Defaults to `false`.                                                                                                                                                                                                                                                                                                                                                          |
+| `enableASM`                   | **Deprecated**: use `appSecMode` instead. Enable [Datadog App and API Protection][19] on the Lambda function. Requires the Datadog extension to be present (using `addExtension` or manually added) and `enableDDTracing`. Defaults to `false`.                                                                                                                                                                              |
+| `appSecMode`                  | Configure [Datadog App and API Protection][19]. Accepts `off`, `on`, `extension`, and `tracer`. To enable App and API Protection, set the value to `on`. The values `on`, `extension` and `tracer` require `enableDDTracing`. Defaults to `off`. For more information on the `tracer` and `extension` options read [Enable in-tracer App and API Protection](#enable-in-tracer-app-and-api-protection)                       |
 | `enableDDLogs`                | Enable Datadog log collection using the Lambda Extension. Defaults to `true`. Note: This setting has no effect on logs sent by the Datadog Forwarder.                                                                                                                                                                                                                                                                        |
 | `monitors`                    | When defined, the Datadog plugin configures monitors for the deployed function. Requires setting `DATADOG_API_KEY` and `DATADOG_APP_KEY` in your environment. To learn how to define monitors, see [To Enable and Configure a Recommended Serverless Monitor](#to-enable-and-configure-a-recommended-serverless-monitor).                                                                                                    |
 | `captureLambdaPayload`        | [Captures incoming and outgoing AWS Lambda payloads][17] in the Datadog APM spans for Lambda invocations. Defaults to `false`.                                                                                                                                                                                                                                                                                               |
@@ -205,6 +206,21 @@ custom:
               warning: 2
               critical: 3
 ```
+
+### Enable in-tracer App and API Protection
+
+The [Datadog Lambda Library for Python][8] (version `8.114.0` or later) can run [App and API Protection][19] inside your function, giving the security engine more request context. This complements the in-extension approach provided by the [Datadog Lambda Extension][12]. Support for additional runtimes is coming.
+
+`appSecMode` controls which implementation runs:
+
+* **`on` (recommended):** Enable App and API Protection.
+  - If you’re on a supported runtime and using the plugin-provided layers (`addLayers: true`), enable the library implementation.
+  - For other runtimes, enable the **extension** implementation.
+* **`tracer`:** Force the library implementation. Every function must be Python and use the Python library at version `8.114.0` or newer.
+* **`extension`:** Force the **extension** implementation, even if a library with support is present.
+* **`off`:** Disable App and API Protection.
+
+
 
 ## Breaking Changes
 
