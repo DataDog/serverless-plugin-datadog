@@ -142,6 +142,9 @@ export interface Configuration {
 
   // Only required if you are not using the Datadog Agent.
   llmObsAgentlessEnabled?: boolean;
+
+  // Skips auto-setting the AWS_LAMBDA_EXEC_WRAPPER environment variable
+  skipAwsLambdaExecWrapperEnvVar?: boolean;
 }
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
@@ -287,7 +290,9 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
       )
         environment[ddAppsecEnabledEnvVar] = true;
       else if (config.appSecMode === "on" || config.appSecMode === "extension") {
-        environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] ??= AWS_LAMBDA_EXEC_WRAPPER;
+        if (!config.skipAwsLambdaExecWrapperEnvVar) {
+          environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] ??= AWS_LAMBDA_EXEC_WRAPPER;
+        }
         environment[ddServerlessAppsecEnabledEnvVar] = true;
       }
     }
@@ -297,7 +302,9 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
       if ((config.enableASM && !config.enableDDTracing) || (config.enableASM && !config.addExtension)) {
         throw new Error("`enableASM` requires the extension to be present, and `enableDDTracing` to be enabled");
       }
-      environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] ??= AWS_LAMBDA_EXEC_WRAPPER;
+      if (!config.skipAwsLambdaExecWrapperEnvVar) {
+        environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] ??= AWS_LAMBDA_EXEC_WRAPPER;
+      }
       environment[ddServerlessAppsecEnabledEnvVar] ??= config.enableASM;
     }
     if (config.enableXrayTracing !== undefined && environment[ddMergeXrayTracesEnvVar] === undefined) {
@@ -361,7 +368,7 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
       environment[ddLlmObsAgentlessEnabled] = config.llmObsAgentlessEnabled;
     }
 
-    if (type === RuntimeType.DOTNET || type === RuntimeType.JAVA) {
+    if ((type === RuntimeType.DOTNET || type === RuntimeType.JAVA) && !config.skipAwsLambdaExecWrapperEnvVar) {
       if (environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] === undefined) {
         environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] = AWS_LAMBDA_EXEC_WRAPPER;
       } else if (environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] !== AWS_LAMBDA_EXEC_WRAPPER) {

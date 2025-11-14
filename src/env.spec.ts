@@ -2033,4 +2033,314 @@ describe("setEnvConfiguration", () => {
       ]);
     });
   });
+
+  describe("skipAwsLambdaExecWrapperEnvVar", () => {
+    // Test: Skip for DOTNET/JAVA runtimes
+    describe("when set to true", () => {
+      it("does not set AWS_LAMBDA_EXEC_WRAPPER for DOTNET and JAVA runtimes", () => {
+        const handlers: FunctionInfo[] = [
+          {
+            handler: {
+              environment: {},
+              events: [],
+            },
+            name: "function-dotnet",
+            type: RuntimeType.DOTNET,
+          },
+          {
+            handler: {
+              environment: {},
+              events: [],
+            },
+            name: "function-java",
+            type: RuntimeType.JAVA,
+          },
+        ];
+
+        setEnvConfiguration(
+          {
+            ...defaultConfiguration,
+            apiKey: "1234",
+            skipAwsLambdaExecWrapperEnvVar: true,
+          },
+          handlers,
+        );
+
+        expect(handlers).toEqual([
+          {
+            handler: {
+              environment: {
+                DD_API_KEY: "1234",
+                DD_CAPTURE_LAMBDA_PAYLOAD: false,
+                DD_LOGS_INJECTION: false,
+                DD_MERGE_XRAY_TRACES: false,
+                DD_SERVERLESS_LOGS_ENABLED: true,
+                DD_SITE: "datadoghq.com",
+                DD_TRACE_ENABLED: true,
+              },
+              events: [],
+            },
+            name: "function-dotnet",
+            type: RuntimeType.DOTNET,
+          },
+          {
+            handler: {
+              environment: {
+                DD_API_KEY: "1234",
+                DD_CAPTURE_LAMBDA_PAYLOAD: false,
+                DD_LOGS_INJECTION: false,
+                DD_MERGE_XRAY_TRACES: false,
+                DD_SERVERLESS_LOGS_ENABLED: true,
+                DD_SITE: "datadoghq.com",
+                DD_TRACE_ENABLED: true,
+              },
+              events: [],
+            },
+            name: "function-java",
+            type: RuntimeType.JAVA,
+          },
+        ]);
+      });
+
+      it("does not set AWS_LAMBDA_EXEC_WRAPPER for appSecMode 'on'", () => {
+        const handlers: FunctionInfo[] = [
+          {
+            handler: {
+              environment: {},
+              events: [],
+            },
+            name: "function-node",
+            type: RuntimeType.NODE,
+          },
+        ];
+
+        setEnvConfiguration(
+          {
+            ...defaultConfiguration,
+            apiKey: "1234",
+            appSecMode: "on",
+            skipAwsLambdaExecWrapperEnvVar: true,
+          },
+          handlers,
+        );
+
+        expect(handlers).toEqual([
+          {
+            handler: {
+              environment: {
+                DD_API_KEY: "1234",
+                DD_CAPTURE_LAMBDA_PAYLOAD: false,
+                DD_LOGS_INJECTION: false,
+                DD_MERGE_XRAY_TRACES: false,
+                DD_SERVERLESS_APPSEC_ENABLED: true,
+                DD_SERVERLESS_LOGS_ENABLED: true,
+                DD_SITE: "datadoghq.com",
+                DD_TRACE_ENABLED: true,
+              },
+              events: [],
+            },
+            name: "function-node",
+            type: RuntimeType.NODE,
+          },
+        ]);
+      });
+
+      it("does not set AWS_LAMBDA_EXEC_WRAPPER for appSecMode 'extension'", () => {
+        const handlers: FunctionInfo[] = [
+          {
+            handler: {
+              environment: {},
+              events: [],
+            },
+            name: "function-python",
+            type: RuntimeType.PYTHON,
+          },
+        ];
+
+        setEnvConfiguration(
+          {
+            ...defaultConfiguration,
+            apiKey: "1234",
+            appSecMode: "extension",
+            skipAwsLambdaExecWrapperEnvVar: true,
+          },
+          handlers,
+        );
+
+        expect(handlers).toEqual([
+          {
+            handler: {
+              environment: {
+                DD_API_KEY: "1234",
+                DD_CAPTURE_LAMBDA_PAYLOAD: false,
+                DD_LOGS_INJECTION: false,
+                DD_MERGE_XRAY_TRACES: false,
+                DD_SERVERLESS_APPSEC_ENABLED: true,
+                DD_SERVERLESS_LOGS_ENABLED: true,
+                DD_SITE: "datadoghq.com",
+                DD_TRACE_ENABLED: true,
+              },
+              events: [],
+            },
+            name: "function-python",
+            type: RuntimeType.PYTHON,
+          },
+        ]);
+      });
+
+      it("does not set AWS_LAMBDA_EXEC_WRAPPER for enableASM", () => {
+        const handlers: FunctionInfo[] = [
+          {
+            handler: {
+              environment: {},
+              events: [],
+            },
+            name: "function-node",
+            type: RuntimeType.NODE,
+          },
+        ];
+
+        setEnvConfiguration(
+          {
+            ...defaultConfiguration,
+            apiKey: "1234",
+            enableASM: true,
+            skipAwsLambdaExecWrapperEnvVar: true,
+          },
+          handlers,
+        );
+
+        expect(handlers).toEqual([
+          {
+            handler: {
+              environment: {
+                DD_API_KEY: "1234",
+                DD_CAPTURE_LAMBDA_PAYLOAD: false,
+                DD_LOGS_INJECTION: false,
+                DD_MERGE_XRAY_TRACES: false,
+                DD_SERVERLESS_APPSEC_ENABLED: true,
+                DD_SERVERLESS_LOGS_ENABLED: true,
+                DD_SITE: "datadoghq.com",
+                DD_TRACE_ENABLED: true,
+              },
+              events: [],
+            },
+            name: "function-node",
+            type: RuntimeType.NODE,
+          },
+        ]);
+      });
+    });
+
+    describe("when set to false or undefined", () => {
+      it("sets AWS_LAMBDA_EXEC_WRAPPER for DOTNET and JAVA runtimes (default behavior)", () => {
+        const handlers: FunctionInfo[] = [
+          {
+            handler: {
+              environment: {},
+              events: [],
+            },
+            name: "function-dotnet",
+            type: RuntimeType.DOTNET,
+          },
+          {
+            handler: {
+              environment: {},
+              events: [],
+            },
+            name: "function-java",
+            type: RuntimeType.JAVA,
+          },
+        ];
+
+        setEnvConfiguration(
+          {
+            ...defaultConfiguration,
+            apiKey: "1234",
+            skipAwsLambdaExecWrapperEnvVar: false,
+          },
+          handlers,
+        );
+
+        expect(handlers).toEqual([
+          {
+            handler: {
+              environment: {
+                AWS_LAMBDA_EXEC_WRAPPER: "/opt/datadog_wrapper",
+                DD_API_KEY: "1234",
+                DD_CAPTURE_LAMBDA_PAYLOAD: false,
+                DD_LOGS_INJECTION: false,
+                DD_MERGE_XRAY_TRACES: false,
+                DD_SERVERLESS_LOGS_ENABLED: true,
+                DD_SITE: "datadoghq.com",
+                DD_TRACE_ENABLED: true,
+              },
+              events: [],
+            },
+            name: "function-dotnet",
+            type: RuntimeType.DOTNET,
+          },
+          {
+            handler: {
+              environment: {
+                AWS_LAMBDA_EXEC_WRAPPER: "/opt/datadog_wrapper",
+                DD_API_KEY: "1234",
+                DD_CAPTURE_LAMBDA_PAYLOAD: false,
+                DD_LOGS_INJECTION: false,
+                DD_MERGE_XRAY_TRACES: false,
+                DD_SERVERLESS_LOGS_ENABLED: true,
+                DD_SITE: "datadoghq.com",
+                DD_TRACE_ENABLED: true,
+              },
+              events: [],
+            },
+            name: "function-java",
+            type: RuntimeType.JAVA,
+          },
+        ]);
+      });
+
+      it("sets AWS_LAMBDA_EXEC_WRAPPER when undefined (backward compatibility)", () => {
+        const handlers: FunctionInfo[] = [
+          {
+            handler: {
+              environment: {},
+              events: [],
+            },
+            name: "function-dotnet",
+            type: RuntimeType.DOTNET,
+          },
+        ];
+
+        setEnvConfiguration(
+          {
+            ...defaultConfiguration,
+            apiKey: "1234",
+            // skipAwsLambdaExecWrapperEnvVar is not set (undefined)
+          },
+          handlers,
+        );
+
+        expect(handlers).toEqual([
+          {
+            handler: {
+              environment: {
+                AWS_LAMBDA_EXEC_WRAPPER: "/opt/datadog_wrapper",
+                DD_API_KEY: "1234",
+                DD_CAPTURE_LAMBDA_PAYLOAD: false,
+                DD_LOGS_INJECTION: false,
+                DD_MERGE_XRAY_TRACES: false,
+                DD_SERVERLESS_LOGS_ENABLED: true,
+                DD_SITE: "datadoghq.com",
+                DD_TRACE_ENABLED: true,
+              },
+              events: [],
+            },
+            name: "function-dotnet",
+            type: RuntimeType.DOTNET,
+          },
+        ]);
+      });
+    });
+  });
 });
