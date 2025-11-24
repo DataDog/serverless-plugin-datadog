@@ -16,3 +16,4 @@ updates:
         update-types:
           - "minor"
           - "patch"
+    open-pull-requests-limit: 0
