@@ -601,7 +601,7 @@ describe("setEnvConfiguration", () => {
     ]);
   });
 
-  it ("skips setting AWS_LAMBDA_EXEC_WRAPPER for Java and .NET functions when addExtension is false", () => {
+  it("skips setting AWS_LAMBDA_EXEC_WRAPPER for Java and .NET functions when addExtension is false", () => {
     const handlers: FunctionInfo[] = [
       {
         handler: {
@@ -620,72 +620,72 @@ describe("setEnvConfiguration", () => {
         type: RuntimeType.DOTNET,
       },
     ];
-  setEnvConfiguration(
-    {
-      addLayers: true,
-      apiKey: "1234",
-      apiKMSKey: "5678",
-      site: "datadoghq.eu",
-      subdomain: "app",
-      logLevel: "debug",
-      flushMetricsToLogs: true,
-      enableXrayTracing: true,
-      enableDDTracing: true,
-      enableDDLogs: true,
-      addExtension: false,
-      enableTags: true,
-      injectLogContext: false,
-      subscribeToAccessLogs: true,
-      subscribeToExecutionLogs: false,
-      subscribeToStepFunctionLogs: false,
-      exclude: ["dd-excluded-function"],
-      enableSourceCodeIntegration: true,
-      uploadGitMetadata: false,
-      failOnError: false,
-      skipCloudformationOutputs: false,
-    },
-    handlers,
-  );  
-  expect(handlers).toEqual([
-    {
-      handler: {
-        environment: {
-          DD_API_KEY: "1234",
-          DD_CAPTURE_LAMBDA_PAYLOAD: undefined,
-          DD_FLUSH_TO_LOG: true,
-          DD_KMS_API_KEY: "5678",
-          DD_LOG_LEVEL: "debug",
-          DD_SITE: "datadoghq.eu",
-          DD_TRACE_ENABLED: true,
-          DD_MERGE_XRAY_TRACES: true,
-          DD_LOGS_INJECTION: false,
-          DD_SERVERLESS_LOGS_ENABLED: true,
-        },
-        events: [],
+    setEnvConfiguration(
+      {
+        addLayers: true,
+        apiKey: "1234",
+        apiKMSKey: "5678",
+        site: "datadoghq.eu",
+        subdomain: "app",
+        logLevel: "debug",
+        flushMetricsToLogs: true,
+        enableXrayTracing: true,
+        enableDDTracing: true,
+        enableDDLogs: true,
+        addExtension: false,
+        enableTags: true,
+        injectLogContext: false,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
+        subscribeToStepFunctionLogs: false,
+        exclude: ["dd-excluded-function"],
+        enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
+        failOnError: false,
+        skipCloudformationOutputs: false,
       },
+      handlers,
+    );
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_API_KEY: "1234",
+            DD_CAPTURE_LAMBDA_PAYLOAD: undefined,
+            DD_FLUSH_TO_LOG: true,
+            DD_KMS_API_KEY: "5678",
+            DD_LOG_LEVEL: "debug",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_MERGE_XRAY_TRACES: true,
+            DD_LOGS_INJECTION: false,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+          },
+          events: [],
+        },
         name: "function",
         type: RuntimeType.JAVA,
       },
       {
         handler: {
-        environment: {
-          DD_API_KEY: "1234",
-          DD_CAPTURE_LAMBDA_PAYLOAD: undefined,
-          DD_FLUSH_TO_LOG: true,
-          DD_KMS_API_KEY: "5678",
-          DD_LOG_LEVEL: "debug",
-          DD_SITE: "datadoghq.eu",
-          DD_TRACE_ENABLED: true,
-          DD_MERGE_XRAY_TRACES: true,
-          DD_LOGS_INJECTION: false,
-          DD_SERVERLESS_LOGS_ENABLED: true,
+          environment: {
+            DD_API_KEY: "1234",
+            DD_CAPTURE_LAMBDA_PAYLOAD: undefined,
+            DD_FLUSH_TO_LOG: true,
+            DD_KMS_API_KEY: "5678",
+            DD_LOG_LEVEL: "debug",
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+            DD_MERGE_XRAY_TRACES: true,
+            DD_LOGS_INJECTION: false,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+          },
+          events: [],
         },
-        events: [],
+        name: "function2",
+        type: RuntimeType.DOTNET,
       },
-      name: "function2",
-      type: RuntimeType.DOTNET,
-    },
-  ]);
+    ]);
   });
   it("doesn't overwrite already present env vars", () => {
     const handlers: FunctionInfo[] = [
