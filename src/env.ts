@@ -361,7 +361,7 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
       environment[ddLlmObsAgentlessEnabled] = config.llmObsAgentlessEnabled;
     }
 
-    if (type === RuntimeType.DOTNET || type === RuntimeType.JAVA) {
+    if ((type === RuntimeType.DOTNET || type === RuntimeType.JAVA) && config.addExtension) {
       if (environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] === undefined) {
         environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] = AWS_LAMBDA_EXEC_WRAPPER;
       } else if (environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] !== AWS_LAMBDA_EXEC_WRAPPER) {
