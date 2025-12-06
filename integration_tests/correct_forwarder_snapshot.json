@@ -885,8 +885,7 @@
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
-            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
-            "AWS_LAMBDA_EXEC_WRAPPER": "/opt/datadog_wrapper"
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false
           }
         },
         "Role": {
@@ -937,8 +936,7 @@
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
-            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
-            "AWS_LAMBDA_EXEC_WRAPPER": "/opt/datadog_wrapper"
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false
           }
         },
         "Role": {
@@ -989,8 +987,7 @@
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
-            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
-            "AWS_LAMBDA_EXEC_WRAPPER": "/opt/datadog_wrapper"
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false
           }
         },
         "Role": {
@@ -1041,8 +1038,7 @@
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
-            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
-            "AWS_LAMBDA_EXEC_WRAPPER": "/opt/datadog_wrapper"
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false
           }
         },
         "Role": {
