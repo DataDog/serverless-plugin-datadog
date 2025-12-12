@@ -3975,9 +3975,9 @@ possible-typed-array-names@^1.0.0:
   integrity sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==
 
 prettier@^3.6.2:
-  version "3.6.2"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.6.2.tgz#ccda02a1003ebbb2bfda6f83a074978f608b9393"
-  integrity sha512-I7AIg5boAr5R0FFtJ6rCfD+LFsWHp81dolrFD8S79U9tb8Az2nGrJncnMSnys+bpQJfRUzqs9hnA81OAA3hCuQ==
+  version "3.7.4"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.7.4.tgz#d2f8335d4b1cec47e1c8098645411b0c9dff9c0f"
+  integrity sha512-v6UNi1+3hSlVvv8fSaoUbggEM5VErKmmpGA7Pl3HF8V6uKY7rvClBOJlH6yNwQtfTueNkGVpOv/mtWL9L4bgRA==
 
 pretty-format@30.2.0:
   version "30.2.0"
@@ -4247,9 +4247,9 @@ semver@^7.5.3, semver@^7.5.4, semver@^7.7.3:
   integrity sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==
 
 serverless-step-functions@^3.17.0:
-  version "3.23.3"
-  resolved "https://registry.yarnpkg.com/serverless-step-functions/-/serverless-step-functions-3.23.3.tgz#1ca684184d2f9bafb13cb390553ee2f141493db6"
-  integrity sha512-Gg/qih3tMJM/jco4pYqkYxWdpkr0LeXKjNJ6IdC1nl5Nzav/x02upwNG1uJ8XRU3t0fmLcbWfj7xyhh592uu5Q==
+  version "3.23.4"
+  resolved "https://registry.yarnpkg.com/serverless-step-functions/-/serverless-step-functions-3.23.4.tgz#8e1d3b60f7fc0a2ce54f5dc2f53b4c5e2fbf6519"
+  integrity sha512-8vxfhkxDsj0A2DoY/MO7jUiFhKVkrE00/yoi67UDKQKB3+3lHoX0Uscc81D2K68asiEv7XMzfBd8K1zbDHCqZQ==
   dependencies:
     "@serverless/utils" "^6.7.0"
     asl-validator "^3.11.0"
@@ -4692,9 +4692,9 @@ trim-repeated@^1.0.0:
     escape-string-regexp "^1.0.2"
 
 ts-jest@^29.1.1:
-  version "29.4.5"
-  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-29.4.5.tgz#a6b0dc401e521515d5342234be87f1ca96390a6f"
-  integrity sha512-HO3GyiWn2qvTQA4kTgjDcXiMwYQt68a1Y8+JuLRVpdIzm+UOLSHgl/XqR4c6nzJkq5rOkjc02O2I7P7l/Yof0Q==
+  version "29.4.6"
+  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-29.4.6.tgz#51cb7c133f227396818b71297ad7409bb77106e9"
+  integrity sha512-fSpWtOO/1AjSNQguk43hb/JCo16oJDnMJf3CdEGNkqsEX3t0KX96xvyX1D7PfLCpVoKu4MfVrqUkFyblYoY4lA==
   dependencies:
     bs-logger "^0.2.6"
     fast-json-stable-stringify "^2.1.0"
