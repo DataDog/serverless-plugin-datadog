@@ -1576,7 +1576,7 @@ describe("ServerlessPlugin", () => {
       const plugin = new ServerlessPlugin(serverless, {});
       expect(async () => {
         await plugin.hooks["after:datadog:generate:init"]();
-      }).rejects.toThrowError(
+      }).rejects.toThrow(
         "The following configuration options have been removed: subscribeToApiGatewayLogs. Please use the subscribeToAccessLogs or subscribeToExecutionLogs options instead.",
       );
     });
@@ -1620,7 +1620,7 @@ describe("ServerlessPlugin", () => {
       const plugin = new ServerlessPlugin(serverless, {});
       expect(async () => {
         await plugin.hooks["after:datadog:generate:init"]();
-      }).rejects.toThrowError(
+      }).rejects.toThrow(
         "The following configuration options have been removed: subscribeToApiGatewayLogs subscribeToHttpApiLogs subscribeToWebsocketLogs. Please use the subscribeToAccessLogs or subscribeToExecutionLogs options instead.",
       );
     });

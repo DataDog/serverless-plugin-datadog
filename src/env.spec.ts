@@ -1184,7 +1184,7 @@ describe("setEnvConfiguration", () => {
         },
         handlers,
       );
-    }).toThrowError("When `llmObsEnabled` is true, `llmObsMlApp` must also be set.");
+    }).toThrow("When `llmObsEnabled` is true, `llmObsMlApp` must also be set.");
   });
 
   it("throws error when `llmObsMlApp` is set to an invalid value", () => {
@@ -1227,7 +1227,7 @@ describe("setEnvConfiguration", () => {
         },
         handlers,
       );
-    }).toThrowError(
+    }).toThrow(
       "`llmObsMlApp` must only contain up to 193 alphanumeric characters, hyphens, underscores, periods, and slashes.",
     );
   });
@@ -1271,7 +1271,7 @@ describe("setEnvConfiguration", () => {
         },
         handlers,
       );
-    }).toThrowError(
+    }).toThrow(
       "apiKeySecretArn` is not supported for Node runtimes when using Synchronous Metrics. Set DATADOG_API_KEY in your environment, or use `apiKmsKey` in the configuration.",
     );
   });
