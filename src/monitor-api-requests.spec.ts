@@ -443,9 +443,9 @@ describe("searchMonitor", () => {
   });
   it("throws an Invalid Authentication Error when authentication is invalid", async () => {
     (fetch as unknown as jest.Mock).mockReturnValue({ status: 403, statusText: "Unauthorized" });
-    await expect(
-      async () => await searchMonitors("datadoghq.com", "queryString", "apikey", "appkey"),
-    ).rejects.toThrow("Can't fetch monitors. Status code: 403. Message: Unauthorized");
+    await expect(async () => await searchMonitors("datadoghq.com", "queryString", "apikey", "appkey")).rejects.toThrow(
+      "Can't fetch monitors. Status code: 403. Message: Unauthorized",
+    );
   });
 });
 
