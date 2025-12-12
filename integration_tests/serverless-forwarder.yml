@@ -46,6 +46,21 @@ functions:
           path: /users/update
           method: put
       - websocket: $connect
+  PythonHello310:
+    handler: py_handler.hello
+    runtime: python3.10
+  PythonHello311:
+    handler: py_handler.hello
+    runtime: python3.11
+  PythonHello312:
+    handler: py_handler.hello
+    runtime: python3.12
+  PythonHello313:
+    handler: py_handler.hello
+    runtime: python3.13
+  PythonHello314:
+    handler: py_handler.hello
+    runtime: python3.14
   JavascriptHello16-x:
     handler: js_handler.hello
     runtime: nodejs16.x
@@ -63,6 +78,12 @@ functions:
   JavascriptHello20-x:
     handler: js_handler.hello
     runtime: nodejs20.x
+  JavascriptHello22-x:
+    handler: js_handler.hello
+    runtime: nodejs22.x
+  JavascriptHello24-x:
+    handler: js_handler.hello
+    runtime: nodejs24.x
   ExcludeThis:
     handler: js_handler.hello
     runtime: nodejs20.x
@@ -81,12 +102,30 @@ functions:
   JavaHello11:
     handler: java_handler.hello
     runtime: java11
+  JavaHello17:
+    handler: java_handler.hello
+    runtime: java17
+  JavaHello21:
+    handler: java_handler.hello
+    runtime: java21
   providedHello:
     handler: provided_handler.hello
     runtime: provided
+  providedAl2Hello:
+    handler: provided_handler.hello
+    runtime: provided.al2
+  providedAl2023Hello:
+    handler: provided_handler.hello
+    runtime: provided.al2023
   RubyHello32:
     handler: rb_handler.hello
     runtime: ruby3.2
+  RubyHello33:
+    handler: rb_handler.hello
+    runtime: ruby3.3
+  RubyHello34:
+    handler: rb_handler.hello
+    runtime: ruby3.4
 
 resources:
   Resources:
