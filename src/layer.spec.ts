@@ -46,6 +46,7 @@ describe("findHandlers", () => {
       "node18-function": { handler: "myfile.handler", runtime: "nodejs18.x" },
       "node20-function": { handler: "myfile.handler", runtime: "nodejs20.x" },
       "node22-function": { handler: "myfile.handler", runtime: "nodejs22.x" },
+      "node24-function": { handler: "myfile.handler", runtime: "nodejs24.x" },
       "python37-function": { handler: "myfile.handler", runtime: "python3.7" },
       "python38-function": { handler: "myfile.handler", runtime: "python3.8" },
       "python39-function": { handler: "myfile.handler", runtime: "python3.9" },
@@ -53,8 +54,10 @@ describe("findHandlers", () => {
       "python311-function": { handler: "myfile.handler", runtime: "python3.11" },
       "python312-function": { handler: "myfile.handler", runtime: "python3.12" },
       "python313-function": { handler: "myfile.handler", runtime: "python3.13" },
+      "python314-function": { handler: "myfile.handler", runtime: "python3.14" },
       "ruby32-function": { handler: "myfile.handler", runtime: "ruby3.2" },
       "ruby33-function": { handler: "myfile.handler", runtime: "ruby3.3" },
+      "ruby34-function": { handler: "myfile.handler", runtime: "ruby3.4" },
       "java8-function": { handler: "myfile.handler", runtime: "java8" },
       "java8.al2-function": { handler: "myfile.handler", runtime: "java8.al2" },
       "java11-function": { handler: "myfile.handler", runtime: "java11" },
@@ -99,6 +102,12 @@ describe("findHandlers", () => {
         runtime: "nodejs22.x",
       },
       {
+        name: "node24-function",
+        handler: { handler: "myfile.handler", runtime: "nodejs24.x" },
+        type: RuntimeType.NODE,
+        runtime: "nodejs24.x",
+      },
+      {
         name: "python37-function",
         handler: { handler: "myfile.handler", runtime: "python3.7" },
         type: RuntimeType.PYTHON,
@@ -141,6 +150,12 @@ describe("findHandlers", () => {
         runtime: "python3.13",
       },
       {
+        name: "python314-function",
+        handler: { handler: "myfile.handler", runtime: "python3.14" },
+        type: RuntimeType.PYTHON,
+        runtime: "python3.14",
+      },
+      {
         name: "ruby32-function",
         handler: { handler: "myfile.handler", runtime: "ruby3.2" },
         type: RuntimeType.RUBY,
@@ -151,6 +166,12 @@ describe("findHandlers", () => {
         handler: { handler: "myfile.handler", runtime: "ruby3.3" },
         type: RuntimeType.RUBY,
         runtime: "ruby3.3",
+      },
+      {
+        name: "ruby34-function",
+        handler: { handler: "myfile.handler", runtime: "ruby3.4" },
+        type: RuntimeType.RUBY,
+        runtime: "ruby3.4",
       },
       {
         name: "java8-function",
