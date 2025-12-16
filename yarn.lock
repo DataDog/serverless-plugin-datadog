@@ -278,10 +278,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@datadog/datadog-ci-base@4.3.0":
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-base/-/datadog-ci-base-4.3.0.tgz#5b59dfc82bf014c3c666303bd4a27787e274a1cc"
-  integrity sha512-OJdJJQvRXOkKSGK0a8n6Tq+xTtfik6qhHg67Z9Ld9wuD1lC1K5GEjZAcPdHe4elIxC7d0gSYHSt9wHcMNZhCIA==
+"@datadog/datadog-ci-base@4.4.0":
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-base/-/datadog-ci-base-4.4.0.tgz#0a511456cab6942bfb410974e0291e2d456009c0"
+  integrity sha512-sFssfj3EQKBiD9SkVYzhkzHZEQqmnsMGXKYKoLLTFcTmRbaePItx/1Sa3KzFVIWBhZQSpYoJt3VZ7+cagCShLA==
   dependencies:
     "@antfu/install-pkg" "^1.1.0"
     "@types/datadog-metrics" "0.6.1"
@@ -306,38 +306,38 @@
     typanion "^3.14.0"
     upath "^2.0.1"
 
-"@datadog/datadog-ci-plugin-deployment@4.3.0":
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-deployment/-/datadog-ci-plugin-deployment-4.3.0.tgz#07d83c5d58639c28e4bc28242111d7395fea00bf"
-  integrity sha512-ivdLEqymXaMPNhyPJ8NDRyHZdUemmJj8ktzYFCfvwR2mcrL9ea21DfDLs1ecvWmbJZSuWfiolZ4KgvDI0dE3rA==
+"@datadog/datadog-ci-plugin-deployment@4.4.0":
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-deployment/-/datadog-ci-plugin-deployment-4.4.0.tgz#4d22b6e26502833760b8247788f80f219aebc7be"
+  integrity sha512-u9FtFw2TKRF74wwcuM8tWseWTrLKZZ/Lwq1Fz+LtAGHTJ5675WuIhGNnSxbrKU4f2VsaFp+eUIsetcqbuUerXw==
   dependencies:
     axios "^1.12.1"
     chalk "3.0.0"
     simple-git "3.16.0"
 
-"@datadog/datadog-ci-plugin-dora@4.3.0":
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-dora/-/datadog-ci-plugin-dora-4.3.0.tgz#db4ca6a4b79e3837ac0feb46ad4d5f11110396d8"
-  integrity sha512-eq4kD1Ch5BCrQxaPeauBfxxlpyVAO/WO3MjpFkD0D7Cny3AHwkgVlaTWj7VF08EmsZx+BNlutZXaqpsVKAVMWg==
+"@datadog/datadog-ci-plugin-dora@4.4.0":
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-dora/-/datadog-ci-plugin-dora-4.4.0.tgz#b8feedd2ce043999c5fec6ccb2ace75f665cdb41"
+  integrity sha512-DuyKfiwxZoNu5dlMPZNq6DYlafR/3kpaqS0q9KfGStnu1LwS5YTREuZgssNkyYWnF6qZN80x1l7E/ubaAFVYOg==
   dependencies:
     axios "^1.12.1"
     chalk "3.0.0"
     simple-git "3.16.0"
 
-"@datadog/datadog-ci-plugin-gate@4.3.0":
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-gate/-/datadog-ci-plugin-gate-4.3.0.tgz#436c02c2365a6edfa3dd487fb511071d493477cb"
-  integrity sha512-0BMTE0gA5A8etWj+yT/COPlJPne/e6ugsSUxLN/UEcFHU5YbMaXOjrP6CXEktO4m24yRCY4JgMbyHEKFdy+hfw==
+"@datadog/datadog-ci-plugin-gate@4.4.0":
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-gate/-/datadog-ci-plugin-gate-4.4.0.tgz#6f7af2e9e295e39bba6096e845130ad31eac63d4"
+  integrity sha512-bR5AY5p5/5jQuZtcuEPJrEpL1WhJiXhfPwuc9OhGN0ny4/98S3Hg02aQ9aoloFipsBgEN3W5XhrWH6Pn1jSI5w==
   dependencies:
     "@types/uuid" "^9.0.2"
     axios "^1.12.1"
     chalk "3.0.0"
     uuid "^9.0.0"
 
-"@datadog/datadog-ci-plugin-sarif@4.3.0":
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-sarif/-/datadog-ci-plugin-sarif-4.3.0.tgz#6e6e86f0022c4fb2b43a1ba84848f29cb970be0d"
-  integrity sha512-pmDrzfib4JuOlsAkE7rIuW5Iv6d7QsNtaK9W0kQXYO4hQgN3FQfWp/MMM/z2AVg6vgU1JD7fIKU3zDbW+q1SXg==
+"@datadog/datadog-ci-plugin-sarif@4.4.0":
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-sarif/-/datadog-ci-plugin-sarif-4.4.0.tgz#ba38373626102a2ea4b78766a262c595a7d328e2"
+  integrity sha512-kgExnC/ReiGKr9R6SxaXr62lp2fYJQ4i8c9x4/GqDpNbLENQdsqBmxs6h1/N3xkdt3/p3RZlMcAhIytLYDkBAA==
   dependencies:
     ajv "^8.12.0"
     ajv-formats "^2.1.1"
@@ -348,10 +348,10 @@
     upath "^2.0.1"
     uuid "^9.0.0"
 
-"@datadog/datadog-ci-plugin-sbom@4.3.0":
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-sbom/-/datadog-ci-plugin-sbom-4.3.0.tgz#2ff548c9a7f8ecc11971a0e2029bdcb3cf250372"
-  integrity sha512-Bs/AR3W/V3+b2xktOiPxH4BEJJGBIm9SY6qoLxHwTkEDOB+E7DTQ9CeapSayClubG5daqOL/xxAArvbtQVbtMg==
+"@datadog/datadog-ci-plugin-sbom@4.4.0":
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-sbom/-/datadog-ci-plugin-sbom-4.4.0.tgz#11c46c4b423240d6c855470bd8d985f642abf805"
+  integrity sha512-bBsgIBBT0KsWqLcIMuf692PGjMNjG6OKNUjuPZOWbuToyKKnpRRkMDrX9KvUWVXuMKfDEp7i2PYw/2fQm5DXHg==
   dependencies:
     ajv "^8.12.0"
     ajv-formats "^2.1.1"
@@ -361,10 +361,10 @@
     simple-git "3.16.0"
     upath "^2.0.1"
 
-"@datadog/datadog-ci-plugin-synthetics@4.3.0":
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-synthetics/-/datadog-ci-plugin-synthetics-4.3.0.tgz#5ed457bb04cfaa25c065f91aa9a1426a678528fa"
-  integrity sha512-8mIvBvbIBObPoZpQz4LzKjLjmxSUY9GdWesURHtrWQPc0fegq7mfXTpUprHNxiH7YQZp8FOR4XfOC7D33bVdbw==
+"@datadog/datadog-ci-plugin-synthetics@4.4.0":
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci-plugin-synthetics/-/datadog-ci-plugin-synthetics-4.4.0.tgz#907e05cac2cafb1d021653246e474d95387d457e"
+  integrity sha512-SpGdOZUSjEVZZD/hopPKuXnOP6ZRl0nnZ8i5ffVIxohlMwn5y0vMWjjkDohk24M+2QBDUnMe4sNXW4YP1aeSWg==
   dependencies:
     axios "^1.12.1"
     chalk "3.0.0"
@@ -381,18 +381,18 @@
     xml2js "0.5.0"
     yamux-js "0.1.2"
 
-"@datadog/datadog-ci@4.3.0":
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci/-/datadog-ci-4.3.0.tgz#daf2293904090febd7a86a20064c5858349592f7"
-  integrity sha512-tjkW6jhv3GuWiBxKP+dhVfUZtJkUHXXMWnU5iSISNw4S2v2V54y48jvyP3fz7VBZs3uXoWwLhRUithOYrZMgjw==
+"@datadog/datadog-ci@4.4.0":
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/@datadog/datadog-ci/-/datadog-ci-4.4.0.tgz#dd15ff0ac748f642a8c19dfeccba2d2a0c52d4b2"
+  integrity sha512-vpQPcz+FRgDhPoHg9aXtTeaVe6Dhky6q1vG9TmOWDX39Pjf/Wz1LEY94uWvK6miC8orHf6RtIGOSxsycRNde7g==
   dependencies:
-    "@datadog/datadog-ci-base" "4.3.0"
-    "@datadog/datadog-ci-plugin-deployment" "4.3.0"
-    "@datadog/datadog-ci-plugin-dora" "4.3.0"
-    "@datadog/datadog-ci-plugin-gate" "4.3.0"
-    "@datadog/datadog-ci-plugin-sarif" "4.3.0"
-    "@datadog/datadog-ci-plugin-sbom" "4.3.0"
-    "@datadog/datadog-ci-plugin-synthetics" "4.3.0"
+    "@datadog/datadog-ci-base" "4.4.0"
+    "@datadog/datadog-ci-plugin-deployment" "4.4.0"
+    "@datadog/datadog-ci-plugin-dora" "4.4.0"
+    "@datadog/datadog-ci-plugin-gate" "4.4.0"
+    "@datadog/datadog-ci-plugin-sarif" "4.4.0"
+    "@datadog/datadog-ci-plugin-sbom" "4.4.0"
+    "@datadog/datadog-ci-plugin-synthetics" "4.4.0"
     axios "^1.12.1"
     chalk "3.0.0"
     clipanion "^3.2.1"
