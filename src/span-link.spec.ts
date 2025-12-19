@@ -43,7 +43,7 @@ describe("mergeStepFunctionAndLambdaTraces option related tests", () => {
       const service = serviceWithResources();
       const serverless: Serverless = service.serverless;
       mergeStepFunctionAndLambdaTraces(resources, serverless);
-      expect(stepFunctionsHelper.updateDefinitionString).toBeCalledTimes(0);
+      expect(stepFunctionsHelper.updateDefinitionString).toHaveBeenCalledTimes(0);
     });
 
     it("have one state machine in the resources", async () => {
@@ -63,7 +63,7 @@ describe("mergeStepFunctionAndLambdaTraces option related tests", () => {
       const service = serviceWithResources();
       const serverless: Serverless = service.serverless;
       mergeStepFunctionAndLambdaTraces(resources, serverless);
-      expect(stepFunctionsHelper.updateDefinitionString).toBeCalledTimes(1);
+      expect(stepFunctionsHelper.updateDefinitionString).toHaveBeenCalledTimes(1);
     });
 
     it("can handle a steate machine with a string DefinitionString", async () => {
@@ -82,7 +82,7 @@ describe("mergeStepFunctionAndLambdaTraces option related tests", () => {
       const service = serviceWithResources();
       const serverless: Serverless = service.serverless;
       mergeStepFunctionAndLambdaTraces(resources, serverless);
-      expect(stepFunctionsHelper.updateDefinitionString).toBeCalledTimes(1);
+      expect(stepFunctionsHelper.updateDefinitionString).toHaveBeenCalledTimes(1);
     });
 
     it("have two state machine in the resources", async () => {
@@ -110,7 +110,7 @@ describe("mergeStepFunctionAndLambdaTraces option related tests", () => {
       const service = serviceWithResources();
       const serverless: Serverless = service.serverless;
       mergeStepFunctionAndLambdaTraces(resources, serverless);
-      expect(stepFunctionsHelper.updateDefinitionString).toBeCalledTimes(2);
+      expect(stepFunctionsHelper.updateDefinitionString).toHaveBeenCalledTimes(2);
     });
   });
 });
