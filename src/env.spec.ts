@@ -496,6 +496,7 @@ describe("setEnvConfiguration", () => {
         addLayers: false,
         apiKey: "1234",
         apiKeySecretArn: "some-resource:from:aws:secrets-manager:arn",
+        apiKeySsmArn: "some-resource:from:aws:ssm:arn",
         apiKMSKey: "0912",
         site: "datadoghq.eu",
         subdomain: "app",
@@ -525,6 +526,7 @@ describe("setEnvConfiguration", () => {
           environment: {
             DD_API_KEY: "1234",
             DD_API_KEY_SECRET_ARN: "some-resource:from:aws:secrets-manager:arn",
+            DD_API_KEY_SSM_ARN: "some-resource:from:aws:ssm:arn",
             DD_CAPTURE_LAMBDA_PAYLOAD: false,
             DD_KMS_API_KEY: "0912",
             DD_LOG_LEVEL: "debug",
@@ -544,6 +546,7 @@ describe("setEnvConfiguration", () => {
           environment: {
             DD_API_KEY: "1234",
             DD_API_KEY_SECRET_ARN: "some-resource:from:aws:secrets-manager:arn",
+            DD_API_KEY_SSM_ARN: "some-resource:from:aws:ssm:arn",
             DD_CAPTURE_LAMBDA_PAYLOAD: false,
             DD_KMS_API_KEY: "0912",
             DD_LOG_LEVEL: "debug",
@@ -564,6 +567,7 @@ describe("setEnvConfiguration", () => {
           environment: {
             DD_API_KEY: "1234",
             DD_API_KEY_SECRET_ARN: "some-resource:from:aws:secrets-manager:arn",
+            DD_API_KEY_SSM_ARN: "some-resource:from:aws:ssm:arn",
             DD_CAPTURE_LAMBDA_PAYLOAD: false,
             DD_KMS_API_KEY: "0912",
             DD_LOG_LEVEL: "debug",
@@ -583,6 +587,7 @@ describe("setEnvConfiguration", () => {
           environment: {
             DD_API_KEY: "1234",
             DD_API_KEY_SECRET_ARN: "some-resource:from:aws:secrets-manager:arn",
+            DD_API_KEY_SSM_ARN: "some-resource:from:aws:ssm:arn",
             DD_CAPTURE_LAMBDA_PAYLOAD: false,
             DD_KMS_API_KEY: "0912",
             DD_LOG_LEVEL: "debug",
@@ -1274,6 +1279,190 @@ describe("setEnvConfiguration", () => {
     }).toThrow(
       "apiKeySecretArn` is not supported for Node runtimes when using Synchronous Metrics. Set DATADOG_API_KEY in your environment, or use `apiKmsKey` in the configuration.",
     );
+  });
+
+  it("successfully sets DD_API_KEY_SSM_ARN for Node runtime with sync metrics", () => {
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+          runtime: "nodejs20.x",
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
+
+    setEnvConfiguration(
+      {
+        addLayers: false,
+        apiKeySsmArn: "arn:aws:ssm:us-east-1:123456789012:parameter/datadog/api-key",
+        site: "datadoghq.eu",
+        subdomain: "app",
+        logLevel: "debug",
+        flushMetricsToLogs: false,
+        enableXrayTracing: true,
+        enableDDTracing: true,
+        enableDDLogs: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
+        subscribeToStepFunctionLogs: false,
+        addExtension: false,
+        enableTags: true,
+        injectLogContext: true,
+        exclude: ["dd-excluded-function"],
+        enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
+        captureLambdaPayload: false,
+        failOnError: false,
+        skipCloudformationOutputs: false,
+      },
+      handlers,
+    );
+
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_API_KEY_SSM_ARN: "arn:aws:ssm:us-east-1:123456789012:parameter/datadog/api-key",
+            DD_CAPTURE_LAMBDA_PAYLOAD: false,
+            DD_FLUSH_TO_LOG: false,
+            DD_LOGS_INJECTION: true,
+            DD_LOG_LEVEL: "debug",
+            DD_MERGE_XRAY_TRACES: true,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_SITE: "datadoghq.eu",
+            DD_TRACE_ENABLED: true,
+          },
+          events: [],
+          runtime: "nodejs20.x",
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ]);
+  });
+
+  it("successfully sets DD_API_KEY_SSM_ARN for Python runtime with extension", () => {
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+          runtime: "python3.11",
+        },
+        name: "function",
+        type: RuntimeType.PYTHON,
+      },
+    ];
+
+    setEnvConfiguration(
+      {
+        addLayers: true,
+        apiKeySsmArn: "arn:aws:ssm:us-east-1:123456789012:parameter/datadog/api-key",
+        site: "datadoghq.com",
+        subdomain: "app",
+        logLevel: "info",
+        flushMetricsToLogs: true,
+        enableXrayTracing: false,
+        enableDDTracing: true,
+        enableDDLogs: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
+        subscribeToStepFunctionLogs: false,
+        addExtension: true,
+        enableTags: true,
+        injectLogContext: false,
+        exclude: [],
+        enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
+        captureLambdaPayload: false,
+        failOnError: false,
+        skipCloudformationOutputs: false,
+      },
+      handlers,
+    );
+
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_API_KEY_SSM_ARN: "arn:aws:ssm:us-east-1:123456789012:parameter/datadog/api-key",
+            DD_CAPTURE_LAMBDA_PAYLOAD: false,
+            DD_LOGS_INJECTION: false,
+            DD_LOG_LEVEL: "info",
+            DD_MERGE_XRAY_TRACES: false,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_SITE: "datadoghq.com",
+            DD_TRACE_ENABLED: true,
+          },
+          events: [],
+          runtime: "python3.11",
+        },
+        name: "function",
+        type: RuntimeType.PYTHON,
+      },
+    ]);
+  });
+
+  it("doesn't set DD_API_KEY from environment if apiKeySsmArn is defined", () => {
+    process.env = {};
+    process.env.DATADOG_API_KEY = "dd-api-key";
+    const handlers: FunctionInfo[] = [
+      {
+        handler: {
+          environment: {},
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ];
+
+    setEnvConfiguration(
+      {
+        addLayers: false,
+        apiKeySsmArn: "arn:aws:ssm:us-east-1:123456789012:parameter/datadog/api-key",
+        site: "datadoghq.com",
+        subdomain: "app",
+        logLevel: "info",
+        flushMetricsToLogs: false,
+        enableXrayTracing: true,
+        enableDDTracing: true,
+        enableDDLogs: true,
+        addExtension: true,
+        enableTags: true,
+        injectLogContext: true,
+        subscribeToAccessLogs: true,
+        subscribeToExecutionLogs: false,
+        subscribeToStepFunctionLogs: false,
+        exclude: [],
+        enableSourceCodeIntegration: true,
+        uploadGitMetadata: false,
+        failOnError: false,
+        skipCloudformationOutputs: false,
+      },
+      handlers,
+    );
+    expect(handlers).toEqual([
+      {
+        handler: {
+          environment: {
+            DD_API_KEY_SSM_ARN: "arn:aws:ssm:us-east-1:123456789012:parameter/datadog/api-key",
+            DD_LOG_LEVEL: "info",
+            DD_LOGS_INJECTION: false,
+            DD_SERVERLESS_LOGS_ENABLED: true,
+            DD_SITE: "datadoghq.com",
+            DD_TRACE_ENABLED: true,
+            DD_MERGE_XRAY_TRACES: true,
+          },
+          events: [],
+        },
+        name: "function",
+        type: RuntimeType.NODE,
+      },
+    ]);
   });
   it("defines `DD_COLD_START_TRACING` when enableColdStartTracing is set", () => {
     const handlers: FunctionInfo[] = [
