@@ -638,7 +638,7 @@ function validateConfiguration(config: Configuration): void {
       config.apiKeySsmArn === undefined
     ) {
       throw new Error(
-        "The environment variable `DATADOG_API_KEY` or configuration variable `apiKMSKey`, `apiKeySecretArn`, or `apiKeySsmArn` must be set because `addExtension` is set to true as default.",
+        "The environment variable `DATADOG_API_KEY` or configuration variable `apiKMSKey` or `apiKeySecretArn` or `apiKeySsmArn` must be set because `addExtension` is set to true as default.",
       );
     }
   }
@@ -657,10 +657,21 @@ function validateConfiguration(config: Configuration): void {
 }
 
 function checkForMultipleApiKeys(config: Configuration): void {
-  const hasMultipleApiKeys = [config.apiKey, config.apiKMSKey, config.apiKeySecretArn, config.apiKeySsmArn]
-    .filter(key => key !== undefined).length;
-  
-  if (hasMultipleApiKeys) {
-    throw new Error("Only one of `apiKey`, `apiKMSKey`, `apiKeySecretArn`, or `apiKeySsmArn` should be set at the same time.");
+  const definedKeys = [];
+  if (config.apiKey !== undefined) definedKeys.push("`apiKey`");
+  if (config.apiKMSKey !== undefined) definedKeys.push("`apiKMSKey`");
+  if (config.apiKeySecretArn !== undefined) definedKeys.push("`apiKeySecretArn`");
+  if (config.apiKeySsmArn !== undefined) definedKeys.push("`apiKeySsmArn`");
+
+  if (definedKeys.length > 1) {
+    let message;
+    if (definedKeys.length === 2) {
+      message = `${definedKeys[0]} and ${definedKeys[1]}`;
+    } else {
+      const last = definedKeys[definedKeys.length - 1];
+      const rest = definedKeys.slice(0, -1).join(", ");
+      message = `${rest}, and ${last}`;
+    }
+    throw new Error(`${message} should not be set at the same time.`);
   }
 }
