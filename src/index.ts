@@ -634,10 +634,11 @@ function validateConfiguration(config: Configuration): void {
       config.apiKey === undefined &&
       process.env.DATADOG_API_KEY === undefined &&
       config.apiKMSKey === undefined &&
-      config.apiKeySecretArn === undefined
+      config.apiKeySecretArn === undefined &&
+      config.apiKeySsmArn === undefined
     ) {
       throw new Error(
-        "The environment variable `DATADOG_API_KEY` or configuration variable `apiKMSKey` or `apiKeySecretArn` must be set because `addExtension` is set to true as default.",
+        "The environment variable `DATADOG_API_KEY` or configuration variable `apiKMSKey`, `apiKeySecretArn`, or `apiKeySsmArn` must be set because `addExtension` is set to true as default.",
       );
     }
   }
@@ -656,18 +657,10 @@ function validateConfiguration(config: Configuration): void {
 }
 
 function checkForMultipleApiKeys(config: Configuration): void {
-  let multipleApiKeysMessage;
-  if (config.apiKey !== undefined && config.apiKMSKey !== undefined && config.apiKeySecretArn !== undefined) {
-    multipleApiKeysMessage = "`apiKey`, `apiKMSKey`, and `apiKeySecretArn`";
-  } else if (config.apiKey !== undefined && config.apiKMSKey !== undefined) {
-    multipleApiKeysMessage = "`apiKey` and `apiKMSKey`";
-  } else if (config.apiKey !== undefined && config.apiKeySecretArn !== undefined) {
-    multipleApiKeysMessage = "`apiKey` and `apiKeySecretArn`";
-  } else if (config.apiKMSKey !== undefined && config.apiKeySecretArn !== undefined) {
-    multipleApiKeysMessage = "`apiKMSKey` and `apiKeySecretArn`";
-  }
-
-  if (multipleApiKeysMessage) {
-    throw new Error(`${multipleApiKeysMessage} should not be set at the same time.`);
+  const hasMultipleApiKeys = [config.apiKey, config.apiKMSKey, config.apiKeySecretArn, config.apiKeySsmArn]
+    .filter(key => key !== undefined).length;
+  
+  if (hasMultipleApiKeys) {
+    throw new Error("Only one of `apiKey`, `apiKMSKey`, `apiKeySecretArn`, or `apiKeySsmArn` should be set at the same time.");
   }
 }
