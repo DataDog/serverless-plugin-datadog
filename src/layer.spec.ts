@@ -66,6 +66,7 @@ describe("findHandlers", () => {
       "java25-function": { handler: "myfile.handler", runtime: "java25" },
       "dotnet6-function": { handler: "myfile.handler", runtime: "dotnet6" },
       "dotnet8-function": { handler: "myfile.handler", runtime: "dotnet8" },
+      "dotnet10-function": { handler: "myfile.handler", runtime: "dotnet10" },
       "provided-function": { handler: "myfile.handler", runtime: "provided" },
       "provided.al2023-function": { handler: "myfile.handler", runtime: "provided.al2023" },
     });
@@ -221,6 +222,12 @@ describe("findHandlers", () => {
         handler: { handler: "myfile.handler", runtime: "dotnet8" },
         type: RuntimeType.DOTNET,
         runtime: "dotnet8",
+      },
+      {
+        name: "dotnet10-function",
+        handler: { handler: "myfile.handler", runtime: "dotnet10" },
+        type: RuntimeType.DOTNET,
+        runtime: "dotnet10",
       },
       {
         name: "provided-function",

@@ -70,6 +70,7 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
   "python3.14": RuntimeType.PYTHON,
   dotnet6: RuntimeType.DOTNET,
   dotnet8: RuntimeType.DOTNET,
+  dotnet10: RuntimeType.DOTNET,
   java11: RuntimeType.JAVA,
   java17: RuntimeType.JAVA,
   java21: RuntimeType.JAVA,
