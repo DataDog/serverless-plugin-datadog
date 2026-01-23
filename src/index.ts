@@ -657,7 +657,9 @@ function validateConfiguration(config: Configuration): void {
 }
 
 function checkForMultipleApiKeys(config: Configuration): void {
-  const definedKeys = ['apiKey', 'apiKMSKey', 'apiKeySecretArn', 'apiKeySsmArn'].filter((key) => key in config).map((key) =>  `\`${key}\``);
+  const definedKeys = ["apiKey", "apiKMSKey", "apiKeySecretArn", "apiKeySsmArn"]
+    .filter((key) => key in config)
+    .map((key) => `\`${key}\``);
 
   if (definedKeys.length > 1) {
     let message;
