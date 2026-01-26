@@ -28,6 +28,8 @@ export interface Configuration {
   monitorsAppKey?: string;
   // The ARN of the secret in AWS Secrets Manager containing the Datadog API key.
   apiKeySecretArn?: string;
+  // The ARN of the parameter in AWS Systems Manager Parameter Store containing the Datadog API key.
+  apiKeySsmArn?: string;
   // Datadog API Key encrypted using KMS, only necessary when using metrics without log forwarding
   apiKMSKey?: string;
   // Whether to capture and store the payload and response of a lambda invocation
@@ -147,6 +149,7 @@ const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
 const apiKeyKMSEnvVar = "DD_KMS_API_KEY";
 const apiKeySecretArnEnvVar = "DD_API_KEY_SECRET_ARN";
+const apiKeySsmArnEnvVar = "DD_API_KEY_SSM_ARN";
 const siteURLEnvVar = "DD_SITE";
 const logLevelEnvVar = "DD_LOG_LEVEL";
 const logForwardingEnvVar = "DD_FLUSH_TO_LOG";
@@ -221,11 +224,12 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
       environment[apiKeyEnvVar] === undefined &&
       // Only set this from the environment if all other methods of authentication
       // are not in use. This will set DATADOG_API_KEY on the lambda from the environment
-      // variable directly if they haven't set one of the below three options
+      // variable directly if they haven't set one of the below four options
       // in the configuration.
       config.apiKMSKey === undefined &&
       config.apiKey === undefined &&
-      config.apiKeySecretArn === undefined
+      config.apiKeySecretArn === undefined &&
+      config.apiKeySsmArn === undefined
     ) {
       environment[apiKeyEnvVar] = process.env.DATADOG_API_KEY;
       logMessage("Using DATADOG_API_KEY environment variable for authentication");
@@ -245,6 +249,9 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
         );
       }
       environment[apiKeySecretArnEnvVar] = config.apiKeySecretArn;
+    }
+    if (config.apiKeySsmArn !== undefined && environment[apiKeySsmArnEnvVar] === undefined) {
+      environment[apiKeySsmArnEnvVar] = config.apiKeySsmArn;
     }
     if (environment[siteURLEnvVar] === undefined) {
       environment[siteURLEnvVar] = config.site;

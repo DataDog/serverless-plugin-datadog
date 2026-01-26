@@ -634,10 +634,11 @@ function validateConfiguration(config: Configuration): void {
       config.apiKey === undefined &&
       process.env.DATADOG_API_KEY === undefined &&
       config.apiKMSKey === undefined &&
-      config.apiKeySecretArn === undefined
+      config.apiKeySecretArn === undefined &&
+      config.apiKeySsmArn === undefined
     ) {
       throw new Error(
-        "The environment variable `DATADOG_API_KEY` or configuration variable `apiKMSKey` or `apiKeySecretArn` must be set because `addExtension` is set to true as default.",
+        "The environment variable `DATADOG_API_KEY` or configuration variable `apiKMSKey` or `apiKeySecretArn` or `apiKeySsmArn` must be set because `addExtension` is set to true as default.",
       );
     }
   }
@@ -656,18 +657,19 @@ function validateConfiguration(config: Configuration): void {
 }
 
 function checkForMultipleApiKeys(config: Configuration): void {
-  let multipleApiKeysMessage;
-  if (config.apiKey !== undefined && config.apiKMSKey !== undefined && config.apiKeySecretArn !== undefined) {
-    multipleApiKeysMessage = "`apiKey`, `apiKMSKey`, and `apiKeySecretArn`";
-  } else if (config.apiKey !== undefined && config.apiKMSKey !== undefined) {
-    multipleApiKeysMessage = "`apiKey` and `apiKMSKey`";
-  } else if (config.apiKey !== undefined && config.apiKeySecretArn !== undefined) {
-    multipleApiKeysMessage = "`apiKey` and `apiKeySecretArn`";
-  } else if (config.apiKMSKey !== undefined && config.apiKeySecretArn !== undefined) {
-    multipleApiKeysMessage = "`apiKMSKey` and `apiKeySecretArn`";
-  }
+  const definedKeys = ["apiKey", "apiKMSKey", "apiKeySecretArn", "apiKeySsmArn"]
+    .filter((key) => key in config)
+    .map((key) => `\`${key}\``);
 
-  if (multipleApiKeysMessage) {
-    throw new Error(`${multipleApiKeysMessage} should not be set at the same time.`);
+  if (definedKeys.length > 1) {
+    let message;
+    if (definedKeys.length === 2) {
+      message = `${definedKeys[0]} and ${definedKeys[1]}`;
+    } else {
+      const last = definedKeys[definedKeys.length - 1];
+      const rest = definedKeys.slice(0, -1).join(", ");
+      message = `${rest}, and ${last}`;
+    }
+    throw new Error(`${message} should not be set at the same time.`);
   }
 }
