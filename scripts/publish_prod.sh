@@ -46,8 +46,8 @@ CURRENT_VERSION=$(node -pe "require('./package.json').version")
 if [ -z "$1" ]; then
     echo "Must specify a desired version number"
     exit 1
-elif [[ ! $1 =~ [0-9]+\.[0-9]+\.[0-9]+ ]]; then
-    echo "Must use a semantic version, e.g., 3.1.4"
+elif [[ ! $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "Must use a semantic version, e.g., 3.1.4 (note the lack of any \`v\` prefix)"
     exit 1
 else
     VERSION=$1
