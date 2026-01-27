@@ -10,3 +10,10 @@ test_forwarder_snapshot.json
 test_extension_snapshot.json
 test_extension_apigateway.json
 .node-version
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
