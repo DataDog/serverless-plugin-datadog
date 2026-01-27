@@ -36,7 +36,7 @@ jobs:
         run: yarn lint
 
       - name: Install depcheck
-        run: yarn global add depcheck
+        run: npm install -g depcheck
 
       - name: Run depcheck
         run: depcheck --ignores="@types/jest,serverless-step-functions"

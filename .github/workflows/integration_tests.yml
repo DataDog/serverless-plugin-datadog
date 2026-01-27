@@ -26,7 +26,7 @@ jobs:
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install Serverless Framework
-        run: sudo yarn global add serverless@3.39 --prefix /usr/local
+        run: npm install -g serverless@3.39
 
       - name: Run snapshot tests
         env:
