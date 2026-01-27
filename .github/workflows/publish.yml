@@ -19,9 +19,7 @@ jobs:
       - run: corepack enable && corepack prepare yarn@4.10.3 --activate
       - run: yarn
       - run: yarn build
-      - run: yarn publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+      - run: yarn npm publish
 
       - name: Send success message to Slack
         env:
