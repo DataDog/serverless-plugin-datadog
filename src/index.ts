@@ -625,6 +625,7 @@ function validateConfiguration(config: Configuration): void {
     "ap1.datadoghq.com",
     "ap2.datadoghq.com",
     "ddog-gov.com",
+    "test123.prod.dog",
   ];
   if (!config.testingMode && config.site !== undefined && !siteList.includes(config.site.toLowerCase())) {
     throw new Error(`Warning: Invalid site URL. Must be one of ${siteList.join(", ")}.`);
