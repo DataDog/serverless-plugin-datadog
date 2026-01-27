@@ -90,7 +90,9 @@ fi
 
 echo
 echo "Bumping the version number and committing the changes"
-yarn version --new-version "$VERSION"
+yarn version "$VERSION"
+git commit -am "v$VERSION"
+git tag "v$VERSION"
 
 yarn build
 
