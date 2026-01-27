@@ -9,7 +9,7 @@ We love pull requests. Here's a quick guide.
     yarn install
     ```
 1. Make your changes.
-1. Test your changes against your own testing application with the help of [`yarn link`](https://classic.yarnpkg.com/en/docs/cli/link/):
+1. Test your changes against your own testing application with the help of [`yarn link`](https://yarnpkg.com/cli/link):
     ```bash
     # From the root of the serverless-plugin-datadog repo
     yarn build

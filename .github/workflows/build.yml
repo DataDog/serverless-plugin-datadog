@@ -1,6 +1,9 @@
 name: build
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
 
 jobs:
   lint:
@@ -13,7 +16,10 @@ jobs:
       - name: Set up Node 22
         uses: actions/setup-node@v3
         with:
-          node-version: 22
+          node-version: 24
+
+      - name: Set up Yarn
+        run: corepack enable && corepack prepare yarn@4.10.3 --activate
 
       - name: Cache Node modules
         id: cache-node-modules
@@ -33,7 +39,7 @@ jobs:
         run: yarn lint
 
       - name: Install depcheck
-        run: yarn global add depcheck
+        run: npm install -g depcheck
 
       - name: Run depcheck
         run: depcheck --ignores="@types/jest,serverless-step-functions"
@@ -43,7 +49,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        node-version: [20, 22]
+        node-version: [20, 22, 24]
 
     steps:
       - name: Checkout
@@ -53,6 +59,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+
+      - name: Set up Yarn
+        run: corepack enable && corepack prepare yarn@4.10.3 --activate
 
       - name: Cache Node modules
         id: cache-node-modules
