@@ -13,7 +13,7 @@ jobs:
       - name: Set up Node 22
         uses: actions/setup-node@v3
         with:
-          node-version: 22
+          node-version: 24
 
       - name: Cache Node modules
         id: cache-node-modules
@@ -43,7 +43,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        node-version: [20, 22]
+        node-version: [20, 22, 24]
 
     steps:
       - name: Checkout
