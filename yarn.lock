@@ -5752,7 +5752,7 @@ __metadata:
     mock-fs: "npm:5.5.0"
     prettier: "npm:^3.6.2"
     serverless-step-functions: "npm:^3.17.0"
-    simple-git: "npm:^3.16.0"
+    simple-git: "npm:^3.16.1"
     ts-jest: "npm:^29.1.1"
     tslint: "npm:^6.1.3"
     typescript: "npm:^5.9.3"
@@ -5839,7 +5839,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"simple-git@npm:^3.16.0":
+"simple-git@npm:^3.16.1":
   version: 3.30.0
   resolution: "simple-git@npm:3.30.0"
   dependencies:
