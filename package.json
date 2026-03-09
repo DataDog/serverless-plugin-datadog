@@ -58,7 +58,7 @@
   },
   "dependencies": {
     "@datadog/datadog-ci": "5.8.0",
-    "simple-git": "^3.16.1"
+    "simple-git": "^3.32.3"
   },
   "peerDependencies": {
     "serverless": "4.x || 3.x || 2.x || 1.x"
