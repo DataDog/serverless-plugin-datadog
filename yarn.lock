@@ -391,9 +391,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@datadog/datadog-ci-base@npm:5.8.0":
-  version: 5.8.0
-  resolution: "@datadog/datadog-ci-base@npm:5.8.0"
+"@datadog/datadog-ci-base@npm:5.9.0":
+  version: 5.9.0
+  resolution: "@datadog/datadog-ci-base@npm:5.9.0"
   dependencies:
     "@antfu/install-pkg": "npm:^1.1.0"
     "@types/datadog-metrics": "npm:0.6.1"
@@ -404,11 +404,12 @@ __metadata:
     datadog-metrics: "npm:0.9.3"
     debug: "npm:^4.4.1"
     deep-extend: "npm:0.6.0"
-    fast-xml-parser: "npm:^5.3.4"
+    fast-xml-parser: "npm:^5.3.7"
     form-data: "npm:^4.0.4"
-    glob: "npm:^10.5.0"
+    glob: "npm:^13.0.5"
     inquirer: "npm:^8.2.6"
     jest-diff: "npm:^30.2.0"
+    js-yaml: "npm:4.1.1"
     jszip: "npm:^3.10.1"
     proxy-agent: "npm:^6.4.0"
     semver: "npm:^7.5.3"
@@ -418,19 +419,20 @@ __metadata:
     typanion: "npm:^3.14.0"
     upath: "npm:^2.0.1"
   peerDependencies:
-    "@datadog/datadog-ci-plugin-aas": 5.8.0
-    "@datadog/datadog-ci-plugin-cloud-run": 5.8.0
-    "@datadog/datadog-ci-plugin-container-app": 5.8.0
-    "@datadog/datadog-ci-plugin-coverage": 5.8.0
-    "@datadog/datadog-ci-plugin-deployment": 5.8.0
-    "@datadog/datadog-ci-plugin-dora": 5.8.0
-    "@datadog/datadog-ci-plugin-gate": 5.8.0
-    "@datadog/datadog-ci-plugin-junit": 5.8.0
-    "@datadog/datadog-ci-plugin-lambda": 5.8.0
-    "@datadog/datadog-ci-plugin-sarif": 5.8.0
-    "@datadog/datadog-ci-plugin-sbom": 5.8.0
-    "@datadog/datadog-ci-plugin-stepfunctions": 5.8.0
-    "@datadog/datadog-ci-plugin-synthetics": 5.8.0
+    "@datadog/datadog-ci-plugin-aas": 5.9.0
+    "@datadog/datadog-ci-plugin-cloud-run": 5.9.0
+    "@datadog/datadog-ci-plugin-container-app": 5.9.0
+    "@datadog/datadog-ci-plugin-coverage": 5.9.0
+    "@datadog/datadog-ci-plugin-deployment": 5.9.0
+    "@datadog/datadog-ci-plugin-dora": 5.9.0
+    "@datadog/datadog-ci-plugin-gate": 5.9.0
+    "@datadog/datadog-ci-plugin-junit": 5.9.0
+    "@datadog/datadog-ci-plugin-lambda": 5.9.0
+    "@datadog/datadog-ci-plugin-sarif": 5.9.0
+    "@datadog/datadog-ci-plugin-sbom": 5.9.0
+    "@datadog/datadog-ci-plugin-stepfunctions": 5.9.0
+    "@datadog/datadog-ci-plugin-synthetics": 5.9.0
+    "@datadog/datadog-ci-plugin-terraform": 5.9.0
   peerDependenciesMeta:
     "@datadog/datadog-ci-plugin-aas":
       optional: true
@@ -458,88 +460,90 @@ __metadata:
       optional: true
     "@datadog/datadog-ci-plugin-synthetics":
       optional: true
-  checksum: 10c0/b973fc0d8c8c66f312f929a11318c9426ea57ae23b74b3a7b1b13ebb59c2b0c03a86f0599bbd5e613910ba8d61f2468d36b46ac73475629e827c799658cd5256
+    "@datadog/datadog-ci-plugin-terraform":
+      optional: true
+  checksum: 10c0/a4212aa05b8504cc0a743d91454f9f45879a1c2af2559ba891a3e5994767beaadbbd8bc2ba990a94cdf914f4b8ff79ccbb005821c891d1a3d0f1aeb528d57517
   languageName: node
   linkType: hard
 
-"@datadog/datadog-ci-plugin-coverage@npm:5.8.0":
-  version: 5.8.0
-  resolution: "@datadog/datadog-ci-plugin-coverage@npm:5.8.0"
+"@datadog/datadog-ci-plugin-coverage@npm:5.9.0":
+  version: 5.9.0
+  resolution: "@datadog/datadog-ci-plugin-coverage@npm:5.9.0"
   dependencies:
     axios: "npm:^1.13.5"
     chalk: "npm:3.0.0"
-    fast-xml-parser: "npm:^5.3.4"
+    fast-xml-parser: "npm:^5.3.7"
     form-data: "npm:^4.0.4"
     simple-git: "npm:3.16.0"
     upath: "npm:^2.0.1"
   peerDependencies:
-    "@datadog/datadog-ci-base": 5.8.0
-  checksum: 10c0/6a5eecff7957d9c32e66eebf6ba731894d9d68bff4174c84acc80196cb4d306b3b2b290bafe7d7ccaba64f3c945f67d4c81cb7e75158b38bc39186869a0150d2
+    "@datadog/datadog-ci-base": 5.9.0
+  checksum: 10c0/a150828aee2cb39b3fbc0aad4703b1de2efd8cf71414d3e8af289eed61b9f5211564a5253320557db427063f5521aec56ffc6e3715b19e4a0f762ec27a671077
   languageName: node
   linkType: hard
 
-"@datadog/datadog-ci-plugin-deployment@npm:5.8.0":
-  version: 5.8.0
-  resolution: "@datadog/datadog-ci-plugin-deployment@npm:5.8.0"
+"@datadog/datadog-ci-plugin-deployment@npm:5.9.0":
+  version: 5.9.0
+  resolution: "@datadog/datadog-ci-plugin-deployment@npm:5.9.0"
   dependencies:
     axios: "npm:^1.13.5"
     chalk: "npm:3.0.0"
     simple-git: "npm:3.16.0"
   peerDependencies:
-    "@datadog/datadog-ci-base": 5.8.0
-  checksum: 10c0/10ff78004e7866ffe4702c580dbc71b7cb4a7546ae77a135bb3e56e492a08d4cdc4021e55d4939c8aab0d427589d5f80b12c55fd77bc8e0a90f1543c06412ad5
+    "@datadog/datadog-ci-base": 5.9.0
+  checksum: 10c0/0195f3aa814db1f157bd7446cfcf88573d07cf372de070e05ce29de89714e75c4201f4dd86ea7e10480d0b1392cbf014336d190924fcec81178f29c5117d8315
   languageName: node
   linkType: hard
 
-"@datadog/datadog-ci-plugin-dora@npm:5.8.0":
-  version: 5.8.0
-  resolution: "@datadog/datadog-ci-plugin-dora@npm:5.8.0"
+"@datadog/datadog-ci-plugin-dora@npm:5.9.0":
+  version: 5.9.0
+  resolution: "@datadog/datadog-ci-plugin-dora@npm:5.9.0"
   dependencies:
     axios: "npm:^1.13.5"
     chalk: "npm:3.0.0"
     simple-git: "npm:3.16.0"
   peerDependencies:
-    "@datadog/datadog-ci-base": 5.8.0
-  checksum: 10c0/ead46eac82dc5b6b6d1427c557b8807e5a124a3420fcb731a6351372c1bb2284f0a26d4140fd1a696e66597e68c697d40ab14d2d9645bd3babc66e6ead0d50c3
+    "@datadog/datadog-ci-base": 5.9.0
+  checksum: 10c0/e77ff3e7431670a83433d10160ea712eeab7b5f6a5c45145d3b8f6c5abae9a2bb9b6c7ecb909db8043310e34372dde86c9576d9e41cad7ccb50722728b4c144a
   languageName: node
   linkType: hard
 
-"@datadog/datadog-ci-plugin-gate@npm:5.8.0":
-  version: 5.8.0
-  resolution: "@datadog/datadog-ci-plugin-gate@npm:5.8.0"
+"@datadog/datadog-ci-plugin-gate@npm:5.9.0":
+  version: 5.9.0
+  resolution: "@datadog/datadog-ci-plugin-gate@npm:5.9.0"
   dependencies:
     "@types/uuid": "npm:^9.0.2"
     axios: "npm:^1.13.5"
     chalk: "npm:3.0.0"
     uuid: "npm:^9.0.0"
   peerDependencies:
-    "@datadog/datadog-ci-base": 5.8.0
-  checksum: 10c0/759727b7cf77d17939d29a2801d61d931362672cca45e1c8b47223b11e47eb6afca7db90d9a915d01ee52c13da23bf04f77ed05c9d3cb4ce71a242e19369bec4
+    "@datadog/datadog-ci-base": 5.9.0
+  checksum: 10c0/82d6479ddc0feae56ff4dfe91caccb0a9af281b49fcd40e5b2b23d0b082c83f3fce47ec695de5ea24acf93312c91bc0056df0ca424024e35f6e0777671b27579
   languageName: node
   linkType: hard
 
-"@datadog/datadog-ci-plugin-junit@npm:5.8.0":
-  version: 5.8.0
-  resolution: "@datadog/datadog-ci-plugin-junit@npm:5.8.0"
+"@datadog/datadog-ci-plugin-junit@npm:5.9.0":
+  version: 5.9.0
+  resolution: "@datadog/datadog-ci-plugin-junit@npm:5.9.0"
   dependencies:
     axios: "npm:^1.13.5"
     chalk: "npm:3.0.0"
-    fast-xml-parser: "npm:^5.3.4"
+    fast-xml-parser: "npm:^5.3.7"
     form-data: "npm:^4.0.4"
     upath: "npm:^2.0.1"
     uuid: "npm:^9.0.0"
   peerDependencies:
-    "@datadog/datadog-ci-base": 5.8.0
-  checksum: 10c0/55934a8d46df63637ebebfb5f53fde00dcd12fadde54cd8950b086bb1bffd559fb22b87f7457a15ac4d10e8a3ce82016ef7ffa001ae428bc0e46d23a17e6e340
+    "@datadog/datadog-ci-base": 5.9.0
+  checksum: 10c0/8c3eeeeeeff295860fd732869ab808952b5628f4c757b71907f116317a7ff618cfa5dc95f9e92d2f12b91c4ce0a48891311b021cc1428fbd7411e72acb1df956
   languageName: node
   linkType: hard
 
-"@datadog/datadog-ci-plugin-sarif@npm:5.8.0":
-  version: 5.8.0
-  resolution: "@datadog/datadog-ci-plugin-sarif@npm:5.8.0"
+"@datadog/datadog-ci-plugin-sarif@npm:5.9.0":
+  version: 5.9.0
+  resolution: "@datadog/datadog-ci-plugin-sarif@npm:5.9.0"
   dependencies:
-    ajv: "npm:^8.12.0"
-    ajv-formats: "npm:^2.1.1"
+    ajv: "npm:^8.18.0"
+    ajv-formats: "npm:^3.0.1"
     axios: "npm:^1.13.5"
     chalk: "npm:3.0.0"
     form-data: "npm:^4.0.4"
@@ -547,50 +551,46 @@ __metadata:
     upath: "npm:^2.0.1"
     uuid: "npm:^9.0.0"
   peerDependencies:
-    "@datadog/datadog-ci-base": 5.8.0
-  checksum: 10c0/db8b930d1bb158fb8dd68c7412c14b5b8406c26d79c16fbc00870a6c6e61e5bdf8f726ba6458600993c360dd037efbd85f291a1a3cad9ff27db6e6bbcf02b028
+    "@datadog/datadog-ci-base": 5.9.0
+  checksum: 10c0/b1c0989329c53ec1b2350f02dfbf3072abca671dd21ad6a23d12a60b6d47508ea86400dfbb829981e4f1b5b71d4b8a1b5eeaa05fcfe2ff83a7226fd47cc1fc48
   languageName: node
   linkType: hard
 
-"@datadog/datadog-ci-plugin-sbom@npm:5.8.0":
-  version: 5.8.0
-  resolution: "@datadog/datadog-ci-plugin-sbom@npm:5.8.0"
+"@datadog/datadog-ci-plugin-sbom@npm:5.9.0":
+  version: 5.9.0
+  resolution: "@datadog/datadog-ci-plugin-sbom@npm:5.9.0"
   dependencies:
-    ajv: "npm:^8.12.0"
-    ajv-formats: "npm:^2.1.1"
+    ajv: "npm:^8.18.0"
+    ajv-formats: "npm:^3.0.1"
     axios: "npm:^1.13.5"
     chalk: "npm:3.0.0"
     packageurl-js: "npm:^2.0.1"
     simple-git: "npm:3.16.0"
     upath: "npm:^2.0.1"
   peerDependencies:
-    "@datadog/datadog-ci-base": 5.8.0
-  checksum: 10c0/b0715ad0aab3e4e52856e2dc5e7792d5042a07a0997350519d5291e3e57c99b8b2bb0bfa572729b6df0754e8d32fe762ec9dd502e4a47b011f5ad49c51918027
+    "@datadog/datadog-ci-base": 5.9.0
+  checksum: 10c0/68adf9ef8aea24b1fe4b902998eaf3203fd6b8970e7d1d4e4771beeb13861970565d3fa1552af407784fe23ec4b4f14a9cb61480c41b733b0f704276963976b4
   languageName: node
   linkType: hard
 
-"@datadog/datadog-ci@npm:5.8.0":
-  version: 5.8.0
-  resolution: "@datadog/datadog-ci@npm:5.8.0"
+"@datadog/datadog-ci@npm:5.9.0":
+  version: 5.9.0
+  resolution: "@datadog/datadog-ci@npm:5.9.0"
   dependencies:
-    "@datadog/datadog-ci-base": "npm:5.8.0"
-    "@datadog/datadog-ci-plugin-coverage": "npm:5.8.0"
-    "@datadog/datadog-ci-plugin-deployment": "npm:5.8.0"
-    "@datadog/datadog-ci-plugin-dora": "npm:5.8.0"
-    "@datadog/datadog-ci-plugin-gate": "npm:5.8.0"
-    "@datadog/datadog-ci-plugin-junit": "npm:5.8.0"
-    "@datadog/datadog-ci-plugin-sarif": "npm:5.8.0"
-    "@datadog/datadog-ci-plugin-sbom": "npm:5.8.0"
-    axios: "npm:^1.13.5"
+    "@datadog/datadog-ci-base": "npm:5.9.0"
+    "@datadog/datadog-ci-plugin-coverage": "npm:5.9.0"
+    "@datadog/datadog-ci-plugin-deployment": "npm:5.9.0"
+    "@datadog/datadog-ci-plugin-dora": "npm:5.9.0"
+    "@datadog/datadog-ci-plugin-gate": "npm:5.9.0"
+    "@datadog/datadog-ci-plugin-junit": "npm:5.9.0"
+    "@datadog/datadog-ci-plugin-sarif": "npm:5.9.0"
+    "@datadog/datadog-ci-plugin-sbom": "npm:5.9.0"
     chalk: "npm:3.0.0"
     clipanion: "npm:^3.2.1"
-    js-yaml: "npm:4.1.1"
-    semver: "npm:^7.5.3"
     typanion: "npm:^3.14.0"
-    upath: "npm:^2.0.1"
   bin:
     datadog-ci: dist/cli.js
-  checksum: 10c0/574acc2d79340c20aa01e5f44e98d36b30f84d9d92f7bb4490eb291584d1a08b8fbedeb7c04d829d5e401d25249981fee27f15608c355dad60d067a2a54a3d08
+  checksum: 10c0/fdf301e841d5171582cee0843625dc86aa6c627ae25225f702f0f20f524e476dbe443a28c5f3ac57ae2aaab3fb00a6290f3fbfa4e993b426d6e8aeb6c47afa15
   languageName: node
   linkType: hard
 
@@ -1571,20 +1571,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ajv-formats@npm:^2.1.1":
-  version: 2.1.1
-  resolution: "ajv-formats@npm:2.1.1"
-  dependencies:
-    ajv: "npm:^8.0.0"
-  peerDependencies:
-    ajv: ^8.0.0
-  peerDependenciesMeta:
-    ajv:
-      optional: true
-  checksum: 10c0/e43ba22e91b6a48d96224b83d260d3a3a561b42d391f8d3c6d2c1559f9aa5b253bfb306bc94bbeca1d967c014e15a6efe9a207309e95b3eaae07fcbcdc2af662
-  languageName: node
-  linkType: hard
-
 "ajv-formats@npm:^3.0.1":
   version: 3.0.1
   resolution: "ajv-formats@npm:3.0.1"
@@ -1608,6 +1594,18 @@ __metadata:
     json-schema-traverse: "npm:^1.0.0"
     require-from-string: "npm:^2.0.2"
   checksum: 10c0/ec3ba10a573c6b60f94639ffc53526275917a2df6810e4ab5a6b959d87459f9ef3f00d5e7865b82677cb7d21590355b34da14d1d0b9c32d75f95a187e76fff35
+  languageName: node
+  linkType: hard
+
+"ajv@npm:^8.18.0":
+  version: 8.18.0
+  resolution: "ajv@npm:8.18.0"
+  dependencies:
+    fast-deep-equal: "npm:^3.1.3"
+    fast-uri: "npm:^3.0.1"
+    json-schema-traverse: "npm:^1.0.0"
+    require-from-string: "npm:^2.0.2"
+  checksum: 10c0/e7517c426173513a07391be951879932bdf3348feaebd2199f5b901c20f99d60db8cd1591502d4d551dc82f594e82a05c4fe1c70139b15b8937f7afeaed9532f
   languageName: node
   linkType: hard
 
@@ -1855,6 +1853,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"balanced-match@npm:^4.0.2":
+  version: 4.0.4
+  resolution: "balanced-match@npm:4.0.4"
+  checksum: 10c0/07e86102a3eb2ee2a6a1a89164f29d0dbaebd28f2ca3f5ca786f36b8b23d9e417eb3be45a4acf754f837be5ac0a2317de90d3fcb7f4f4dc95720a1f36b26a17b
+  languageName: node
+  linkType: hard
+
 "base64-js@npm:^1.3.1":
   version: 1.5.1
   resolution: "base64-js@npm:1.5.1"
@@ -1929,6 +1934,15 @@ __metadata:
   dependencies:
     balanced-match: "npm:^1.0.0"
   checksum: 10c0/6d117a4c793488af86b83172deb6af143e94c17bc53b0b3cec259733923b4ca84679d506ac261f4ba3c7ed37c46018e2ff442f9ce453af8643ecd64f4a54e6cf
+  languageName: node
+  linkType: hard
+
+"brace-expansion@npm:^5.0.2":
+  version: 5.0.4
+  resolution: "brace-expansion@npm:5.0.4"
+  dependencies:
+    balanced-match: "npm:^4.0.2"
+  checksum: 10c0/359cbcfa80b2eb914ca1f3440e92313fbfe7919ee6b274c35db55bec555aded69dac5ee78f102cec90c35f98c20fa43d10936d0cd9978158823c249257e1643a
   languageName: node
   linkType: hard
 
@@ -3072,14 +3086,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-xml-parser@npm:^5.3.4":
-  version: 5.3.4
-  resolution: "fast-xml-parser@npm:5.3.4"
+"fast-xml-builder@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "fast-xml-builder@npm:1.0.0"
+  checksum: 10c0/2631fda265c81e8008884d08944eeed4e284430116faa5b8b7a43a3602af367223b7bf01c933215c9ad2358b8666e45041bc038d64877156a2f88821841b3014
+  languageName: node
+  linkType: hard
+
+"fast-xml-parser@npm:^5.3.7":
+  version: 5.4.2
+  resolution: "fast-xml-parser@npm:5.4.2"
   dependencies:
-    strnum: "npm:^2.1.0"
+    fast-xml-builder: "npm:^1.0.0"
+    strnum: "npm:^2.1.2"
   bin:
     fxparser: src/cli/cli.js
-  checksum: 10c0/d77866ca860ad185153e12f6ba12274d32026319ad8064e4681342b8a8e1ffad3f1f98daf04d77239fb12eb1d906ee7185fd328deda74529680e8dae0f3e9327
+  checksum: 10c0/83ea57fda336f3fdcc8938ecc8730236a3e084843cbe6c2fb009c3f2fe2811570316735c1c7e76a4d3dbce2b0387312b106444d5d603dc6135b4bcf0e07251bb
   languageName: node
   linkType: hard
 
@@ -3403,7 +3425,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:^10.3.10, glob@npm:^10.5.0":
+"glob@npm:^10.3.10":
   version: 10.5.0
   resolution: "glob@npm:10.5.0"
   dependencies:
@@ -3427,6 +3449,17 @@ __metadata:
     minipass: "npm:^7.1.2"
     path-scurry: "npm:^2.0.0"
   checksum: 10c0/8e2f5821f3f7c312dd102e23a15b80c79e0837a9872784293ba2e15ec73b3f3749a49a42a31bfcb4e52c84820a474e92331c2eebf18819d20308f5c33876630a
+  languageName: node
+  linkType: hard
+
+"glob@npm:^13.0.5":
+  version: 13.0.6
+  resolution: "glob@npm:13.0.6"
+  dependencies:
+    minimatch: "npm:^10.2.2"
+    minipass: "npm:^7.1.3"
+    path-scurry: "npm:^2.0.2"
+  checksum: 10c0/269c236f11a9b50357fe7a8c6aadac667e01deb5242b19c84975628f05f4438d8ee1354bb62c5d6c10f37fd59911b54d7799730633a2786660d8c69f1d18120a
   languageName: node
   linkType: hard
 
@@ -4785,6 +4818,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"minimatch@npm:^10.2.2":
+  version: 10.2.4
+  resolution: "minimatch@npm:10.2.4"
+  dependencies:
+    brace-expansion: "npm:^5.0.2"
+  checksum: 10c0/35f3dfb7b99b51efd46afd378486889f590e7efb10e0f6a10ba6800428cf65c9a8dedb74427d0570b318d749b543dc4e85f06d46d2858bc8cac7e1eb49a95945
+  languageName: node
+  linkType: hard
+
 "minimatch@npm:^3.0.4, minimatch@npm:^3.1.1":
   version: 3.1.2
   resolution: "minimatch@npm:3.1.2"
@@ -4874,6 +4916,13 @@ __metadata:
   version: 7.1.2
   resolution: "minipass@npm:7.1.2"
   checksum: 10c0/b0fd20bb9fb56e5fa9a8bfac539e8915ae07430a619e4b86ff71f5fc757ef3924b23b2c4230393af1eda647ed3d75739e4e0acb250a6b1eb277cf7f8fe449557
+  languageName: node
+  linkType: hard
+
+"minipass@npm:^7.1.3":
+  version: 7.1.3
+  resolution: "minipass@npm:7.1.3"
+  checksum: 10c0/539da88daca16533211ea5a9ee98dc62ff5742f531f54640dd34429e621955e91cc280a91a776026264b7f9f6735947629f920944e9c1558369e8bf22eb33fbb
   languageName: node
   linkType: hard
 
@@ -5304,6 +5353,16 @@ __metadata:
     lru-cache: "npm:^11.0.0"
     minipass: "npm:^7.1.2"
   checksum: 10c0/2a16ed0e81fbc43513e245aa5763354e25e787dab0d539581a6c3f0f967461a159ed6236b2559de23aa5b88e7dc32b469b6c47568833dd142a4b24b4f5cd2620
+  languageName: node
+  linkType: hard
+
+"path-scurry@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "path-scurry@npm:2.0.2"
+  dependencies:
+    lru-cache: "npm:^11.0.0"
+    minipass: "npm:^7.1.2"
+  checksum: 10c0/b35ad37cf6557a87fd057121ce2be7695380c9138d93e87ae928609da259ea0a170fac6f3ef1eb3ece8a068e8b7f2f3adf5bb2374cf4d4a57fe484954fcc9482
   languageName: node
   linkType: hard
 
@@ -5743,7 +5802,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "serverless-plugin-datadog@workspace:."
   dependencies:
-    "@datadog/datadog-ci": "npm:5.8.0"
+    "@datadog/datadog-ci": "npm:5.9.0"
     "@types/jest": "npm:^30.0.0"
     "@types/mock-fs": "npm:4.13.4"
     "@types/serverless": "npm:3.12.28"
@@ -5762,8 +5821,8 @@ __metadata:
   linkType: soft
 
 "serverless-step-functions@npm:^3.17.0":
-  version: 3.23.4
-  resolution: "serverless-step-functions@npm:3.23.4"
+  version: 3.24.0
+  resolution: "serverless-step-functions@npm:3.24.0"
   dependencies:
     "@serverless/utils": "npm:^6.7.0"
     asl-validator: "npm:^3.11.0"
@@ -5773,7 +5832,7 @@ __metadata:
     lodash: "npm:^4.17.11"
   peerDependencies:
     serverless: ">=2.32.0"
-  checksum: 10c0/86b8a28948d82c16c26413c657cbd4efb114409de61b8e202e0e445dc1096bbef1e3dc63b3bf8fb3ef672b57907aa7a9c82ab6709197a6c9939292bebbce3916
+  checksum: 10c0/b25f980bd89102f032767208ef10773d7400c0431bb857b8dcc95ceee49a699f2080987ba0d9e391554607bfd20f592021acfba4f98de076a9554bab344db9de
   languageName: node
   linkType: hard
 
@@ -6068,10 +6127,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"strnum@npm:^2.1.0":
-  version: 2.1.2
-  resolution: "strnum@npm:2.1.2"
-  checksum: 10c0/4e04753b793540d79cd13b2c3e59e298440477bae2b853ab78d548138385193b37d766d95b63b7046475d68d44fb1fca692f0a3f72b03f4168af076c7b246df9
+"strnum@npm:^2.1.2":
+  version: 2.2.0
+  resolution: "strnum@npm:2.2.0"
+  checksum: 10c0/9a656f5048047abff8d10d0bb57761a01916e368a71e95d4f5a962b57f64b738e20672e68ba10b7de3dc78e861c77bc0566bdeed7017abdda1caf0303c929a3f
   languageName: node
   linkType: hard
 
