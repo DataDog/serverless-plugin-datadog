@@ -84,7 +84,7 @@ export interface Configuration {
   // When set, this plugin will not try to redirect the handlers of these specified functions;
   exclude: string[];
   // When set, this plugin will configure the specified monitors for the function
-  monitors?: { [id: string]: { [key: string]: any } }[];
+  monitors?: Record<string, Record<string, unknown>>[];
 
   // When set, this plugin will fail a deployment if monitors can't be created
   failOnError: boolean;
@@ -217,7 +217,7 @@ export const defaultConfiguration: Configuration = {
 export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]): void {
   handlers.forEach(({ handler, type }) => {
     handler.environment ??= {};
-    const environment = handler.environment as any;
+    const environment = handler.environment as Record<string, unknown>;
     const functionName = handler.name ?? "";
     if (
       process.env.DATADOG_API_KEY !== undefined &&
@@ -397,10 +397,7 @@ function throwEnvVariableError(variable: string, value: string, functionName: st
 }
 
 export function getConfig(service: Service): Configuration {
-  let custom = service.custom as any;
-  if (custom === undefined) {
-    custom = {};
-  }
+  const custom = service.custom ?? {};
 
   let datadog = custom.datadog as Partial<Configuration> | undefined;
   if (datadog === undefined) {
@@ -425,7 +422,7 @@ export function getConfig(service: Service): Configuration {
 }
 
 export function forceExcludeDepsFromWebpack(service: Service): void {
-  const includeModules = getPropertyFromPath(service, ["custom", "webpack", "includeModules"]);
+  const includeModules = getPropertyFromPath(service as unknown as Record<string, unknown>, ["custom", "webpack", "includeModules"]);
   if (includeModules === undefined) {
     return;
   }
@@ -442,23 +439,25 @@ export function forceExcludeDepsFromWebpack(service: Service): void {
   }
 }
 
-function getPropertyFromPath(obj: any, path: string[]): any {
+function getPropertyFromPath(obj: Record<string, unknown>, path: string[]): Record<string, unknown> | undefined {
+  let current: Record<string, unknown> = obj;
   for (const part of path) {
-    let prop = obj[part];
+    let prop = current[part];
     if (prop === undefined || prop === true) {
       prop = {};
-      obj[part] = prop;
+      current[part] = prop;
     }
     if (prop === false) {
       return;
     }
-    obj = prop;
+    current = prop as Record<string, unknown>;
   }
-  return obj;
+  return current;
 }
 
 export function hasWebpackPlugin(service: Service): boolean {
-  const plugins: string[] | undefined = (service as any).plugins;
+  const serviceWithPlugins = service as unknown as { plugins?: string[] | { modules?: string[] } };
+  const plugins = serviceWithPlugins.plugins;
   if (plugins === undefined) {
     return false;
   }
@@ -467,7 +466,7 @@ export function hasWebpackPlugin(service: Service): boolean {
     return plugins.find((plugin) => plugin === webpackPluginName) !== undefined;
   }
   // We have an enhanced plugins object
-  const modules: string[] | undefined = (service as any).plugins.modules;
+  const modules: string[] | undefined = plugins.modules;
   if (modules === undefined) {
     return false;
   }

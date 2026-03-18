@@ -42,6 +42,7 @@ const US_GOV_REGION_PREFIX = "us-gov-";
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
 export interface ExtendedFunctionDefinition extends FunctionDefinition {
   architecture?: string;
+  layers?: string[];
 }
 
 export interface LayerJSON {
@@ -54,7 +55,7 @@ export interface LayerJSON {
   };
 }
 
-export const runtimeLookup: { [key: string]: RuntimeType } = {
+export const runtimeLookup: Record<string, RuntimeType> = {
   "nodejs16.x": RuntimeType.NODE,
   "nodejs18.x": RuntimeType.NODE,
   "nodejs20.x": RuntimeType.NODE,
@@ -87,7 +88,7 @@ export const runtimeLookup: { [key: string]: RuntimeType } = {
 };
 
 // Map from x86 runtime keys in layers.json to the corresponding ARM runtime keys
-export const ARM_RUNTIME_KEYS: { [key: string]: string } = {
+export const ARM_RUNTIME_KEYS: Record<string, string> = {
   "python3.8": "python3.8-arm",
   "python3.9": "python3.9-arm",
   "python3.10": "python3.10-arm",
@@ -199,7 +200,7 @@ export function applyLambdaLibraryLayers(
     }
 
     const architecture =
-      handler.handler?.architecture ?? (service.provider as any).architecture ?? DEFAULT_ARCHITECTURE;
+      handler.handler?.architecture ?? (service.provider as unknown as { architecture?: string }).architecture ?? DEFAULT_ARCHITECTURE;
     const isArm64 = architecture === ARM64_ARCHITECTURE;
 
     // Use the ARM layer if customer's handler is using ARM
@@ -249,7 +250,7 @@ export function applyExtensionLayer(
       continue;
     }
     const architecture =
-      (handler.handler as any).architecture ?? (service.provider as any).architecture ?? DEFAULT_ARCHITECTURE;
+      handler.handler.architecture ?? (service.provider as unknown as { architecture?: string }).architecture ?? DEFAULT_ARCHITECTURE;
     let extensionLayerKey: string = "extension";
 
     if (architecture === ARM64_ARCHITECTURE) {
@@ -283,7 +284,7 @@ export function pushLayerARN(layerARN: string, currentLayers: string[]): string[
 }
 
 export function isFunctionDefinitionHandler(funcDef: FunctionDefinition): funcDef is FunctionDefinitionHandler {
-  return typeof (funcDef as any).handler === "string";
+  return typeof (funcDef as unknown as Record<string, unknown>).handler === "string";
 }
 
 /**
@@ -299,8 +300,8 @@ function addLayer(service: Service, handler: FunctionInfo, layerArn: string): vo
 }
 
 function getLayers(service: Service, handler: FunctionInfo): string[] {
-  const functionLayersList = ((handler.handler as any).layers as string[] | string[]) || [];
-  const serviceLayersList = ((service.provider as any).layers as string[] | string[]) || [];
+  const functionLayersList = handler.handler.layers ?? [];
+  const serviceLayersList = (service.provider as unknown as { layers?: string[] }).layers ?? [];
   // Function-level layers override service-level layers
   // Append to the function-level layers if other function-level layers are present
   // If service-level layers are present
@@ -322,7 +323,7 @@ function removePreviousLayer(service: Service, handler: FunctionInfo, previousLa
 }
 
 function setLayers(handler: FunctionInfo, layers: string[]): void {
-  (handler.handler as any).layers = layers;
+  handler.handler.layers = layers;
 }
 
 function buildLocalLambdaLayerARN(layerARN: string | undefined, accountId: string, region: string): string | undefined {

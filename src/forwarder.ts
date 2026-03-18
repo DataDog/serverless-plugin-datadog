@@ -63,14 +63,49 @@ const REST_EXECUTION_SUBSCRIPTION_KEY = "RestExecutionLogGroupSubscription";
 const WEBSOCKETS_EXECUTION_LOG_GROUP_KEY = "WebsocketsExecutionLogGroup";
 const WEBSOCKETS_EXECUTION_SUBSCRIPTION_KEY = "WebsocketsExecutionLogGroupSubscription";
 
+/** A single CloudFormation resource */
+interface CfnResource {
+  Type: string;
+  Properties?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+/** The Resources block of a compiled CloudFormation template */
+export type CfnResourceMap = Record<string, CfnResource>;
+
+/** A compiled AWS::StepFunctions::StateMachine CFN resource */
+export interface StateMachineCfnResource {
+  Properties?: {
+    Tags?: Array<{ Key: string; Value: string }>;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
+
+/** Logging config for a step function (from serverless-step-functions plugin) */
+interface StepFunctionLoggingConfig {
+  level: string;
+  includeExecutionData: boolean;
+  destinations: unknown[];
+}
+
+/** A step function entry from stepFunctions.stateMachines */
+export interface StepFunctionConfig {
+  name: string;
+  loggingConfig?: StepFunctionLoggingConfig;
+}
+
+/** A CloudFormation intrinsic function value */
+type CfnIntrinsicValue = Record<string, unknown>;
+
 // When users define ARN with CloudFormation functions, the ARN takes this type instead of a string.
 export interface CloudFormationObjectArn {
   "Fn::Sub"?: string;
   "arn:aws"?: string;
 }
 
-function isLogGroup(value: any): value is LogGroupResource {
-  return value.Type === logGroupKey;
+function isLogGroup(value: unknown): value is LogGroupResource {
+  return (value as LogGroupResource).Type === logGroupKey;
 }
 
 /**
@@ -91,7 +126,7 @@ export async function addExecutionLogGroupsAndSubscriptions(
   aws: Aws,
   functionArn: CloudFormationObjectArn | string,
 ): Promise<void> {
-  const extendedProvider = (service.provider as any)?.logs;
+  const extendedProvider = (service.provider as unknown as { logs?: LogsConfig })?.logs;
 
   if (!isLogsConfig(extendedProvider)) {
     return;
@@ -119,7 +154,7 @@ export async function addExecutionLogGroupsAndSubscriptions(
   }
 }
 
-export async function addStepFunctionLogGroup(aws: Aws, resources: any, stepFunction: any): Promise<void> {
+export async function addStepFunctionLogGroup(aws: Aws, resources: CfnResourceMap, stepFunction: StepFunctionConfig): Promise<void> {
   const stepFunctionName = stepFunction.name;
   const logGroupName = `/aws/vendedlogs/states/${stepFunctionName}-Logs-${aws.getStage()}`;
   const logGroupResourceName = `${normalizeResourceName(stepFunctionName)}LogGroup`;
@@ -142,14 +177,14 @@ export async function addStepFunctionLogGroup(aws: Aws, resources: any, stepFunc
   };
 }
 
-export function addDdSlsPluginTag(stateMachineObj: any): void {
+export function addDdSlsPluginTag(stateMachineObj: StateMachineCfnResource): void {
   stateMachineObj.Properties?.Tags?.push({
     Key: "dd_sls_plugin",
     Value: `v${version}`,
   });
 }
 
-export function addDdTraceEnabledTag(stateMachineObj: any, enableStepFunctionsTracing: undefined | boolean): void {
+export function addDdTraceEnabledTag(stateMachineObj: StateMachineCfnResource, enableStepFunctionsTracing: undefined | boolean): void {
   if (!enableStepFunctionsTracing) {
     return;
   }
@@ -160,8 +195,8 @@ export function addDdTraceEnabledTag(stateMachineObj: any, enableStepFunctionsTr
 }
 
 export async function addStepFunctionLogGroupSubscription(
-  resources: any,
-  stepFunction: any,
+  resources: CfnResourceMap,
+  stepFunction: StepFunctionConfig,
   functionArn: CloudFormationObjectArn | string,
 ): Promise<void> {
   const logGroupSubscriptionResourceName = `${normalizeResourceName(stepFunction.name)}LogGroupSubscription`;
@@ -176,7 +211,7 @@ export async function addStepFunctionLogGroupSubscription(
         "Fn::Select": [
           6,
           {
-            "Fn::Split": [":", stepFunction.loggingConfig.destinations[0]],
+            "Fn::Split": [":", stepFunction.loggingConfig!.destinations[0]],
           },
         ],
       },
@@ -266,21 +301,21 @@ export async function describeSubscriptionFilters(aws: Aws, logGroupName: string
 }
 
 // Helper functions to validate we have a particular log group and if we should subscribe to it
-function validateRestApiSubscription(resource: any, subscribe: boolean, extendedProvider: any): boolean {
+function validateRestApiSubscription(resource: LogGroupResource, subscribe: boolean, extendedProvider: LogsConfig): boolean {
   return (
     restAccessLoggingIsEnabled(extendedProvider) &&
     resource.Properties.LogGroupName.startsWith("/aws/api-gateway/") &&
     subscribe
   );
 }
-function validateHttpApiSubscription(resource: any, subscribe: boolean, extendedProvider: any): boolean {
+function validateHttpApiSubscription(resource: LogGroupResource, subscribe: boolean, extendedProvider: LogsConfig): boolean {
   return (
     httpAccessLoggingIsEnabled(extendedProvider) &&
     resource.Properties.LogGroupName.startsWith("/aws/http-api/") &&
     subscribe
   );
 }
-function validateWebsocketSubscription(resource: any, subscribe: boolean, extendedProvider: any): boolean {
+function validateWebsocketSubscription(resource: LogGroupResource, subscribe: boolean, extendedProvider: LogsConfig): boolean {
   return (
     websocketAccessLoggingIsEnabled(extendedProvider) &&
     resource.Properties.LogGroupName.startsWith("/aws/websocket/") &&
@@ -290,12 +325,12 @@ function validateWebsocketSubscription(resource: any, subscribe: boolean, extend
 
 function shouldSubscribe(
   resourceName: string,
-  resource: any,
+  resource: unknown,
   forwarderConfigs: ForwarderConfigs,
   handlers: FunctionInfo[],
   service: Service,
 ): boolean {
-  const extendedProvider = (service.provider as any)?.logs;
+  const extendedProvider = (service.provider as unknown as { logs?: LogsConfig })?.logs;
   if (!isLogGroup(resource)) {
     return false;
   }
@@ -374,7 +409,7 @@ async function createWebsocketExecutionLogGroupName(aws: Aws) {
   };
 }
 
-function addExecutionLogGroup(logGroupName: any) {
+function addExecutionLogGroup(logGroupName: string | CfnIntrinsicValue) {
   // Create the Execution log group for API Gateway REST logging manually
   const executionLogGroup = {
     Type: "AWS::Logs::LogGroup",
@@ -397,45 +432,47 @@ function subscribeToExecutionLogGroup(functionArn: string | CloudFormationObject
   return executionSubscription;
 }
 
-export function isLogsConfig(obj: any): obj is LogsConfig {
-  if (typeof obj !== "object") {
+export function isLogsConfig(obj: unknown): obj is LogsConfig {
+  if (typeof obj !== "object" || obj === null) {
     return false;
   }
+  const record = obj as Record<string, unknown>;
 
-  if (obj.hasOwnProperty("restApi")) {
-    if (!isSubLogsConfig(obj.restApi)) {
+  if (record.hasOwnProperty("restApi")) {
+    if (!isSubLogsConfig(record.restApi)) {
       return false;
     }
   }
 
-  if (obj.hasOwnProperty("httpApi")) {
-    if (!isSubLogsConfig(obj.httpApi)) {
+  if (record.hasOwnProperty("httpApi")) {
+    if (!isSubLogsConfig(record.httpApi)) {
       return false;
     }
   }
 
-  if (obj.hasOwnProperty("websocket")) {
-    if (!isSubLogsConfig(obj.websocket)) {
+  if (record.hasOwnProperty("websocket")) {
+    if (!isSubLogsConfig(record.websocket)) {
       return false;
     }
   }
   return true;
 }
 
-function isSubLogsConfig(obj: any): obj is SubLogsConfig {
+function isSubLogsConfig(obj: unknown): obj is SubLogsConfig {
   if (typeof obj === "boolean") {
     return true;
   }
-  if (typeof obj !== "object") {
+  if (typeof obj !== "object" || obj === null) {
     return false;
   }
-  if (obj.hasOwnProperty("accessLogging")) {
-    if (typeof obj.accessLogging !== "boolean" && typeof obj.accessLogging !== undefined) {
+  const record = obj as Record<string, unknown>;
+  if (record.hasOwnProperty("accessLogging")) {
+    if (typeof record.accessLogging !== "boolean" && typeof record.accessLogging !== undefined) {
       return false;
     }
   }
-  if (obj.hasOwnProperty("executionLogging")) {
-    if (typeof obj.executionLogging !== "boolean" && typeof obj.executionLogging !== undefined) {
+  if (record.hasOwnProperty("executionLogging")) {
+    if (typeof record.executionLogging !== "boolean" && typeof record.executionLogging !== undefined) {
       return false;
     }
   }

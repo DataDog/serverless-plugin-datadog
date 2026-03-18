@@ -8,11 +8,21 @@ import {
 } from "./monitor-api-requests";
 
 export interface MonitorParams {
-  [key: string]: any;
+  name?: string;
+  type?: string;
+  query?: string;
+  message?: string;
+  tags?: string[];
+  options?: {
+    thresholds?: {
+      critical?: number;
+      [key: string]: unknown;
+    };
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
 }
-export interface Monitor {
-  [key: string]: MonitorParams;
-}
+export type Monitor = Record<string, MonitorParams>;
 
 export interface ServerlessMonitor {
   name: string;
@@ -23,9 +33,7 @@ export interface ServerlessMonitor {
   templateVariables?: TemplateVariable[];
 }
 
-export interface RecommendedMonitors {
-  [key: string]: ServerlessMonitor;
-}
+export type RecommendedMonitors = Record<string, ServerlessMonitor>;
 /**
  * Adds the appropriate tags and required parameters that will be passed as part of the request body for creating and updating monitors
  * @param monitor - the Monitor object that is defined in the serverless.yml file
@@ -41,7 +49,7 @@ export function buildMonitorParams(
   service: string,
   env: string,
   recommendedMonitors: RecommendedMonitors,
-): { [x: string]: any } {
+): MonitorParams {
   const serverlessMonitorId = Object.keys(monitor)[0];
 
   if (!monitor[serverlessMonitorId]) {
@@ -107,7 +115,7 @@ function isRecommendedMonitor(serverlessMonitorId: string, recommendedMonitors: 
  * @param existingMonitors - Monitors that have already been created
  * @returns true if given monitor already exists
  */
-function doesMonitorExist(serverlessMonitorId: string, existingMonitors: { [key: string]: number }): boolean {
+function doesMonitorExist(serverlessMonitorId: string, existingMonitors: Record<string, number>): boolean {
   return Object.keys(existingMonitors).includes(serverlessMonitorId);
 }
 
@@ -123,7 +131,7 @@ function doesMonitorExist(serverlessMonitorId: string, existingMonitors: { [key:
 async function deleteRemovedMonitors(
   site: string,
   pluginMonitors: Monitor[],
-  existingMonitors: { [key: string]: number },
+  existingMonitors: Record<string, number>,
   monitorsApiKey: string,
   monitorsAppKey: string,
 ): Promise<string[]> {
