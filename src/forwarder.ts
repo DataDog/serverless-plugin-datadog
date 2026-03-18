@@ -154,7 +154,11 @@ export async function addExecutionLogGroupsAndSubscriptions(
   }
 }
 
-export async function addStepFunctionLogGroup(aws: Aws, resources: CfnResourceMap, stepFunction: StepFunctionConfig): Promise<void> {
+export async function addStepFunctionLogGroup(
+  aws: Aws,
+  resources: CfnResourceMap,
+  stepFunction: StepFunctionConfig,
+): Promise<void> {
   const stepFunctionName = stepFunction.name;
   const logGroupName = `/aws/vendedlogs/states/${stepFunctionName}-Logs-${aws.getStage()}`;
   const logGroupResourceName = `${normalizeResourceName(stepFunctionName)}LogGroup`;
@@ -184,7 +188,10 @@ export function addDdSlsPluginTag(stateMachineObj: StateMachineCfnResource): voi
   });
 }
 
-export function addDdTraceEnabledTag(stateMachineObj: StateMachineCfnResource, enableStepFunctionsTracing: undefined | boolean): void {
+export function addDdTraceEnabledTag(
+  stateMachineObj: StateMachineCfnResource,
+  enableStepFunctionsTracing: undefined | boolean,
+): void {
   if (!enableStepFunctionsTracing) {
     return;
   }
@@ -301,21 +308,33 @@ export async function describeSubscriptionFilters(aws: Aws, logGroupName: string
 }
 
 // Helper functions to validate we have a particular log group and if we should subscribe to it
-function validateRestApiSubscription(resource: LogGroupResource, subscribe: boolean, extendedProvider: LogsConfig): boolean {
+function validateRestApiSubscription(
+  resource: LogGroupResource,
+  subscribe: boolean,
+  extendedProvider: LogsConfig,
+): boolean {
   return (
     restAccessLoggingIsEnabled(extendedProvider) &&
     resource.Properties.LogGroupName.startsWith("/aws/api-gateway/") &&
     subscribe
   );
 }
-function validateHttpApiSubscription(resource: LogGroupResource, subscribe: boolean, extendedProvider: LogsConfig): boolean {
+function validateHttpApiSubscription(
+  resource: LogGroupResource,
+  subscribe: boolean,
+  extendedProvider: LogsConfig,
+): boolean {
   return (
     httpAccessLoggingIsEnabled(extendedProvider) &&
     resource.Properties.LogGroupName.startsWith("/aws/http-api/") &&
     subscribe
   );
 }
-function validateWebsocketSubscription(resource: LogGroupResource, subscribe: boolean, extendedProvider: LogsConfig): boolean {
+function validateWebsocketSubscription(
+  resource: LogGroupResource,
+  subscribe: boolean,
+  extendedProvider: LogsConfig,
+): boolean {
   return (
     websocketAccessLoggingIsEnabled(extendedProvider) &&
     resource.Properties.LogGroupName.startsWith("/aws/websocket/") &&

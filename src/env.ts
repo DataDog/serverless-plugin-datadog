@@ -422,7 +422,11 @@ export function getConfig(service: Service): Configuration {
 }
 
 export function forceExcludeDepsFromWebpack(service: Service): void {
-  const includeModules = getPropertyFromPath(service as unknown as Record<string, unknown>, ["custom", "webpack", "includeModules"]);
+  const includeModules = getPropertyFromPath(service as unknown as Record<string, unknown>, [
+    "custom",
+    "webpack",
+    "includeModules",
+  ]);
   if (includeModules === undefined) {
     return;
   }

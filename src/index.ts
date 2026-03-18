@@ -367,8 +367,10 @@ This is expected if you only deploy part of the stack.`);
   private async afterDeploy(): Promise<void> {
     const config = getConfig(this.serverless.service);
     const custom = this.serverless.service.custom ?? {};
-    const service = (custom as Record<string, Record<string, string>>).datadog?.service ?? this.serverless.service.getServiceName();
-    const env = (custom as Record<string, Record<string, string>>).datadog?.env ?? this.serverless.getProvider("aws").getStage();
+    const service =
+      (custom as Record<string, Record<string, string>>).datadog?.service ?? this.serverless.service.getServiceName();
+    const env =
+      (custom as Record<string, Record<string, string>>).datadog?.env ?? this.serverless.getProvider("aws").getStage();
 
     if (config.enabled === false) return;
     if (

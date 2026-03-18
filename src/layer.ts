@@ -200,7 +200,9 @@ export function applyLambdaLibraryLayers(
     }
 
     const architecture =
-      handler.handler?.architecture ?? (service.provider as unknown as { architecture?: string }).architecture ?? DEFAULT_ARCHITECTURE;
+      handler.handler?.architecture ??
+      (service.provider as unknown as { architecture?: string }).architecture ??
+      DEFAULT_ARCHITECTURE;
     const isArm64 = architecture === ARM64_ARCHITECTURE;
 
     // Use the ARM layer if customer's handler is using ARM
@@ -250,7 +252,9 @@ export function applyExtensionLayer(
       continue;
     }
     const architecture =
-      handler.handler.architecture ?? (service.provider as unknown as { architecture?: string }).architecture ?? DEFAULT_ARCHITECTURE;
+      handler.handler.architecture ??
+      (service.provider as unknown as { architecture?: string }).architecture ??
+      DEFAULT_ARCHITECTURE;
     let extensionLayerKey: string = "extension";
 
     if (architecture === ARM64_ARCHITECTURE) {
