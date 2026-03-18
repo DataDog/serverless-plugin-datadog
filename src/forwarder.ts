@@ -76,7 +76,7 @@ export type CfnResourceMap = Record<string, CfnResource>;
 /** A compiled AWS::StepFunctions::StateMachine CFN resource */
 export interface StateMachineCfnResource {
   Properties?: {
-    Tags?: Array<{ Key: string; Value: string }>;
+    Tags?: { Key: string; Value: string }[];
     [key: string]: unknown;
   };
   [key: string]: unknown;
