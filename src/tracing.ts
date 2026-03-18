@@ -25,14 +25,14 @@ export function enableTracing(service: Service, tracingMode: TracingMode, handle
   if (tracingMode === TracingMode.XRAY || tracingMode === TracingMode.HYBRID) {
     provider.tracing = {
       apiGateway: provider.apiGateway?.restApiId
-        ? (undefined as any) // Current type definition does not allow undefined however it is a valid option.
+        ? (undefined as unknown as boolean) // Current type definition does not allow undefined however it is a valid option.
         : true,
       lambda: true,
     };
   }
   handlers.forEach(({ handler }) => {
     handler.environment ??= {};
-    const environment = handler.environment as any;
+    const environment = handler.environment as Record<string, string | boolean>;
     // if tracing is not enabled, merge x-ray cannot be enabled
     if (environment[ddTraceEnabledEnvVar] === false || environment[ddTraceEnabledEnvVar] === "false") {
       environment[ddMergeXrayTracesEnvVar] = false;

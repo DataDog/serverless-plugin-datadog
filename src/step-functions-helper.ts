@@ -6,22 +6,22 @@ export interface GeneralResource {
     DefinitionString?:
       | string
       | {
-          "Fn::Sub": any[];
+          "Fn::Sub": (string | object)[];
         };
   };
 }
 
 export interface StateMachineDefinition {
-  States: { [key: string]: StateMachineStep };
+  States: Record<string, StateMachineStep>;
 }
 
 export type PayloadObject = {
-  "Execution.$"?: any;
-  Execution?: any;
-  "State.$"?: any;
-  State?: any;
-  "StateMachine.$"?: any;
-  StateMachine?: any;
+  "Execution.$"?: string;
+  Execution?: unknown;
+  "State.$"?: string;
+  State?: unknown;
+  "StateMachine.$"?: string;
+  StateMachine?: unknown;
 };
 
 export type StepFunctionInput = {
@@ -323,7 +323,10 @@ manually merge these traces, check out https://docs.datadoghq.com/serverless/ste
 }
 
 export function inspectAndRecommendStepFunctionsInstrumentation(serverless: Serverless): void {
-  const stepFunctions = Object.values((serverless.service as any).stepFunctions?.stateMachines || {});
+  const stepFunctions = Object.values(
+    (serverless.service as unknown as { stepFunctions?: { stateMachines?: Record<string, unknown> } }).stepFunctions
+      ?.stateMachines ?? {},
+  );
   if (stepFunctions.length !== 0) {
     serverless.cli.log(
       `Uninstrumented Step Functions detected in your serverless.yml file. If you would like to see Step Functions traces, please see details of 'enableStepFunctionsTracing' and 'mergeStepFunctionAndLambdaTraces' variables in the README (https://github.com/DataDog/serverless-plugin-datadog/)`,

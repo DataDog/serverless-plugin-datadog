@@ -31,6 +31,8 @@ import {
   addExecutionLogGroupsAndSubscriptions,
   addStepFunctionLogGroup,
   addStepFunctionLogGroupSubscription,
+  StateMachineCfnResource,
+  StepFunctionConfig,
 } from "./forwarder";
 import { newSimpleGit } from "./git";
 import {
@@ -53,8 +55,8 @@ import { inspectAndRecommendStepFunctionsInstrumentation } from "./step-function
 
 // Separate interface since DefinitelyTyped currently doesn't include tags or env
 export interface ExtendedFunctionDefinition extends FunctionDefinition {
-  tags?: { [key: string]: string };
-  environment?: { [key: string]: string };
+  tags?: Record<string, string>;
+  environment?: Record<string, string>;
 }
 
 enum TagKeys {
@@ -101,7 +103,7 @@ module.exports = class ServerlessPlugin {
     private options: Serverless.Options,
   ) {}
 
-  private displayedMessages: { [msg: string]: true } = {};
+  private displayedMessages: Record<string, true> = {};
   private logToCliOnce(message: string): void {
     if (this.displayedMessages[message] === undefined) {
       this.displayedMessages[message] = true;
@@ -120,7 +122,7 @@ module.exports = class ServerlessPlugin {
     const config = getConfig(this.serverless.service);
     if (config.enabled === false) return;
     this.serverless.cli.log("Auto instrumenting functions with Datadog");
-    configHasOldProperties(config);
+    configHasOldProperties(config as unknown as Record<string, unknown>);
     if (config.monitorsApiKey !== undefined || config.monitorsAppKey !== undefined) {
       this.serverless.cli.log(
         "Warning: `monitorsApiKey` and `monitorsAppKey` have been deprecated. Please set DATADOG_API_KEY and DATADOG_APP_KEY in your environment instead.",
@@ -305,18 +307,21 @@ This is expected if you only deploy part of the stack.`);
 
     if (config.enableStepFunctionsTracing || config.subscribeToStepFunctionLogs) {
       const resources = compiledCfnTemplate.Resources;
-      const stepFunctions = Object.values((this.serverless.service as any).stepFunctions.stateMachines);
+      const serviceWithSF = this.serverless.service as unknown as {
+        stepFunctions: { stateMachines: Record<string, StepFunctionConfig> };
+      };
+      const stepFunctions = Object.values(serviceWithSF.stepFunctions.stateMachines);
       if (stepFunctions.length === 0) {
         this.serverless.cli.log("subscribeToStepFunctionLogs is set to true but no step functions were found.");
       } else {
         this.serverless.cli.log("Subscribing step function log groups to Datadog Forwarder");
-        for (const stepFunction of stepFunctions as any[]) {
+        for (const stepFunction of stepFunctions) {
           if (!stepFunction.hasOwnProperty("loggingConfig")) {
             this.serverless.cli.log(`Creating log group for ${stepFunction.name} and logging to it with level ALL.`);
             await addStepFunctionLogGroup(aws, resources, stepFunction);
           } else {
             this.serverless.cli.log(`Found logging config for step function ${stepFunction.name}`);
-            const loggingConfig = stepFunction.loggingConfig;
+            const loggingConfig = stepFunction.loggingConfig!;
 
             if (loggingConfig.level !== "ALL") {
               loggingConfig.level = "ALL";
@@ -361,9 +366,11 @@ This is expected if you only deploy part of the stack.`);
 
   private async afterDeploy(): Promise<void> {
     const config = getConfig(this.serverless.service);
-    const custom = (this.serverless.service.custom ?? {}) as any;
-    const service = custom.datadog?.service ?? this.serverless.service.getServiceName();
-    const env = custom.datadog?.env ?? this.serverless.getProvider("aws").getStage();
+    const custom = this.serverless.service.custom ?? {};
+    const service =
+      (custom as Record<string, Record<string, string>>).datadog?.service ?? this.serverless.service.getServiceName();
+    const env =
+      (custom as Record<string, Record<string, string>>).datadog?.env ?? this.serverless.getProvider("aws").getStage();
 
     if (config.enabled === false) return;
     if (
@@ -420,16 +427,13 @@ This is expected if you only deploy part of the stack.`);
     const provider = this.serverless.service.provider as Provider;
     const service = this.serverless.service as Service;
 
-    let custom = service.custom as any;
-    if (custom === undefined) {
-      custom = {};
-    }
+    const custom = service.custom ?? {};
 
     handlers.forEach(({ handler }) => {
       handler.environment ??= {};
-      const environment = handler.environment as any;
+      const environment = handler.environment as Record<string, unknown>;
       provider.environment ??= {};
-      const providerEnvironment = provider.environment as any;
+      const providerEnvironment = provider.environment as Record<string, unknown>;
 
       if (custom?.datadog?.service) {
         environment[ddServiceEnvVar] ??= providerEnvironment[ddServiceEnvVar] ?? custom.datadog.service;
@@ -460,14 +464,11 @@ This is expected if you only deploy part of the stack.`);
   private addDDTagsForLambda(handlers: FunctionInfo[]): void {
     const service = this.serverless.service as Service;
 
-    let custom = service.custom as any;
-    if (custom === undefined) {
-      custom = {};
-    }
+    const custom = service.custom ?? {};
 
     handlers.forEach(({ handler }) => {
       handler.tags ??= {};
-      const tags = handler.tags as any;
+      const tags = handler.tags as Record<string, string>;
 
       if (custom?.datadog?.service) {
         tags[TagKeys.Service] ??= custom.datadog.service;
@@ -497,7 +498,7 @@ This is expected if you only deploy part of the stack.`);
    * Check for service, env, version, and additional tags at the custom level.
    * If these don't already exist on the state machine level, add them.
    */
-  private addTagsForStateMachine(stateMachine: any): void {
+  private addTagsForStateMachine(stateMachine: StateMachineCfnResource): void {
     const service = this.serverless.service as Service;
 
     const datadog = service.custom?.datadog;
@@ -506,7 +507,7 @@ This is expected if you only deploy part of the stack.`);
     }
 
     stateMachine.Properties ??= {};
-    stateMachine.Properties.Tags ??= {};
+    stateMachine.Properties.Tags ??= [];
     const tags = stateMachine.Properties.Tags;
 
     if (datadog.service && !tags.hasOwnProperty(TagKeys.Service)) {
@@ -591,7 +592,7 @@ This is expected if you only deploy part of the stack.`);
   }
 };
 
-function configHasOldProperties(obj: any): void {
+function configHasOldProperties(obj: Record<string, unknown>): void {
   let hasOldProperties = false;
   let message = "The following configuration options have been removed:";
 
