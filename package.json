@@ -28,7 +28,7 @@
     "serverless-step-functions": "^3.17.0",
     "ts-jest": "^29.1.1",
     "tslint": "^6.1.3",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.2"
   },
   "jest": {
     "verbose": true,
