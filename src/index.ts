@@ -78,6 +78,7 @@ module.exports = class ServerlessPlugin {
     "before:deploy:function:packageFunction": this.beforePackageFunction.bind(this),
     "before:offline:start:init": this.beforePackageFunction.bind(this),
     "before:step-functions-offline:start": this.beforePackageFunction.bind(this),
+    "before:deploy:deploy": this.beforeDeploy.bind(this),
     "after:deploy:deploy": this.afterDeploy.bind(this),
     "before:package:finalize": this.afterPackageFunction.bind(this),
   };
@@ -360,6 +361,19 @@ This is expected if you only deploy part of the stack.`);
         this.serverless.cli.log(
           `Error raise when inspecting if there are any uninstrumented Step Functions state machines. Error: ${error}`,
         );
+      }
+    }
+  }
+
+  private async beforeDeploy(): Promise<void> {
+    const config = getConfig(this.serverless.service);
+    if (config.enabled === false) return;
+    try {
+      validateConfiguration(config);
+    } catch (error) {
+      this.serverless.cli.log(`Error occurred when validating configuration: ${error}`);
+      if (config.failOnError) {
+        throw error;
       }
     }
   }
