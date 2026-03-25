@@ -971,6 +971,86 @@ describe("ServerlessPlugin", () => {
     expect(threwError).toBe(false);
   });
 
+  describe("beforeDeploy", () => {
+    afterEach(() => {
+      mock.restore();
+    });
+
+    it("logs and does not throw when validateConfiguration fails and failOnError is false", async () => {
+      mock({});
+      let logs = "";
+      const serverless = {
+        cli: { log: (m: string) => (logs += m) },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          provider: { region: "us-east-1" },
+          functions: {},
+          custom: {
+            datadog: {
+              site: "datadogehq.com", // invalid to trigger validateConfiguration error
+              failOnError: false,
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await expect(plugin.hooks["before:deploy:deploy"]()).resolves.not.toThrow();
+      expect(logs).toContain("Warning: Invalid site URL. Must be one of");
+    });
+
+    it("throws when validateConfiguration fails and failOnError is true", async () => {
+      mock({});
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          provider: { region: "us-east-1" },
+          functions: {},
+          custom: {
+            datadog: {
+              site: "datadogehq.com", // invalid to trigger validateConfiguration error
+              failOnError: true,
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await expect(plugin.hooks["before:deploy:deploy"]()).rejects.toThrow(
+        "Warning: Invalid site URL. Must be one of",
+      );
+    });
+
+    it("logs and does not throw when monitors are enabled but API or APP key is missing and failOnError is false", async () => {
+      process.env = {};
+      mock({});
+      let logs = "";
+      const serverless = {
+        cli: { log: (m: string) => (logs += m) },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          provider: { region: "us-east-1" },
+          functions: {},
+          custom: {
+            datadog: {
+              monitors: true,
+              testingMode: false,
+              integrationTesting: false,
+              failOnError: false,
+              addExtension: false,
+            },
+          },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await expect(plugin.hooks["before:deploy:deploy"]()).resolves.not.toThrow();
+      expect(logs).toContain(
+        "When `monitors` is enabled, `DATADOG_API_KEY` and `DATADOG_APP_KEY` environment variables must be set.",
+      );
+    });
+  });
   it("throws an error if not all keys required by monitors are defined", async () => {
     process.env = {};
     mock({});
