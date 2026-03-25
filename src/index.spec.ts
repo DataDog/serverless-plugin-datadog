@@ -1017,9 +1017,7 @@ describe("ServerlessPlugin", () => {
         },
       };
       const plugin = new ServerlessPlugin(serverless, {});
-      await expect(plugin.hooks["before:deploy:deploy"]()).rejects.toThrow(
-        "Warning: Invalid site URL. Must be one of",
-      );
+      await expect(plugin.hooks["before:deploy:deploy"]()).rejects.toThrow("Warning: Invalid site URL. Must be one of");
     });
 
     it("logs and does not throw when monitors are enabled but API or APP key is missing and failOnError is false", async () => {
