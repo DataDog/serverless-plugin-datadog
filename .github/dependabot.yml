@@ -1,0 +1,15 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: /
+  schedule:
+    interval: weekly
+  groups:
+    all-minor-and-patch-updates:
+      patterns:
+      - '*'
+      update-types:
+      - minor
+      - patch
+  cooldown:
+    default-days: 14
