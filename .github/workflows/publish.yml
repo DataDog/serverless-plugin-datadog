@@ -12,13 +12,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "24.x"
           registry-url: "https://registry.npmjs.org"
       - run: corepack enable && corepack prepare yarn@4.10.3 --activate
-      - run: yarn
+      - run: yarn install --immutable
       - run: yarn build
       - run: npm publish
 
