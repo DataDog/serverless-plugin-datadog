@@ -30,7 +30,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: yarn install
+        run: yarn install --immutable
 
       - name: Check formatting
         run: yarn check-formatting
@@ -72,7 +72,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: yarn install
+        run: yarn install --immutable
 
       - name: Build
         run: yarn build
