@@ -5807,8 +5807,8 @@ __metadata:
   linkType: soft
 
 "serverless-step-functions@npm:^3.17.0":
-  version: 3.24.0
-  resolution: "serverless-step-functions@npm:3.24.0"
+  version: 3.27.0
+  resolution: "serverless-step-functions@npm:3.27.0"
   dependencies:
     "@serverless/utils": "npm:^6.7.0"
     asl-validator: "npm:^3.11.0"
@@ -5818,7 +5818,7 @@ __metadata:
     lodash: "npm:^4.17.11"
   peerDependencies:
     serverless: ">=2.32.0"
-  checksum: 10c0/b25f980bd89102f032767208ef10773d7400c0431bb857b8dcc95ceee49a699f2080987ba0d9e391554607bfd20f592021acfba4f98de076a9554bab344db9de
+  checksum: 10c0/3442646da899f67b56364dce3bbfbd33d0de6239caccb10de1af8ef51c2847867a2b14ed96532e427bbb250afaebe40a622cbda0f8b5bdab8fac16dfdbee9d9e
   languageName: node
   linkType: hard
 
