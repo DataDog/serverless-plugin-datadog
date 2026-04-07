@@ -95,13 +95,26 @@ if [ "$1" = "-g" ]; then
     FILE_NAME="src/layers-gov.json"
 fi
 
+EXISTING_JSON="{}"
+if [ -f "$FILE_NAME" ]; then
+    EXISTING_JSON=$(cat "$FILE_NAME")
+fi
+
 # Fetch the layers for each region in parallel
 echo "Fetching layers for each region"
 rm -rf layers
 mkdir layers
 for region in $AVAILABLE_REGIONS; do
   {
-    aws lambda list-layers --region "$region" | jq -c '[.Layers[] | {LayerName, LastLayerArn: .LatestMatchingVersion.LayerVersionArn}]' > layers/$region.json
+    if ! aws lambda list-layers --region "$region" --cli-connect-timeout 10 --cli-read-timeout 60 | jq -c '[.Layers[] | {LayerName, LastLayerArn: .LatestMatchingVersion.LayerVersionArn}]' > layers/$region.json; then
+      if [ "$region" = "me-south-1" ]; then
+        echo "WARNING: Failed to fetch layers for region me-south-1, skipping" >&2
+        echo '[]' > layers/$region.json
+      else
+        echo "ERROR: Failed to fetch layers for region $region" >&2
+        exit 1
+      fi
+    fi
   } &
 done
 wait # Wait for all parallel jobs to complete
@@ -117,11 +130,17 @@ do
 
         last_layer_arn=$(cat layers/$region.json | jq -r --arg layer_name $layer_name '.[] | select(.LayerName == $layer_name) .LastLayerArn')
 
-        if [ -z $last_layer_arn ]; then
-             >&2 echo "No layer found for $region, $layer_name"
-        else
+        if [ -n "$last_layer_arn" ]; then
             echo $last_layer_arn
             INPUT_JSON=$(jq -r ".regions . \"$region\" . \"$json_layer_name\" = \"$last_layer_arn\"" <<< $INPUT_JSON)
+        else
+            existing_arn=$(echo "$EXISTING_JSON" | jq -r --arg region "$region" --arg layer "$json_layer_name" '.regions[$region][$layer] // empty')
+            if [ -n "$existing_arn" ]; then
+                >&2 echo "API returned no layer for $region, $layer_name — using existing version $existing_arn"
+                INPUT_JSON=$(jq -r ".regions . \"$region\" . \"$json_layer_name\" = \"$existing_arn\"" <<< $INPUT_JSON)
+            else
+                >&2 echo "No layer found for $region, $layer_name"
+            fi
         fi
     done
 done
