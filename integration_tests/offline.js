@@ -17,6 +17,12 @@
  * synthetic "does not exist" error, which the Serverless handler treats as a
  * fresh stack and skips the comparison entirely.  The rest of the packaging
  * lifecycle is unaffected.
+ *
+ * This shim exists because Serverless Framework has no credential-free packaging mode
+ * when custom layers are defined. Tracked upstream:
+ *   https://github.com/serverless/serverless/issues/8187 (root cause, open since 2020)
+ *   https://github.com/serverless/serverless/issues/12969 (feature request for --artifacts-only)
+ * If either issue is resolved, this plugin can be removed.
  */
 class OfflinePackaging {
   constructor(serverless) {
