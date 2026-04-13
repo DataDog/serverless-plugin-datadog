@@ -3,6 +3,7 @@ frameworkVersion: "3"
 
 plugins:
   - ../dist/src
+  - ./offline
 
 provider:
   name: aws
