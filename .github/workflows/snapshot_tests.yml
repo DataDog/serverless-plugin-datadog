@@ -1,4 +1,4 @@
-name: integration-tests
+name: snapshot-tests
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  integration-tests:
+  snapshot-tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -35,10 +35,5 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: ./scripts/run_integration_tests.sh
+        run: ./scripts/run_snapshot_tests.sh
 
-      - name: Test getting recommended monitors
-        env:
-          DD_API_KEY: ${{ secrets.DD_API_KEY }}
-          DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
-        run: npm run test:integration
