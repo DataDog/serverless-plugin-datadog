@@ -10,5 +10,5 @@ module.exports = {
   clearMocks: true,
   collectCoverageFrom: ["src/**/*.ts"],
   testRegex: "(src\\/).*(\\.spec\\.ts)$",
-  testPathIgnorePatterns: ["\\.snap$", "<rootDir>/node_modules/", "integration_tests/"],
+  testPathIgnorePatterns: ["\\.snap$", "<rootDir>/node_modules/", "snapshot_tests/"],
 };
