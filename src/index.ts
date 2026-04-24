@@ -11,7 +11,7 @@ import { FunctionDefinition } from "serverless";
 import Service from "serverless/classes/Service";
 import Aws, { Provider } from "serverless/plugins/aws/provider/awsProvider";
 import { version } from "../package.json";
-import { gitMetadata } from "@datadog/datadog-ci";
+import { getGitCommitInfo, uploadGitCommitHash } from "@datadog/datadog-ci-base/commands/git-metadata/library";
 import {
   Configuration,
   ddEnvEnvVar,
@@ -261,13 +261,13 @@ module.exports = class ServerlessPlugin {
         const simpleGit = await newSimpleGit();
         if (simpleGit !== undefined && (await simpleGit.checkIsRepo())) {
           try {
-            const [gitRemote, gitHash] = await gitMetadata.getGitCommitInfo();
+            const [gitRemote, gitHash] = await getGitCommitInfo();
             handlers.forEach(({ handler }) => {
               setSourceCodeIntegrationEnvVar(handler, gitHash, gitRemote);
             });
             if (config.uploadGitMetadata) {
               this.logToCliOnce(`Uploading git metadata`);
-              await gitMetadata.uploadGitCommitHash((process.env.DATADOG_API_KEY ?? config.apiKey)!, config.site);
+              await uploadGitCommitHash((process.env.DATADOG_API_KEY ?? config.apiKey)!, config.site);
             }
           } catch (err) {
             this.logToCliOnce(`Error occurred when adding source code integration: ${err}`);
