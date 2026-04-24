@@ -11,7 +11,7 @@ import { FunctionDefinition } from "serverless";
 import Service from "serverless/classes/Service";
 import Aws, { Provider } from "serverless/plugins/aws/provider/awsProvider";
 import { version } from "../package.json";
-import { gitMetadata } from "@datadog/datadog-ci";
+import { gitMetadata } from "@datadog/datadog-ci-base";
 import {
   Configuration,
   ddEnvEnvVar,
