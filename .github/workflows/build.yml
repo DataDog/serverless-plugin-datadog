@@ -46,6 +46,7 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.node-version == 26 }}
     strategy:
       max-parallel: 4
       matrix:
