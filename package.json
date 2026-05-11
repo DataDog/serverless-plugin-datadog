@@ -57,7 +57,7 @@
     ]
   },
   "dependencies": {
-    "@datadog/datadog-ci-base": "^5.14.0",
+    "@datadog/datadog-ci-base": "^5.16.1",
     "simple-git": "^3.36.0"
   },
   "peerDependencies": {
