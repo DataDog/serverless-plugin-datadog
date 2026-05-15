@@ -58,6 +58,7 @@ describe("findHandlers", () => {
       "ruby32-function": { handler: "myfile.handler", runtime: "ruby3.2" },
       "ruby33-function": { handler: "myfile.handler", runtime: "ruby3.3" },
       "ruby34-function": { handler: "myfile.handler", runtime: "ruby3.4" },
+      "ruby40-function": { handler: "myfile.handler", runtime: "ruby4.0" },
       "java8-function": { handler: "myfile.handler", runtime: "java8" },
       "java8.al2-function": { handler: "myfile.handler", runtime: "java8.al2" },
       "java11-function": { handler: "myfile.handler", runtime: "java11" },
@@ -174,6 +175,12 @@ describe("findHandlers", () => {
         handler: { handler: "myfile.handler", runtime: "ruby3.4" },
         type: RuntimeType.RUBY,
         runtime: "ruby3.4",
+      },
+      {
+        name: "ruby40-function",
+        handler: { handler: "myfile.handler", runtime: "ruby4.0" },
+        type: RuntimeType.RUBY,
+        runtime: "ruby4.0",
       },
       {
         name: "java8-function",
