@@ -1,0 +1,118 @@
+import {client, v2} from '@datadog/datadog-api-client';
+
+// Runner-agnostic telemetry poller. Mirrors the datadog-ci reference
+// (cloud-run-telemetry-checker.ts): poll spans + logs on a bounded budget, then
+// assert *identity* on the matched records, not mere existence.
+
+const POLL_INTERVAL_SECONDS = 15;
+const MAX_ATTEMPTS = 20;
+
+const waitFor = (seconds: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+
+const buildConfiguration = (): client.Configuration => {
+  const configuration = client.createConfiguration({
+    authMethods: {
+      apiKeyAuth: process.env.DATADOG_API_KEY ?? process.env.DD_API_KEY,
+      appKeyAuth: process.env.DATADOG_APP_KEY ?? process.env.DD_APP_KEY,
+    },
+  });
+  const site = process.env.DATADOG_SITE ?? process.env.DD_SITE;
+  if (site) {
+    configuration.setServerVariables({site});
+  }
+
+  return configuration;
+};
+
+// Poll until at least one returned record carries every identity marker. We filter
+// in-process (rather than trusting the query alone) so a stray record that merely
+// matches the service filter can't pass for one stamped with the full identity.
+const pollUntilIdentity = async (
+  label: string,
+  query: () => Promise<unknown[]>,
+  markers: string[],
+): Promise<void> => {
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    // eslint-disable-next-line no-console
+    console.log(`[${label}] attempt ${attempt}/${MAX_ATTEMPTS}`);
+    try {
+      const results = await query();
+      const matching = results.filter((record) => {
+        const serialized = JSON.stringify(record);
+
+        return markers.every((marker) => serialized.includes(marker));
+      });
+      if (matching.length > 0) {
+        // eslint-disable-next-line no-console
+        console.log(`[${label}] found ${matching.length} record(s) with identity [${markers.join(', ')}]`);
+
+        return;
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(`[${label}] query error:`, error);
+    }
+
+    if (attempt < MAX_ATTEMPTS) {
+      await waitFor(POLL_INTERVAL_SECONDS);
+    }
+  }
+  throw new Error(
+    `[${label}] timed out after ${MAX_ATTEMPTS} attempts (${MAX_ATTEMPTS * POLL_INTERVAL_SECONDS}s) ` +
+      `waiting for telemetry with identity [${markers.join(', ')}]`,
+  );
+};
+
+const recentWindow = (): {from: string; to: string} => {
+  const now = new Date();
+  const from = new Date(now.getTime() - 15 * 60 * 1000);
+
+  return {from: from.toISOString(), to: now.toISOString()};
+};
+
+const querySpans = async (configuration: client.Configuration, serviceName: string): Promise<unknown[]> => {
+  const api = new v2.SpansApi(configuration);
+  const {from, to} = recentWindow();
+  const response = await api.listSpans({
+    body: {
+      data: {
+        attributes: {
+          filter: {query: `@service:${serviceName}`, from, to},
+          page: {limit: 25},
+        },
+        type: 'search_request',
+      },
+    },
+  });
+
+  return response.data ?? [];
+};
+
+const queryLogs = async (configuration: client.Configuration, serviceName: string): Promise<unknown[]> => {
+  const api = new v2.LogsApi(configuration);
+  const {from, to} = recentWindow();
+  const response = await api.listLogs({
+    body: {
+      filter: {query: `service:${serviceName}`, from, to},
+      page: {limit: 25},
+    },
+  });
+
+  return response.data ?? [];
+};
+
+export interface TelemetryIdentity {
+  serviceName: string;
+  env: string;
+  version: string;
+}
+
+export const checkTelemetryFlowing = async ({serviceName, env, version}: TelemetryIdentity): Promise<void> => {
+  const configuration = buildConfiguration();
+  await Promise.all([
+    // Traces carry service + env + version identity.
+    pollUntilIdentity('spans', () => querySpans(configuration, serviceName), [serviceName, env, version]),
+    // Logs carry service + env identity.
+    pollUntilIdentity('logs', () => queryLogs(configuration, serviceName), [serviceName, env]),
+  ]);
+};
