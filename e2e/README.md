@@ -83,8 +83,11 @@ to skip the suite.
 
 `.github/workflows/e2e.yml` runs the suite behind a `dorny/paths-filter` gate
 (`src/**`, `e2e/**`, the workflow file) and the `SKIP_LAMBDA_TESTS` flag, with
-per-provider OIDC (`aws-actions/configure-aws-credentials`). Required repo settings:
+GitHub→AWS OIDC (`aws-actions/configure-aws-credentials`). Required repo settings:
 
-- Secrets: `DATADOG_API_KEY_E2E`, `DATADOG_APP_KEY_E2E`
-- Variables: `AWS_ROLE_ARN_E2E` (the OIDC role), optionally `AWS_REGION_E2E`,
-  `DATADOG_SITE_E2E`
+- Secrets: `DD_API_KEY`, `DD_APP_KEY` (existing repo secrets, reused for telemetry)
+- Variables: `AWS_ROLE_ARN_E2E` (the OIDC deploy role), `AWS_REGION_E2E` (default
+  `us-east-1`), optionally `DATADOG_SITE_E2E`
+
+The OIDC deploy role and the policy backing it are cataloged in
+`serverless-ci/e2e/iam-infra.md`.

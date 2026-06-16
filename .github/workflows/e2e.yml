@@ -75,8 +75,8 @@ jobs:
         run: npm test
         working-directory: e2e
         env:
-          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY_E2E }}
-          DATADOG_APP_KEY: ${{ secrets.DATADOG_APP_KEY_E2E }}
+          DATADOG_API_KEY: ${{ secrets.DD_API_KEY }}
+          DATADOG_APP_KEY: ${{ secrets.DD_APP_KEY }}
           DATADOG_SITE: ${{ vars.DATADOG_SITE_E2E || 'datadoghq.com' }}
           AWS_REGION: ${{ vars.AWS_REGION_E2E || 'us-east-1' }}
           # When nothing relevant changed, the suite is skipped (still green).
