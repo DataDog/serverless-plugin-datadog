@@ -3,7 +3,19 @@ name: e2e
 on:
   push:
     branches: [main]
+    paths:
+      - 'src/**'
+      - 'e2e/**'
+      - 'package.json'
+      - 'yarn.lock'
+      - '.github/workflows/e2e.yml'
   pull_request:
+    paths:
+      - 'src/**'
+      - 'e2e/**'
+      - 'package.json'
+      - 'yarn.lock'
+      - '.github/workflows/e2e.yml'
   workflow_dispatch:
 
 # One in-flight e2e run per ref; cancel older runs so ephemeral resources don't pile up.
@@ -71,13 +83,22 @@ jobs:
         run: npm install
         working-directory: e2e
 
+      # Short-lived Datadog API + App keys via OIDC federation (dd-sts), governed by
+      # the serverless-plugin-datadog-e2e policy. No static Datadog keys in this repo.
+      - name: Get Datadog credentials (dd-sts)
+        id: dd-sts
+        if: needs.check-lambda-changes.outputs.should_run == 'true'
+        uses: DataDog/dd-sts-action@2e8187910199bd93129520183c093e19aa585c75 # v1.0.0
+        with:
+          policy: serverless-plugin-datadog-e2e
+
       - name: Run e2e suite
         run: npm test
         working-directory: e2e
         env:
-          DATADOG_API_KEY: ${{ secrets.DD_API_KEY }}
-          DATADOG_APP_KEY: ${{ secrets.DD_APP_KEY }}
-          DATADOG_SITE: ${{ vars.DATADOG_SITE_E2E || 'datadoghq.com' }}
+          DATADOG_API_KEY: ${{ steps.dd-sts.outputs.api_key }}
+          DATADOG_APP_KEY: ${{ steps.dd-sts.outputs.app_key }}
+          DATADOG_SITE: ${{ vars.DD_SITE_E2E || 'datadoghq.com' }}
           AWS_REGION: ${{ vars.AWS_REGION_E2E || 'us-east-1' }}
           # When nothing relevant changed, the suite is skipped (still green).
           SKIP_LAMBDA_TESTS: ${{ needs.check-lambda-changes.outputs.should_run != 'true' }}
