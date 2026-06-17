@@ -73,7 +73,7 @@ jobs:
       # OIDC federation: GitHub -> AWS. The role is assumable only from this repo's
       # workflows and scoped to the e2e sandbox account.
       - name: AWS auth (OIDC)
-        if: needs.check-lambda-changes.outputs.should_run == 'true'
+        if: needs.check-lambda-changes.outputs.should_run == 'true' && vars.AWS_ROLE_ARN_E2E != ''
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN_E2E }}
@@ -87,7 +87,7 @@ jobs:
       # the serverless-plugin-datadog-e2e policy. No static Datadog keys in this repo.
       - name: Get Datadog credentials (dd-sts)
         id: dd-sts
-        if: needs.check-lambda-changes.outputs.should_run == 'true'
+        if: needs.check-lambda-changes.outputs.should_run == 'true' && vars.AWS_ROLE_ARN_E2E != ''
         uses: DataDog/dd-sts-action@2e8187910199bd93129520183c093e19aa585c75 # v1.0.0
         with:
           policy: serverless-plugin-datadog-e2e
@@ -100,5 +100,7 @@ jobs:
           DATADOG_APP_KEY: ${{ steps.dd-sts.outputs.app_key }}
           DATADOG_SITE: ${{ vars.DD_SITE_E2E || 'datadoghq.com' }}
           AWS_REGION: ${{ vars.AWS_REGION_E2E || 'us-east-1' }}
-          # When nothing relevant changed, the suite is skipped (still green).
-          SKIP_LAMBDA_TESTS: ${{ needs.check-lambda-changes.outputs.should_run != 'true' }}
+          # When nothing relevant changed, or AWS OIDC federation isn't wired yet, the
+          # suite is skipped (still green) so CI stays green until the dd-source policy
+          # and AWS_ROLE_ARN_E2E are provisioned.
+          SKIP_LAMBDA_TESTS: ${{ needs.check-lambda-changes.outputs.should_run != 'true' || vars.AWS_ROLE_ARN_E2E == '' }}
