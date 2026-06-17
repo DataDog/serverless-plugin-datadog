@@ -85,9 +85,11 @@ to skip the suite.
 (`src/**`, `e2e/**`, the workflow file) and the `SKIP_LAMBDA_TESTS` flag, with
 GitHub→AWS OIDC (`aws-actions/configure-aws-credentials`). Required repo settings:
 
-- Secrets: `DD_API_KEY`, `DD_APP_KEY` (existing repo secrets, reused for telemetry)
+- Datadog auth (dd-sts): short-lived API + App keys minted at runtime via
+  [`DataDog/dd-sts-action`](https://github.com/DataDog/dd-sts-action) under the
+  `serverless-plugin-datadog-e2e` policy -- no static Datadog keys in this repo
 - Variables: `AWS_ROLE_ARN_E2E` (the OIDC deploy role), `AWS_REGION_E2E` (default
-  `us-east-1`), optionally `DATADOG_SITE_E2E`
+  `us-east-1`), optionally `DD_SITE_E2E`
 
 The OIDC deploy role and the policy backing it are cataloged in
 `serverless-ci/e2e/iam-infra.md`.
