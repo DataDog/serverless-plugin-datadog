@@ -82,6 +82,8 @@ jobs:
 
       - name: Upload coverage to Datadog
         if: matrix.node-version == 24
+        continue-on-error: true
         env:
           DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-        run: npx --yes @datadog/datadog-ci coverage upload --service serverless-plugin-datadog coverage/lcov.info
+          DD_SERVICE: serverless-plugin-datadog
+        run: npx --yes @datadog/datadog-ci coverage upload coverage/lcov.info
