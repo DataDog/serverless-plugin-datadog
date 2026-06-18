@@ -59,13 +59,18 @@ runs in `afterAll` regardless of outcome.
 
 ```
 cd e2e
-cp .env.local.example .env.local   # fill in DATADOG_API_KEY / DATADOG_APP_KEY
 npm install
-aws-vault exec sso-serverless-sandbox-account-admin -- npm test
+
+# Datadog auth: dd-auth mints short-lived keys for the org -- no pasted keys.
+dd-auth --domain app.datadoghq.com -- bash -c '
+  export DATADOG_API_KEY="$DD_API_KEY" DATADOG_APP_KEY="$DD_APP_KEY"
+  aws-vault exec sso-serverless-sandbox-account-admin -- npm test
+'
 ```
 
-`.env.local` is loaded automatically (real env vars win). Set `SKIP_LAMBDA_TESTS=true`
-to skip the suite.
+`dd-auth` injects `$DD_API_KEY` / `$DD_APP_KEY` into the wrapped subprocess; the
+suite reads them as `DATADOG_API_KEY` / `DATADOG_APP_KEY`. AWS credentials still come
+from `aws-vault`. Set `SKIP_LAMBDA_TESTS=true` to skip the suite.
 
 ## Configuration
 
