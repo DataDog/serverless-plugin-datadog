@@ -5,9 +5,10 @@ import {fileURLToPath} from 'node:url';
 
 import {afterAll, beforeAll, describe, it} from 'vitest';
 
+import {ENV_NAME, ENV_VERSION, functionName, NAMING, RETRY_PATTERNS, VERIFIER} from './helpers/e2e.config';
 import {execPromise, execPromiseWithRetries} from './helpers/exec';
 import {checkTelemetryFlowing} from './helpers/lambda-telemetry-checker';
-import {functionName, functionSnapshot, verifyInstrumented, verifyUninstrumented, type FunctionSnapshot} from './helpers/lambda-verifier';
+import {functionSnapshot, verifyInstrumented, verifyUninstrumented, type FunctionSnapshot} from './helpers/lambda-verifier';
 import {freshnessTimestamp, namePrefix, newRunId} from './helpers/naming';
 
 // Full lifecycle for the serverless-plugin-datadog AWS Lambda instrumentation:
@@ -28,15 +29,13 @@ const fixtureDir = path.join(e2eDir, 'fixtures', 'lambda-node');
 
 const DEPLOY_TIMEOUT_MS = 900_000;
 const TELEMETRY_TIMEOUT_MS = 600_000;
-const ENV_VERSION = '1.0.0';
-const ENV_NAME = 'e2e';
 
 const describeOrSkip = process.env.SKIP_LAMBDA_TESTS === 'true' ? describe.skip : describe;
 
 describeOrSkip('serverless-plugin-datadog lambda e2e', () => {
   const region = process.env.AWS_REGION ?? 'us-east-1';
   const runId = newRunId();
-  const serviceName = namePrefix(runId);
+  const serviceName = namePrefix(NAMING, runId);
   const apiKey = process.env.DATADOG_API_KEY ?? process.env.DD_API_KEY;
   const appKey = process.env.DATADOG_APP_KEY ?? process.env.DD_APP_KEY;
   const site = process.env.DATADOG_SITE ?? process.env.DD_SITE ?? 'datadoghq.com';
@@ -53,7 +52,9 @@ describeOrSkip('serverless-plugin-datadog lambda e2e', () => {
   const slsOptions = {env: deployEnv, cwd: fixtureDir};
 
   const deploy = () =>
-    execPromiseWithRetries('npx --no-install serverless deploy --stage e2e --conceal', slsOptions, {
+    execPromiseWithRetries('npx --no-install serverless deploy --stage e2e --conceal', {
+      ...slsOptions,
+      retryPatterns: RETRY_PATTERNS,
       maxAttempts: 2,
       delaySeconds: 20,
     });
@@ -82,8 +83,8 @@ describeOrSkip('serverless-plugin-datadog lambda e2e', () => {
       const result = await deploy();
       assert.equal(result.exitCode, 0, `sls deploy failed: ${result.stderr || result.stdout}`);
 
-      await verifyInstrumented(serviceName, region);
-      firstSnapshot = await functionSnapshot(functionName(serviceName), region);
+      await verifyInstrumented(VERIFIER, serviceName, region);
+      firstSnapshot = await functionSnapshot(VERIFIER, serviceName, region);
     },
     DEPLOY_TIMEOUT_MS,
   );
@@ -97,6 +98,7 @@ describeOrSkip('serverless-plugin-datadog lambda e2e', () => {
         const result = await execPromiseWithRetries(
           `aws lambda invoke --function-name "${functionName(serviceName)}" --region "${region}"` +
             ` --payload '{}' --cli-binary-format raw-in-base64-out --output json "${outFile}"`,
+          {retryPatterns: RETRY_PATTERNS},
         );
         assert.equal(result.exitCode, 0, `lambda invoke failed: ${result.stderr}`);
         const meta = JSON.parse(result.stdout) as {StatusCode?: number; FunctionError?: string};
@@ -116,9 +118,9 @@ describeOrSkip('serverless-plugin-datadog lambda e2e', () => {
       assert.equal(result.exitCode, 0, `re-deploy failed: ${result.stderr || result.stdout}`);
 
       // Still instrumented, still no double-wrap / duplicate layers...
-      await verifyInstrumented(serviceName, region);
+      await verifyInstrumented(VERIFIER, serviceName, region);
       // ...and byte-for-byte the same instrumentation as the first apply.
-      const secondSnapshot = await functionSnapshot(functionName(serviceName), region);
+      const secondSnapshot = await functionSnapshot(VERIFIER, serviceName, region);
       assert.deepEqual(secondSnapshot, firstSnapshot, 're-apply changed the function config');
     },
     DEPLOY_TIMEOUT_MS,
@@ -127,13 +129,15 @@ describeOrSkip('serverless-plugin-datadog lambda e2e', () => {
   it(
     'removes cleanly with no residue',
     async () => {
-      const result = await execPromiseWithRetries('npx --no-install serverless remove --stage e2e', slsOptions, {
+      const result = await execPromiseWithRetries('npx --no-install serverless remove --stage e2e', {
+        ...slsOptions,
+        retryPatterns: RETRY_PATTERNS,
         maxAttempts: 2,
         delaySeconds: 20,
       });
       assert.equal(result.exitCode, 0, `sls remove failed: ${result.stderr || result.stdout}`);
 
-      await verifyUninstrumented(serviceName, region);
+      await verifyUninstrumented(VERIFIER, serviceName, region);
     },
     DEPLOY_TIMEOUT_MS,
   );
