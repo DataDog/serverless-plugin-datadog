@@ -61,11 +61,12 @@ runs in `afterAll` regardless of outcome.
 cd e2e
 npm install
 
-# Datadog auth: dd-auth mints short-lived keys for the org -- no pasted keys.
-dd-auth --domain app.datadoghq.com -- bash -c '
-  export DATADOG_API_KEY="$DD_API_KEY" DATADOG_APP_KEY="$DD_APP_KEY"
-  aws-vault exec sso-serverless-sandbox-account-admin -- npm test
-'
+# aws-vault provides AWS creds; dd-auth mints short-lived keys for the org -- no pasted keys.
+aws-vault exec sso-serverless-sandbox-account-admin -- \
+  dd-auth --domain app.datadoghq.com -- bash -c '
+    export DATADOG_API_KEY="$DD_API_KEY" DATADOG_APP_KEY="$DD_APP_KEY"
+    npm test
+  '
 ```
 
 `dd-auth` injects `$DD_API_KEY` / `$DD_APP_KEY` into the wrapped subprocess; the
