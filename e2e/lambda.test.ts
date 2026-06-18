@@ -106,7 +106,7 @@ describeOrSkip('serverless-plugin-datadog lambda e2e', () => {
         assert.ok(!meta.FunctionError, `invocation errored: ${meta.FunctionError}`);
       }
 
-      await checkTelemetryFlowing({serviceName, env: ENV_NAME, version: ENV_VERSION});
+      await checkTelemetryFlowing({serviceName, env: ENV_NAME, version: ENV_VERSION, runId});
     },
     TELEMETRY_TIMEOUT_MS,
   );

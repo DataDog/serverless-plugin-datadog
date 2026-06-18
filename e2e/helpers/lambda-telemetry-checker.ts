@@ -11,12 +11,67 @@
 
 import {client, v2} from '@datadog/datadog-api-client';
 
+import {RUN_ID_TAG_KEY} from './naming';
+
 // Runner-agnostic telemetry poller. Mirrors the datadog-ci reference
 // (cloud-run-telemetry-checker.ts): poll spans + logs on a bounded budget, then assert
 // *identity* on the matched records, not mere existence.
 
 const POLL_INTERVAL_SECONDS = 15;
 const MAX_ATTEMPTS = 20;
+
+// A single ingested span or log, flattened to the fields we assert on -- mirrors the Go
+// shared Event: top-level string attributes plus "key:value" tag strings.
+interface ParsedEvent {
+  attrs: Record<string, string>;
+  tags: string[];
+}
+
+interface IdentityTag {
+  key: string;
+  value: string;
+}
+
+// Flatten a raw span/log record into attrs + tags. Reserved fields (service/env/version)
+// sit at the top of `attributes`; logs nest their structured attributes one level deeper;
+// tags arrive as a "key:value" string array.
+const parseEvent = (record: unknown): ParsedEvent => {
+  const attrs: Record<string, string> = {};
+  const tags: string[] = [];
+  const attributes = (record as {attributes?: Record<string, unknown>})?.attributes;
+  if (attributes && typeof attributes === 'object') {
+    for (const key of ['service', 'env', 'version']) {
+      const value = attributes[key];
+      if (typeof value === 'string' && value !== '') {
+        attrs[key] = value;
+      }
+    }
+    const nested = attributes.attributes;
+    if (nested && typeof nested === 'object') {
+      for (const [key, value] of Object.entries(nested)) {
+        if (typeof value === 'string') {
+          attrs[key] = value;
+        }
+      }
+    }
+    if (Array.isArray(attributes.tags)) {
+      for (const tag of attributes.tags) {
+        if (typeof tag === 'string') {
+          tags.push(tag);
+        }
+      }
+    }
+  }
+
+  return {attrs, tags};
+};
+
+// Assert key=value as a structured attribute or a "key:value" tag -- identity, not a
+// substring match against the serialized blob.
+const has = (event: ParsedEvent, key: string, value: string): boolean =>
+  event.attrs[key] === value || event.tags.includes(`${key}:${value}`);
+
+const identityLabel = (identity: IdentityTag[]): string => identity.map(({key, value}) => `${key}:${value}`).join(', ');
 
 const waitFor = (seconds: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, seconds * 1000));
 
@@ -41,7 +96,7 @@ const buildConfiguration = (): client.Configuration => {
 const pollUntilIdentity = async (
   label: string,
   query: () => Promise<unknown[]>,
-  markers: string[],
+  identity: IdentityTag[],
 ): Promise<void> => {
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     // eslint-disable-next-line no-console
@@ -49,13 +104,13 @@ const pollUntilIdentity = async (
     try {
       const results = await query();
       const matching = results.filter((record) => {
-        const serialized = JSON.stringify(record);
+        const event = parseEvent(record);
 
-        return markers.every((marker) => serialized.includes(marker));
+        return identity.every(({key, value}) => has(event, key, value));
       });
       if (matching.length > 0) {
         // eslint-disable-next-line no-console
-        console.log(`[${label}] found ${matching.length} record(s) with identity [${markers.join(', ')}]`);
+        console.log(`[${label}] found ${matching.length} record(s) with identity [${identityLabel(identity)}]`);
 
         return;
       }
@@ -70,7 +125,7 @@ const pollUntilIdentity = async (
   }
   throw new Error(
     `[${label}] timed out after ${MAX_ATTEMPTS} attempts (${MAX_ATTEMPTS * POLL_INTERVAL_SECONDS}s) ` +
-      `waiting for telemetry with identity [${markers.join(', ')}]`,
+      `waiting for telemetry with identity [${identityLabel(identity)}]`,
   );
 };
 
@@ -116,14 +171,32 @@ export interface TelemetryIdentity {
   serviceName: string;
   env: string;
   version: string;
+  runId: string;
+  // Run-id tag key; defaults to the shared convention. Override only if a repo diverges.
+  runIdTagKey?: string;
 }
 
-export const checkTelemetryFlowing = async ({serviceName, env, version}: TelemetryIdentity): Promise<void> => {
+export const checkTelemetryFlowing = async ({
+  serviceName,
+  env,
+  version,
+  runId,
+  runIdTagKey = RUN_ID_TAG_KEY,
+}: TelemetryIdentity): Promise<void> => {
   const configuration = buildConfiguration();
   await Promise.all([
-    // Traces carry service + env + version identity.
-    pollUntilIdentity('spans', () => querySpans(configuration, serviceName), [serviceName, env, version]),
-    // Logs carry service + env identity.
-    pollUntilIdentity('logs', () => queryLogs(configuration, serviceName), [serviceName, env]),
+    // Traces carry service + env + version + run-id identity.
+    pollUntilIdentity('spans', () => querySpans(configuration, serviceName), [
+      {key: 'service', value: serviceName},
+      {key: 'env', value: env},
+      {key: 'version', value: version},
+      {key: runIdTagKey, value: runId},
+    ]),
+    // Logs carry service + env + run-id identity.
+    pollUntilIdentity('logs', () => queryLogs(configuration, serviceName), [
+      {key: 'service', value: serviceName},
+      {key: 'env', value: env},
+      {key: runIdTagKey, value: runId},
+    ]),
   ]);
 };
