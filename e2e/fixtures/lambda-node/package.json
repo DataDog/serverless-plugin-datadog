@@ -1,0 +1,9 @@
+{
+  "name": "one-e2e-lambda-node-workload",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Ephemeral Lambda workload deployed by the serverless-plugin-datadog e2e suite. The serverless-plugin-datadog dependency is installed from a packed tarball by ../../setup.sh (not listed here, to avoid a recursive file: link).",
+  "dependencies": {
+    "serverless": "3.39.0"
+  }
+}

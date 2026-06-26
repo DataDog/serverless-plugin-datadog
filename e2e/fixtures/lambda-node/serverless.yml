@@ -1,0 +1,49 @@
+# Uninstrumented workload + the serverless-plugin-datadog instrumentation it plugs
+# into. The plugin runs as part of `sls deploy` (APPLY) and is torn down with the
+# whole stack on `sls remove` (REMOVE). Everything that has to be unique or stamped
+# per run is injected via env so this file stays static (see e2e/helpers/naming.ts).
+#
+# frameworkVersion is pinned to 3 to avoid the Serverless Framework v4 login/license
+# flow in CI. The runtime is pinned to one canonical Node.js version (see RULES in
+# the spec: one canonical runtime per platform).
+service: ${env:E2E_SERVICE_NAME}
+
+frameworkVersion: "3"
+
+plugins:
+  - serverless-plugin-datadog
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: ${env:AWS_REGION, "ap-northeast-3"}
+  stage: e2e
+  # Hygiene: freshness tag set atomically at creation, on both the CloudFormation
+  # stack and every resource, so the cross-repo sweeper can age it out.
+  stackTags:
+    one_e2e_created: ${env:E2E_CREATED_TS}
+  tags:
+    one_e2e_created: ${env:E2E_CREATED_TS}
+
+custom:
+  datadog:
+    # API key wiring + site: required for the extension to ship telemetry.
+    apiKey: ${env:DD_API_KEY}
+    site: ${env:DD_SITE, "datadoghq.com"}
+    # Identity: service carries the unique run id, env + version are fixed markers.
+    # These flow onto ingested telemetry and let us assert identity, not existence.
+    service: ${env:E2E_SERVICE_NAME}
+    env: e2e
+    version: "1.0.0"
+    # The mechanism under test: library layer + extension layer + tracing + logs.
+    addLayers: true
+    addExtension: true
+    enableDDTracing: true
+    enableDDLogs: true
+    # Keep the deploy hermetic: no git metadata upload (needs app key + git ctx).
+    enableSourceCodeIntegration: false
+    uploadGitMetadata: false
+
+functions:
+  hello:
+    handler: handler.handler
