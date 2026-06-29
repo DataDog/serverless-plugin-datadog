@@ -73,6 +73,15 @@ const has = (event: ParsedEvent, key: string, value: string): boolean =>
 
 const identityLabel = (identity: IdentityTag[]): string => identity.map(({key, value}) => `${key}:${value}`).join(', ');
 
+// Auth failures (bad/missing DATADOG_API_KEY/DATADOG_APP_KEY) are non-retryable: polling
+// won't fix credentials, so surface them immediately instead of burning the full budget.
+// The datadog-api-client throws ApiException with a numeric `code` carrying the status.
+const authErrorCode = (error: unknown): number | undefined => {
+  const code = (error as {code?: unknown})?.code;
+
+  return code === 401 || code === 403 ? code : undefined;
+};
+
 const waitFor = (seconds: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, seconds * 1000));
 
 const buildConfiguration = (): client.Configuration => {
@@ -115,6 +124,13 @@ const pollUntilIdentity = async (
         return;
       }
     } catch (error) {
+      const code = authErrorCode(error);
+      if (code !== undefined) {
+        throw new Error(
+          `[${label}] authentication failed (HTTP ${code}) -- check DATADOG_API_KEY/DATADOG_APP_KEY ` +
+            `and DATADOG_SITE; not retrying`,
+        );
+      }
       // eslint-disable-next-line no-console
       console.error(`[${label}] query error:`, error);
     }
