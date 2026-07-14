@@ -2,6 +2,7 @@ import Service from "serverless/classes/Service";
 import { FunctionInfo } from "./layer";
 import { version } from "../package.json";
 import Aws = require("serverless/plugins/aws/provider/awsProvider");
+import { cloudWatchLogsDescribeSubscriptionFilters, lambdaGetFunction } from "./aws-sdk-request";
 
 const logGroupKey = "AWS::Logs::LogGroup";
 const logGroupSubscriptionKey = "AWS::Logs::SubscriptionFilter";
@@ -38,10 +39,6 @@ interface SubscriptionFilter {
   logGroupName: string;
   roleArn: string;
 }
-interface DescribeSubscriptionFiltersResponse {
-  subscriptionFilters: SubscriptionFilter[];
-}
-
 type SubLogsConfig =
   | boolean
   | {
@@ -115,7 +112,7 @@ function isLogGroup(value: unknown): value is LogGroupResource {
  */
 async function validateForwarderArn(aws: Aws, functionArn: CloudFormationObjectArn | string): Promise<void> {
   try {
-    await aws.request("Lambda", "getFunction", { FunctionName: functionArn });
+    await lambdaGetFunction(aws, functionArn as string);
   } catch (err) {
     throw new DatadogForwarderNotFoundError(`Could not perform GetFunction on ${functionArn}.`);
   }
@@ -293,14 +290,7 @@ export async function canSubscribeLogGroup(aws: Aws, logGroupName: string, expec
 
 export async function describeSubscriptionFilters(aws: Aws, logGroupName: string): Promise<SubscriptionFilter[]> {
   try {
-    const result: DescribeSubscriptionFiltersResponse = await aws.request(
-      "CloudWatchLogs",
-      "describeSubscriptionFilters",
-      {
-        logGroupName,
-      },
-    );
-    return result.subscriptionFilters;
+    return await cloudWatchLogsDescribeSubscriptionFilters(aws, logGroupName);
   } catch (err) {
     // An error will occur if the log group doesn't exist, so we swallow this and return an empty list.
     return [];

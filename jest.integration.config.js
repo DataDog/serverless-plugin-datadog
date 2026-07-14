@@ -9,5 +9,5 @@ module.exports = {
   testEnvironment: "<rootDir>/testEnvironment.js",
   clearMocks: true,
   collectCoverageFrom: ["src/**/*.ts"],
-  testRegex: ["(snapshot_tests\\/).*(\\.spec\\.ts)$"],
+  testRegex: [String.raw`(snapshot_tests[\/]).*(\.spec\.ts)$`],
 };
