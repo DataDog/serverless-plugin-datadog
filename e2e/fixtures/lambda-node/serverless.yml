@@ -15,7 +15,7 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs20.x
+  runtime: nodejs24.x
   region: ${env:AWS_REGION, "ap-northeast-3"}
   stage: e2e
   # Hygiene: freshness tag set atomically at creation, on both the CloudFormation
