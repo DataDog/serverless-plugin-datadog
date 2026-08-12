@@ -1,3 +1,6 @@
+import type { CloudFormationClient } from "@aws-sdk/client-cloudformation";
+import type { CloudWatchLogsClient } from "@aws-sdk/client-cloudwatch-logs";
+import type { LambdaClient } from "@aws-sdk/client-lambda";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
 
 /**
@@ -32,12 +35,55 @@ function supportsAwsSdkV3(aws: Aws): aws is AwsProviderWithSdkV3 {
   return typeof (aws as Partial<AwsProviderWithSdkV3>).getAwsSdkV3Config === "function";
 }
 
+interface AwsSdkV3Clients {
+  lambda: Map<string, Promise<LambdaClient>>;
+  cloudWatchLogs: Map<string, Promise<CloudWatchLogsClient>>;
+  cloudFormation: Map<string, Promise<CloudFormationClient>>;
+}
+
+const sdkV3Clients = new WeakMap<Aws, AwsSdkV3Clients>();
+
+function getSdkV3Clients(aws: Aws): AwsSdkV3Clients {
+  let clients = sdkV3Clients.get(aws);
+  if (clients === undefined) {
+    clients = {
+      lambda: new Map(),
+      cloudWatchLogs: new Map(),
+      cloudFormation: new Map(),
+    };
+    sdkV3Clients.set(aws, clients);
+  }
+  return clients;
+}
+
+function getSdkV3Client<T>(
+  clients: Map<string, Promise<T>>,
+  region: string | undefined,
+  create: () => Promise<T>,
+): Promise<T> {
+  const key = region ?? "default";
+  const cachedClient = clients.get(key);
+  if (cachedClient !== undefined) {
+    return cachedClient;
+  }
+
+  const client = create().catch((error) => {
+    clients.delete(key);
+    throw error;
+  });
+  clients.set(key, client);
+  return client;
+}
+
 /** Calls Lambda GetFunction. Rejects if the function does not exist. */
 export async function lambdaGetFunction(aws: Aws, functionName: string): Promise<void> {
   if (supportsAwsSdkV3(aws)) {
-    const { LambdaClient, GetFunctionCommand } = await import("@aws-sdk/client-lambda");
-    const client = new LambdaClient(await aws.getAwsSdkV3Config());
-    await client.send(new GetFunctionCommand({ FunctionName: functionName }));
+    const lambda = await import("@aws-sdk/client-lambda");
+    const region = aws.getRegion();
+    const client = await getSdkV3Client(getSdkV3Clients(aws).lambda, region, async () => {
+      return new lambda.LambdaClient(await aws.getAwsSdkV3Config({ region }));
+    });
+    await client.send(new lambda.GetFunctionCommand({ FunctionName: functionName }));
     return;
   }
   await aws.request("Lambda", "getFunction", { FunctionName: functionName });
@@ -46,10 +92,12 @@ export async function lambdaGetFunction(aws: Aws, functionName: string): Promise
 /** Calls CloudWatchLogs DescribeSubscriptionFilters for a log group. */
 export async function cloudWatchLogsDescribeSubscriptionFilters(aws: Aws, logGroupName: string): Promise<any[]> {
   if (supportsAwsSdkV3(aws)) {
-    const { CloudWatchLogsClient, DescribeSubscriptionFiltersCommand } =
-      await import("@aws-sdk/client-cloudwatch-logs");
-    const client = new CloudWatchLogsClient(await aws.getAwsSdkV3Config());
-    const output = await client.send(new DescribeSubscriptionFiltersCommand({ logGroupName }));
+    const cloudWatchLogs = await import("@aws-sdk/client-cloudwatch-logs");
+    const region = aws.getRegion();
+    const client = await getSdkV3Client(getSdkV3Clients(aws).cloudWatchLogs, region, async () => {
+      return new cloudWatchLogs.CloudWatchLogsClient(await aws.getAwsSdkV3Config({ region }));
+    });
+    const output = await client.send(new cloudWatchLogs.DescribeSubscriptionFiltersCommand({ logGroupName }));
     return output.subscriptionFilters ?? [];
   }
   const result = await aws.request("CloudWatchLogs", "describeSubscriptionFilters", { logGroupName });
@@ -59,9 +107,11 @@ export async function cloudWatchLogsDescribeSubscriptionFilters(aws: Aws, logGro
 /** Calls CloudFormation DescribeStacks for a stack in the given region. */
 export async function cloudFormationDescribeStacks(aws: Aws, stackName: string, region: string): Promise<any> {
   if (supportsAwsSdkV3(aws)) {
-    const { CloudFormationClient, DescribeStacksCommand } = await import("@aws-sdk/client-cloudformation");
-    const client = new CloudFormationClient(await aws.getAwsSdkV3Config({ region }));
-    return client.send(new DescribeStacksCommand({ StackName: stackName }));
+    const cloudFormation = await import("@aws-sdk/client-cloudformation");
+    const client = await getSdkV3Client(getSdkV3Clients(aws).cloudFormation, region, async () => {
+      return new cloudFormation.CloudFormationClient(await aws.getAwsSdkV3Config({ region }));
+    });
+    return client.send(new cloudFormation.DescribeStacksCommand({ StackName: stackName }));
   }
   return aws.request("CloudFormation", "describeStacks", { StackName: stackName }, { region });
 }
