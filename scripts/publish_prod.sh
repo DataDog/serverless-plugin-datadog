@@ -38,7 +38,7 @@ if [ "$BRANCH" != "main" ]; then
 fi
 
 echo "Updating main branch"
-gt s
+git pull --ff-only origin main
 
 # Ensure no uncommitted changes
 if [ -n "$(git status --porcelain)" ]; then
@@ -73,7 +73,7 @@ fi
 # Check we have merged our changes
 echo "Checking changes have been merged to main branch"
 LAST_MERGED_COMMIT="$(git log --oneline -1)"
-read -p "The most recent commit to the main branch was ${LAST_MERGED_COMMIT}. Was this your most recent change? (y/n): " CONT
+read -r -p "The most recent commit to the main branch was ${LAST_MERGED_COMMIT}. Was this your most recent change? (y/n): " CONT
 if [ "$CONT" != "y" ]; then
     echo "Please merge your changes before finishing the release!"
     echo "Exiting"
@@ -81,14 +81,14 @@ if [ "$CONT" != "y" ]; then
 fi
 
 # Confirm to proceed
-read -p "About to bump the version from ${CURRENT_VERSION} to ${VERSION} and create a release PR. Continue? (y/n) " CONT
+read -r -p "About to bump the version from ${CURRENT_VERSION} to ${VERSION} and create a release PR. Continue? (y/n) " CONT
 if [ "$CONT" != "y" ]; then
     echo "Exiting"
     exit 1
 fi
 
 if [ "${UPDATE_LAYERS:-true}" != "false" ]; then
-    read -p "About to update layer versions to the latest available from AWS. Continue? (y/n) " CONT
+    read -r -p "About to update layer versions to the latest available from AWS. Continue? (y/n) " CONT
     if [ "$CONT" != "y" ]; then
         echo "Exiting"
         exit 1
@@ -110,7 +110,12 @@ fi
 echo
 echo "Bumping the version number and creating a release PR"
 yarn version "$VERSION"
-git cr chore "release $VERSION"
+RELEASE_BRANCH="release/v$VERSION"
+git switch -c "$RELEASE_BRANCH"
+git add package.json src/layers.json src/layers-gov.json
+git commit -m "v$VERSION"
+git push --set-upstream origin "$RELEASE_BRANCH"
+gh pr create --base main --head "$RELEASE_BRANCH" --title "v$VERSION" --body "Release v$VERSION."
 
 echo
-printf 'After the PR merges, run: ./scripts/publish_prod.sh %s --publish\n' "$VERSION"
+printf 'After the PR merges, switch to main and run: ./scripts/publish_prod.sh %s --publish\n' "$VERSION"
