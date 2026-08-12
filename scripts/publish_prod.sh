@@ -9,25 +9,25 @@
 # Prepare a release PR:
 #   ./scripts/publish_prod.sh <VERSION_NUMBER>
 # Publish after the release PR is merged:
-#   ./scripts/publish_prod.sh <VERSION_NUMBER> --publish
+#   ./scripts/publish_prod.sh --publish
 # Skip updating the layer versions:
 #   UPDATE_LAYERS=false ./scripts/publish_prod.sh <VERSION_NUMBER>
 
 set -euo pipefail
 
-if [ -z "${1:-}" ]; then
-    echo "Must specify a desired version number"
-    exit 1
-elif [[ ! $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    echo "Must use a semantic version, e.g., 3.1.4 (note the lack of any \`v\` prefix)"
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <VERSION_NUMBER> | --publish"
     exit 1
 fi
-VERSION=$1
-MODE=${2:-prepare}
 
-if [ "$MODE" != "prepare" ] && [ "$MODE" != "--publish" ]; then
-    echo "Unknown mode: $MODE"
-    exit 1
+MODE=$1
+if [ "$MODE" != "--publish" ]; then
+    VERSION=$MODE
+    MODE=prepare
+    if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo "Must specify a semantic version, e.g., 3.1.4 (note the lack of any \`v\` prefix)"
+        exit 1
+    fi
 fi
 
 # Ensure on main, and pull the latest
@@ -50,10 +50,7 @@ fi
 CURRENT_VERSION=$(node -pe "require('./package.json').version")
 
 if [ "$MODE" = "--publish" ]; then
-    if [ "$CURRENT_VERSION" != "$VERSION" ]; then
-        echo "package.json version is $CURRENT_VERSION, expected $VERSION"
-        exit 1
-    fi
+    VERSION=$CURRENT_VERSION
 
     if git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null; then
         echo "Tag v$VERSION already exists, aborting"
@@ -118,4 +115,4 @@ git push --set-upstream origin "$RELEASE_BRANCH"
 gh pr create --base main --head "$RELEASE_BRANCH" --title "v$VERSION" --body "Release v$VERSION."
 
 echo
-printf 'After the PR merges, switch to main and run: ./scripts/publish_prod.sh %s --publish\n' "$VERSION"
+printf 'After the PR merges, switch to main and run: ./scripts/publish_prod.sh --publish\n'
