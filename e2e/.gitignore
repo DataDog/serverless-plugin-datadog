@@ -1,0 +1,8 @@
+node_modules
+.yarn/
+.env.local
+fixtures/**/node_modules
+fixtures/**/.serverless
+fixtures/**/package-lock.json
+serverless-plugin-datadog-*.tgz
+*.log
