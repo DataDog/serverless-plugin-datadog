@@ -5,23 +5,40 @@
 # This product includes software developed at Datadog (https://www.datadoghq.com/).
 # Copyright 2021 Datadog, Inc.
 
-# Usage - run commands from repo root:
-# To publish a new version:
+# Usage -- run commands from repo root:
+# Prepare a release PR:
 #   ./scripts/publish_prod.sh <VERSION_NUMBER>
-# To publish a new version without updating the layer versions:
+# Publish after the release PR is merged:
+#   ./scripts/publish_prod.sh --publish
+# Skip updating the layer versions:
 #   UPDATE_LAYERS=false ./scripts/publish_prod.sh <VERSION_NUMBER>
 
-set -e
+set -euo pipefail
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <VERSION_NUMBER> | --publish"
+    exit 1
+fi
+
+MODE=$1
+if [ "$MODE" != "--publish" ]; then
+    VERSION=$MODE
+    MODE=prepare
+    if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo "Must specify a semantic version, e.g., 3.1.4 (note the lack of any \`v\` prefix)"
+        exit 1
+    fi
+fi
 
 # Ensure on main, and pull the latest
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
-if [ $BRANCH != "main" ]; then
+if [ "$BRANCH" != "main" ]; then
     echo "Not on main, aborting"
     exit 1
-else
-    echo "Updating main branch"
-    git pull origin main
 fi
+
+echo "Updating main branch"
+git pull --ff-only origin main
 
 # Ensure no uncommitted changes
 if [ -n "$(git status --porcelain)" ]; then
@@ -29,46 +46,51 @@ if [ -n "$(git status --porcelain)" ]; then
     exit 1
 fi
 
+# Read the current version
+CURRENT_VERSION=$(node -pe "require('./package.json').version")
+
+if [ "$MODE" = "--publish" ]; then
+    VERSION=$CURRENT_VERSION
+
+    if git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null; then
+        echo "Tag v$VERSION already exists, aborting"
+        exit 1
+    fi
+
+    yarn build
+    git tag -s -m "v$VERSION" "v$VERSION"
+    git push origin "refs/tags/v$VERSION"
+
+    echo
+    echo "DONE! Please create a new release using the link below. It will trigger a GitHub action to publish to npm."
+    echo "https://github.com/DataDog/serverless-plugin-datadog/releases/new?tag=v$VERSION&title=v$VERSION"
+    exit 0
+fi
+
 # Check we have merged our changes
 echo "Checking changes have been merged to main branch"
 LAST_MERGED_COMMIT="$(git log --oneline -1)"
-read -p "The most recent commit to the main branch was ${LAST_MERGED_COMMIT}. Was this your most recent change? (y/n): " CONT
+read -r -p "The most recent commit to the main branch was ${LAST_MERGED_COMMIT}. Was this your most recent change? (y/n): " CONT
 if [ "$CONT" != "y" ]; then
     echo "Please merge your changes before finishing the release!"
     echo "Exiting"
     exit 1
 fi
 
-# Read the current version
-CURRENT_VERSION=$(node -pe "require('./package.json').version")
-
-# Read the desired version
-if [ -z "$1" ]; then
-    echo "Must specify a desired version number"
-    exit 1
-elif [[ ! $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    echo "Must use a semantic version, e.g., 3.1.4 (note the lack of any \`v\` prefix)"
-    exit 1
-else
-    VERSION=$1
-fi
-
 # Confirm to proceed
-read -p "About to bump the version from ${CURRENT_VERSION} to ${VERSION}, and publish. Continue? (y/n)" CONT
+read -r -p "About to bump the version from ${CURRENT_VERSION} to ${VERSION} and create a release PR. Continue? (y/n) " CONT
 if [ "$CONT" != "y" ]; then
     echo "Exiting"
     exit 1
 fi
 
-if [ "$UPDATE_LAYERS" != "false" ]; then
-    read -p "About to update layer versions to the latest available from AWS. Continue? (y/n)" CONT
+if [ "${UPDATE_LAYERS:-true}" != "false" ]; then
+    read -r -p "About to update layer versions to the latest available from AWS. Continue? (y/n) " CONT
     if [ "$CONT" != "y" ]; then
         echo "Exiting"
         exit 1
     fi
-fi
 
-if [ "$UPDATE_LAYERS" != "false" ]; then
     echo "If an SSO authorization link is printed below, please make sure to authorize it with your GovCloud account."
     aws-vault exec sso-govcloud-us1-fed-engineering -- aws sts get-caller-identity
 
@@ -80,27 +102,17 @@ if [ "$UPDATE_LAYERS" != "false" ]; then
 
     echo "Updating layer versions for commercial AWS accounts"
     aws-vault exec sso-prod-engineering -- ./scripts/generate_layers_json.sh
-
-    # Commit layer updates if needed
-    if [[ $(git status --porcelain) == *"src/layers"* ]]; then
-        echo "Layers updated, committing changes"
-        git commit src/layers.json src/layers-gov.json -m "Update layer versions"
-    fi
 fi
 
 echo
-echo "Bumping the version number and committing the changes"
+echo "Bumping the version number and creating a release PR"
 yarn version "$VERSION"
-git commit -am "v$VERSION"
-git tag "v$VERSION"
-
-yarn build
-
-echo
-echo 'Pushing updates to GitHub'
-git push origin main
-git push origin "refs/tags/v$VERSION"
+RELEASE_BRANCH="release/v$VERSION"
+git switch -c "$RELEASE_BRANCH"
+git add package.json src/layers.json src/layers-gov.json
+git commit -m "v$VERSION"
+git push --set-upstream origin "$RELEASE_BRANCH"
+gh pr create --base main --head "$RELEASE_BRANCH" --title "v$VERSION" --body "Release v$VERSION."
 
 echo
-echo "DONE! Please create a new release using the link below. It will trigger a GitHub action to publish to npm."
-echo "https://github.com/DataDog/serverless-plugin-datadog/releases/new?tag=v$VERSION&title=v$VERSION"
+printf 'After the PR merges, switch to main and run: ./scripts/publish_prod.sh --publish\n'
