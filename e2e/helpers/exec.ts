@@ -42,13 +42,16 @@ export const execPromise = async (command: string, options: ExecOptions = {}): P
   const {env, cwd, maxBuffer = DEFAULT_MAX_BUFFER} = options;
 
   return new Promise((resolve) => {
-    child_process.exec(command, {env: {...process.env, ...env}, cwd, maxBuffer}, (error, stdout, stderr) => {
+    const child = child_process.exec(command, {env: {...process.env, ...env}, cwd, maxBuffer}, (error, stdout, stderr) => {
       resolve({
         exitCode: error ? (typeof error.code === 'number' ? error.code : 1) : 0,
         stdout: stdout.trim(),
         stderr: stderr.trim(),
       });
     });
+
+    child.stdout?.pipe(process.stdout);
+    child.stderr?.pipe(process.stderr);
   });
 };
 
