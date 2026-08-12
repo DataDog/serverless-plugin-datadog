@@ -9,6 +9,6 @@ module.exports = {
   testEnvironment: "<rootDir>/testEnvironment.js",
   clearMocks: true,
   collectCoverageFrom: ["src/**/*.ts"],
-  testRegex: "(src\\/).*(\\.spec\\.ts)$",
-  testPathIgnorePatterns: ["\\.snap$", "<rootDir>/node_modules/", "snapshot_tests/"],
+  testRegex: String.raw`(src[\\/]).*(\.spec\.ts)$`,
+  testPathIgnorePatterns: [String.raw`\.snap$`, "<rootDir>/node_modules/", "snapshot_tests/"],
 };

@@ -1,5 +1,6 @@
 import * as Serverless from "serverless";
 import { FunctionInfo } from "./layer";
+import { cloudFormationDescribeStacks } from "./aws-sdk-request";
 
 const yellowFont = "\x1b[33m";
 const orangeFont = "\x1b[38;2;255;165;0m";
@@ -41,18 +42,11 @@ export async function printOutputs(
   service: string,
   env: string,
 ): Promise<void> {
-  const stackName = serverless.getProvider("aws").naming.getStackName();
-  const describeStackOutput = await serverless
-    .getProvider("aws")
-    .request(
-      "CloudFormation",
-      "describeStacks",
-      { StackName: stackName },
-      { region: serverless.getProvider("aws").getRegion() },
-    )
-    .catch(() => {
-      // Ignore any request exceptions, fail silently and skip output logging
-    });
+  const aws = serverless.getProvider("aws");
+  const stackName = aws.naming.getStackName();
+  const describeStackOutput = await cloudFormationDescribeStacks(aws, stackName, aws.getRegion()).catch(() => {
+    // Ignore any request exceptions, fail silently and skip output logging
+  });
   if (describeStackOutput === undefined) {
     return;
   }

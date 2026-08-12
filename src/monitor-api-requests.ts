@@ -1,5 +1,6 @@
 import * as Serverless from "serverless";
 import { MonitorParams, ServerlessMonitor, replaceCriticalThreshold } from "./monitors";
+import { cloudFormationDescribeStacks } from "./aws-sdk-request";
 
 export class InvalidAuthenticationError extends Error {
   constructor(message: string) {
@@ -127,18 +128,11 @@ export async function searchMonitors(
 }
 
 export async function getCloudFormationStackId(serverless: Serverless): Promise<string> {
-  const stackName = serverless.getProvider("aws").naming.getStackName();
-  const describeStackOutput = await serverless
-    .getProvider("aws")
-    .request(
-      "CloudFormation",
-      "describeStacks",
-      { StackName: stackName },
-      { region: serverless.getProvider("aws").getRegion() },
-    )
-    .catch(() => {
-      // Ignore any request exceptions, fail silently and skip output logging
-    });
+  const aws = serverless.getProvider("aws");
+  const stackName = aws.naming.getStackName();
+  const describeStackOutput = await cloudFormationDescribeStacks(aws, stackName, aws.getRegion()).catch(() => {
+    // Ignore any request exceptions, fail silently and skip output logging
+  });
   const cloudFormationStackId: string = describeStackOutput ? describeStackOutput.Stacks[0].StackId : "";
   return cloudFormationStackId;
 }
