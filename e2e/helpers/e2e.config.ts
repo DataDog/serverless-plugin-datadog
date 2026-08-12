@@ -21,7 +21,7 @@ export const NAMING: E2ENaming = {tool: 'slsplugin', platform: 'lambda'};
 
 export const ENV_NAME = 'e2e';
 export const ENV_VERSION = '1.0.0';
-const RUNTIME = 'nodejs20.x';
+const RUNTIME = 'nodejs24.x';
 
 // Transient cloud-provider errors safe to retry, passed as ExecOptions.retryPatterns.
 export const RETRY_PATTERNS = [
