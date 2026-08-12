@@ -2,7 +2,7 @@
   "name": "serverless-plugin-datadog-e2e",
   "version": "0.0.0",
   "private": true,
-  "packageManager": "yarn@4.10.3",
+  "packageManager": "yarn@4.17.1",
   "type": "module",
   "description": "End-to-end suite for the serverless-plugin-datadog AWS Lambda instrumentation.",
   "scripts": {
@@ -12,8 +12,8 @@
   },
   "devDependencies": {
     "@datadog/datadog-api-client": "^1.40.0",
-    "@types/node": "^20.19.0",
-    "typescript": "^5.9.3",
-    "vitest": "^2.1.9"
+    "@types/node": "^26.2.0",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.0"
   }
 }

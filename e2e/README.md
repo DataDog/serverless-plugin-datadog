@@ -42,7 +42,7 @@ runs in `afterAll` regardless of outcome.
 
 ## Prerequisites
 
-- **Node 24** and Yarn 4.10.3 (provided locally by Volta, yarn switch, or another
+- **Node 24** and Yarn 4.17.1 (provided locally by Volta, yarn switch, or another
   version manager).
 - Install root dependencies before the first run. `yarn test` builds the plugin at the
   repo root, then installs the fixture.

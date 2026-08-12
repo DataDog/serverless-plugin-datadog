@@ -65,7 +65,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Set up Yarn
-        run: corepack enable && corepack prepare yarn@4.10.3 --activate
+        run: corepack enable && corepack prepare yarn@4.17.1 --activate
 
       - name: Install plugin dependencies
         run: yarn install --immutable

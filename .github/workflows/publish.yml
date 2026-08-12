@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: "24.x"
           registry-url: "https://registry.npmjs.org"
-      - run: corepack enable && corepack prepare yarn@4.10.3 --activate
+      - run: corepack enable && corepack prepare yarn@4.17.1 --activate
       - run: yarn install --immutable
       - run: yarn build
       - run: npm publish

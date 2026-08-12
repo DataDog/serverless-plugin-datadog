@@ -1,0 +1,11 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "options": {
+    "typeAware": true
+  },
+  "rules": {
+    "no-console": "off",
+    "no-empty": "off",
+    "typescript/no-floating-promises": "error"
+  }
+}
