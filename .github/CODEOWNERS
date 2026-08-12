@@ -2,3 +2,6 @@
 
 # Documentation
 *.md  @DataDog/documentation
+
+# e2e tests, including markdown
+e2e/ @DataDog/serverless-onboarding-and-enablement

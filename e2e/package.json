@@ -6,6 +6,8 @@
   "type": "module",
   "description": "End-to-end suite for the serverless-plugin-datadog AWS Lambda instrumentation.",
   "scripts": {
+    "setup": "bash setup.sh",
+    "test": "yarn setup && vitest run",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
