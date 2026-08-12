@@ -42,14 +42,14 @@ runs in `afterAll` regardless of outcome.
 
 ## Prerequisites
 
-- **Node 20** and **npm** (the suite is a standalone npm project, isolated from the
-  plugin's Yarn Berry setup).
-- The plugin is built and the fixture is installed automatically by `pretest`
-  (`npm test` runs `yarn build` at the repo root, then `npm install` in the fixture).
+- **Node 24** and Yarn 4.10.3 (provided locally by Volta, yarn switch, or another
+  version manager).
+- Install root dependencies before the first run. `yarn test` builds the plugin at the
+  repo root, then installs the fixture.
 - **AWS auth** with permission to deploy Lambda / CloudFormation in the target
   account. Locally, wrap the run with `aws-vault`:
   ```
-  aws-vault exec sso-serverless-sandbox-account-admin -- npm test
+  aws-vault exec sso-serverless-sandbox-account-admin -- yarn test
   ```
   In CI, credentials come from GitHub→AWS OIDC (no static keys).
 - **Datadog keys**: `DATADOG_API_KEY` (wired into the extension and used for the API
@@ -58,14 +58,17 @@ runs in `afterAll` regardless of outcome.
 ## Run locally
 
 ```
+# From the repository root
+yarn install --immutable
+
 cd e2e
-npm install
+yarn install --immutable
 
 # aws-vault provides AWS creds; dd-auth mints short-lived keys for the org -- no pasted keys.
 aws-vault exec sso-serverless-sandbox-account-admin -- \
   dd-auth --domain app.datadoghq.com -- bash -c '
     export DATADOG_API_KEY="$DD_API_KEY" DATADOG_APP_KEY="$DD_APP_KEY"
-    npm test
+    yarn test
   '
 ```
 

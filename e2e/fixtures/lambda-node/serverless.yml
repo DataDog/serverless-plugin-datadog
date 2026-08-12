@@ -35,6 +35,7 @@ custom:
     service: ${env:E2E_SERVICE_NAME}
     env: e2e
     version: "1.0.0"
+    tags: one_e2e_run_id:${env:E2E_RUN_ID}
     # The mechanism under test: library layer + extension layer + tracing + logs.
     addLayers: true
     addExtension: true

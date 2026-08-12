@@ -12,7 +12,7 @@ cd "$(dirname "$0")"
 E2E_DIR="$PWD"
 
 echo "==> Building plugin"
-(cd .. && COREPACK_ENABLE_DOWNLOAD_PROMPT=0 yarn build)
+(cd .. && yarn build)
 
 echo "==> Packing plugin"
 rm -f "$E2E_DIR"/serverless-plugin-datadog-*.tgz

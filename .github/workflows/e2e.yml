@@ -50,7 +50,7 @@ jobs:
     needs: [check-lambda-changes]
     strategy:
       matrix:
-        node-version: [20]
+        node-version: [24]
     permissions:
       contents: read
       id-token: write
@@ -80,7 +80,7 @@ jobs:
           aws-region: ${{ vars.AWS_REGION_E2E || 'ap-northeast-3' }}
 
       - name: Install e2e dependencies
-        run: npm install
+        run: yarn install --immutable
         working-directory: e2e
 
       # Short-lived Datadog API + App keys via OIDC federation (dd-sts), governed by
@@ -93,7 +93,7 @@ jobs:
           policy: serverless-plugin-datadog-e2e
 
       - name: Run e2e suite
-        run: npm test
+        run: yarn test
         working-directory: e2e
         env:
           DATADOG_API_KEY: ${{ steps.dd-sts.outputs.api_key }}
