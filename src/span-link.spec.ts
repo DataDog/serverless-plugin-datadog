@@ -1,10 +1,12 @@
-// tslint:disable-next-line:no-var-requires
-const stepFunctionsHelper = require("./step-functions-helper");
-stepFunctionsHelper.updateDefinitionString = jest.fn().mockImplementation();
-
 import Service from "serverless/classes/Service";
 import Serverless from "serverless";
+import * as stepFunctionsHelper from "./step-functions-helper";
 import { mergeStepFunctionAndLambdaTraces } from "./span-link";
+
+vi.mock("./step-functions-helper", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("./step-functions-helper")>()),
+  updateDefinitionString: vi.fn(),
+}));
 
 describe("mergeStepFunctionAndLambdaTraces option related tests", () => {
   function serviceWithResources(resources?: Record<string, any>, serviceName = "my-service"): Service {

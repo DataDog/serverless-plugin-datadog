@@ -1,3 +1,4 @@
+import type { Mock } from "vitest";
 import {
   createMonitor,
   updateMonitor,
@@ -10,7 +11,7 @@ import {
 import { MonitorParams, handleMonitorsApiResponse } from "./monitors";
 
 beforeAll(() => {
-  global.fetch = jest.fn();
+  global.fetch = vi.fn();
 });
 
 const monitorParams: MonitorParams = {
@@ -88,47 +89,41 @@ describe("createMonitor", () => {
     method: "POST",
   };
   afterEach(() => {
-    (fetch as unknown as jest.Mock).mockClear();
+    (fetch as unknown as Mock).mockClear();
   });
   it("returns true when syntax is valid", async () => {
-    (fetch as unknown as jest.Mock).mockReturnValue({ status: 200 });
+    (fetch as unknown as Mock).mockReturnValue({ status: 200 });
     const response = await createMonitor("datadoghq.com", monitorParams, "apikey", "appkey");
     expect(response.status).toBe(200);
-    expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
-      "https://api.datadoghq.com/api/v1/monitor",
-      validRequestBody,
-    );
+    expect(fetch as unknown as Mock).toHaveBeenCalledWith("https://api.datadoghq.com/api/v1/monitor", validRequestBody);
   });
   it("returns false and logs a 400 Bad Request when syntax is invalid", async () => {
-    (fetch as unknown as jest.Mock).mockReturnValue({
+    (fetch as unknown as Mock).mockReturnValue({
       status: 400,
-      text: jest.fn().mockResolvedValue("Mock response text"),
+      text: vi.fn().mockResolvedValue("Mock response text"),
     });
     const response = await createMonitor("datadoghq.com", invalidMonitorParams, "apikey", "appkey");
     await expect(handleMonitorsApiResponse(response, "high_error_rate", "app", "datadoghq.com")).rejects.toThrow(
       "400 Bad Request: Mock response text. This could be due to incorrect syntax or a missing required tag for high_error_rate. Have you looked at your monitor tag policies? https://app.datadoghq.com/monitors/settings/policies",
     );
     expect(response.status).toBe(400);
-    expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
+    expect(fetch as unknown as Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v1/monitor",
       invalidRequestBody,
     );
   });
   it("returns an Error", async () => {
-    (fetch as unknown as jest.Mock).mockReturnValue({
+    (fetch as unknown as Mock).mockReturnValue({
       status: 403,
       statusText: "Unauthorized",
-      text: jest.fn().mockResolvedValue("Mock response text"),
+      text: vi.fn().mockResolvedValue("Mock response text"),
     });
     const response = await createMonitor("datadoghq.com", monitorParams, "apikey", "appkey");
     await expect(handleMonitorsApiResponse(response, "high_error_rate")).rejects.toThrow(
       "403 Unauthorized: Mock response text",
     );
     expect(response.status).toBe(403);
-    expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
-      "https://api.datadoghq.com/api/v1/monitor",
-      validRequestBody,
-    );
+    expect(fetch as unknown as Mock).toHaveBeenCalledWith("https://api.datadoghq.com/api/v1/monitor", validRequestBody);
   });
 });
 
@@ -144,45 +139,45 @@ describe("updateMonitor", () => {
     method: "PUT",
   };
   afterEach(() => {
-    (fetch as unknown as jest.Mock).mockClear();
+    (fetch as unknown as Mock).mockClear();
   });
   it("returns true when syntax is valid", async () => {
-    (fetch as unknown as jest.Mock).mockReturnValue({ status: 200 });
+    (fetch as unknown as Mock).mockReturnValue({ status: 200 });
     const response = await updateMonitor("datadoghq.com", 12345, monitorParams, "apikey", "appkey");
     expect(response.status).toBe(200);
-    expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
+    expect(fetch as unknown as Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v1/monitor/12345",
       validRequestBody,
     );
   });
   it("returns false and logs 400 Bad Request when syntax is invalid", async () => {
-    console.log = jest.fn();
-    (fetch as unknown as jest.Mock).mockReturnValue({
+    console.log = vi.fn();
+    (fetch as unknown as Mock).mockReturnValue({
       status: 400,
-      text: jest.fn().mockResolvedValue("Mock response text"),
+      text: vi.fn().mockResolvedValue("Mock response text"),
     });
     const response = await updateMonitor("datadoghq.com", 12345, invalidMonitorParams, "apikey", "appkey");
     await expect(handleMonitorsApiResponse(response, "high_error_rate", "app", "datadoghq.com")).rejects.toThrow(
       "400 Bad Request: Mock response text. This could be due to incorrect syntax or a missing required tag for high_error_rate. Have you looked at your monitor tag policies? https://app.datadoghq.com/monitors/settings/policies",
     );
     expect(response.status).toBe(400);
-    expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
+    expect(fetch as unknown as Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v1/monitor/12345",
       invalidRequestBody,
     );
   });
   it("throws an Invalid Authentication Error when authentication is invalid", async () => {
-    (fetch as unknown as jest.Mock).mockReturnValue({
+    (fetch as unknown as Mock).mockReturnValue({
       status: 403,
       statusText: "Unauthorized",
-      text: jest.fn().mockResolvedValue("Mock response text"),
+      text: vi.fn().mockResolvedValue("Mock response text"),
     });
     const response = await updateMonitor("datadoghq.com", 12345, monitorParams, "apikey", "appkey");
     await expect(handleMonitorsApiResponse(response, "high_error_rate")).rejects.toThrow(
       "403 Unauthorized: Mock response text",
     );
     expect(response.status).toBe(403);
-    expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
+    expect(fetch as unknown as Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v1/monitor/12345",
       validRequestBody,
     );
@@ -195,29 +190,29 @@ describe("deleteMonitor", () => {
     method: "DELETE",
   };
   afterEach(() => {
-    (fetch as unknown as jest.Mock).mockClear();
+    (fetch as unknown as Mock).mockClear();
   });
   it("returns true when syntax is valid", async () => {
-    (fetch as unknown as jest.Mock).mockReturnValue({ status: 200 });
+    (fetch as unknown as Mock).mockReturnValue({ status: 200 });
     const response = await deleteMonitor("datadoghq.com", 12345, "apikey", "appkey");
     expect(response.status).toBe(200);
-    expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
+    expect(fetch as unknown as Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v1/monitor/12345",
       validRequestBody,
     );
   });
   it("returns false and throws an Error", async () => {
-    (fetch as unknown as jest.Mock).mockReturnValue({
+    (fetch as unknown as Mock).mockReturnValue({
       status: 403,
       statusText: "Unauthorized",
-      text: jest.fn().mockResolvedValue("Mock response text"),
+      text: vi.fn().mockResolvedValue("Mock response text"),
     });
     const response = await deleteMonitor("datadoghq.com", 12345, "apikey", "appkey");
     await expect(handleMonitorsApiResponse(response, "high_error_rate")).rejects.toThrow(
       "403 Unauthorized: Mock response text",
     );
     expect(response.status).toBe(403);
-    expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
+    expect(fetch as unknown as Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v1/monitor/12345",
       validRequestBody,
     );
@@ -226,7 +221,7 @@ describe("deleteMonitor", () => {
 
 describe("searchMonitor", () => {
   it("returns monitor data", async () => {
-    (fetch as unknown as jest.Mock).mockReturnValue({
+    (fetch as unknown as Mock).mockReturnValue({
       status: 200,
       json: () => ({
         metadata: { total_count: 3, page: 0, per_page: 30, page_count: 1 },
@@ -299,7 +294,7 @@ describe("searchMonitor", () => {
     });
   });
   it("returns multiple pages of monitor data", async () => {
-    const fetchMock = (fetch as unknown as jest.Mock)
+    const fetchMock = (fetch as unknown as Mock)
       .mockReturnValueOnce({
         status: 200,
         json: () => ({
@@ -442,7 +437,7 @@ describe("searchMonitor", () => {
     });
   });
   it("throws an Invalid Authentication Error when authentication is invalid", async () => {
-    (fetch as unknown as jest.Mock).mockReturnValue({ status: 403, statusText: "Unauthorized" });
+    (fetch as unknown as Mock).mockReturnValue({ status: 403, statusText: "Unauthorized" });
     await expect(async () => await searchMonitors("datadoghq.com", "queryString", "apikey", "appkey")).rejects.toThrow(
       "Can't fetch monitors. Status code: 403. Message: Unauthorized",
     );
@@ -455,10 +450,10 @@ describe("getRecommendedMonitors", () => {
     method: "GET",
   };
   afterEach(() => {
-    (fetch as unknown as jest.Mock).mockClear();
+    (fetch as unknown as Mock).mockClear();
   });
   it("returns recommended monitors", async () => {
-    (fetch as unknown as jest.Mock).mockReturnValue({
+    (fetch as unknown as Mock).mockReturnValue({
       status: 200,
       json: () => ({
         data: [
@@ -816,7 +811,7 @@ describe("getRecommendedMonitors", () => {
       "sum(last_15m):sum:aws.lambda.throttles {aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,region,functionname}.as_count() / ( sum:aws.lambda.throttles {aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,region,functionname}.as_count() + sum:aws.lambda.invocations{aws_cloudformation_stack-id:aws_cloudformation_stack-id:cloudformation_stackid} by {aws_account,region,functionname}.as_count()) >= 0.1",
     );
 
-    expect(fetch as unknown as jest.Mock).toHaveBeenCalledWith(
+    expect(fetch as unknown as Mock).toHaveBeenCalledWith(
       "https://api.datadoghq.com/api/v2/monitor/recommended?count=50&start=0&search=tag%3A%22product%3Aserverless%22%20AND%20tag%3A%22integration%3Aamazon-lambda%22",
       validRequestBody,
     );

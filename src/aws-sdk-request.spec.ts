@@ -1,3 +1,4 @@
+import type { Mock } from "vitest";
 import Aws from "serverless/plugins/aws/provider/awsProvider";
 import {
   cloudFormationDescribeStacks,
@@ -5,50 +6,62 @@ import {
   lambdaGetFunction,
 } from "./aws-sdk-request";
 
-const lambdaSend = jest.fn();
-const logsSend = jest.fn();
-const cfnSend = jest.fn();
+const lambdaSend = vi.fn();
+const logsSend = vi.fn();
+const cfnSend = vi.fn();
 
-const LambdaClient = jest.fn().mockImplementation(() => ({ send: lambdaSend }));
-const CloudWatchLogsClient = jest.fn().mockImplementation(() => ({ send: logsSend }));
-const CloudFormationClient = jest.fn().mockImplementation(() => ({ send: cfnSend }));
+const LambdaClient = vi.fn().mockImplementation(function () {
+  return { send: lambdaSend };
+});
+const CloudWatchLogsClient = vi.fn().mockImplementation(function () {
+  return { send: logsSend };
+});
+const CloudFormationClient = vi.fn().mockImplementation(function () {
+  return { send: cfnSend };
+});
 
-jest.mock("@aws-sdk/client-lambda", () => ({
+vi.mock("@aws-sdk/client-lambda", () => ({
   LambdaClient,
-  GetFunctionCommand: jest.fn().mockImplementation((input) => ({ input })),
+  GetFunctionCommand: vi.fn().mockImplementation(function (input) {
+    return { input };
+  }),
 }));
-jest.mock("@aws-sdk/client-cloudwatch-logs", () => ({
+vi.mock("@aws-sdk/client-cloudwatch-logs", () => ({
   CloudWatchLogsClient,
-  DescribeSubscriptionFiltersCommand: jest.fn().mockImplementation((input) => ({ input })),
+  DescribeSubscriptionFiltersCommand: vi.fn().mockImplementation(function (input) {
+    return { input };
+  }),
 }));
-jest.mock("@aws-sdk/client-cloudformation", () => ({
+vi.mock("@aws-sdk/client-cloudformation", () => ({
   CloudFormationClient,
-  DescribeStacksCommand: jest.fn().mockImplementation((input) => ({ input })),
+  DescribeStacksCommand: vi.fn().mockImplementation(function (input) {
+    return { input };
+  }),
 }));
 
 /** Serverless Framework style provider: exposes request(), no getAwsSdkV3Config(). */
-function legacyAwsMock(requestImpl: jest.Mock): Aws {
+function legacyAwsMock(requestImpl: Mock): Aws {
   return { request: requestImpl } as unknown as Aws;
 }
 
 type AwsV3Mock = Aws & {
-  getAwsSdkV3Config: jest.Mock;
-  getRegion: jest.Mock;
+  getAwsSdkV3Config: Mock;
+  getRegion: Mock;
 };
 
 /** osls v4 style provider: exposes getAwsSdkV3Config(), request() throws. */
 function oslsV4AwsMock(config: Record<string, unknown> = { region: "us-east-1" }): AwsV3Mock {
   return {
-    getAwsSdkV3Config: jest.fn().mockResolvedValue(config),
-    getRegion: jest.fn().mockReturnValue(config.region),
-    request: jest.fn().mockRejectedValue(new Error("AWS_SDK_V2_SURFACE_REMOVED")),
+    getAwsSdkV3Config: vi.fn().mockResolvedValue(config),
+    getRegion: vi.fn().mockReturnValue(config.region),
+    request: vi.fn().mockRejectedValue(new Error("AWS_SDK_V2_SURFACE_REMOVED")),
   } as unknown as AwsV3Mock;
 }
 
 describe("aws-sdk-request dual path", () => {
   describe("Serverless Framework (legacy provider.request path)", () => {
     it("lambdaGetFunction calls provider.request", async () => {
-      const request = jest.fn().mockResolvedValue(undefined);
+      const request = vi.fn().mockResolvedValue(undefined);
       await lambdaGetFunction(legacyAwsMock(request), "my-forwarder");
       expect(request).toHaveBeenCalledWith("Lambda", "getFunction", { FunctionName: "my-forwarder" });
       expect(LambdaClient).not.toHaveBeenCalled();
@@ -56,7 +69,7 @@ describe("aws-sdk-request dual path", () => {
 
     it("cloudWatchLogsDescribeSubscriptionFilters returns filters from provider.request", async () => {
       const filters = [{ filterName: "dd" }];
-      const request = jest.fn().mockResolvedValue({ subscriptionFilters: filters });
+      const request = vi.fn().mockResolvedValue({ subscriptionFilters: filters });
       const result = await cloudWatchLogsDescribeSubscriptionFilters(legacyAwsMock(request), "/aws/lambda/foo");
       expect(request).toHaveBeenCalledWith("CloudWatchLogs", "describeSubscriptionFilters", {
         logGroupName: "/aws/lambda/foo",
@@ -66,7 +79,7 @@ describe("aws-sdk-request dual path", () => {
 
     it("cloudFormationDescribeStacks calls provider.request with region option", async () => {
       const output = { Stacks: [{ StackId: "abc" }] };
-      const request = jest.fn().mockResolvedValue(output);
+      const request = vi.fn().mockResolvedValue(output);
       const result = await cloudFormationDescribeStacks(legacyAwsMock(request), "my-stack", "eu-west-1");
       expect(request).toHaveBeenCalledWith(
         "CloudFormation",
@@ -89,8 +102,10 @@ describe("aws-sdk-request dual path", () => {
       expect(aws.getAwsSdkV3Config).toHaveBeenCalledWith({ region: "us-east-1" });
       expect(LambdaClient).toHaveBeenCalledTimes(1);
       expect(LambdaClient).toHaveBeenCalledWith({ region: "us-east-1" });
-      expect(lambdaSend).toHaveBeenCalledWith({ input: { FunctionName: "my-forwarder" } });
-      expect(lambdaSend).toHaveBeenCalledWith({ input: { FunctionName: "another-forwarder" } });
+      expect(lambdaSend).toHaveBeenCalledWith(expect.objectContaining({ input: { FunctionName: "my-forwarder" } }));
+      expect(lambdaSend).toHaveBeenCalledWith(
+        expect.objectContaining({ input: { FunctionName: "another-forwarder" } }),
+      );
     });
 
     it("uses separate Lambda clients for separate providers", async () => {

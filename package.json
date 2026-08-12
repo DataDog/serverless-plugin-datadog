@@ -9,26 +9,25 @@
   "scripts": {
     "prebuild": "./scripts/check_layers_json.sh",
     "build": "tsc",
-    "test": "jest --config jest.config.js",
-    "test:integration": "jest ./snapshot_tests --config jest.integration.config.js",
-    "test:watch": "jest --watch",
-    "coverage": "jest --coverage",
-    "lint": "tslint --project tsconfig.json",
-    "check-formatting": "prettier --check \"src/**\" \"README.md\"",
-    "format": "prettier --write \"src/**\" \"README.md\""
+    "test": "vitest run",
+    "test:integration": "vitest run --config vitest.integration.config.mts",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
+    "lint": "oxlint --type-aware --quiet src --ignore-pattern \"**/*.spec.ts\"",
+    "check-formatting": "oxfmt --check \"src/**\"",
+    "format": "oxfmt \"src/**\""
   },
   "devDependencies": {
-    "@types/jest": "^30.0.0",
     "@types/mock-fs": "4.13.4",
     "@types/serverless": "3.12.28",
-    "jest": "^30.2.0",
-    "jest-environment-node": "^30.2.0",
+    "@vitest/coverage-v8": "^4.1.0",
     "mock-fs": "5.5.0",
-    "prettier": "^3.8.3",
+    "oxfmt": "^0.63.0",
+    "oxlint": "^1.78.0",
+    "oxlint-tsgolint": "^7.0.2001",
     "serverless-step-functions": "^3.24.4",
-    "ts-jest": "^29.4.9",
-    "tslint": "^6.1.3",
-    "typescript": "^5.9.3"
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.0"
   },
   "dependencies": {
     "@aws-sdk/client-cloudformation": "^3.137.0",
@@ -40,7 +39,7 @@
   "peerDependencies": {
     "serverless": "4.x || 3.x || 2.x || 1.x"
   },
-  "packageManager": "yarn@4.10.3",
+  "packageManager": "yarn@4.17.1",
   "resolutions": {
     "js-yaml": "^4.2.0",
     "lodash": "^4.18.1",

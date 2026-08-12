@@ -6,7 +6,7 @@
  * Copyright 2021 Datadog, Inc.
  */
 
-jest.mock("./monitors.ts", () => {
+vi.mock("./monitors.ts", () => {
   return {
     setMonitors: async (shouldThrow: Boolean) => {
       if (shouldThrow) {
@@ -17,7 +17,7 @@ jest.mock("./monitors.ts", () => {
   };
 });
 
-const ServerlessPlugin = require("./index");
+const ServerlessPlugin = (await import("./index")).default;
 
 import mock from "mock-fs";
 import { FunctionDefinition } from "serverless";
@@ -599,7 +599,7 @@ describe("ServerlessPlugin", () => {
     });
 
     beforeEach(() => {
-      jest.resetModules();
+      vi.resetModules();
       process.env = {};
     });
 

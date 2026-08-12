@@ -96,7 +96,7 @@ describe("hasWebpackPlugin", () => {
 
 describe("getConfig", () => {
   beforeEach(() => {
-    jest.resetModules();
+    vi.resetModules();
     process.env = {};
   });
   it("get a default configuration when none is present", () => {
@@ -451,7 +451,7 @@ describe("forceExcludeDepsFromWebpack", () => {
 
 describe("setEnvConfiguration", () => {
   beforeEach(() => {
-    jest.resetModules();
+    vi.resetModules();
     process.env = {};
   });
 

@@ -19,7 +19,7 @@ jobs:
           node-version: 24
 
       - name: Set up Yarn
-        run: corepack enable && corepack prepare yarn@4.10.3 --activate
+        run: corepack enable && corepack prepare yarn@4.17.1 --activate
 
       - name: Cache Node modules
         id: cache-node-modules
@@ -61,7 +61,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Set up Yarn
-        run: corepack enable && corepack prepare yarn@4.10.3 --activate
+        run: corepack enable && corepack prepare yarn@4.17.1 --activate
 
       - name: Cache Node modules
         id: cache-node-modules
