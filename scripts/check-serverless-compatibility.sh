@@ -2,6 +2,7 @@
 set -euo pipefail
 
 : "${SERVERLESS_PACKAGE:?SERVERLESS_PACKAGE must be set}"
+: "${SERVERLESS_BINARY:?SERVERLESS_BINARY must be set}"
 
 workdir=$(mktemp -d)
 trap 'rm -rf "$workdir"' EXIT
@@ -46,5 +47,5 @@ npm install --prefix "$workdir/fixture" --no-audit --no-fund --legacy-peer-deps 
   "$SERVERLESS_PACKAGE" "$workdir"/serverless-plugin-datadog-*.tgz
 (
   cd "$workdir/fixture"
-  ./node_modules/.bin/osls package
+  "./node_modules/.bin/$SERVERLESS_BINARY" package
 )

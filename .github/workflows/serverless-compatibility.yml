@@ -20,14 +20,19 @@ jobs:
         include:
           - name: Serverless 1.83.3
             package: serverless@1.83.3
+            binary: serverless
           - name: Serverless 2.72.4
             package: serverless@2.72.4
+            binary: serverless
           - name: Serverless 3.39.0
             package: serverless@3.39.0
+            binary: serverless
           - name: OSLS 3.77.0
             package: osls@3.77.0
+            binary: osls
           - name: OSLS 4.1.0
             package: osls@4.1.0
+            binary: osls
 
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
@@ -56,3 +61,4 @@ jobs:
         run: ./scripts/check-serverless-compatibility.sh
         env:
           SERVERLESS_PACKAGE: ${{ matrix.package }}
+          SERVERLESS_BINARY: ${{ matrix.binary }}
