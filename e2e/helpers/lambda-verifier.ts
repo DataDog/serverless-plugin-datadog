@@ -68,10 +68,24 @@ export interface LambdaVerifierConfig {
 const getConfiguration = async (fnName: string, region: string): Promise<LambdaConfiguration> => {
   const result = await execPromise(
     `aws lambda get-function-configuration --function-name "${fnName}" --region "${region}" --output json`,
+    {logOutput: false},
   );
   assert.equal(result.exitCode, 0, `get-function-configuration failed: ${result.stderr}`);
 
-  return JSON.parse(result.stdout) as LambdaConfiguration;
+  const configuration = JSON.parse(result.stdout) as LambdaConfiguration;
+  const variables = configuration.Environment?.Variables;
+  if (variables !== undefined) {
+    const redactedVariables = Object.fromEntries(
+      Object.keys(variables).map((key) => [key, '[redacted]']),
+    );
+    // eslint-disable-next-line no-console
+    console.log(JSON.stringify({...configuration, Environment: {Variables: redactedVariables}}, null, 2));
+  } else {
+    // eslint-disable-next-line no-console
+    console.log(JSON.stringify(configuration, null, 2));
+  }
+
+  return configuration;
 };
 
 const getTags = async (functionArn: string, region: string): Promise<Record<string, string>> => {

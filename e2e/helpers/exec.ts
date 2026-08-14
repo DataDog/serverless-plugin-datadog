@@ -27,6 +27,7 @@ export interface ExecOptions {
   // Serverless / AWS / CFN calls can emit large output; default generous but bounded.
   // CFN deploys need ~16MB; sls/cdk need more, so callers raise it as needed.
   maxBuffer?: number;
+  logOutput?: boolean;
   // Transient cloud-provider error substrings safe to retry. Supplied by the caller so
   // each cloud/tool contributes its own patterns; empty means never retry.
   retryPatterns?: string[];
@@ -39,7 +40,7 @@ const DEFAULT_MAX_ATTEMPTS = 3;
 const DEFAULT_DELAY_SECONDS = 10;
 
 export const execPromise = async (command: string, options: ExecOptions = {}): Promise<ExecResult> => {
-  const {env, cwd, maxBuffer = DEFAULT_MAX_BUFFER} = options;
+  const {env, cwd, maxBuffer = DEFAULT_MAX_BUFFER, logOutput = true} = options;
 
   return new Promise((resolve) => {
     const child = child_process.exec(command, {env: {...process.env, ...env}, cwd, maxBuffer}, (error, stdout, stderr) => {
@@ -50,8 +51,10 @@ export const execPromise = async (command: string, options: ExecOptions = {}): P
       });
     });
 
-    child.stdout?.pipe(process.stdout);
-    child.stderr?.pipe(process.stderr);
+    if (logOutput) {
+      child.stdout?.pipe(process.stdout);
+      child.stderr?.pipe(process.stderr);
+    }
   });
 };
 
