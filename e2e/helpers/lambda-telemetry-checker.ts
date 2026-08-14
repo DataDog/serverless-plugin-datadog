@@ -90,6 +90,9 @@ const buildConfiguration = (): client.Configuration => {
       apiKeyAuth: process.env.DATADOG_API_KEY ?? process.env.DD_API_KEY,
       appKeyAuth: process.env.DATADOG_APP_KEY ?? process.env.DD_APP_KEY,
     },
+    // node-fetch can fail while decoding compressed search responses. Requesting
+    // identity encoding keeps polling reliable without changing request payloads.
+    httpConfig: {compress: false},
   });
   const site = process.env.DATADOG_SITE ?? process.env.DD_SITE;
   if (site) {
