@@ -40,7 +40,7 @@ function createMockService(
 }
 
 describe("findHandlers", () => {
-  it("finds all runtimes with matching layers", () => {
+  it("finds supported and unsupported runtimes", () => {
     const mockService = createMockService("us-east-1", {
       "go-function": { handler: "myfile.handler", runtime: "go1.10" },
       "node16-function": { handler: "myfile.handler", runtime: "nodejs16.x" },
@@ -84,7 +84,7 @@ describe("findHandlers", () => {
       {
         name: "node16-function",
         handler: { handler: "myfile.handler", runtime: "nodejs16.x" },
-        type: RuntimeType.NODE,
+        type: RuntimeType.UNSUPPORTED,
         runtime: "nodejs16.x",
       },
       {
@@ -114,7 +114,7 @@ describe("findHandlers", () => {
       {
         name: "python37-function",
         handler: { handler: "myfile.handler", runtime: "python3.7" },
-        type: RuntimeType.PYTHON,
+        type: RuntimeType.UNSUPPORTED,
         runtime: "python3.7",
       },
       {
@@ -186,7 +186,7 @@ describe("findHandlers", () => {
       {
         name: "java8-function",
         handler: { handler: "myfile.handler", runtime: "java8" },
-        type: RuntimeType.JAVA,
+        type: RuntimeType.UNSUPPORTED,
         runtime: "java8",
       },
       {
@@ -240,7 +240,7 @@ describe("findHandlers", () => {
       {
         name: "provided-function",
         handler: { handler: "myfile.handler", runtime: "provided" },
-        type: RuntimeType.CUSTOM,
+        type: RuntimeType.UNSUPPORTED,
         runtime: "provided",
       },
       {
@@ -1075,7 +1075,7 @@ describe("applyLambdaLibraryLayers", () => {
 });
 
 describe("catalog-backed layer application", () => {
-  it("selects commercial x86_64 and arm64 layers, including the x86_64 fallback", () => {
+  it("selects commercial x86_64 and arm64 layers", () => {
     const x86Handler = {
       handler: { runtime: "nodejs20.x" },
       type: RuntimeType.NODE,
@@ -1086,19 +1086,10 @@ describe("catalog-backed layer application", () => {
       type: RuntimeType.PYTHON,
       runtime: "python3.9",
     } as FunctionInfo;
-    const fallbackHandler = {
-      handler: { runtime: "python3.7" },
-      type: RuntimeType.PYTHON,
-      runtime: "python3.7",
-    } as FunctionInfo;
-
     applyLambdaLibraryLayers(createMockService("us-east-1", {}, "x86_64"), [x86Handler], layerCatalog);
     applyLambdaLibraryLayers(createMockService("us-east-1", {}, "arm64"), [armHandler], layerCatalog);
-    applyLambdaLibraryLayers(createMockService("us-east-1", {}, "arm64"), [fallbackHandler], layerCatalog);
-
     expect(x86Handler.handler.layers).toEqual(["arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Node20-x:142"]);
     expect(armHandler.handler.layers).toEqual(["arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Python39-ARM:127"]);
-    expect(fallbackHandler.handler.layers).toEqual(["arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Python37:85"]);
   });
 
   it("selects standard and FIPS Extension layers in commercial AWS and GovCloud", () => {

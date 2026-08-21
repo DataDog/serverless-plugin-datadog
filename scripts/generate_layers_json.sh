@@ -14,12 +14,10 @@
 set -e
 
 LAYER_NAMES=(
-    "Datadog-Node16-x"
     "Datadog-Node18-x"
     "Datadog-Node20-x"
     "Datadog-Node22-x"
     "Datadog-Node24-x"
-    "Datadog-Python37"
     "Datadog-Python38"
     "Datadog-Python38-ARM"
     "Datadog-Python39"
@@ -52,12 +50,10 @@ LAYER_NAMES=(
 )
 
 JSON_LAYER_NAMES=(
-    "nodejs16.x"
     "nodejs18.x"
     "nodejs20.x"
     "nodejs22.x"
     "nodejs24.x"
-    "python3.7"
     "python3.8"
     "python3.8-arm"
     "python3.9"
