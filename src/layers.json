@@ -1,4 +1,210 @@
 {
+  "generated": "This file is generated. Do not edit manually.",
+  "normalizationPrefixes": {
+    "dotnet": "dotnet",
+    "java": "java"
+  },
+  "runtimes": {
+    "nodejs16.x": {
+      "type": "node",
+      "layerKeys": {
+        "x86_64": "nodejs16.x",
+        "arm64": "nodejs16.x"
+      }
+    },
+    "nodejs18.x": {
+      "type": "node",
+      "layerKeys": {
+        "x86_64": "nodejs18.x",
+        "arm64": "nodejs18.x"
+      }
+    },
+    "nodejs20.x": {
+      "type": "node",
+      "layerKeys": {
+        "x86_64": "nodejs20.x",
+        "arm64": "nodejs20.x"
+      }
+    },
+    "nodejs22.x": {
+      "type": "node",
+      "layerKeys": {
+        "x86_64": "nodejs22.x",
+        "arm64": "nodejs22.x"
+      }
+    },
+    "nodejs24.x": {
+      "type": "node",
+      "layerKeys": {
+        "x86_64": "nodejs24.x",
+        "arm64": "nodejs24.x"
+      }
+    },
+    "python3.7": {
+      "type": "python",
+      "layerKeys": {
+        "x86_64": "python3.7"
+      }
+    },
+    "python3.8": {
+      "type": "python",
+      "layerKeys": {
+        "x86_64": "python3.8",
+        "arm64": "python3.8-arm"
+      }
+    },
+    "python3.9": {
+      "type": "python",
+      "layerKeys": {
+        "x86_64": "python3.9",
+        "arm64": "python3.9-arm"
+      }
+    },
+    "python3.10": {
+      "type": "python",
+      "layerKeys": {
+        "x86_64": "python3.10",
+        "arm64": "python3.10-arm"
+      }
+    },
+    "python3.11": {
+      "type": "python",
+      "layerKeys": {
+        "x86_64": "python3.11",
+        "arm64": "python3.11-arm"
+      }
+    },
+    "python3.12": {
+      "type": "python",
+      "layerKeys": {
+        "x86_64": "python3.12",
+        "arm64": "python3.12-arm"
+      }
+    },
+    "python3.13": {
+      "type": "python",
+      "layerKeys": {
+        "x86_64": "python3.13",
+        "arm64": "python3.13-arm"
+      }
+    },
+    "python3.14": {
+      "type": "python",
+      "layerKeys": {
+        "x86_64": "python3.14",
+        "arm64": "python3.14-arm"
+      }
+    },
+    "dotnet6": {
+      "type": "dotnet",
+      "layerKeys": {
+        "x86_64": "dotnet",
+        "arm64": "dotnet-arm"
+      }
+    },
+    "dotnet8": {
+      "type": "dotnet",
+      "layerKeys": {
+        "x86_64": "dotnet",
+        "arm64": "dotnet-arm"
+      }
+    },
+    "dotnet10": {
+      "type": "dotnet",
+      "layerKeys": {
+        "x86_64": "dotnet",
+        "arm64": "dotnet-arm"
+      }
+    },
+    "java11": {
+      "type": "java",
+      "layerKeys": {
+        "x86_64": "java",
+        "arm64": "java"
+      }
+    },
+    "java17": {
+      "type": "java",
+      "layerKeys": {
+        "x86_64": "java",
+        "arm64": "java"
+      }
+    },
+    "java21": {
+      "type": "java",
+      "layerKeys": {
+        "x86_64": "java",
+        "arm64": "java"
+      }
+    },
+    "java25": {
+      "type": "java",
+      "layerKeys": {
+        "x86_64": "java",
+        "arm64": "java"
+      }
+    },
+    "java8.al2": {
+      "type": "java",
+      "layerKeys": {
+        "x86_64": "java",
+        "arm64": "java"
+      }
+    },
+    "java8": {
+      "type": "java",
+      "layerKeys": {
+        "x86_64": "java",
+        "arm64": "java"
+      }
+    },
+    "provided.al2": {
+      "type": "custom"
+    },
+    "provided.al2023": {
+      "type": "custom"
+    },
+    "provided": {
+      "type": "custom"
+    },
+    "ruby3.2": {
+      "type": "ruby",
+      "layerKeys": {
+        "x86_64": "ruby3.2",
+        "arm64": "ruby3.2-arm"
+      }
+    },
+    "ruby3.3": {
+      "type": "ruby",
+      "layerKeys": {
+        "x86_64": "ruby3.3",
+        "arm64": "ruby3.3-arm"
+      }
+    },
+    "ruby3.4": {
+      "type": "ruby",
+      "layerKeys": {
+        "x86_64": "ruby3.4",
+        "arm64": "ruby3.4-arm"
+      }
+    },
+    "ruby4.0": {
+      "type": "ruby",
+      "layerKeys": {
+        "x86_64": "ruby4.0",
+        "arm64": "ruby4.0-arm"
+      }
+    },
+    "go1.x": {
+      "type": "go"
+    }
+  },
+  "layerKeys": {
+    "extension": {
+      "x86_64": "extension",
+      "arm64": "extension-arm"
+    }
+  },
   "regions": {
     "ap-south-2": {
       "nodejs16.x": "arn:aws:lambda:ap-south-2:464622532012:layer:Datadog-Node16-x:120",
@@ -1185,6 +1391,80 @@
       "dotnet": "arn:aws:lambda:ap-southeast-7:464622532012:layer:dd-trace-dotnet:25",
       "dotnet-arm": "arn:aws:lambda:ap-southeast-7:464622532012:layer:dd-trace-dotnet-ARM:25",
       "java": "arn:aws:lambda:ap-southeast-7:464622532012:layer:dd-trace-java:27"
+    },
+    "us-gov-west-1": {
+      "nodejs16.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node16-x:120",
+      "nodejs18.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node18-x:142",
+      "nodejs20.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node20-x:142",
+      "nodejs22.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node22-x:142",
+      "nodejs24.x": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Node24-x:142",
+      "python3.7": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python37:85",
+      "python3.8": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python38:127",
+      "python3.8-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python38-ARM:127",
+      "python3.9": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python39:127",
+      "python3.9-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python39-ARM:127",
+      "python3.10": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python310:127",
+      "python3.10-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python310-ARM:127",
+      "python3.11": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python311:127",
+      "python3.11-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python311-ARM:127",
+      "python3.12": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python312:127",
+      "python3.12-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python312-ARM:127",
+      "python3.13": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python313:127",
+      "python3.13-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python313-ARM:127",
+      "python3.14": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python314:127",
+      "python3.14-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Python314-ARM:127",
+      "ruby3.2": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Ruby3-2:29",
+      "ruby3.2-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Ruby3-2-ARM:29",
+      "ruby3.3": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Ruby3-3:29",
+      "ruby3.3-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Ruby3-3-ARM:29",
+      "ruby3.4": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Ruby3-4:29",
+      "ruby3.4-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Ruby3-4-ARM:29",
+      "ruby4.0": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Ruby4-0:29",
+      "ruby4.0-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Ruby4-0-ARM:29",
+      "extension": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Extension:99",
+      "extension-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Extension-ARM:99",
+      "extension-fips": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Extension-FIPS:99",
+      "extension-arm-fips": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Extension-ARM-FIPS:99",
+      "dotnet": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:dd-trace-dotnet:25",
+      "dotnet-arm": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:dd-trace-dotnet-ARM:25",
+      "java": "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:dd-trace-java:27"
+    },
+    "us-gov-east-1": {
+      "nodejs16.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node16-x:120",
+      "nodejs18.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node18-x:142",
+      "nodejs20.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node20-x:142",
+      "nodejs22.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node22-x:142",
+      "nodejs24.x": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Node24-x:142",
+      "python3.7": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python37:85",
+      "python3.8": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python38:127",
+      "python3.8-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python38-ARM:127",
+      "python3.9": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python39:127",
+      "python3.9-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python39-ARM:127",
+      "python3.10": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python310:127",
+      "python3.10-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python310-ARM:127",
+      "python3.11": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python311:127",
+      "python3.11-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python311-ARM:127",
+      "python3.12": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python312:127",
+      "python3.12-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python312-ARM:127",
+      "python3.13": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python313:127",
+      "python3.13-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python313-ARM:127",
+      "python3.14": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python314:127",
+      "python3.14-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Python314-ARM:127",
+      "ruby3.2": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Ruby3-2:29",
+      "ruby3.2-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Ruby3-2-ARM:29",
+      "ruby3.3": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Ruby3-3:29",
+      "ruby3.3-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Ruby3-3-ARM:29",
+      "ruby3.4": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Ruby3-4:29",
+      "ruby3.4-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Ruby3-4-ARM:29",
+      "ruby4.0": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Ruby4-0:29",
+      "ruby4.0-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Ruby4-0-ARM:29",
+      "extension": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Extension:99",
+      "extension-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Extension-ARM:99",
+      "extension-fips": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Extension-FIPS:99",
+      "extension-arm-fips": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:Datadog-Extension-ARM-FIPS:99",
+      "dotnet": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:dd-trace-dotnet:25",
+      "dotnet-arm": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:dd-trace-dotnet-ARM:25",
+      "java": "arn:aws-us-gov:lambda:us-gov-east-1:002406178527:layer:dd-trace-java:27"
     }
   }
 }

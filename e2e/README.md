@@ -83,7 +83,7 @@ from `aws-vault`. Set `SKIP_LAMBDA_TESTS=true` to skip the suite.
 | `DATADOG_API_KEY`  | yes      | --               | Wired into the extension + API-client auth     |
 | `DATADOG_APP_KEY`  | yes      | --               | API-client auth for span/log polling           |
 | `DATADOG_SITE`     | no       | `datadoghq.com`  | Datadog site                                   |
-| `AWS_REGION`       | no       | `ap-northeast-3` | Deploy region (must be pinned in `layers.json`)|
+| `AWS_REGION`       | no       | `ap-northeast-3` | Deploy region (must be pinned in `layers.json`) |
 | `SKIP_LAMBDA_TESTS`| no       | --               | `true` skips the suite                         |
 
 (AWS credentials come from the ambient AWS env / `aws-vault` / OIDC.)

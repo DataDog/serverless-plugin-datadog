@@ -48,14 +48,14 @@ export const RETRY_PATTERNS = [
 // only function is `hello`.
 export const functionName = (serviceName: string): string => `${serviceName}-e2e-hello`;
 
-// Pinned artifact versions come from the plugin's own src/layers.json, so a version
+// Pinned artifact versions come from the plugin's generated catalog, so a version
 // mismatch blames the plugin/registry, not upstream drift.
 const expectedLayerArns = (region: string): ExpectedLayers => {
-  const layersPath = fileURLToPath(new URL('../../src/layers.json', import.meta.url));
-  const layers = JSON.parse(fs.readFileSync(layersPath, 'utf-8')) as {
+  const catalogPath = fileURLToPath(new URL('../../src/layers.json', import.meta.url));
+  const catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf-8')) as {
     regions: Record<string, Record<string, string>>;
   };
-  const regionLayers = layers.regions[region];
+  const regionLayers = catalog.regions[region];
   assert.ok(regionLayers, `region ${region} not present in src/layers.json`);
   const node = regionLayers[RUNTIME];
   const extension = regionLayers.extension;

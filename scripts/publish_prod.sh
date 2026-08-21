@@ -109,7 +109,7 @@ echo "Bumping the version number and creating a release PR"
 yarn version "$VERSION"
 RELEASE_BRANCH="release/v$VERSION"
 git switch -c "$RELEASE_BRANCH"
-git add package.json src/layers.json src/layers-gov.json
+git add package.json src/layers.json
 git commit -m "v$VERSION"
 git push --set-upstream origin "$RELEASE_BRANCH"
 gh pr create --base main --head "$RELEASE_BRANCH" --title "v$VERSION" --body "Release v$VERSION."
