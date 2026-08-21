@@ -15,6 +15,7 @@ import {
   findHandlers,
   pushLayerARN,
 } from "./layer";
+import * as layerCatalog from "./layer-catalog.json";
 
 import { FunctionDefinitionHandler, FunctionDefinitionImage } from "serverless";
 import Service from "serverless/classes/Service";
@@ -1070,6 +1071,85 @@ describe("applyLambdaLibraryLayers", () => {
       runtime: "dotnet6",
       layers: ["arn:aws:lambda:us-gov-east-1:464622532012:layer:Datadog-Extension:47"],
     });
+  });
+});
+
+describe("catalog-backed layer application", () => {
+  it("selects commercial x86_64 and arm64 layers, including the x86_64 fallback", () => {
+    const x86Handler = {
+      handler: { runtime: "nodejs20.x" },
+      type: RuntimeType.NODE,
+      runtime: "nodejs20.x",
+    } as FunctionInfo;
+    const armHandler = {
+      handler: { runtime: "python3.9" },
+      type: RuntimeType.PYTHON,
+      runtime: "python3.9",
+    } as FunctionInfo;
+    const fallbackHandler = {
+      handler: { runtime: "python3.7" },
+      type: RuntimeType.PYTHON,
+      runtime: "python3.7",
+    } as FunctionInfo;
+
+    applyLambdaLibraryLayers(createMockService("us-east-1", {}, "x86_64"), [x86Handler], layerCatalog);
+    applyLambdaLibraryLayers(createMockService("us-east-1", {}, "arm64"), [armHandler], layerCatalog);
+    applyLambdaLibraryLayers(createMockService("us-east-1", {}, "arm64"), [fallbackHandler], layerCatalog);
+
+    expect(x86Handler.handler.layers).toEqual(["arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Node20-x:142"]);
+    expect(armHandler.handler.layers).toEqual(["arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Python39-ARM:127"]);
+    expect(fallbackHandler.handler.layers).toEqual(["arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Python37:85"]);
+  });
+
+  it("selects standard and FIPS Extension layers in commercial AWS and GovCloud", () => {
+    const handler = (): FunctionInfo => ({
+      handler: { runtime: "nodejs20.x" },
+      type: RuntimeType.NODE,
+      runtime: "nodejs20.x",
+    });
+    const commercialStandardHandler = handler();
+    const commercialFipsHandler = handler();
+    const govCloudStandardHandler = handler();
+    const govCloudFipsHandler = handler();
+
+    applyExtensionLayer(createMockService("us-east-1", {}), [commercialStandardHandler], layerCatalog);
+    applyExtensionLayer(createMockService("us-east-1", {}), [commercialFipsHandler], layerCatalog, undefined, true);
+    applyExtensionLayer(createMockService("us-gov-west-1", {}), [govCloudStandardHandler], layerCatalog);
+    applyExtensionLayer(createMockService("us-gov-west-1", {}), [govCloudFipsHandler], layerCatalog, undefined, true);
+
+    expect(commercialStandardHandler.handler.layers).toEqual([
+      "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:99",
+    ]);
+    expect(commercialFipsHandler.handler.layers).toEqual([
+      "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension-FIPS:99",
+    ]);
+    expect(govCloudStandardHandler.handler.layers).toEqual([
+      "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Extension:99",
+    ]);
+    expect(govCloudFipsHandler.handler.layers).toEqual([
+      "arn:aws-us-gov:lambda:us-gov-west-1:002406178527:layer:Datadog-Extension-FIPS:99",
+    ]);
+  });
+
+  it("preserves missing-region and custom-account behavior", () => {
+    const missingRegionHandler = {
+      handler: { runtime: "nodejs20.x" },
+      type: RuntimeType.NODE,
+      runtime: "nodejs20.x",
+    } as FunctionInfo;
+    const customAccountHandler = {
+      handler: { runtime: "nodejs20.x" },
+      type: RuntimeType.NODE,
+      runtime: "nodejs20.x",
+    } as FunctionInfo;
+
+    applyLambdaLibraryLayers(createMockService("cn-north-1", {}), [missingRegionHandler], layerCatalog);
+    applyLambdaLibraryLayers(createMockService("cn-north-1", {}), [customAccountHandler], layerCatalog, "123456789012");
+
+    expect(missingRegionHandler.handler.layers).toBeUndefined();
+    expect(customAccountHandler.handler.layers).toEqual([
+      "arn:aws-cn:lambda:cn-north-1:123456789012:layer:Datadog-Node20-x:142",
+    ]);
   });
 });
 

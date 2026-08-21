@@ -43,8 +43,7 @@ import {
   RuntimeType,
   getDefaultIsFIPSEnabledFlag,
 } from "./layer";
-import * as govLayers from "./layers-gov.json";
-import * as layers from "./layers.json";
+import * as layerCatalog from "./layer-catalog.json";
 import { getCloudFormationStackId } from "./monitor-api-requests";
 import { setMonitors } from "./monitors";
 import { addOutputLinks, printOutputs } from "./output";
@@ -136,7 +135,7 @@ module.exports = class ServerlessPlugin {
 
     setEnvConfiguration(config, handlers);
 
-    const allLayers = { regions: { ...layers.regions, ...govLayers.regions } };
+    const allLayers = layerCatalog;
     const accountId = config.useLayersFromAccount;
     if (config.addLayers) {
       this.serverless.cli.log("Adding Lambda Library Layers to functions");

@@ -280,7 +280,7 @@ This product includes software developed at Datadog (<https://www.datadoghq.com/
 [12]: https://docs.datadoghq.com/serverless/datadog_lambda_library/extension/
 [13]: https://docs.aws.amazon.com/lambda/latest/dg/using-extensions.html
 [14]: https://github.com/DataDog/serverless-plugin-datadog/blob/master/CONTRIBUTING.md
-[15]: https://github.com/DataDog/serverless-plugin-datadog/blob/master/src/layers.json
+[15]: https://github.com/DataDog/serverless-plugin-datadog/blob/master/src/layer-catalog.json
 [16]: https://docs.datadoghq.com/tracing/setup_overview/configure_data_security/?tab=mongodb#replace-rules-for-tag-filtering
 [17]: https://www.datadoghq.com/blog/troubleshoot-lambda-function-request-response-payloads/
 [18]: https://docs.datadoghq.com/integrations/guide/source-code-integration

@@ -8,6 +8,7 @@
 import { FunctionDefinition, FunctionDefinitionHandler } from "serverless";
 import Service from "serverless/classes/Service";
 import { Configuration } from "./env";
+import layerCatalog from "./layer-catalog.json";
 
 export enum RuntimeType {
   NODE = "node",
@@ -55,63 +56,28 @@ export interface LayerJSON {
   };
 }
 
-export const runtimeLookup: Record<string, RuntimeType> = {
-  "nodejs16.x": RuntimeType.NODE,
-  "nodejs18.x": RuntimeType.NODE,
-  "nodejs20.x": RuntimeType.NODE,
-  "nodejs22.x": RuntimeType.NODE,
-  "nodejs24.x": RuntimeType.NODE,
-  "python3.7": RuntimeType.PYTHON,
-  "python3.8": RuntimeType.PYTHON,
-  "python3.9": RuntimeType.PYTHON,
-  "python3.10": RuntimeType.PYTHON,
-  "python3.11": RuntimeType.PYTHON,
-  "python3.12": RuntimeType.PYTHON,
-  "python3.13": RuntimeType.PYTHON,
-  "python3.14": RuntimeType.PYTHON,
-  dotnet6: RuntimeType.DOTNET,
-  dotnet8: RuntimeType.DOTNET,
-  dotnet10: RuntimeType.DOTNET,
-  java11: RuntimeType.JAVA,
-  java17: RuntimeType.JAVA,
-  java21: RuntimeType.JAVA,
-  java25: RuntimeType.JAVA,
-  "java8.al2": RuntimeType.JAVA,
-  java8: RuntimeType.JAVA,
-  "provided.al2": RuntimeType.CUSTOM,
-  "provided.al2023": RuntimeType.CUSTOM,
-  provided: RuntimeType.CUSTOM,
-  "ruby3.2": RuntimeType.RUBY,
-  "ruby3.3": RuntimeType.RUBY,
-  "ruby3.4": RuntimeType.RUBY,
-  "ruby4.0": RuntimeType.RUBY,
-  "go1.x": RuntimeType.GO,
+type ArchitectureLayerKeys = Partial<Record<typeof X86_64_ARCHITECTURE | typeof ARM64_ARCHITECTURE, string>>;
+type CatalogLayerConfiguration = { layerKeys?: ArchitectureLayerKeys };
+type LayerCatalog = {
+  normalizationPrefixes: Record<string, string>;
+  runtimes: Record<string, CatalogLayerConfiguration & { type: RuntimeType }>;
+  layerKeys: Record<string, ArchitectureLayerKeys>;
 };
 
-// Map from x86 runtime keys in layers.json to the corresponding ARM runtime keys
-export const ARM_RUNTIME_KEYS: Record<string, string> = {
-  "python3.8": "python3.8-arm",
-  "python3.9": "python3.9-arm",
-  "python3.10": "python3.10-arm",
-  "python3.11": "python3.11-arm",
-  "python3.12": "python3.12-arm",
-  "python3.13": "python3.13-arm",
-  "python3.14": "python3.14-arm",
-  "ruby3.2": "ruby3.2-arm",
-  "ruby3.3": "ruby3.3-arm",
-  "ruby3.4": "ruby3.4-arm",
-  "ruby4.0": "ruby4.0-arm",
-  extension: "extension-arm",
-  dotnet: "dotnet-arm",
-  // The same Node layers work for both x86 and ARM
-  "nodejs16.x": "nodejs16.x",
-  "nodejs18.x": "nodejs18.x",
-  "nodejs20.x": "nodejs20.x",
-  "nodejs22.x": "nodejs22.x",
-  "nodejs24.x": "nodejs24.x",
-  // The same Java layer works for both x86 and ARM
-  java: "java",
-};
+const catalog = layerCatalog as LayerCatalog;
+
+export const runtimeLookup = Object.fromEntries(
+  Object.entries(catalog.runtimes).map(([runtime, configuration]) => [runtime, configuration.type]),
+) as Record<string, RuntimeType>;
+
+export const ARM_RUNTIME_KEYS = Object.fromEntries(
+  [...Object.values(catalog.runtimes).map(({ layerKeys }) => layerKeys), ...Object.values(catalog.layerKeys)]
+    .filter(
+      (layerKeys): layerKeys is Required<ArchitectureLayerKeys> =>
+        layerKeys?.[X86_64_ARCHITECTURE] !== undefined && layerKeys[ARM64_ARCHITECTURE] !== undefined,
+    )
+    .map((layerKeys) => [layerKeys[X86_64_ARCHITECTURE], layerKeys[ARM64_ARCHITECTURE]]),
+) as Record<string, string>;
 
 export function findHandlers(service: Service, exclude: string[], defaultRuntime?: string): FunctionInfo[] {
   return Object.entries(service.functions)
@@ -132,21 +98,18 @@ export function findHandlers(service: Service, exclude: string[], defaultRuntime
 }
 
 /**
- * Normalize the runtime in the yml to match our layers.json keys
- * For most runtimes the key in layers.json is the same as the string set in the
- * serverless.yml, but for dotnet and java they are not
+ * Normalize the runtime in the yml to match the generated catalog keys.
+ * For most runtimes the catalog key is the same as the string set in the
+ * serverless.yml, but for dotnet and java it is not.
  *
  * @param runtimeSetting string set in serverless.yml ex: "dotnet6", "nodejs18.x"
  * @returns normalized runtime key
  */
 export function normalizeRuntimeKey(runtimeSetting: string): string {
-  if (runtimeSetting.startsWith("dotnet")) {
-    return "dotnet";
-  }
-  if (runtimeSetting.startsWith("java")) {
-    return "java";
-  }
-  return runtimeSetting;
+  return (
+    Object.entries(catalog.normalizationPrefixes).find(([prefix]) => runtimeSetting.startsWith(prefix))?.[1] ??
+    runtimeSetting
+  );
 }
 
 /**
@@ -154,7 +117,7 @@ export function normalizeRuntimeKey(runtimeSetting: string): string {
  *
  * @param service Serverless framework service
  * @param handlers Lambda functions to add layers to
- * @param layers layers.json file read into an object
+ * @param layers generated layer catalog read into an object
  * @param accountId optional account ID that the layers live in - undefined
  *        unless the customer sets a value for useLayersFromAccount in yaml
  * @param isUsingExtension whether to install the Datadog Lambda Extension as a layer

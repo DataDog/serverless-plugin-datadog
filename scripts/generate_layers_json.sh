@@ -9,7 +9,7 @@
 
 # Call: ./scripts/generate_layers_json [-g]
 # Opts:
-#   -g: generate govcloud file
+#   -g: fetch GovCloud regions with a GovCloud AWS profile
 
 set -e
 
@@ -91,18 +91,15 @@ JSON_LAYER_NAMES=(
 
 AVAILABLE_REGIONS=$(aws ec2 describe-regions | jq -r '.[] | .[] | .RegionName')
 
-FILE_NAME="src/layers.json"
+FILE_NAME="src/layer-catalog.json"
 
-INPUT_JSON="{\"regions\":{}}"
-
-if [ "$1" = "-g" ]; then
-    FILE_NAME="src/layers-gov.json"
+if [ ! -f "$FILE_NAME" ]; then
+    echo "Layer catalog not set, please make sure to restore it before generating"
+    exit 1
 fi
 
-EXISTING_JSON="{}"
-if [ -f "$FILE_NAME" ]; then
-    EXISTING_JSON=$(cat "$FILE_NAME")
-fi
+EXISTING_JSON=$(cat "$FILE_NAME")
+INPUT_JSON="$EXISTING_JSON"
 
 # Fetch the layers for each region in parallel
 echo "Fetching layers for each region"
