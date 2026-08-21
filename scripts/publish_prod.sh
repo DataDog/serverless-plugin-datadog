@@ -10,8 +10,6 @@
 #   ./scripts/publish_prod.sh <VERSION_NUMBER>
 # Publish after the release PR is merged:
 #   ./scripts/publish_prod.sh --publish
-# Skip updating the layer versions:
-#   UPDATE_LAYERS=false ./scripts/publish_prod.sh <VERSION_NUMBER>
 
 set -euo pipefail
 
@@ -84,32 +82,12 @@ if [ "$CONT" != "y" ]; then
     exit 1
 fi
 
-if [ "${UPDATE_LAYERS:-true}" != "false" ]; then
-    read -r -p "About to update layer versions to the latest available from AWS. Continue? (y/n) " CONT
-    if [ "$CONT" != "y" ]; then
-        echo "Exiting"
-        exit 1
-    fi
-
-    echo "If an SSO authorization link is printed below, please make sure to authorize it with your GovCloud account."
-    aws-vault exec sso-govcloud-us1-fed-engineering -- aws sts get-caller-identity
-
-    echo "If an SSO authorization link is printed below, please make sure to authorize it with your datadoghq.com account."
-    aws-vault exec sso-prod-engineering -- aws sts get-caller-identity
-
-    echo "Updating layer versions for GovCloud AWS accounts"
-    aws-vault exec sso-govcloud-us1-fed-engineering -- ./scripts/generate_layers_json.sh -g
-
-    echo "Updating layer versions for commercial AWS accounts"
-    aws-vault exec sso-prod-engineering -- ./scripts/generate_layers_json.sh
-fi
-
 echo
 echo "Bumping the version number and creating a release PR"
 yarn version "$VERSION"
 RELEASE_BRANCH="release/v$VERSION"
 git switch -c "$RELEASE_BRANCH"
-git add package.json src/layers.json
+git add package.json
 git commit -m "v$VERSION"
 git push --set-upstream origin "$RELEASE_BRANCH"
 gh pr create --base main --head "$RELEASE_BRANCH" --title "v$VERSION" --body "Release v$VERSION."
