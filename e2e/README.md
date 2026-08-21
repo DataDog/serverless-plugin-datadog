@@ -24,8 +24,8 @@ CloudFormation stack, so the clean end-state is the function (and all its DD
 config) being absent -- asserted explicitly.
 
 **Config verified** (`helpers/lambda-verifier.ts`): the pinned Datadog Node layer
-+ extension layer (versions read from `../src/layer-catalog.json`, so drift blames
-the plugin), the redirected handler with the original preserved in `DD_LAMBDA_HANDLER`,
++ extension layer (versions read from `../src/layers.json`, so drift blames the
+plugin), the redirected handler with the original preserved in `DD_LAMBDA_HANDLER`,
 the required `DD_*` env vars, and the `service` / `env` / `version` / `dd_sls_plugin`
 tags. Identity (run-id service name, env, version) is asserted -- not mere presence.
 
@@ -83,7 +83,7 @@ from `aws-vault`. Set `SKIP_LAMBDA_TESTS=true` to skip the suite.
 | `DATADOG_API_KEY`  | yes      | --               | Wired into the extension + API-client auth     |
 | `DATADOG_APP_KEY`  | yes      | --               | API-client auth for span/log polling           |
 | `DATADOG_SITE`     | no       | `datadoghq.com`  | Datadog site                                   |
-| `AWS_REGION`       | no       | `ap-northeast-3` | Deploy region (must be pinned in `layer-catalog.json`) |
+| `AWS_REGION`       | no       | `ap-northeast-3` | Deploy region (must be pinned in `layers.json`) |
 | `SKIP_LAMBDA_TESTS`| no       | --               | `true` skips the suite                         |
 
 (AWS credentials come from the ambient AWS env / `aws-vault` / OIDC.)

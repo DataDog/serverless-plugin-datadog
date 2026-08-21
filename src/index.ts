@@ -43,7 +43,7 @@ import {
   RuntimeType,
   getDefaultIsFIPSEnabledFlag,
 } from "./layer";
-import * as layerCatalog from "./layer-catalog.json";
+import * as layerCatalog from "./layers.json";
 import { getCloudFormationStackId } from "./monitor-api-requests";
 import { setMonitors } from "./monitors";
 import { addOutputLinks, printOutputs } from "./output";

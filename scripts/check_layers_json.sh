@@ -7,7 +7,7 @@
 
 set -e
 
-if [ ! -f "src/layer-catalog.json" ]
+if [ ! -f "src/layers.json" ]
 then
     echo "Layer catalog not set, please make sure to run generate_layers_json.sh before building"
     exit 1

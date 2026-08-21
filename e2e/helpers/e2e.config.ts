@@ -51,16 +51,16 @@ export const functionName = (serviceName: string): string => `${serviceName}-e2e
 // Pinned artifact versions come from the plugin's generated catalog, so a version
 // mismatch blames the plugin/registry, not upstream drift.
 const expectedLayerArns = (region: string): ExpectedLayers => {
-  const catalogPath = fileURLToPath(new URL('../../src/layer-catalog.json', import.meta.url));
+  const catalogPath = fileURLToPath(new URL('../../src/layers.json', import.meta.url));
   const catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf-8')) as {
     regions: Record<string, Record<string, string>>;
   };
   const regionLayers = catalog.regions[region];
-  assert.ok(regionLayers, `region ${region} not present in src/layer-catalog.json`);
+  assert.ok(regionLayers, `region ${region} not present in src/layers.json`);
   const node = regionLayers[RUNTIME];
   const extension = regionLayers.extension;
-  assert.ok(node, `no ${RUNTIME} layer pinned for ${region} in src/layer-catalog.json`);
-  assert.ok(extension, `no extension layer pinned for ${region} in src/layer-catalog.json`);
+  assert.ok(node, `no ${RUNTIME} layer pinned for ${region} in src/layers.json`);
+  assert.ok(extension, `no extension layer pinned for ${region} in src/layers.json`);
 
   return {node, extension};
 };

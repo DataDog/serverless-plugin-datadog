@@ -8,7 +8,7 @@
 import { FunctionDefinition, FunctionDefinitionHandler } from "serverless";
 import Service from "serverless/classes/Service";
 import { Configuration } from "./env";
-import layerCatalog from "./layer-catalog.json";
+import layerCatalog from "./layers.json";
 
 export enum RuntimeType {
   NODE = "node",

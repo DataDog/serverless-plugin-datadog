@@ -91,7 +91,7 @@ JSON_LAYER_NAMES=(
 
 AVAILABLE_REGIONS=$(aws ec2 describe-regions | jq -r '.[] | .[] | .RegionName')
 
-FILE_NAME="src/layer-catalog.json"
+FILE_NAME="src/layers.json"
 
 if [ ! -f "$FILE_NAME" ]; then
     echo "Layer catalog not set, please make sure to restore it before generating"

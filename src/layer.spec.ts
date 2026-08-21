@@ -15,7 +15,7 @@ import {
   findHandlers,
   pushLayerARN,
 } from "./layer";
-import * as layerCatalog from "./layer-catalog.json";
+import * as layerCatalog from "./layers.json";
 
 import { FunctionDefinitionHandler, FunctionDefinitionImage } from "serverless";
 import Service from "serverless/classes/Service";
