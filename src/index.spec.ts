@@ -545,7 +545,7 @@ describe("ServerlessPlugin", () => {
     });
   });
 
-  it("Adds tracing layer for java8", async () => {
+  it("does not add layers for unsupported java8", async () => {
     mock({});
     const serverless = {
       cli: {
@@ -579,10 +579,7 @@ describe("ServerlessPlugin", () => {
         functions: {
           node1: {
             handler: "my-func.ev",
-            layers: [
-              expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:dd-trace-java\:.*/),
-              expect.stringMatching(/arn\:aws\:lambda\:us\-east\-1\:.*\:layer\:Datadog-Extension\:.*/),
-            ],
+            layers: [],
             runtime: "java8",
           },
         },

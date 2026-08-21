@@ -331,7 +331,7 @@
           },
           "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/dd-sls-plugin-integration-test.zip"
         },
-        "Handler": "datadog_lambda.handler.handler",
+        "Handler": "py_handler.hello",
         "Runtime": "python3.7",
         "FunctionName": "dd-sls-plugin-integration-test-dev-PythonHello37",
         "MemorySize": 1024,
@@ -353,8 +353,7 @@
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_SERVICE": "dd-sls-plugin-integration-test",
-            "DD_ENV": "dev",
-            "DD_LAMBDA_HANDLER": "py_handler.hello"
+            "DD_ENV": "dev"
           }
         },
         "Role": {
@@ -362,11 +361,7 @@
             "IamRoleLambdaExecution",
             "Arn"
           ]
-        },
-        "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python37:XXX",
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
-        ]
+        }
       },
       "DependsOn": [
         "PythonHello37LogGroup"
@@ -731,7 +726,7 @@
           },
           "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/dd-sls-plugin-integration-test.zip"
         },
-        "Handler": "/opt/nodejs/node_modules/datadog-lambda-js/handler.handler",
+        "Handler": "js_handler.hello",
         "Runtime": "nodejs16.x",
         "FunctionName": "dd-sls-plugin-integration-test-dev-JavascriptHello16-x",
         "MemorySize": 1024,
@@ -753,8 +748,7 @@
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
             "DD_SERVICE": "dd-sls-plugin-integration-test",
-            "DD_ENV": "dev",
-            "DD_LAMBDA_HANDLER": "js_handler.hello"
+            "DD_ENV": "dev"
           }
         },
         "Role": {
@@ -762,11 +756,7 @@
             "IamRoleLambdaExecution",
             "Arn"
           ]
-        },
-        "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node16-x:XXX",
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
-        ]
+        }
       },
       "DependsOn": [
         "JavascriptHello16DashxLogGroup"
@@ -1205,7 +1195,6 @@
             "DD_LOGS_INJECTION": false,
             "DD_SERVERLESS_LOGS_ENABLED": true,
             "DD_CAPTURE_LAMBDA_PAYLOAD": false,
-            "AWS_LAMBDA_EXEC_WRAPPER": "/opt/datadog_wrapper",
             "DD_SERVICE": "dd-sls-plugin-integration-test",
             "DD_ENV": "dev"
           }
@@ -1215,11 +1204,7 @@
             "IamRoleLambdaExecution",
             "Arn"
           ]
-        },
-        "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:dd-trace-java:XXX",
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
-        ]
+        }
       },
       "DependsOn": [
         "JavaHello8LogGroup"
@@ -1414,10 +1399,7 @@
             "IamRoleLambdaExecution",
             "Arn"
           ]
-        },
-        "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Extension:XXX"
-        ]
+        }
       },
       "DependsOn": [
         "ProvidedHelloLogGroup"

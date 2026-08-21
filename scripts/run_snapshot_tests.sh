@@ -68,7 +68,7 @@ for ((i = 0; i < ${#SERVERLESS_CONFIGS[@]}; i++)); do
     set +e # Dont exit right away if there is a diff in snapshots
     cd ..
 
-    python $scripts_dir/compare_snapshots.py $snapshot_tests_dir/${TEST_SNAPSHOTS[i]} $snapshot_tests_dir/${CORRECT_SNAPSHOTS[i]}
+    python3 $scripts_dir/compare_snapshots.py $snapshot_tests_dir/${TEST_SNAPSHOTS[i]} $snapshot_tests_dir/${CORRECT_SNAPSHOTS[i]}
     return_code=$?
     set -e
     if [ $return_code -eq 0 ]; then

@@ -717,7 +717,7 @@
           },
           "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/dd-sls-plugin-integration-test.zip"
         },
-        "Handler": "datadog_lambda.handler.handler",
+        "Handler": "py_handler.hello",
         "Runtime": "python3.7",
         "FunctionName": "dd-sls-plugin-integration-test-dev-PythonHello37",
         "MemorySize": 1024,
@@ -745,8 +745,7 @@
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
-            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
-            "DD_LAMBDA_HANDLER": "py_handler.hello"
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false
           }
         },
         "Role": {
@@ -754,10 +753,7 @@
             "IamRoleLambdaExecution",
             "Arn"
           ]
-        },
-        "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Python37:XXX"
-        ]
+        }
       },
       "DependsOn": [
         "PythonHello37LogGroup"
@@ -1157,7 +1153,7 @@
           },
           "S3Key": "serverless/dd-sls-plugin-integration-test/dev/XXXXXXXXXXXXX-XXXX-XX-XXXXX:XX:XX.XXXX/dd-sls-plugin-integration-test.zip"
         },
-        "Handler": "/opt/nodejs/node_modules/datadog-lambda-js/handler.handler",
+        "Handler": "js_handler.hello",
         "Runtime": "nodejs16.x",
         "FunctionName": "dd-sls-plugin-integration-test-dev-JavascriptHello16-x",
         "MemorySize": 1024,
@@ -1185,8 +1181,7 @@
             "DD_MERGE_XRAY_TRACES": false,
             "DD_LOGS_INJECTION": true,
             "DD_SERVERLESS_LOGS_ENABLED": true,
-            "DD_CAPTURE_LAMBDA_PAYLOAD": false,
-            "DD_LAMBDA_HANDLER": "js_handler.hello"
+            "DD_CAPTURE_LAMBDA_PAYLOAD": false
           }
         },
         "Role": {
@@ -1194,10 +1189,7 @@
             "IamRoleLambdaExecution",
             "Arn"
           ]
-        },
-        "Layers": [
-          "arn:aws:lambda:sa-east-1:464622532012:layer:Datadog-Node16-x:XXX"
-        ]
+        }
       },
       "DependsOn": [
         "JavascriptHello16DashxLogGroup"
