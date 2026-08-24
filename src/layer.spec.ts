@@ -252,6 +252,14 @@ describe("findHandlers", () => {
   });
 });
 
+describe("unsupported runtimes", () => {
+  it.each(["nodejs12.x", "python3.6"])("classifies %s as unsupported", (runtime) => {
+    const service = createMockService("us-east-1", { function: { runtime } });
+
+    expect(findHandlers(service, [])).toEqual([expect.objectContaining({ type: RuntimeType.UNSUPPORTED })]);
+  });
+});
+
 describe("applyLambdaLibraryLayers", () => {
   it("adds a layer array if none are present at the function array or service.provider array", () => {
     const handler = {
