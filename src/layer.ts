@@ -8,6 +8,7 @@
 import { FunctionDefinition, FunctionDefinitionHandler } from "serverless";
 import Service from "serverless/classes/Service";
 import { Configuration } from "./env";
+import layerCatalog from "./runtime-catalog.json";
 
 export enum RuntimeType {
   NODE = "node",
@@ -55,63 +56,16 @@ export interface LayerJSON {
   };
 }
 
-export const runtimeLookup: Record<string, RuntimeType> = {
-  "nodejs16.x": RuntimeType.NODE,
-  "nodejs18.x": RuntimeType.NODE,
-  "nodejs20.x": RuntimeType.NODE,
-  "nodejs22.x": RuntimeType.NODE,
-  "nodejs24.x": RuntimeType.NODE,
-  "python3.7": RuntimeType.PYTHON,
-  "python3.8": RuntimeType.PYTHON,
-  "python3.9": RuntimeType.PYTHON,
-  "python3.10": RuntimeType.PYTHON,
-  "python3.11": RuntimeType.PYTHON,
-  "python3.12": RuntimeType.PYTHON,
-  "python3.13": RuntimeType.PYTHON,
-  "python3.14": RuntimeType.PYTHON,
-  dotnet6: RuntimeType.DOTNET,
-  dotnet8: RuntimeType.DOTNET,
-  dotnet10: RuntimeType.DOTNET,
-  java11: RuntimeType.JAVA,
-  java17: RuntimeType.JAVA,
-  java21: RuntimeType.JAVA,
-  java25: RuntimeType.JAVA,
-  "java8.al2": RuntimeType.JAVA,
-  java8: RuntimeType.JAVA,
-  "provided.al2": RuntimeType.CUSTOM,
-  "provided.al2023": RuntimeType.CUSTOM,
-  provided: RuntimeType.CUSTOM,
-  "ruby3.2": RuntimeType.RUBY,
-  "ruby3.3": RuntimeType.RUBY,
-  "ruby3.4": RuntimeType.RUBY,
-  "ruby4.0": RuntimeType.RUBY,
-  "go1.x": RuntimeType.GO,
+type LayerCatalog = {
+  normalizationPrefixes: Record<string, string>;
+  runtimeLookup: Record<string, RuntimeType>;
+  armRuntimeKeys: Record<string, string>;
 };
 
-// Map from x86 runtime keys in layers.json to the corresponding ARM runtime keys
-export const ARM_RUNTIME_KEYS: Record<string, string> = {
-  "python3.8": "python3.8-arm",
-  "python3.9": "python3.9-arm",
-  "python3.10": "python3.10-arm",
-  "python3.11": "python3.11-arm",
-  "python3.12": "python3.12-arm",
-  "python3.13": "python3.13-arm",
-  "python3.14": "python3.14-arm",
-  "ruby3.2": "ruby3.2-arm",
-  "ruby3.3": "ruby3.3-arm",
-  "ruby3.4": "ruby3.4-arm",
-  "ruby4.0": "ruby4.0-arm",
-  extension: "extension-arm",
-  dotnet: "dotnet-arm",
-  // The same Node layers work for both x86 and ARM
-  "nodejs16.x": "nodejs16.x",
-  "nodejs18.x": "nodejs18.x",
-  "nodejs20.x": "nodejs20.x",
-  "nodejs22.x": "nodejs22.x",
-  "nodejs24.x": "nodejs24.x",
-  // The same Java layer works for both x86 and ARM
-  java: "java",
-};
+const catalog = layerCatalog as LayerCatalog;
+
+export const runtimeLookup = catalog.runtimeLookup;
+export const ARM_RUNTIME_KEYS = catalog.armRuntimeKeys;
 
 export function findHandlers(service: Service, exclude: string[], defaultRuntime?: string): FunctionInfo[] {
   return Object.entries(service.functions)
@@ -140,13 +94,10 @@ export function findHandlers(service: Service, exclude: string[], defaultRuntime
  * @returns normalized runtime key
  */
 export function normalizeRuntimeKey(runtimeSetting: string): string {
-  if (runtimeSetting.startsWith("dotnet")) {
-    return "dotnet";
-  }
-  if (runtimeSetting.startsWith("java")) {
-    return "java";
-  }
-  return runtimeSetting;
+  return (
+    Object.entries(catalog.normalizationPrefixes).find(([prefix]) => runtimeSetting.startsWith(prefix))?.[1] ??
+    runtimeSetting
+  );
 }
 
 /**
