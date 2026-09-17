@@ -27,7 +27,7 @@
     "oxlint-tsgolint": "^7.0.2001",
     "serverless-step-functions": "^3.31.2",
     "typescript": "^7.0.2",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.11"
   },
   "dependencies": {
     "@aws-sdk/client-cloudformation": "^3.1107.0",
@@ -41,7 +41,7 @@
   },
   "packageManager": "yarn@4.17.1",
   "resolutions": {
-    "js-yaml": "^4.2.0",
+    "js-yaml": "^4.3.2",
     "lodash": "^4.18.1",
     "brace-expansion": "^5.0.9",
     "undici": "^7.28.0"
