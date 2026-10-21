@@ -47,6 +47,6 @@
     "undici": "^7.29.1",
     "simple-git": "^4.0.2",
     "basic-ftp": "^6.2.2",
-    "oxfmt/tinypool": "2.1.2"
+    "tinypool@npm:2.1.0": "npm:^2.1.2"
   }
 }
