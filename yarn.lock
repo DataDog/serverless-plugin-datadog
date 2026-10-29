@@ -6562,7 +6562,6 @@ __metadata:
     oxlint: "npm:^1.78.0"
     oxlint-tsgolint: "npm:^7.0.2001"
     serverless-step-functions: "npm:^3.31.2"
-    simple-git: "npm:^4.0.2"
     typescript: "npm:^7.0.2"
     vitest: "npm:^4.1.11"
   peerDependencies:

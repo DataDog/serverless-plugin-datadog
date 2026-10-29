@@ -2,8 +2,7 @@ import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getGitCommitInfo } from "@datadog/datadog-ci-base/commands/git-metadata/library";
-import { newSimpleGit } from "./git";
+import { getGitCommitInfo, isGitRepo } from "@datadog/datadog-ci-base/commands/git-metadata/library";
 
 describe("Git integration", () => {
   let temporaryDirectory: string;
@@ -42,29 +41,30 @@ describe("Git integration", () => {
     rmSync(temporaryDirectory, { recursive: true, force: true });
   });
 
-  it("detects a Git repository and reads its current commit", async () => {
+  it("detects a Git repository", async () => {
     vi.spyOn(process, "cwd").mockReturnValue(repositoryDirectory);
 
-    const git = await newSimpleGit();
-
-    expect(git).toBeDefined();
-    expect(await git!.checkIsRepo()).toBe(true);
-    expect(await git!.revparse("HEAD")).toBe(commitHash);
+    expect(await isGitRepo()).toBe(true);
   });
 
-  it("uses the repository root when called from a nested directory", async () => {
+  it("detects a Git repository from a nested directory", async () => {
     vi.spyOn(process, "cwd").mockReturnValue(nestedDirectory);
 
-    const git = await newSimpleGit();
-
-    expect(git).toBeDefined();
-    expect(await git!.raw("ls-files")).toBe("nested/nested.ts\nroot.ts\n");
+    expect(await isGitRepo()).toBe(true);
   });
 
-  it("returns undefined outside a Git repository", async () => {
+  it("returns false outside a Git repository instead of throwing", async () => {
     vi.spyOn(process, "cwd").mockReturnValue(temporaryDirectory);
 
-    expect(await newSimpleGit()).toBeUndefined();
+    expect(await isGitRepo()).toBe(false);
+  });
+
+  it("detects a repository selected with GIT_DIR and GIT_WORK_TREE", async () => {
+    vi.stubEnv("GIT_DIR", join(repositoryDirectory, ".git"));
+    vi.stubEnv("GIT_WORK_TREE", repositoryDirectory);
+    vi.spyOn(process, "cwd").mockReturnValue(temporaryDirectory);
+
+    expect(await isGitRepo()).toBe(true);
   });
 
   it("reads Datadog commit metadata from a nested directory", async () => {

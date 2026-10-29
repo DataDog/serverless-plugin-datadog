@@ -33,8 +33,7 @@
     "@aws-sdk/client-cloudformation": "^3.1107.0",
     "@aws-sdk/client-cloudwatch-logs": "^3.1107.0",
     "@aws-sdk/client-lambda": "^3.1107.0",
-    "@datadog/datadog-ci-base": "^5.26.1",
-    "simple-git": "^4.0.2"
+    "@datadog/datadog-ci-base": "^5.26.1"
   },
   "peerDependencies": {
     "serverless": "4.x || 3.x || 2.x || 1.x"
