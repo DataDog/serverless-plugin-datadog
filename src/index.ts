@@ -11,7 +11,11 @@ import { FunctionDefinition } from "serverless";
 import Service from "serverless/classes/Service";
 import Aws, { Provider } from "serverless/plugins/aws/provider/awsProvider";
 import { version } from "../package.json";
-import { getGitCommitInfo, uploadGitCommitHash } from "@datadog/datadog-ci-base/commands/git-metadata/library";
+import {
+  getGitCommitInfo,
+  isGitRepo,
+  uploadGitCommitHash,
+} from "@datadog/datadog-ci-base/commands/git-metadata/library";
 import {
   Configuration,
   ddEnvEnvVar,
@@ -34,7 +38,6 @@ import {
   StateMachineCfnResource,
   StepFunctionConfig,
 } from "./forwarder";
-import { newSimpleGit } from "./git";
 import {
   applyExtensionLayer,
   applyLambdaLibraryLayers,
@@ -258,8 +261,7 @@ module.exports = class ServerlessPlugin {
           `Skipping enabling source code integration because ${keyError}. Please set either DATADOG_API_KEY in your environment, or set the apiKey parameter in Serverless.`,
         );
       } else {
-        const simpleGit = await newSimpleGit();
-        if (simpleGit !== undefined && (await simpleGit.checkIsRepo())) {
+        if (await isGitRepo()) {
           try {
             const [gitRemote, gitHash] = await getGitCommitInfo();
             handlers.forEach(({ handler }) => {
