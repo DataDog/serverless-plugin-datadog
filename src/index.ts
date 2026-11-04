@@ -137,7 +137,13 @@ module.exports = class ServerlessPlugin {
     const defaultRuntime = this.serverless.service.provider.runtime;
     const handlers = findHandlers(this.serverless.service, config.exclude, defaultRuntime);
 
-    setEnvConfiguration(config, handlers);
+    // Don't assign `provider.environment` here: without the extension nothing else creates it, and an empty one
+    // would add an Environment block to excluded functions. (addDDEnvVars creates it when the extension is used.)
+    const providerEnvironment = (this.serverless.service.provider as Provider).environment as
+      | Record<string, unknown>
+      | null
+      | undefined;
+    setEnvConfiguration(config, handlers, providerEnvironment);
 
     const allLayers = { regions: { ...layers.regions, ...govLayers.regions } };
     const accountId = config.useLayersFromAccount;

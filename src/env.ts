@@ -73,7 +73,9 @@ export interface Configuration {
   // but will not override existing tags set on function or provider levels. Defaults to true
   enableTags: boolean;
   // When set, the lambda layer will automatically patch console.log with Datadog's tracing ids.
-  injectLogContext: boolean;
+  // Defaults to true, or to false when `addExtension` is true. A function-level DD_LOGS_INJECTION takes precedence;
+  // an explicit value here takes precedence over a provider-level DD_LOGS_INJECTION.
+  injectLogContext?: boolean;
   // When set, the plugin will automatically tag the function with git.commit.sha and git.repository_url.
   enableSourceCodeIntegration: boolean;
   // When set, if enableSourceCodeIntegration is true, the plugin will upload git metadata to Datadog.
@@ -194,7 +196,6 @@ export const defaultConfiguration: Configuration = {
   enableDDTracing: true,
   addExtension: true,
   enableTags: true,
-  injectLogContext: true,
   enableSourceCodeIntegration: true,
   uploadGitMetadata: true,
   exclude: [],
@@ -214,7 +215,13 @@ export const defaultConfiguration: Configuration = {
   redirectHandlers: true,
 };
 
-export function setEnvConfiguration(config: Configuration, handlers: FunctionInfo[]): void {
+export function setEnvConfiguration(
+  config: Configuration,
+  handlers: FunctionInfo[],
+  providerEnvironment?: Record<string, unknown> | null,
+): void {
+  // `provider.environment` can be null in serverless.yml (an empty `environment:` key).
+  const providerEnv = providerEnvironment ?? {};
   handlers.forEach(({ handler, type }) => {
     handler.environment ??= {};
     const environment = handler.environment as Record<string, unknown>;
@@ -310,11 +317,10 @@ export function setEnvConfiguration(config: Configuration, handlers: FunctionInf
     if (config.enableXrayTracing !== undefined && environment[ddMergeXrayTracesEnvVar] === undefined) {
       environment[ddMergeXrayTracesEnvVar] = config.enableXrayTracing;
     }
-    if (config.addExtension) {
-      environment[logInjectionEnvVar] = false;
-    } else if (config.injectLogContext !== undefined && environment[logInjectionEnvVar] === undefined) {
-      environment[logInjectionEnvVar] = config.injectLogContext;
-    }
+    // Precedence: function-level DD_LOGS_INJECTION > explicit `injectLogContext` > provider-level DD_LOGS_INJECTION >
+    // default (on, except when the extension is used). Null (an empty YAML value) counts as unset.
+    environment[logInjectionEnvVar] ??=
+      config.injectLogContext ?? providerEnv[logInjectionEnvVar] ?? !config.addExtension;
     if (config.enableDDLogs !== undefined && environment[ddLogsEnabledEnvVar] === undefined) {
       environment[ddLogsEnabledEnvVar] = config.enableDDLogs;
     }
