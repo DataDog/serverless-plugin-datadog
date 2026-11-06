@@ -5,3 +5,8 @@
 
 # e2e tests, including markdown
 e2e/ @DataDog/serverless-onboarding-and-enablement
+
+# Release files: package version bump and Lambda layer catalog
+package.json @DataDog/serverless-aws @DataDog/serverless-onboarding-and-enablement
+src/layers.json @DataDog/serverless-aws @DataDog/serverless-onboarding-and-enablement
+src/layers-gov.json @DataDog/serverless-aws @DataDog/serverless-onboarding-and-enablement
