@@ -187,7 +187,6 @@ describe("getConfig", () => {
       enableDDLogs: true,
       addExtension: true,
       enableTags: true,
-      injectLogContext: true,
       exclude: [],
       testingMode: false,
       integrationTesting: false,
@@ -229,7 +228,6 @@ describe("getConfig", () => {
       enableDDLogs: true,
       addExtension: true,
       enableTags: true,
-      injectLogContext: true,
       exclude: [],
       testingMode: false,
       integrationTesting: false,
@@ -271,7 +269,6 @@ describe("getConfig", () => {
       enableDDLogs: true,
       addExtension: true,
       enableTags: true,
-      injectLogContext: true,
       exclude: [],
       testingMode: false,
       integrationTesting: false,
@@ -315,7 +312,6 @@ it("disable source code integration", () => {
     enableDDLogs: true,
     addExtension: true,
     enableTags: true,
-    injectLogContext: true,
     exclude: [],
     testingMode: false,
     integrationTesting: false,
@@ -357,7 +353,6 @@ it("disable git metadata upload", () => {
     enableDDLogs: true,
     addExtension: true,
     enableTags: true,
-    injectLogContext: true,
     exclude: [],
     testingMode: false,
     integrationTesting: false,
@@ -911,7 +906,7 @@ describe("setEnvConfiguration", () => {
     ]);
   });
 
-  it("sets `DD_LOGS_INJECTION` to false when `addExtension` is true", () => {
+  it("sets `DD_LOGS_INJECTION` to false by default when `addExtension` is true", () => {
     const handlers: FunctionInfo[] = [
       {
         handler: {
@@ -940,7 +935,6 @@ describe("setEnvConfiguration", () => {
         subscribeToStepFunctionLogs: false,
         addExtension: true,
         enableTags: true,
-        injectLogContext: false,
         exclude: ["dd-excluded-function"],
         enableSourceCodeIntegration: true,
         uploadGitMetadata: false,
@@ -969,6 +963,75 @@ describe("setEnvConfiguration", () => {
         type: RuntimeType.NODE,
       },
     ]);
+  });
+
+  describe("DD_LOGS_INJECTION", () => {
+    const extensionConfig: Configuration = { ...defaultConfiguration, addExtension: true };
+    const makeHandlers = (environment: Record<string, any> = {}): FunctionInfo[] => [
+      { handler: { environment, events: [] }, name: "function", type: RuntimeType.NODE },
+    ];
+
+    it("respects an explicit `injectLogContext: true`", () => {
+      const handlers = makeHandlers();
+      setEnvConfiguration({ ...extensionConfig, injectLogContext: true }, handlers);
+      expect(handlers[0].handler.environment!.DD_LOGS_INJECTION).toBe(true);
+    });
+
+    it("respects a function-level DD_LOGS_INJECTION", () => {
+      const handlers = makeHandlers({ DD_LOGS_INJECTION: true });
+      setEnvConfiguration(extensionConfig, handlers);
+      expect(handlers[0].handler.environment!.DD_LOGS_INJECTION).toBe(true);
+    });
+
+    it("prefers a function-level DD_LOGS_INJECTION over `injectLogContext`", () => {
+      const handlers = makeHandlers({ DD_LOGS_INJECTION: "true" });
+      setEnvConfiguration({ ...extensionConfig, injectLogContext: false }, handlers);
+      expect(handlers[0].handler.environment!.DD_LOGS_INJECTION).toBe("true");
+    });
+
+    it("applies a provider-level DD_LOGS_INJECTION instead of the extension default", () => {
+      const handlers = makeHandlers();
+      setEnvConfiguration(extensionConfig, handlers, { DD_LOGS_INJECTION: true });
+      expect(handlers[0].handler.environment!.DD_LOGS_INJECTION).toBe(true);
+    });
+
+    it("prefers an explicit `injectLogContext` over a provider-level DD_LOGS_INJECTION", () => {
+      const handlers = makeHandlers();
+      setEnvConfiguration({ ...extensionConfig, injectLogContext: true }, handlers, { DD_LOGS_INJECTION: false });
+      expect(handlers[0].handler.environment!.DD_LOGS_INJECTION).toBe(true);
+    });
+
+    it("prefers an explicit `injectLogContext` over a provider-level DD_LOGS_INJECTION without the extension", () => {
+      const handlers = makeHandlers();
+      setEnvConfiguration({ ...extensionConfig, addExtension: false, injectLogContext: true }, handlers, {
+        DD_LOGS_INJECTION: false,
+      });
+      expect(handlers[0].handler.environment!.DD_LOGS_INJECTION).toBe(true);
+    });
+
+    it("prefers an explicit `injectLogContext: false` over a provider-level DD_LOGS_INJECTION: true", () => {
+      const handlers = makeHandlers();
+      setEnvConfiguration({ ...extensionConfig, injectLogContext: false }, handlers, { DD_LOGS_INJECTION: true });
+      expect(handlers[0].handler.environment!.DD_LOGS_INJECTION).toBe(false);
+    });
+
+    it("treats a null DD_LOGS_INJECTION as unset", () => {
+      const handlers = makeHandlers({ DD_LOGS_INJECTION: null });
+      setEnvConfiguration(extensionConfig, handlers, { DD_LOGS_INJECTION: null });
+      expect(handlers[0].handler.environment!.DD_LOGS_INJECTION).toBe(false);
+    });
+
+    it("handles a null provider environment", () => {
+      const handlers = makeHandlers();
+      setEnvConfiguration({ ...extensionConfig, injectLogContext: true }, handlers, null);
+      expect(handlers[0].handler.environment!.DD_LOGS_INJECTION).toBe(true);
+    });
+
+    it("defaults to true when the extension is not used", () => {
+      const handlers = makeHandlers();
+      setEnvConfiguration({ ...extensionConfig, addExtension: false }, handlers);
+      expect(handlers[0].handler.environment!.DD_LOGS_INJECTION).toBe(true);
+    });
   });
 
   it("does not define `DD_LOG_LEVEL` by default when logLevel is undefined", () => {
@@ -1433,7 +1496,6 @@ describe("setEnvConfiguration", () => {
         enableDDLogs: true,
         addExtension: true,
         enableTags: true,
-        injectLogContext: true,
         subscribeToAccessLogs: true,
         subscribeToExecutionLogs: false,
         subscribeToStepFunctionLogs: false,

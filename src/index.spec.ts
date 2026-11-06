@@ -399,6 +399,43 @@ describe("ServerlessPlugin", () => {
         },
       });
     });
+    describe("DD_LOGS_INJECTION", () => {
+      const makeServerless = (provider: Record<string, unknown>, datadog: Record<string, unknown> = {}) => ({
+        cli: { log: () => {} },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          provider: { region: "us-east-1", ...provider },
+          functions: { node1: { handler: "my-func.ev", runtime: "nodejs20.x" } },
+          custom: { datadog: { apiKey: 1234, ...datadog } },
+        },
+      });
+
+      it("does not crash when provider.environment is null", async () => {
+        mock({});
+        const serverless = makeServerless({ environment: null });
+        const plugin = new ServerlessPlugin(serverless, {});
+        await plugin.hooks["before:package:createDeploymentArtifacts"]();
+        expect((serverless.service.functions.node1 as any).environment.DD_LOGS_INJECTION).toBe(false);
+      });
+
+      it("leaves a provider-level DD_LOGS_INJECTION in effect with the extension", async () => {
+        mock({});
+        const serverless = makeServerless({ environment: { DD_LOGS_INJECTION: true } });
+        const plugin = new ServerlessPlugin(serverless, {});
+        await plugin.hooks["before:package:createDeploymentArtifacts"]();
+        expect((serverless.service.functions.node1 as any).environment.DD_LOGS_INJECTION).toBe(true);
+        expect(serverless.service.provider.environment).toEqual({ DD_LOGS_INJECTION: true });
+      });
+
+      it("sets DD_LOGS_INJECTION from injectLogContext with the extension", async () => {
+        mock({});
+        const serverless = makeServerless({}, { injectLogContext: true });
+        const plugin = new ServerlessPlugin(serverless, {});
+        await plugin.hooks["before:package:createDeploymentArtifacts"]();
+        expect((serverless.service.functions.node1 as any).environment.DD_LOGS_INJECTION).toBe(true);
+      });
+    });
   });
 
   it("Adds tracing layer for dotnet", async () => {
