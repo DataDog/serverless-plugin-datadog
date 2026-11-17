@@ -519,7 +519,6 @@ describe("setEnvConfiguration", () => {
       {
         handler: {
           environment: {
-            DD_API_KEY: "1234",
             DD_API_KEY_SECRET_ARN: "some-resource:from:aws:secrets-manager:arn",
             DD_API_KEY_SSM_ARN: "some-resource:from:aws:ssm:arn",
             DD_CAPTURE_LAMBDA_PAYLOAD: false,
@@ -539,7 +538,6 @@ describe("setEnvConfiguration", () => {
       {
         handler: {
           environment: {
-            DD_API_KEY: "1234",
             DD_API_KEY_SECRET_ARN: "some-resource:from:aws:secrets-manager:arn",
             DD_API_KEY_SSM_ARN: "some-resource:from:aws:ssm:arn",
             DD_CAPTURE_LAMBDA_PAYLOAD: false,
@@ -560,7 +558,6 @@ describe("setEnvConfiguration", () => {
       {
         handler: {
           environment: {
-            DD_API_KEY: "1234",
             DD_API_KEY_SECRET_ARN: "some-resource:from:aws:secrets-manager:arn",
             DD_API_KEY_SSM_ARN: "some-resource:from:aws:ssm:arn",
             DD_CAPTURE_LAMBDA_PAYLOAD: false,
@@ -580,7 +577,6 @@ describe("setEnvConfiguration", () => {
       {
         handler: {
           environment: {
-            DD_API_KEY: "1234",
             DD_API_KEY_SECRET_ARN: "some-resource:from:aws:secrets-manager:arn",
             DD_API_KEY_SSM_ARN: "some-resource:from:aws:ssm:arn",
             DD_CAPTURE_LAMBDA_PAYLOAD: false,
@@ -650,7 +646,6 @@ describe("setEnvConfiguration", () => {
       {
         handler: {
           environment: {
-            DD_API_KEY: "1234",
             DD_CAPTURE_LAMBDA_PAYLOAD: undefined,
             DD_FLUSH_TO_LOG: true,
             DD_KMS_API_KEY: "5678",
@@ -669,7 +664,6 @@ describe("setEnvConfiguration", () => {
       {
         handler: {
           environment: {
-            DD_API_KEY: "1234",
             DD_CAPTURE_LAMBDA_PAYLOAD: undefined,
             DD_FLUSH_TO_LOG: true,
             DD_KMS_API_KEY: "5678",
@@ -764,7 +758,6 @@ describe("setEnvConfiguration", () => {
       {
         handler: {
           environment: {
-            DD_API_KEY: "aaaa",
             DD_FLUSH_TO_LOG: false,
             DD_KMS_API_KEY: "bbbb",
             DD_LOGS_INJECTION: true,
@@ -889,7 +882,6 @@ describe("setEnvConfiguration", () => {
       {
         handler: {
           environment: {
-            DD_API_KEY: "1234",
             DD_KMS_API_KEY: "5678",
             DD_LOGS_INJECTION: false,
             DD_LOG_LEVEL: "debug",
@@ -948,7 +940,6 @@ describe("setEnvConfiguration", () => {
       {
         handler: {
           environment: {
-            DD_API_KEY: "1234",
             DD_KMS_API_KEY: "5678",
             DD_LOGS_INJECTION: false,
             DD_LOG_LEVEL: "debug",
@@ -1075,7 +1066,6 @@ describe("setEnvConfiguration", () => {
       {
         handler: {
           environment: {
-            DD_API_KEY: "1234",
             DD_KMS_API_KEY: "5678",
             DD_LOGS_INJECTION: false,
             DD_SERVERLESS_LOGS_ENABLED: true,
@@ -1132,7 +1122,6 @@ describe("setEnvConfiguration", () => {
       {
         handler: {
           environment: {
-            DD_API_KEY: "1234",
             DD_KMS_API_KEY: "5678",
             DD_LOGS_INJECTION: false,
             DD_SERVERLESS_LOGS_ENABLED: true,
@@ -1193,7 +1182,6 @@ describe("setEnvConfiguration", () => {
       {
         handler: {
           environment: {
-            DD_API_KEY: "1234",
             DD_KMS_API_KEY: "5678",
             DD_LOGS_INJECTION: false,
             DD_SERVERLESS_LOGS_ENABLED: true,
@@ -1568,7 +1556,6 @@ describe("setEnvConfiguration", () => {
       {
         handler: {
           environment: {
-            DD_API_KEY: "1234",
             DD_KMS_API_KEY: "5678",
             DD_LOGS_INJECTION: false,
             DD_SERVERLESS_LOGS_ENABLED: true,
@@ -1627,7 +1614,6 @@ describe("setEnvConfiguration", () => {
       {
         handler: {
           environment: {
-            DD_API_KEY: "1234",
             DD_KMS_API_KEY: "5678",
             DD_LOGS_INJECTION: false,
             DD_SERVERLESS_LOGS_ENABLED: true,
@@ -1686,7 +1672,6 @@ describe("setEnvConfiguration", () => {
       {
         handler: {
           environment: {
-            DD_API_KEY: "1234",
             DD_KMS_API_KEY: "5678",
             DD_LOGS_INJECTION: false,
             DD_SERVERLESS_LOGS_ENABLED: true,
@@ -1745,7 +1730,6 @@ describe("setEnvConfiguration", () => {
       {
         handler: {
           environment: {
-            DD_API_KEY: "1234",
             DD_KMS_API_KEY: "5678",
             DD_LOGS_INJECTION: false,
             DD_SERVERLESS_LOGS_ENABLED: true,
@@ -1804,7 +1788,6 @@ describe("setEnvConfiguration", () => {
       {
         handler: {
           environment: {
-            DD_API_KEY: "1234",
             DD_KMS_API_KEY: "5678",
             DD_LOGS_INJECTION: false,
             DD_SERVERLESS_LOGS_ENABLED: true,
@@ -1863,7 +1846,6 @@ describe("setEnvConfiguration", () => {
       {
         handler: {
           environment: {
-            DD_API_KEY: "1234",
             DD_KMS_API_KEY: "5678",
             DD_LOGS_INJECTION: false,
             DD_SERVERLESS_LOGS_ENABLED: true,

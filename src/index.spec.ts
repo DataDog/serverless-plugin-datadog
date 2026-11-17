@@ -640,7 +640,7 @@ describe("ServerlessPlugin", () => {
       process.env = {};
     });
 
-    it("throws error if API key, KMS API, and API key secret ARN are defined", async () => {
+    it("ignores apiKey when listing conflicting encrypted API key options", async () => {
       mock({});
       const serverless = {
         cli: {
@@ -678,89 +678,7 @@ describe("ServerlessPlugin", () => {
         }
       }
       expect(threwError).toBe(true);
-      expect(thrownErrorMessage).toEqual(
-        "`apiKey`, `apiKMSKey`, and `apiKeySecretArn` should not be set at the same time.",
-      );
-    });
-
-    it("throws error if both API key and KMS API key are defined", async () => {
-      mock({});
-      const serverless = {
-        cli: {
-          log: () => {},
-        },
-        service: {
-          provider: {
-            region: "us-east-1",
-          },
-          functions: {
-            node1: {
-              handler: "my-func.ev",
-              runtime: "nodejs20.x",
-            },
-          },
-          custom: {
-            datadog: {
-              apiKey: "1234",
-              apiKMSKey: "5678",
-            },
-          },
-        },
-      };
-
-      const plugin = new ServerlessPlugin(serverless, {});
-      let threwError: boolean = false;
-      let thrownErrorMessage: string | undefined;
-      try {
-        await plugin.hooks["before:package:createDeploymentArtifacts"]();
-      } catch (e) {
-        threwError = true;
-        if (e instanceof Error) {
-          thrownErrorMessage = e.message;
-        }
-      }
-      expect(threwError).toBe(true);
-      expect(thrownErrorMessage).toEqual("`apiKey` and `apiKMSKey` should not be set at the same time.");
-    });
-
-    it("throws error if both API key and API key secret ARN are defined", async () => {
-      mock({});
-      const serverless = {
-        cli: {
-          log: () => {},
-        },
-        service: {
-          provider: {
-            region: "us-east-1",
-          },
-          functions: {
-            node1: {
-              handler: "my-func.ev",
-              runtime: "nodejs20.x",
-            },
-          },
-          custom: {
-            datadog: {
-              apiKey: "1234",
-              apiKeySecretArn: "5678",
-            },
-          },
-        },
-      };
-
-      const plugin = new ServerlessPlugin(serverless, {});
-      let threwError: boolean = false;
-      let thrownErrorMessage: string | undefined;
-      try {
-        await plugin.hooks["before:package:createDeploymentArtifacts"]();
-      } catch (e) {
-        threwError = true;
-        if (e instanceof Error) {
-          thrownErrorMessage = e.message;
-        }
-      }
-      expect(threwError).toBe(true);
-      expect(thrownErrorMessage).toEqual("`apiKey` and `apiKeySecretArn` should not be set at the same time.");
+      expect(thrownErrorMessage).toEqual("`apiKMSKey` and `apiKeySecretArn` should not be set at the same time.");
     });
 
     it("throws error if both KMS API and API key secret ARN are defined", async () => {
@@ -968,6 +886,78 @@ describe("ServerlessPlugin", () => {
     expect(threwError).toBe(false);
   });
 
+  it("allows apiKey for monitors alongside apiKeySsmArn for the Lambda", async () => {
+    process.env = {};
+    mock({});
+    const functions = {
+      node1: {
+        handler: "my-func.ev",
+        runtime: "nodejs20.x",
+      },
+    } as Record<string, any>;
+    const serverless = {
+      cli: {
+        log: () => {},
+      },
+      getProvider: (_name: string) => awsMock(),
+      service: {
+        getServiceName: () => "dev",
+        provider: {
+          region: "us-east-1",
+        },
+        functions,
+        getFunction: (name: string) => functions[name],
+        getAllFunctions: () => Object.keys(functions),
+        custom: {
+          datadog: {
+            addExtension: true,
+            addLayers: false,
+            apiKey: "plain-text-key",
+            apiKeySsmArn: "arn:aws:ssm:us-east-1:123456789012:parameter/datadog/api-key",
+            appKey: "app-key",
+            monitors: true,
+          },
+        },
+      },
+    };
+
+    const plugin = new ServerlessPlugin(serverless, {});
+    await plugin.hooks["before:package:createDeploymentArtifacts"]();
+    expect(functions.node1.environment.DD_API_KEY_SSM_ARN).toEqual(
+      "arn:aws:ssm:us-east-1:123456789012:parameter/datadog/api-key",
+    );
+    expect(functions.node1.environment.DD_API_KEY).toBeUndefined();
+  });
+
+  it("allows monitors with DATADOG_API_KEY from the environment and appKey from config", async () => {
+    process.env = { DATADOG_API_KEY: "1234" };
+    mock({});
+    const serverless = {
+      cli: {
+        log: () => {},
+      },
+      getProvider: (_name: string) => awsMock(),
+      service: {
+        getServiceName: () => "dev",
+        provider: {
+          region: "us-east-1",
+        },
+        functions: {},
+        custom: {
+          datadog: {
+            addExtension: true,
+            apiKeySsmArn: "arn:aws:ssm:us-east-1:123456789012:parameter/datadog/api-key",
+            appKey: "5678",
+            monitors: true,
+          },
+        },
+      },
+    };
+
+    const plugin = new ServerlessPlugin(serverless, {});
+    await expect(plugin.hooks["before:package:createDeploymentArtifacts"]()).resolves.not.toThrow();
+  });
+
   it("allows use of monitorsApiKey and monitorsAppKey to create a lambda with monitors", async () => {
     mock({});
     const serverless = {
@@ -1082,7 +1072,7 @@ describe("ServerlessPlugin", () => {
       const plugin = new ServerlessPlugin(serverless, {});
       await expect(plugin.hooks["before:deploy:deploy"]()).resolves.not.toThrow();
       expect(logs).toContain(
-        "When `monitors` is enabled, `DATADOG_API_KEY` and `DATADOG_APP_KEY` environment variables must be set.",
+        "When `monitors` is enabled, set an API key (`apiKey` or `DATADOG_API_KEY`) and an app key (`appKey` or `DATADOG_APP_KEY`).",
       );
     });
   });
@@ -1126,7 +1116,7 @@ describe("ServerlessPlugin", () => {
     }
     expect(threwError).toBe(true);
     expect(thrownErrorMessage).toEqual(
-      "When `monitors` is enabled, `DATADOG_API_KEY` and `DATADOG_APP_KEY` environment variables must be set.",
+      "When `monitors` is enabled, set an API key (`apiKey` or `DATADOG_API_KEY`) and an app key (`appKey` or `DATADOG_APP_KEY`).",
     );
   });
 
