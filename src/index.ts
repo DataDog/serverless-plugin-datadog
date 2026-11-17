@@ -669,9 +669,8 @@ function validateConfiguration(config: Configuration): void {
   }
   if (config.monitors) {
     if (
-      (process.env.DATADOG_API_KEY === undefined || process.env.DATADOG_APP_KEY === undefined) &&
-      // Support deprecated monitorsApiKey and monitorsAppKey
-      (config.apiKey === undefined || config.appKey === undefined) &&
+      ((config.apiKey ?? process.env.DATADOG_API_KEY) === undefined ||
+        (config.appKey ?? process.env.DATADOG_APP_KEY) === undefined) &&
       (config.testingMode === false || config.integrationTesting === false)
     ) {
       throw new Error(
@@ -682,7 +681,8 @@ function validateConfiguration(config: Configuration): void {
 }
 
 function checkForMultipleApiKeys(config: Configuration): void {
-  const definedKeys = ["apiKey", "apiKMSKey", "apiKeySecretArn", "apiKeySsmArn"]
+  // `apiKey` can be combined with one of these; it is then used only for deploy-time API calls
+  const definedKeys = ["apiKMSKey", "apiKeySecretArn", "apiKeySsmArn"]
     .filter((key) => key in config)
     .map((key) => `\`${key}\``);
 
