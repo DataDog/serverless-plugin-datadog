@@ -256,7 +256,7 @@ module.exports = class ServerlessPlugin {
 
     if (config.enableSourceCodeIntegration) {
       this.logToCliOnce(`Adding source code integration`);
-      if ((process.env.DATADOG_API_KEY ?? config.apiKey) === undefined) {
+      if ((config.apiKey ?? process.env.DATADOG_API_KEY) === undefined) {
         let keyError;
         if (config.apiKeySecretArn) {
           keyError = "encrypted credentials through KMS/Secrets Manager is not supported for this integration";
@@ -275,7 +275,7 @@ module.exports = class ServerlessPlugin {
             });
             if (config.uploadGitMetadata) {
               this.logToCliOnce(`Uploading git metadata`);
-              await uploadGitCommitHash((process.env.DATADOG_API_KEY ?? config.apiKey)!, config.site);
+              await uploadGitCommitHash((config.apiKey ?? process.env.DATADOG_API_KEY)!, config.site);
             }
           } catch (err) {
             this.logToCliOnce(`Error occurred when adding source code integration: ${err}`);
