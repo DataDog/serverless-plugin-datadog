@@ -142,7 +142,7 @@ There are seven recommended monitors with default values pre-configured.
 
 To create a recommended monitor, you must use its respective serverless monitor ID. You must also provide a Datadog API key and app key, using either the `apiKey` and `appKey` parameters or the `DATADOG_API_KEY` and `DATADOG_APP_KEY` environment variables.
 
-To keep the plain-text API key off your Lambda functions, set `apiKeySecretArn`, `apiKeySsmArn`, or `apiKMSKey` alongside `apiKey`. The Lambda functions use the encrypted option, and the plugin uses `apiKey` only to create monitors:
+To keep the plain-text API key off your Lambda functions, set `apiKeySecretArn`, `apiKeySsmArn`, or `apiKMSKey` alongside `apiKey`. The Lambda functions use the encrypted option, and the plugin uses `apiKey` only for deploy-time API calls, such as creating monitors:
 
 ```yaml
 custom:

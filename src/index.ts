@@ -129,7 +129,7 @@ module.exports = class ServerlessPlugin {
     configHasOldProperties(config as unknown as Record<string, unknown>);
     if (config.monitorsApiKey !== undefined || config.monitorsAppKey !== undefined) {
       this.serverless.cli.log(
-        "Warning: `monitorsApiKey` and `monitorsAppKey` have been deprecated. Please set DATADOG_API_KEY and DATADOG_APP_KEY in your environment instead.",
+        "Warning: `monitorsApiKey` and `monitorsAppKey` have been deprecated. Please use `apiKey` and `appKey`, or set DATADOG_API_KEY and DATADOG_APP_KEY in your environment, instead.",
       );
     }
     validateConfiguration(config);
@@ -674,7 +674,7 @@ function validateConfiguration(config: Configuration): void {
       (config.testingMode === false || config.integrationTesting === false)
     ) {
       throw new Error(
-        "When `monitors` is enabled, `DATADOG_API_KEY` and `DATADOG_APP_KEY` environment variables must be set.",
+        "When `monitors` is enabled, set an API key (`apiKey` or `DATADOG_API_KEY`) and an app key (`appKey` or `DATADOG_APP_KEY`).",
       );
     }
   }

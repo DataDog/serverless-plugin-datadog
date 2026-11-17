@@ -1072,7 +1072,7 @@ describe("ServerlessPlugin", () => {
       const plugin = new ServerlessPlugin(serverless, {});
       await expect(plugin.hooks["before:deploy:deploy"]()).resolves.not.toThrow();
       expect(logs).toContain(
-        "When `monitors` is enabled, `DATADOG_API_KEY` and `DATADOG_APP_KEY` environment variables must be set.",
+        "When `monitors` is enabled, set an API key (`apiKey` or `DATADOG_API_KEY`) and an app key (`appKey` or `DATADOG_APP_KEY`).",
       );
     });
   });
@@ -1116,7 +1116,7 @@ describe("ServerlessPlugin", () => {
     }
     expect(threwError).toBe(true);
     expect(thrownErrorMessage).toEqual(
-      "When `monitors` is enabled, `DATADOG_API_KEY` and `DATADOG_APP_KEY` environment variables must be set.",
+      "When `monitors` is enabled, set an API key (`apiKey` or `DATADOG_API_KEY`) and an app key (`appKey` or `DATADOG_APP_KEY`).",
     );
   });
 
