@@ -2349,3 +2349,77 @@ describe("setEnvConfiguration", () => {
     });
   });
 });
+
+describe("Java tracer AppSec", () => {
+  const config = { ...defaultConfiguration, appSecMode: "on" as const };
+  function java(environment: Record<string, any> = {}): FunctionInfo[] {
+    return [{ name: "java", type: RuntimeType.JAVA, runtime: "java21", handler: { events: [], environment } }];
+  }
+  it.each(["on", "tracer"] as const)("enables tracer WAF and disables extension WAF in %s mode", (appSecMode) => {
+    const handlers = java();
+    setEnvConfiguration({ ...config, appSecMode }, handlers);
+    expect(handlers[0].handler.environment).toMatchObject({
+      DD_APPSEC_ENABLED: true,
+      DD_SERVERLESS_APPSEC_ENABLED: false,
+      AWS_LAMBDA_EXEC_WRAPPER: "/opt/datadog_wrapper",
+    });
+  });
+  it.each([{ addLayers: false }, { addExtension: false }, { addLayers: false, addExtension: false }])(
+    "keeps automatic Java mode on the extension when instrumentation is manual: %j",
+    (manual) => {
+      const handlers = java();
+      setEnvConfiguration({ ...config, ...manual }, handlers);
+      expect(handlers[0].handler.environment).toMatchObject({ DD_SERVERLESS_APPSEC_ENABLED: true });
+      expect(handlers[0].handler.environment).not.toHaveProperty("DD_APPSEC_ENABLED");
+    },
+  );
+  it.each([{ addLayers: false }, { addExtension: false }, { useLayersFromAccount: "123456789012" }])(
+    "allows explicit tracer mode with user-managed instrumentation, like Python: %j",
+    (manual) => {
+      const handlers = java();
+      setEnvConfiguration({ ...config, ...manual, appSecMode: "tracer" }, handlers);
+      expect(handlers[0].handler.environment).toMatchObject({
+        DD_APPSEC_ENABLED: true,
+        DD_SERVERLESS_APPSEC_ENABLED: false,
+      });
+    },
+  );
+  it.each([{ useLayersFromAccount: "123456789012" }])(
+    "allows plugin-managed layers from another account: %j",
+    (overrides) => {
+      const handlers = java();
+      setEnvConfiguration({ ...config, ...overrides }, handlers);
+      expect(handlers[0].handler.environment).toMatchObject({
+        DD_APPSEC_ENABLED: true,
+        DD_SERVERLESS_APPSEC_ENABLED: false,
+      });
+    },
+  );
+  it.each([true, "true", false, "false", { Ref: "ExtensionWaf" }])(
+    "overrides function and provider extension WAF settings: %j",
+    (value) => {
+      for (const handlers of [java({ DD_SERVERLESS_APPSEC_ENABLED: value }), java()]) {
+        setEnvConfiguration(config, handlers, { DD_SERVERLESS_APPSEC_ENABLED: value });
+        expect(handlers[0].handler.environment).toMatchObject({
+          DD_APPSEC_ENABLED: true,
+          DD_SERVERLESS_APPSEC_ENABLED: false,
+        });
+      }
+    },
+  );
+  it.each([{ appSecMode: "extension" as const }, { appSecMode: undefined, enableASM: true }])(
+    "preserves explicit legacy mode: %j",
+    (legacy) => {
+      const handlers = java();
+      setEnvConfiguration({ ...config, ...legacy }, handlers);
+      expect(handlers[0].handler.environment).toMatchObject({ DD_SERVERLESS_APPSEC_ENABLED: true });
+      expect(handlers[0].handler.environment).not.toHaveProperty("DD_APPSEC_ENABLED");
+    },
+  );
+  it("keeps disabled AppSec untouched and rejects disabled tracing", () => {
+    const handlers = java();
+    setEnvConfiguration({ ...config, appSecMode: "off" }, handlers);
+    expect(handlers[0].handler.environment).not.toHaveProperty("DD_APPSEC_ENABLED");
+    expect(() => setEnvConfiguration({ ...config, enableDDTracing: false }, java())).toThrow("enableDDTracing");
+  });
+});

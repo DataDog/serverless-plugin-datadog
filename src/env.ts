@@ -184,7 +184,7 @@ export const ddTagsEnvVar = "DD_TAGS";
 const AWS_LAMBDA_EXEC_WRAPPER_VAR = "AWS_LAMBDA_EXEC_WRAPPER";
 const AWS_LAMBDA_EXEC_WRAPPER = "/opt/datadog_wrapper";
 
-const IN_TRACER_APPSEC_SUPPORTED_RUNTIMES = [RuntimeType.PYTHON];
+const IN_TRACER_APPSEC_SUPPORTED_RUNTIMES = [RuntimeType.PYTHON, RuntimeType.JAVA];
 
 export const defaultConfiguration: Configuration = {
   addLayers: true,
@@ -285,16 +285,22 @@ export function setEnvConfiguration(
 
       if (config.appSecMode === "tracer" && !IN_TRACER_APPSEC_SUPPORTED_RUNTIMES.includes(type)) {
         throw new Error(
-          `\`appSecMode\` is set to \`tracer\`. This requires the function to be a Python runtime. Found: ${type}`,
+          `\`appSecMode\` is set to \`tracer\`. This requires the function to be a Python or Java runtime. Found: ${type}`,
         );
       }
 
       if (
-        (config.appSecMode === "on" && IN_TRACER_APPSEC_SUPPORTED_RUNTIMES.includes(type) && config.addLayers) ||
+        (config.appSecMode === "on" &&
+          IN_TRACER_APPSEC_SUPPORTED_RUNTIMES.includes(type) &&
+          config.addLayers &&
+          (type !== RuntimeType.JAVA || config.addExtension)) ||
         config.appSecMode === "tracer"
-      )
+      ) {
+        if (type === RuntimeType.JAVA) {
+          environment[ddServerlessAppsecEnabledEnvVar] = false;
+        }
         environment[ddAppsecEnabledEnvVar] = true;
-      else if (config.appSecMode === "on" || config.appSecMode === "extension") {
+      } else if (config.appSecMode === "on" || config.appSecMode === "extension") {
         environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] ??= AWS_LAMBDA_EXEC_WRAPPER;
         environment[ddServerlessAppsecEnabledEnvVar] = true;
       }
