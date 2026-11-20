@@ -43,6 +43,7 @@ import {
   applyLambdaLibraryLayers,
   findHandlers,
   FunctionInfo,
+  getLowMemoryWarnings,
   RuntimeType,
   getDefaultIsFIPSEnabledFlag,
 } from "./layer";
@@ -136,6 +137,13 @@ module.exports = class ServerlessPlugin {
 
     const defaultRuntime = this.serverless.service.provider.runtime;
     const handlers = findHandlers(this.serverless.service, config.exclude, defaultRuntime);
+
+    // Warn only: low-memory functions are still instrumented as before.
+    if (config.suppressLowMemoryWarning !== true) {
+      for (const warning of getLowMemoryWarnings(this.serverless.service, handlers)) {
+        this.logToCliOnce(`Warning: ${warning}`);
+      }
+    }
 
     // Don't assign `provider.environment` here: without the extension nothing else creates it, and an empty one
     // would add an Environment block to excluded functions. (addDDEnvVars creates it when the extension is used.)

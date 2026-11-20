@@ -85,6 +85,47 @@ export function findHandlers(service: Service, exclude: string[], defaultRuntime
     ) as FunctionInfo[];
 }
 
+// Functions with less memory than this can run out of memory or time out once the Datadog
+// Lambda Extension and tracer layers are added (about 70 MB of overhead for Python).
+export const LOW_MEMORY_THRESHOLD_MB = 256;
+export const LOW_MEMORY_REASON = "lambda_low_memory";
+// Serverless Framework v1 through v4 default `memorySize` to 1024 MB when neither the
+// function nor the provider sets it.
+export const SERVERLESS_DEFAULT_MEMORY_SIZE_MB = 1024;
+
+/**
+ * Returns the memory size the function is deployed with: `functions.<fn>.memorySize`, then
+ * `provider.memorySize`, then the Serverless Framework default. Returns undefined when the
+ * value is not a plain number (for example, an unresolved variable or an object).
+ */
+export function getEffectiveMemorySize(service: Service, handler: FunctionInfo): number | undefined {
+  const memorySize: unknown =
+    handler.handler.memorySize ??
+    (service.provider as unknown as { memorySize?: unknown }).memorySize ??
+    SERVERLESS_DEFAULT_MEMORY_SIZE_MB;
+  return typeof memorySize === "number" && Number.isFinite(memorySize) ? memorySize : undefined;
+}
+
+/**
+ * Returns a warning for each instrumented function with less than LOW_MEMORY_THRESHOLD_MB of memory.
+ * Functions with an unsupported runtime get no Datadog layers, so they are skipped.
+ */
+export function getLowMemoryWarnings(service: Service, handlers: FunctionInfo[]): string[] {
+  const warnings: string[] = [];
+  for (const handler of handlers) {
+    if (handler.type === RuntimeType.UNSUPPORTED) {
+      continue;
+    }
+    const memorySize = getEffectiveMemorySize(service, handler);
+    if (memorySize !== undefined && memorySize < LOW_MEMORY_THRESHOLD_MB) {
+      warnings.push(
+        `Function ${handler.name} has ${memorySize} MB of memory, below the recommended minimum of ${LOW_MEMORY_THRESHOLD_MB} MB (${LOW_MEMORY_REASON}). The Datadog Lambda Extension and tracer add memory overhead (about 70 MB for Python), which can cause out-of-memory errors and timeouts. Increase the function's memory to at least ${LOW_MEMORY_THRESHOLD_MB} MB, or set custom.datadog.suppressLowMemoryWarning to true to silence this warning.`,
+      );
+    }
+  }
+  return warnings;
+}
+
 /**
  * Normalize the runtime in the yml to match our layers.json keys
  * For most runtimes the key in layers.json is the same as the string set in the

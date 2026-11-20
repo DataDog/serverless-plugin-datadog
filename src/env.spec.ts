@@ -193,6 +193,7 @@ describe("getConfig", () => {
       subscribeToAccessLogs: true,
       subscribeToExecutionLogs: false,
       subscribeToStepFunctionLogs: false,
+      suppressLowMemoryWarning: false,
       enableSourceCodeIntegration: true,
       uploadGitMetadata: true,
       failOnError: false,
@@ -234,6 +235,7 @@ describe("getConfig", () => {
       subscribeToAccessLogs: true,
       subscribeToExecutionLogs: false,
       subscribeToStepFunctionLogs: false,
+      suppressLowMemoryWarning: false,
       enableSourceCodeIntegration: true,
       uploadGitMetadata: true,
       failOnError: false,
@@ -275,6 +277,7 @@ describe("getConfig", () => {
       subscribeToAccessLogs: true,
       subscribeToExecutionLogs: false,
       subscribeToStepFunctionLogs: false,
+      suppressLowMemoryWarning: false,
       customHandler: "/src/custom-handler.handler",
       enableSourceCodeIntegration: true,
       uploadGitMetadata: true,
@@ -318,6 +321,7 @@ it("disable source code integration", () => {
     subscribeToAccessLogs: true,
     subscribeToExecutionLogs: false,
     subscribeToStepFunctionLogs: false,
+    suppressLowMemoryWarning: false,
     enableSourceCodeIntegration: false,
     uploadGitMetadata: true,
     failOnError: false,
@@ -359,6 +363,7 @@ it("disable git metadata upload", () => {
     subscribeToAccessLogs: true,
     subscribeToExecutionLogs: false,
     subscribeToStepFunctionLogs: false,
+    suppressLowMemoryWarning: false,
     enableSourceCodeIntegration: true,
     uploadGitMetadata: false,
     failOnError: false,
@@ -2347,5 +2352,16 @@ describe("setEnvConfiguration", () => {
         },
       ]);
     });
+  });
+});
+
+describe("suppressLowMemoryWarning", () => {
+  it("defaults to false", () => {
+    expect(getConfig({ custom: {} } as any).suppressLowMemoryWarning).toBe(false);
+  });
+
+  it("can be set to true", () => {
+    const result = getConfig({ custom: { datadog: { suppressLowMemoryWarning: true } } } as any);
+    expect(result.suppressLowMemoryWarning).toBe(true);
   });
 });
