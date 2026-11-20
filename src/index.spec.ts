@@ -632,7 +632,7 @@ describe("ServerlessPlugin", () => {
 
   describe("low-memory warning", () => {
     const lowMemoryWarning = (name: string, memorySize: number) =>
-      `Warning: Function ${name} has ${memorySize} MB of memory, below the recommended minimum of 256 MB (lambda_low_memory). The Datadog Lambda Extension and tracer add memory overhead (about 69 MB for Python), which can cause out-of-memory errors and timeouts. Increase the function's memory to at least 256 MB, or set custom.datadog.suppressLowMemoryWarning to true to silence this warning.`;
+      `Warning: Function ${name} has ${memorySize} MB of memory, below the recommended minimum of 256 MB (lambda_low_memory). The Datadog Lambda Extension and tracer add memory overhead (about 70 MB for Python), which can cause out-of-memory errors and timeouts. Increase the function's memory to at least 256 MB, or set custom.datadog.suppressLowMemoryWarning to true to silence this warning.`;
 
     afterEach(() => {
       mock.restore();
