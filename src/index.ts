@@ -129,7 +129,7 @@ module.exports = class ServerlessPlugin {
     configHasOldProperties(config as unknown as Record<string, unknown>);
     if (config.monitorsApiKey !== undefined || config.monitorsAppKey !== undefined) {
       this.serverless.cli.log(
-        "Warning: `monitorsApiKey` and `monitorsAppKey` have been deprecated. Please set DATADOG_API_KEY and DATADOG_APP_KEY in your environment instead.",
+        "Warning: `monitorsApiKey` and `monitorsAppKey` have been deprecated. Please use `apiKey` and `appKey`, or set DATADOG_API_KEY and DATADOG_APP_KEY in your environment, instead.",
       );
     }
     validateConfiguration(config);
@@ -256,7 +256,7 @@ module.exports = class ServerlessPlugin {
 
     if (config.enableSourceCodeIntegration) {
       this.logToCliOnce(`Adding source code integration`);
-      if ((process.env.DATADOG_API_KEY ?? config.apiKey) === undefined) {
+      if ((config.apiKey ?? process.env.DATADOG_API_KEY) === undefined) {
         let keyError;
         if (config.apiKeySecretArn) {
           keyError = "encrypted credentials through KMS/Secrets Manager is not supported for this integration";
@@ -275,7 +275,7 @@ module.exports = class ServerlessPlugin {
             });
             if (config.uploadGitMetadata) {
               this.logToCliOnce(`Uploading git metadata`);
-              await uploadGitCommitHash((process.env.DATADOG_API_KEY ?? config.apiKey)!, config.site);
+              await uploadGitCommitHash((config.apiKey ?? process.env.DATADOG_API_KEY)!, config.site);
             }
           } catch (err) {
             this.logToCliOnce(`Error occurred when adding source code integration: ${err}`);
@@ -669,20 +669,20 @@ function validateConfiguration(config: Configuration): void {
   }
   if (config.monitors) {
     if (
-      (process.env.DATADOG_API_KEY === undefined || process.env.DATADOG_APP_KEY === undefined) &&
-      // Support deprecated monitorsApiKey and monitorsAppKey
-      (config.apiKey === undefined || config.appKey === undefined) &&
+      ((config.apiKey ?? process.env.DATADOG_API_KEY) === undefined ||
+        (config.appKey ?? process.env.DATADOG_APP_KEY) === undefined) &&
       (config.testingMode === false || config.integrationTesting === false)
     ) {
       throw new Error(
-        "When `monitors` is enabled, `DATADOG_API_KEY` and `DATADOG_APP_KEY` environment variables must be set.",
+        "When `monitors` is enabled, set an API key (`apiKey` or `DATADOG_API_KEY`) and an app key (`appKey` or `DATADOG_APP_KEY`).",
       );
     }
   }
 }
 
 function checkForMultipleApiKeys(config: Configuration): void {
-  const definedKeys = ["apiKey", "apiKMSKey", "apiKeySecretArn", "apiKeySsmArn"]
+  // `apiKey` can be combined with one of these; it is then used only for deploy-time API calls
+  const definedKeys = ["apiKMSKey", "apiKeySecretArn", "apiKeySsmArn"]
     .filter((key) => key in config)
     .map((key) => `\`${key}\``);
 

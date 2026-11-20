@@ -222,27 +222,21 @@ export function setEnvConfiguration(
 ): void {
   // `provider.environment` can be null in serverless.yml (an empty `environment:` key).
   const providerEnv = providerEnvironment ?? {};
+  const usesEncryptedApiKey =
+    config.apiKMSKey !== undefined || config.apiKeySecretArn !== undefined || config.apiKeySsmArn !== undefined;
   handlers.forEach(({ handler, type }) => {
     handler.environment ??= {};
     const environment = handler.environment as Record<string, unknown>;
     const functionName = handler.name ?? "";
-    if (
-      process.env.DATADOG_API_KEY !== undefined &&
-      environment[apiKeyEnvVar] === undefined &&
-      // Only set this from the environment if all other methods of authentication
-      // are not in use. This will set DATADOG_API_KEY on the lambda from the environment
-      // variable directly if they haven't set one of the below four options
-      // in the configuration.
-      config.apiKMSKey === undefined &&
-      config.apiKey === undefined &&
-      config.apiKeySecretArn === undefined &&
-      config.apiKeySsmArn === undefined
-    ) {
-      environment[apiKeyEnvVar] = process.env.DATADOG_API_KEY;
-      logMessage("Using DATADOG_API_KEY environment variable for authentication");
-    }
-    if (config.apiKey !== undefined && environment[apiKeyEnvVar] === undefined) {
-      environment[apiKeyEnvVar] = config.apiKey;
+    // A plain-text key only goes on the Lambda when no encrypted option is set.
+    // Otherwise, `apiKey` and DATADOG_API_KEY are used only for deploy-time API calls.
+    if (!usesEncryptedApiKey && environment[apiKeyEnvVar] === undefined) {
+      if (config.apiKey !== undefined) {
+        environment[apiKeyEnvVar] = config.apiKey;
+      } else if (process.env.DATADOG_API_KEY !== undefined) {
+        environment[apiKeyEnvVar] = process.env.DATADOG_API_KEY;
+        logMessage("Using DATADOG_API_KEY environment variable for authentication");
+      }
     }
     if (config.apiKMSKey !== undefined && environment[apiKeyKMSEnvVar] === undefined) {
       environment[apiKeyKMSEnvVar] = config.apiKMSKey;
