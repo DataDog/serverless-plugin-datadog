@@ -730,6 +730,43 @@ describe("ServerlessPlugin", () => {
       expect(logs.filter((log) => log.includes("lambda_low_memory"))).toEqual([lowMemoryWarning("python2", 128)]);
     });
 
+    it("does not warn when addLayers and addExtension are both false", async () => {
+      const { logs, serverless } = await runBeforePackage(
+        { python1: { handler: "my-func.ev", runtime: "python3.12", memorySize: 128 } },
+        {},
+        { addLayers: false, addExtension: false, flushMetricsToLogs: true },
+      );
+      expect(logs.filter((log) => log.includes("lambda_low_memory"))).toEqual([]);
+      expect(serverless.service.functions.python1.layers).toBeUndefined();
+    });
+
+    it("does not warn for Java or .NET functions when addExtension is false", async () => {
+      const { logs, serverless } = await runBeforePackage(
+        {
+          java1: { handler: "my-func.ev", runtime: "java21", memorySize: 128 },
+          dotnet1: { handler: "my-func.ev", runtime: "dotnet8", memorySize: 128 },
+          python1: { handler: "my-func.ev", runtime: "python3.12", memorySize: 128 },
+        },
+        {},
+        { addExtension: false, flushMetricsToLogs: true },
+      );
+      expect(logs.filter((log) => log.includes("lambda_low_memory"))).toEqual([lowMemoryWarning("python1", 128)]);
+      expect(serverless.service.functions.java1.layers).toBeUndefined();
+      expect(serverless.service.functions.dotnet1.layers).toBeUndefined();
+    });
+
+    it("warns when addLayers is false but the extension is added", async () => {
+      const { logs, serverless } = await runBeforePackage(
+        { python1: { handler: "my-func.ev", runtime: "python3.12", memorySize: 128 } },
+        {},
+        { addLayers: false },
+      );
+      expect(logs).toContain(lowMemoryWarning("python1", 128));
+      expect(serverless.service.functions.python1.layers).toEqual([
+        expect.stringMatching(/arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:.*/),
+      ]);
+    });
+
     it("does not warn when the plugin is disabled", async () => {
       const { logs } = await runBeforePackage(
         { python1: { handler: "my-func.ev", runtime: "python3.12", memorySize: 128 } },

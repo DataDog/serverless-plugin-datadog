@@ -107,8 +107,9 @@ export function getEffectiveMemorySize(service: Service, handler: FunctionInfo):
 }
 
 /**
- * Returns a warning for each instrumented function with less than LOW_MEMORY_THRESHOLD_MB of memory.
- * Functions with an unsupported runtime get no Datadog layers, so they are skipped.
+ * Returns a warning for each given function with less than LOW_MEMORY_THRESHOLD_MB of memory.
+ * Pass only the functions that received a Datadog layer (the handlers returned by
+ * applyLambdaLibraryLayers and applyExtensionLayer). Unsupported runtimes are skipped.
  */
 export function getLowMemoryWarnings(service: Service, handlers: FunctionInfo[]): string[] {
   const warnings: string[] = [];
@@ -150,6 +151,7 @@ export function normalizeRuntimeKey(runtimeSetting: string): string {
  * @param accountId optional account ID that the layers live in - undefined
  *        unless the customer sets a value for useLayersFromAccount in yaml
  * @param isUsingExtension whether to install the Datadog Lambda Extension as a layer
+ * @returns the handlers that a library layer was added to
  */
 export function applyLambdaLibraryLayers(
   service: Service,
@@ -157,13 +159,14 @@ export function applyLambdaLibraryLayers(
   layers: LayerJSON,
   accountId?: string,
   isUsingExtension = true,
-): void {
+): FunctionInfo[] {
   const { region } = service.provider;
   // It's possible a local account layer is being used in a region we have not published to so we use a default region's ARNs
   const shouldUseDefaultRegion = layers.regions[region] === undefined && accountId !== undefined;
   const regionRuntimes = shouldUseDefaultRegion ? layers.regions[DEFAULT_REGION] : layers.regions[region];
+  const layeredHandlers: FunctionInfo[] = [];
   if (regionRuntimes === undefined) {
-    return;
+    return layeredHandlers;
   }
 
   for (const handler of handlers) {
@@ -222,23 +225,31 @@ export function applyLambdaLibraryLayers(
 
     if (layerARN) {
       addLayer(service, handler, layerARN);
+      layeredHandlers.push(handler);
     }
   }
+  return layeredHandlers;
 }
 
+/**
+ * Add the Datadog Lambda Extension layer for each handler's architecture
+ *
+ * @returns the handlers that the extension layer was added to
+ */
 export function applyExtensionLayer(
   service: Service,
   handlers: FunctionInfo[],
   layers: LayerJSON,
   accountId?: string,
   isFIPSEnabled: boolean = false,
-): void {
+): FunctionInfo[] {
   const { region } = service.provider;
   // It's possible a local account layer is being used in a region we have not published to so we use a default region's ARNs
   const shouldUseDefaultRegion = layers.regions[region] === undefined && accountId !== undefined;
   const regionRuntimes = shouldUseDefaultRegion ? layers.regions[DEFAULT_REGION] : layers.regions[region];
+  const layeredHandlers: FunctionInfo[] = [];
   if (regionRuntimes === undefined) {
-    return;
+    return layeredHandlers;
   }
 
   for (const handler of handlers) {
@@ -271,8 +282,10 @@ export function applyExtensionLayer(
 
     if (extensionARN) {
       addLayer(service, handler, extensionARN);
+      layeredHandlers.push(handler);
     }
   }
+  return layeredHandlers;
 }
 
 export function pushLayerARN(layerARN: string, currentLayers: string[]): string[] {
