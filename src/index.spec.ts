@@ -630,6 +630,153 @@ describe("ServerlessPlugin", () => {
     });
   });
 
+  describe("low-memory warning", () => {
+    const lowMemoryWarning = (name: string, memorySize: number) =>
+      `Warning: Function ${name} has ${memorySize} MB of memory, below the recommended minimum of 256 MB (lambda_low_memory). The Datadog Lambda Extension and tracer add memory overhead (about 70 MB for Python), which can cause out-of-memory errors and timeouts. Increase the function's memory to at least 256 MB, or set custom.datadog.suppressLowMemoryWarning to true to silence this warning.`;
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    async function runBeforePackage(
+      functions: Record<string, Record<string, unknown>>,
+      provider: Record<string, unknown> = {},
+      datadog: Record<string, unknown> = {},
+    ): Promise<{ logs: string[]; serverless: any }> {
+      mock({});
+      const logs: string[] = [];
+      const serverless = {
+        cli: { log: (message: string) => logs.push(message) },
+        getProvider: (_name: string) => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          provider: { region: "us-east-1", ...provider },
+          functions,
+          custom: { datadog: { apiKey: 1234, ...datadog } },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
+      return { logs, serverless };
+    }
+
+    it("warns for a function below 256 MB and still instruments it", async () => {
+      const { logs, serverless } = await runBeforePackage({
+        python1: { handler: "my-func.ev", runtime: "python3.12", memorySize: 128 },
+      });
+      expect(logs).toContain(lowMemoryWarning("python1", 128));
+      expect(serverless.service.functions.python1.layers).toEqual([
+        expect.stringMatching(/arn:aws:lambda:us-east-1:.*:layer:Datadog-Python312:.*/),
+        expect.stringMatching(/arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:.*/),
+      ]);
+    });
+
+    it("does not warn for a function with exactly 256 MB", async () => {
+      const { logs } = await runBeforePackage({
+        python1: { handler: "my-func.ev", runtime: "python3.12", memorySize: 256 },
+      });
+      expect(logs.filter((log) => log.includes("lambda_low_memory"))).toEqual([]);
+    });
+
+    it("inherits provider.memorySize when the function doesn't set it", async () => {
+      const { logs } = await runBeforePackage(
+        {
+          python1: { handler: "my-func.ev", runtime: "python3.12" },
+          python2: { handler: "my-func.ev", runtime: "python3.12", memorySize: 512 },
+        },
+        { memorySize: 128 },
+      );
+      expect(logs.filter((log) => log.includes("lambda_low_memory"))).toEqual([lowMemoryWarning("python1", 128)]);
+    });
+
+    it("does not warn when memorySize is unset (Serverless default of 1024 MB)", async () => {
+      const { logs } = await runBeforePackage({
+        python1: { handler: "my-func.ev", runtime: "python3.12" },
+      });
+      expect(logs.filter((log) => log.includes("lambda_low_memory"))).toEqual([]);
+    });
+
+    it("does not warn when memorySize is not a plain number", async () => {
+      const { logs } = await runBeforePackage(
+        {
+          python1: { handler: "my-func.ev", runtime: "python3.12", memorySize: "${self:custom.memory}" },
+          python2: { handler: "my-func.ev", runtime: "python3.12", memorySize: { Ref: "Memory" } },
+          python3: { handler: "my-func.ev", runtime: "python3.12" },
+        },
+        { memorySize: "${param:memory}" },
+      );
+      expect(logs.filter((log) => log.includes("lambda_low_memory"))).toEqual([]);
+    });
+
+    it("does not warn when suppressLowMemoryWarning is true", async () => {
+      const { logs, serverless } = await runBeforePackage(
+        { python1: { handler: "my-func.ev", runtime: "python3.12", memorySize: 128 } },
+        {},
+        { suppressLowMemoryWarning: true },
+      );
+      expect(logs.filter((log) => log.includes("lambda_low_memory"))).toEqual([]);
+      expect(serverless.service.functions.python1.layers).toHaveLength(2);
+    });
+
+    it("does not warn for an excluded function", async () => {
+      const { logs } = await runBeforePackage(
+        {
+          python1: { handler: "my-func.ev", runtime: "python3.12", memorySize: 128 },
+          python2: { handler: "my-func.ev", runtime: "python3.12", memorySize: 128 },
+        },
+        {},
+        { exclude: ["python1"] },
+      );
+      expect(logs.filter((log) => log.includes("lambda_low_memory"))).toEqual([lowMemoryWarning("python2", 128)]);
+    });
+
+    it("does not warn when addLayers and addExtension are both false", async () => {
+      const { logs, serverless } = await runBeforePackage(
+        { python1: { handler: "my-func.ev", runtime: "python3.12", memorySize: 128 } },
+        {},
+        { addLayers: false, addExtension: false, flushMetricsToLogs: true },
+      );
+      expect(logs.filter((log) => log.includes("lambda_low_memory"))).toEqual([]);
+      expect(serverless.service.functions.python1.layers).toBeUndefined();
+    });
+
+    it("does not warn for Java or .NET functions when addExtension is false", async () => {
+      const { logs, serverless } = await runBeforePackage(
+        {
+          java1: { handler: "my-func.ev", runtime: "java21", memorySize: 128 },
+          dotnet1: { handler: "my-func.ev", runtime: "dotnet8", memorySize: 128 },
+          python1: { handler: "my-func.ev", runtime: "python3.12", memorySize: 128 },
+        },
+        {},
+        { addExtension: false, flushMetricsToLogs: true },
+      );
+      expect(logs.filter((log) => log.includes("lambda_low_memory"))).toEqual([lowMemoryWarning("python1", 128)]);
+      expect(serverless.service.functions.java1.layers).toBeUndefined();
+      expect(serverless.service.functions.dotnet1.layers).toBeUndefined();
+    });
+
+    it("warns when addLayers is false but the extension is added", async () => {
+      const { logs, serverless } = await runBeforePackage(
+        { python1: { handler: "my-func.ev", runtime: "python3.12", memorySize: 128 } },
+        {},
+        { addLayers: false },
+      );
+      expect(logs).toContain(lowMemoryWarning("python1", 128));
+      expect(serverless.service.functions.python1.layers).toEqual([
+        expect.stringMatching(/arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:.*/),
+      ]);
+    });
+
+    it("does not warn when the plugin is disabled", async () => {
+      const { logs } = await runBeforePackage(
+        { python1: { handler: "my-func.ev", runtime: "python3.12", memorySize: 128 } },
+        {},
+        { enabled: false },
+      );
+      expect(logs).toEqual([]);
+    });
+  });
+
   describe("validateConfiguration", () => {
     afterEach(() => {
       mock.restore();

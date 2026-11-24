@@ -146,6 +146,10 @@ export interface Configuration {
 
   // Only required if you are not using the Datadog Agent.
   llmObsAgentlessEnabled?: boolean;
+
+  // When set to `true`, the plugin does not warn about instrumented functions with less
+  // than LOW_MEMORY_THRESHOLD_MB of memory. Defaults to `false`.
+  suppressLowMemoryWarning?: boolean;
 }
 const webpackPluginName = "serverless-webpack";
 const apiKeyEnvVar = "DD_API_KEY";
@@ -213,6 +217,7 @@ export const defaultConfiguration: Configuration = {
   propagateUpstreamTrace: false,
   enableStepFunctionsTracing: false,
   redirectHandlers: true,
+  suppressLowMemoryWarning: false,
 };
 
 export function setEnvConfiguration(
