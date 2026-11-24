@@ -73,6 +73,7 @@ To further configure your plugin, use the following custom parameters in your `s
 | `llmObsEnabled`            | Toggle to enable submitting data to LLM Observability. Defaults to `false`. |
 | `llmObsMlApp`              | The name of your LLM application, service, or project, under which all traces and spans are grouped. This helps distinguish between different applications or experiments. See [Application naming guidelines](https://docs.datadoghq.com/llm_observability/sdk/?tab=nodejs#application-naming-guidelines) for allowed characters and other constraints. To override this value for a given root span, see [Tracing multiple applications](https://docs.datadoghq.com/llm_observability/sdk/?tab=nodejs#tracing-multiple-applications).  Required if `llmObsEnabled` is `true` |
 | `llmObsAgentlessEnabled`   | Only required if you are not using the Datadog Lambda Extension, in which case this should be set to `true`.  Defaults to `false`. |
+| `suppressLowMemoryWarning` | When set to `true`, silences the warning the plugin prints for each instrumented function with less than 256 MB of memory (reason `lambda_low_memory`). The plugin still instruments these functions. The Datadog Lambda Extension and tracer add memory overhead (about 70 MB for Python), which can cause out-of-memory errors and timeouts. To determine a function's memory, the plugin uses the function's `memorySize`, then `provider.memorySize`, then the Serverless Framework default of 1024 MB. Defaults to `false`. |
 
 To use any of these parameters, add a `custom` > `datadog` section to your `serverless.yml` similar to this example:
 
@@ -223,14 +224,15 @@ custom:
 
 ### Enable in-tracer App and API Protection
 
-The [Datadog Lambda Library for Python][8] (version `8.114.0` or later) can run [App and API Protection][19] inside your function, giving the security engine more request context. This complements the in-extension approach provided by the [Datadog Lambda Extension][12]. Support for additional runtimes is coming.
+The [Datadog Lambda Library for Python][8] (version `8.114.0` or later) can run [App and API Protection][19] inside your function, giving the security engine more request context. This complements the in-extension approach provided by the [Datadog Lambda Extension][12]. Java tracer-based App and API Protection requires Java layer `31` (tracer `1.69.0`) or later and the Datadog Lambda Extension `102` or later.
 
 `appSecMode` controls which implementation runs:
 
 * **`on` (recommended):** Enable App and API Protection.
-  - If you’re on a supported runtime and using the plugin-provided layers (`addLayers: true`), enable the library implementation.
+  - For Python, enable the library implementation when `addLayers: true`.
+  - For Java, enable the tracer implementation when both `addLayers: true` and `addExtension: true`. Otherwise, use the **extension** implementation.
   - For other runtimes, enable the **extension** implementation.
-* **`tracer`:** Force the library implementation. Every function must be Python and use the Python library at version `8.114.0` or newer.
+* **`tracer`:** Force the library implementation. Every function must be Python or Java. Python requires library version `8.114.0` or newer. Java requires layer `31` (tracer `1.69.0`) or newer and extension `102` or newer.
 * **`extension`:** Force the **extension** implementation, even if a library with support is present.
 * **`off`:** Disable App and API Protection.
 

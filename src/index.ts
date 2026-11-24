@@ -43,6 +43,7 @@ import {
   applyLambdaLibraryLayers,
   findHandlers,
   FunctionInfo,
+  getLowMemoryWarnings,
   RuntimeType,
   getDefaultIsFIPSEnabledFlag,
 } from "./layer";
@@ -147,10 +148,20 @@ module.exports = class ServerlessPlugin {
 
     const allLayers = { regions: { ...layers.regions, ...govLayers.regions } };
     const accountId = config.useLayersFromAccount;
+    // Functions that receive a library layer or the extension layer, used for the low-memory warning.
+    const layeredHandlers = new Set<FunctionInfo>();
     if (config.addLayers) {
       this.serverless.cli.log("Adding Lambda Library Layers to functions");
       this.debugLogHandlers(handlers);
-      applyLambdaLibraryLayers(this.serverless.service, handlers, allLayers, accountId, config.addExtension);
+      for (const handler of applyLambdaLibraryLayers(
+        this.serverless.service,
+        handlers,
+        allLayers,
+        accountId,
+        config.addExtension,
+      )) {
+        layeredHandlers.add(handler);
+      }
       if (hasWebpackPlugin(this.serverless.service)) {
         forceExcludeDepsFromWebpack(this.serverless.service);
       }
@@ -163,9 +174,26 @@ module.exports = class ServerlessPlugin {
       this.debugLogHandlers(handlers);
       const isFIPSEnabled =
         config.isFIPSEnabled ?? getDefaultIsFIPSEnabledFlag(config, this.serverless.service.provider.region);
-      applyExtensionLayer(this.serverless.service, handlers, allLayers, accountId, isFIPSEnabled);
+      for (const handler of applyExtensionLayer(
+        this.serverless.service,
+        handlers,
+        allLayers,
+        accountId,
+        isFIPSEnabled,
+      )) {
+        layeredHandlers.add(handler);
+      }
     } else {
       this.serverless.cli.log("Skipping adding Lambda Extension Layer");
+    }
+
+    // Warn only: low-memory functions are still instrumented as before. Functions that got no
+    // Datadog layer carry no Datadog memory overhead, so they are not warned about.
+    if (config.suppressLowMemoryWarning !== true) {
+      const warnedHandlers = handlers.filter((handler) => layeredHandlers.has(handler));
+      for (const warning of getLowMemoryWarnings(this.serverless.service, warnedHandlers)) {
+        this.logToCliOnce(`Warning: ${warning}`);
+      }
     }
 
     if (config.addExtension) {
