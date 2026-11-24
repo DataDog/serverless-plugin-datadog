@@ -80,5 +80,10 @@ jobs:
       - name: Run tests
         run: yarn test
 
-      - name: Upload code coverage report
-        uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # v5
+      - name: Upload coverage to Datadog
+        if: matrix.node-version == 24
+        continue-on-error: true
+        env:
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+          DD_SERVICE: serverless-plugin-datadog
+        run: npx --yes @datadog/datadog-ci coverage upload coverage/lcov.info
