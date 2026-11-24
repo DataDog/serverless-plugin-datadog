@@ -301,9 +301,6 @@ export function setEnvConfiguration(
           (type !== RuntimeType.JAVA || config.addExtension)) ||
         config.appSecMode === "tracer"
       ) {
-        if (type === RuntimeType.JAVA) {
-          environment[ddServerlessAppsecEnabledEnvVar] = false;
-        }
         environment[ddAppsecEnabledEnvVar] = true;
       } else if (config.appSecMode === "on" || config.appSecMode === "extension") {
         environment[AWS_LAMBDA_EXEC_WRAPPER_VAR] ??= AWS_LAMBDA_EXEC_WRAPPER;

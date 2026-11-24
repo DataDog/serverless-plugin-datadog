@@ -85,14 +85,14 @@ describe("ServerlessPlugin", () => {
         ]),
         environment: { DD_APPSEC_ENABLED: true, AWS_LAMBDA_EXEC_WRAPPER: "/opt/datadog_wrapper" },
       });
-      expect(serverless.service.functions.java).toHaveProperty("environment.DD_SERVERLESS_APPSEC_ENABLED", false);
+      expect(serverless.service.functions.java).not.toHaveProperty("environment.DD_SERVERLESS_APPSEC_ENABLED");
       expect(serverless.service.functions.python).toHaveProperty("environment.DD_APPSEC_ENABLED", true);
       expect(serverless.service.functions.node).toHaveProperty("environment.DD_SERVERLESS_APPSEC_ENABLED", true);
       expect(serverless.service.functions.excluded).not.toHaveProperty("environment");
       expect(serverless.service.functions.excluded).not.toHaveProperty("layers");
     });
 
-    it("preserves external layer configuration and overrides the inherited extension WAF flag", async () => {
+    it("preserves external layer configuration and the inherited extension WAF flag", async () => {
       const externalLayer = { Ref: "CustomLayer" };
       const serverless = {
         cli: { log: () => {} },
@@ -112,8 +112,9 @@ describe("ServerlessPlugin", () => {
       await plugin.hooks["before:package:createDeploymentArtifacts"]();
       expect(serverless.service.functions.java).toMatchObject({
         layers: expect.arrayContaining([externalLayer]),
-        environment: { DD_APPSEC_ENABLED: true, DD_SERVERLESS_APPSEC_ENABLED: false },
+        environment: { DD_APPSEC_ENABLED: true },
       });
+      expect(serverless.service.functions.java).not.toHaveProperty("environment.DD_SERVERLESS_APPSEC_ENABLED");
       expect(serverless.service.provider.environment.DD_SERVERLESS_APPSEC_ENABLED).toBe("true");
     });
 
