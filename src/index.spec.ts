@@ -60,6 +60,86 @@ describe("ServerlessPlugin", () => {
       mock.restore();
     });
 
+    it("configures mixed Java and Python tracer AppSec while retaining Node extension AppSec", async () => {
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: () => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          provider: { region: "us-east-1" },
+          functions: {
+            java: { runtime: "java21", handler: "example.Handler" },
+            python: { runtime: "python3.12", handler: "app.handler" },
+            node: { runtime: "nodejs20.x", handler: "app.handler" },
+            excluded: { runtime: "java21", handler: "example.Handler" },
+          },
+          custom: { datadog: { apiKey: "1234", appSecMode: "on", exclude: ["excluded"] } },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
+      expect(serverless.service.functions.java).toMatchObject({
+        layers: expect.arrayContaining([
+          expect.stringContaining(":layer:dd-trace-java:"),
+          expect.stringContaining(":layer:Datadog-Extension:"),
+        ]),
+        environment: { DD_APPSEC_ENABLED: true, AWS_LAMBDA_EXEC_WRAPPER: "/opt/datadog_wrapper" },
+      });
+      expect(serverless.service.functions.java).not.toHaveProperty("environment.DD_SERVERLESS_APPSEC_ENABLED");
+      expect(serverless.service.functions.python).toHaveProperty("environment.DD_APPSEC_ENABLED", true);
+      expect(serverless.service.functions.node).toHaveProperty("environment.DD_SERVERLESS_APPSEC_ENABLED", true);
+      expect(serverless.service.functions.excluded).not.toHaveProperty("environment");
+      expect(serverless.service.functions.excluded).not.toHaveProperty("layers");
+    });
+
+    it("preserves external layer configuration and the inherited extension WAF flag", async () => {
+      const externalLayer = { Ref: "CustomLayer" };
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: () => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          provider: {
+            region: "us-east-1",
+            layers: [externalLayer],
+            environment: { DD_SERVERLESS_APPSEC_ENABLED: "true" },
+          },
+          functions: { java: { runtime: "java21", handler: "example.Handler" } },
+          custom: { datadog: { apiKey: "1234", appSecMode: "on" } },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
+      expect(serverless.service.functions.java).toMatchObject({
+        layers: expect.arrayContaining([externalLayer]),
+        environment: { DD_APPSEC_ENABLED: true },
+      });
+      expect(serverless.service.functions.java).not.toHaveProperty("environment.DD_SERVERLESS_APPSEC_ENABLED");
+      expect(serverless.service.provider.environment.DD_SERVERLESS_APPSEC_ENABLED).toBe("true");
+    });
+
+    it("keeps extension AppSec when Java instrumentation is not installed by the plugin", async () => {
+      const extension = "arn:aws:lambda:us-east-1:464622532012:layer:Datadog-Extension:103";
+      const serverless = {
+        cli: { log: () => {} },
+        getProvider: () => awsMock(),
+        service: {
+          getServiceName: () => "dev",
+          provider: { region: "us-east-1", layers: [extension] },
+          functions: { java: { runtime: "java21", handler: "example.Handler" } },
+          custom: { datadog: { apiKey: "1234", appSecMode: "on", addExtension: false } },
+        },
+      };
+      const plugin = new ServerlessPlugin(serverless, {});
+      await plugin.hooks["before:package:createDeploymentArtifacts"]();
+      expect(serverless.service.functions.java).toMatchObject({
+        environment: { DD_SERVERLESS_APPSEC_ENABLED: true, AWS_LAMBDA_EXEC_WRAPPER: "/opt/datadog_wrapper" },
+      });
+      expect(serverless.service.functions.java).not.toHaveProperty("environment.DD_APPSEC_ENABLED");
+      expect(serverless.service.functions.java).not.toHaveProperty("layers");
+      expect(serverless.service.provider.layers).toEqual([extension]);
+    });
+
     it("adds lambda library layers by default and doesn't change handler", async () => {
       mock({});
       const serverless = {
